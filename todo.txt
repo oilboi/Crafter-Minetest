@@ -1,0 +1,17 @@
+--make a grass biome
+--make trees
+--make hand - mod another mod
+--make items drop
+--make tools
+--make trees drop stuff with shears
+--add treecapitator
+--itemstack max 1000
+crafting recipes
+make trees drop items on treecapitator
+crafting bench
+ores
+make a mob?
+fishing
+bows
+beds - set respawn point
+3d character

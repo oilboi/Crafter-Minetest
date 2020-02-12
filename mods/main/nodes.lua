@@ -1,0 +1,288 @@
+print("Initializing nodes")
+
+minetest.register_node("main:stone", {
+    description = "Stone",
+    tiles = {"stone.png"},
+    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4},
+    sounds = main.stoneSound(),
+    drop="main:cobble",
+})
+
+minetest.register_node("main:cobble", {
+    description = "Cobblestone",
+    tiles = {"cobble.png"},
+    groups = {stone = 2, hard = 1, pickaxe = 2, hand = 4},
+    sounds = main.stoneSound(),
+})
+
+minetest.register_node("main:dirt", {
+    description = "Dirt",
+    tiles = {"dirt.png"},
+    groups = {dirt = 1, soft = 1, shovel = 1, hand = 1},
+    sounds = main.grassSound(),
+})
+
+minetest.register_node("main:grass", {
+    description = "Grass",
+    tiles = {"grass.png"},
+    groups = {dirt = 1, soft = 1, shovel = 1, hand = 1},
+    sounds = main.grassSound(),
+    drop="main:dirt",
+})
+
+minetest.register_node("main:sand", {
+    description = "Sand",
+    tiles = {"sand.png"},
+    groups = {dirt = 1, sand = 1, soft = 1, shovel = 1, hand = 1},
+    sounds = main.sandSound(),
+})
+
+minetest.register_node("main:tree", {
+    description = "Tree",
+    tiles = {"treeCore.png","treeCore.png","treeOut.png","treeOut.png","treeOut.png","treeOut.png"},
+    groups = {wood = 2, tree = 1, hard = 1, axe = 1, hand = 3},
+    sounds = main.woodSound(),
+})
+
+minetest.register_node("main:wood", {
+    description = "Wood",
+    tiles = {"wood.png"},
+    groups = {wood = 1, hard = 1, axe = 1, hand = 3},
+    sounds = main.woodSound(),
+})
+
+minetest.register_node("main:leaves", {
+    description = "Leaves",
+    drawtype = "allfaces_optional",
+	waving = 1,
+	walkable = false,
+	climbable = true,
+	paramtype = "light",
+	is_ground_content = false,	
+    tiles = {"leaves.png"},
+    groups = {leaves = 1, plant = 1, axe = 1, hand = 0, leafdecay = 1},
+    sounds = main.grassSound(),
+    drop = {
+		max_items = 1,
+		items= {
+		{
+			-- Only drop if using a tool whose name is identical to one
+			-- of these.
+			tools = {"main:shears"},
+			rarity = 2,
+			items = {"main:leaves"},
+			-- Whether all items in the dropped item list inherit the
+			-- hardware coloring palette color from the dug node.
+			-- Default is 'false'.
+			--inherit_color = true,
+		},
+		{
+			-- Only drop if using a tool whose name is identical to one
+			-- of these.
+			tools = {"main:shears"},
+			rarity = 2,
+			items = {"main:stick"},
+			-- Whether all items in the dropped item list inherit the
+			-- hardware coloring palette color from the dug node.
+			-- Default is 'false'.
+			--inherit_color = true,
+		},
+		{
+			-- Only drop if using a tool whose name is identical to one
+			-- of these.
+			tools = {"main:shears"},
+			rarity = 6,
+			items = {"main:apple"},
+			-- Whether all items in the dropped item list inherit the
+			-- hardware coloring palette color from the dug node.
+			-- Default is 'false'.
+			--inherit_color = true,
+		},
+		},
+    },
+})
+
+minetest.register_node("main:waterSource", {
+	description = "Water Source",
+	drawtype = "liquid",
+	waving = 3,
+	tiles = {
+		{
+			name = "waterSource.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2.0,
+			},
+		},
+		{
+			name = "waterSource.png",
+			backface_culling = true,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 2.0,
+			},
+		},
+	},
+	alpha = 191,
+	paramtype = "light",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	is_ground_content = false,
+	drop = "",
+	drowning = 1,
+	liquidtype = "source",
+	liquid_alternative_flowing = "main:waterFlow",
+	liquid_alternative_source = "main:waterSource",
+	liquid_viscosity = 1,
+	post_effect_color = {a = 103, r = 30, g = 60, b = 90},
+	groups = {water = 1, liquid = 1, cools_lava = 1, bucket = 1, source = 1},
+	--sounds = default.node_sound_water_defaults(),
+})
+
+minetest.register_node("main:waterFlow", {
+	description = "Water Flow",
+	drawtype = "flowingliquid",
+	waving = 3,
+	tiles = {"water.png"},
+	special_tiles = {
+		{
+			name = "waterFlow.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 0.8,
+			},
+		},
+		{
+			name = "waterFlow.png",
+			backface_culling = true,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 0.8,
+			},
+		},
+	},
+	alpha = 191,
+	paramtype = "light",
+	paramtype2 = "flowingliquid",
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	is_ground_content = false,
+	drop = "",
+	drowning = 1,
+	liquidtype = "flowing",
+	liquid_alternative_flowing = "main:waterFlow",
+	liquid_alternative_source = "main:waterSource",
+	liquid_viscosity = 1,
+	post_effect_color = {a = 103, r = 30, g = 60, b = 90},
+	groups = {water = 1, liquid = 1, notInCreative = 1, cools_lava = 1},
+	--sounds = default.node_sound_water_defaults(),
+})
+
+--[[
+
+minetest.register_node("default:lava_source", {
+	description = S("Lava Source"),
+	drawtype = "liquid",
+	tiles = {
+		{
+			name = "default_lava_source_animated.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 3.0,
+			},
+		},
+		{
+			name = "default_lava_source_animated.png",
+			backface_culling = true,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 3.0,
+			},
+		},
+	},
+	paramtype = "light",
+	light_source = default.LIGHT_MAX - 1,
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	is_ground_content = false,
+	drop = "",
+	drowning = 1,
+	liquidtype = "source",
+	liquid_alternative_flowing = "default:lava_flowing",
+	liquid_alternative_source = "default:lava_source",
+	liquid_viscosity = 7,
+	liquid_renewable = false,
+	damage_per_second = 4 * 2,
+	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
+	groups = {lava = 3, liquid = 2, igniter = 1},
+})
+
+minetest.register_node("default:lava_flowing", {
+	description = S("Flowing Lava"),
+	drawtype = "flowingliquid",
+	tiles = {"default_lava.png"},
+	special_tiles = {
+		{
+			name = "default_lava_flowing_animated.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 3.3,
+			},
+		},
+		{
+			name = "default_lava_flowing_animated.png",
+			backface_culling = true,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 3.3,
+			},
+		},
+	},
+	paramtype = "light",
+	paramtype2 = "flowingliquid",
+	light_source = default.LIGHT_MAX - 1,
+	walkable = false,
+	pointable = false,
+	diggable = false,
+	buildable_to = true,
+	is_ground_content = false,
+	drop = "",
+	drowning = 1,
+	liquidtype = "flowing",
+	liquid_alternative_flowing = "default:lava_flowing",
+	liquid_alternative_source = "default:lava_source",
+	liquid_viscosity = 7,
+	liquid_renewable = false,
+	damage_per_second = 4 * 2,
+	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
+	groups = {lava = 3, liquid = 2, igniter = 1,
+		not_in_creative_inventory = 1},
+})
+
+]]--
