@@ -7,7 +7,7 @@
 --add treecapitator
 --itemstack max 1000
 --ores
-vignette
+--vignette
 furnace
 crafting recipes
 make trees drop items on treecapitator
