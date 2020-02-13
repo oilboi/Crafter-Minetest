@@ -8,6 +8,16 @@ minetest.register_node("main:stone", {
     drop="main:cobble",
 })
 
+local ores = {"coal","iron","gold","diamond"}
+for id,ore in pairs(ores) do
+	minetest.register_node("main:"..ore.."ore", {
+		description = ore:gsub("^%l", string.upper).." Ore",
+		tiles = {"stone.png^"..ore.."ore.png"},
+		groups = {stone = id, hard = id, pickaxe = 1, hand = 4},
+		sounds = main.stoneSound(),
+	})
+end
+
 minetest.register_node("main:cobble", {
     description = "Cobblestone",
     tiles = {"cobble.png"},

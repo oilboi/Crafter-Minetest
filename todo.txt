@@ -6,10 +6,10 @@
 --make trees drop stuff with shears
 --add treecapitator
 --itemstack max 1000
+ores
 crafting recipes
 make trees drop items on treecapitator
 crafting bench
-ores
 make a mob?
 fishing
 bows

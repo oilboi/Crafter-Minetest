@@ -22,6 +22,8 @@ minetest.register_on_mods_loaded(function()
 	end
 end)
 
+print("Max stack set to 1000")
+
 --minetest.register_globalstep(function(dtime)
 --	print(settings:get("dedicated_server_step"))
 --end)
