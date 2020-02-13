@@ -21,6 +21,11 @@ minetest.register_craft({
 	output = "main:iron",
 	recipe = "main:ironore",
 })
+minetest.register_craft({
+	type = "cooking",
+	output = "main:stone",
+	recipe = "main:cobble",
+})
 --fuel
 minetest.register_craft({
 	type = "fuel",

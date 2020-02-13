@@ -10,6 +10,11 @@ minetest.register_craftitem("main:stick", {
 	inventory_image = "stick.png",
 })
 
+minetest.register_craftitem("main:coal", {
+	description = "Coal",
+	inventory_image = "coal.png",
+})
+
 minetest.register_craftitem("main:iron", {
 	description = "Iron",
 	inventory_image = "iron.png",

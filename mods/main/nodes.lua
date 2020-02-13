@@ -10,12 +10,16 @@ minetest.register_node("main:stone", {
 
 local ores = {"coal","iron","gold","diamond"}
 for id,ore in pairs(ores) do
+	local drop = "main:"..ore.."ore"
+	if ore == "diamond" then drop = "main:diamond" elseif ore == "coal" then drop = "main:coal" end
+	
 	minetest.register_node("main:"..ore.."ore", {
 		description = ore:gsub("^%l", string.upper).." Ore",
 		tiles = {"stone.png^"..ore.."ore.png"},
 		groups = {stone = id, hard = id, pickaxe = 1, hand = 4},
 		sounds = main.stoneSound(),
 		--light_source = 14,--debugging ore spawn
+		drop = drop,
 	})
 end
 
