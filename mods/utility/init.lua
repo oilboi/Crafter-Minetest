@@ -79,7 +79,7 @@ local function allow_metadata_inventory_put(pos, listname, index, stack, player)
 	if listname == "fuel" then
 		if minetest.get_craft_result({method="fuel", width=1, items={stack}}).time ~= 0 then
 			if inv:is_empty("src") then
-				meta:set_string("infotext", "Furnace is empty")
+				--meta:set_string("infotext", "Furnace is empty")
 			end
 			return stack:get_count()
 		else
@@ -278,7 +278,7 @@ local function furnace_node_timer(pos, elapsed)
 	meta:set_float("fuel_time", fuel_time)
 	meta:set_float("src_time", src_time)
 	meta:set_string("formspec", formspec)
-	meta:set_string("infotext", infotext)
+	--meta:set_string("infotext", infotext)
 
 	return result
 end
