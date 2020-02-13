@@ -15,6 +15,7 @@ for id,ore in pairs(ores) do
 		tiles = {"stone.png^"..ore.."ore.png"},
 		groups = {stone = id, hard = id, pickaxe = 1, hand = 4},
 		sounds = main.stoneSound(),
+		--light_source = 14,--debugging ore spawn
 	})
 end
 
