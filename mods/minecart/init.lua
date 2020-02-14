@@ -131,7 +131,7 @@ function minecart:ride_rail(self)
 	local x = math.abs(vel.x)
 	local z = math.abs(vel.z)
 	local xdir
-	local zer
+	local zdir
 	local dir = {x=0,y=0,z=0}
 	
 	--check direction
@@ -143,24 +143,24 @@ function minecart:ride_rail(self)
 		
 		--go up
 		if is_rail(pos.x+xdir,pos.y+1,pos.z) or (not is_rail(pos.x,pos.y,pos.z) and is_rail(pos.x+xdir,pos.y,pos.z)) then
-			print("up")
+			--print("up")
 			dir.y = speed
 			dir.x = xdir*speed
 		end
 		
 		--go down
 		if dir.y == 0 and is_rail(pos.x,pos.y-1,pos.z) then
-			print("down")
+			--print("down")
 			dir.y = -speed
 			dir.x = xdir*speed
 		end
 		
 		--go flat
 		if is_rail(pos.x,pos.y,pos.z) then --currently on rail
-			print("forward inside")
+			--print("forward inside")
 			--correct y position
 			if dir.y == 0 and self.object:getpos().y ~= pos.y then
-				print("correcting y")
+				--print("correcting y")
 				local posser = self.object:getpos()
 				self.object:moveto(vector.new(posser.x,pos.y,posser.z))
 			end
@@ -174,24 +174,24 @@ function minecart:ride_rail(self)
 		
 		--go up
 		if is_rail(pos.x,pos.y+1,pos.z+zdir) or (not is_rail(pos.x,pos.y,pos.z) and is_rail(pos.x,pos.y,pos.z+zdir)) then
-			print("up")
+			--print("up")
 			dir.y = speed
 			dir.z = zdir*speed
 		end
 		
 		--go down
 		if dir.y == 0 and is_rail(pos.x,pos.y-1,pos.z) then
-			print("down")
+			--print("down")
 			dir.y = -speed
 			dir.z = zdir*speed
 		end
 		
 		--go flat
 		if is_rail(pos.x,pos.y,pos.z) then --currently on rail
-			print("forward inside")
+			--print("forward inside")
 			--correct y position
 			if dir.y == 0 and self.object:getpos().y ~= pos.y then
-				print("correcting y")
+				--print("correcting y")
 				local posser = self.object:getpos()
 				self.object:moveto(vector.new(posser.x,pos.y,posser.z))
 			end
@@ -199,36 +199,39 @@ function minecart:ride_rail(self)
 		end
 	end
 	--turn
-	if vector.equals(dir,vector.new(0,0,0)) then
+	if dir.y == 0 then
+		self.object:moveto(self.oldpos)
 		if x > z then
 			if is_rail(pos.x,pos.y,pos.z+1) then
 				dir.z = 1
+				dir.x = 0
 				--recenter on the rail
 				self.object:moveto(pos)
 			elseif is_rail(pos.x,pos.y,pos.z-1) then
 				dir.z = -1
+				dir.x = 0
 				--recenter on the rail
 				self.object:moveto(pos)
 			end
-		--[[
 		elseif z > x then
 			if is_rail(pos.x+1,pos.y,pos.z) then
 				dir.x = 1
+				dir.z = 0
 				--recenter on the rail
 				self.object:moveto(pos)
 			elseif is_rail(pos.x-1,pos.y,pos.z) then
 				dir.x = -1
+				dir.z = 0
 				--recenter on the rail
 				self.object:moveto(pos)
 			end
-			]]--
 		end
 	end
 	--apply
 	--if not vector.equals(dir,vector.new(0,0,0)) then
 	self.object:setvelocity(dir)
 	--end
-	self.olddir=dir
+	self.oldpos=self.object:getpos()
 end
 
 
