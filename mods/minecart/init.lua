@@ -199,33 +199,42 @@ function minecart:ride_rail(self)
 		end
 	end
 	--turn
-	if dir.y == 0 then
-		self.object:moveto(self.oldpos)
+	local turnx = 0
+	local turnz = 0
+	
+	if vel.x>0 then turnx=1 elseif vel.x<0 then turnx=-1 end
+	if vel.z>0 then turnz=1 elseif vel.z<0 then turnz=-1 end
+	
+	print(turnx, turnz)
+	
+	if turnx and turnz and dir.y == 0 and not vector.equals(dir, vector.new(0,0,0)) and not is_rail(pos.x+turnx,pos.y-1,pos.z+turnz) and not is_rail(pos.x+turnx,pos.y,pos.z+turnz) and not is_rail(pos.x+turnx,pos.y+1,pos.z+turnz) then
 		if x > z then
+			print("turning")
 			if is_rail(pos.x,pos.y,pos.z+1) then
-				dir.z = 1
+				dir.z = speed
 				dir.x = 0
 				--recenter on the rail
 				self.object:moveto(pos)
 			elseif is_rail(pos.x,pos.y,pos.z-1) then
-				dir.z = -1
+				dir.z = -speed
 				dir.x = 0
 				--recenter on the rail
 				self.object:moveto(pos)
 			end
 		elseif z > x then
 			if is_rail(pos.x+1,pos.y,pos.z) then
-				dir.x = 1
+				dir.x = speed
 				dir.z = 0
 				--recenter on the rail
 				self.object:moveto(pos)
 			elseif is_rail(pos.x-1,pos.y,pos.z) then
-				dir.x = -1
+				dir.x = -speed
 				dir.z = 0
 				--recenter on the rail
 				self.object:moveto(pos)
 			end
 		end
+		
 	end
 	--apply
 	--if not vector.equals(dir,vector.new(0,0,0)) then
