@@ -35,6 +35,7 @@ local minecart = {
 
 	rider = nil,
 	punched = false,
+	speed = 0,
 	
 }
 
@@ -91,7 +92,7 @@ end
 --repel from players on track "push"
 function minecart:push(self)
 	local pos = self.object:getpos()
-	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 2)) do
+	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
 		if object:is_player() and object:get_player_name() ~= self.rider then
 			local player_pos = object:getpos()
 			pos.y = 0
@@ -101,22 +102,25 @@ function minecart:push(self)
 			vel = vector.normalize(vel)
 			local distance = vector.distance(pos,player_pos)
 			
-			distance = (2-distance)*3
+			distance = (1-distance)*10
 			
 			vel = vector.multiply(vel,distance)
 			
-			self.object:setvelocity(vel)
-			
+			--only push if it's faster than current speed
+			if distance > self.speed then
+				self.object:setvelocity(vel)
+				self.speed = distance
+			end		
 		end
 	end
 end
 
 function minecart:ride_rail(self)
-
-	--floor position!!!!
-	
 	local pos = vector.floor(vector.add(self.object:getpos(),0.5))
-	local speed = 10 --change to the cart speed soon
+	local speed = self.speed
+	if self.speed > 10 then
+		self.speed = 10
+	end
 	
 	local vel = self.object:getvelocity()
 	local x = math.abs(vel.x)
@@ -234,14 +238,22 @@ function minecart:ride_rail(self)
 	--end
 	self.oldpos=self.object:getpos()
 	
-	
+	--make the cart move up and down on hills
 	self.object:set_properties({mesh="minecart.obj"})
 	if vel.y <0  then
 		self.object:set_properties({mesh="minecart_down.obj"})
 	elseif vel.y > 0 then
 		self.object:set_properties({mesh="minecart_up.obj"})
 	end
-	return(self.object:set_animation(anim, 1, 0))
+	
+	--slow it down
+	if self.speed > 0 then
+		self.speed = self.speed - 0.01
+	end
+	if self.speed < 0 then
+		self.speed = 0
+	end
+	
 end
 
 
