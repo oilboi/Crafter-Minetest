@@ -39,7 +39,7 @@ local minecart = {
 		physical = false, -- otherwise going uphill breaks
 		collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},--{-0.5, -0.4, -0.5, 0.5, 0.25, 0.5},
 		visual = "mesh",
-		mesh = "minecart.b3d",
+		mesh = "minecart.obj",
 		visual_size = {x=1, y=1},
 		textures = {"minecart.png"},
 		automatic_face_movement_dir = 90.0,
@@ -205,11 +205,9 @@ function minecart:ride_rail(self)
 	if vel.x>0 then turnx=1 elseif vel.x<0 then turnx=-1 end
 	if vel.z>0 then turnz=1 elseif vel.z<0 then turnz=-1 end
 	
-	print(turnx, turnz)
-	
+
 	if turnx and turnz and dir.y == 0 and not vector.equals(dir, vector.new(0,0,0)) and not is_rail(pos.x+turnx,pos.y-1,pos.z+turnz) and not is_rail(pos.x+turnx,pos.y,pos.z+turnz) and not is_rail(pos.x+turnx,pos.y+1,pos.z+turnz) then
 		if x > z then
-			print("turning")
 			if is_rail(pos.x,pos.y,pos.z+1) then
 				dir.z = speed
 				dir.x = 0
@@ -241,6 +239,17 @@ function minecart:ride_rail(self)
 	self.object:setvelocity(dir)
 	--end
 	self.oldpos=self.object:getpos()
+	
+	
+	self.object:set_properties({mesh="minecart.obj"})
+	if vel.y <0  then
+		print("down")
+		self.object:set_properties({mesh="minecart_down.obj"})
+	elseif vel.y > 0 then
+		print("up")
+		self.object:set_properties({mesh="minecart_up.obj"})
+	end
+	return(self.object:set_animation(anim, 1, 0))
 end
 
 
