@@ -2,27 +2,15 @@
 
 Basic idealogy
 
-goal - > go to goal - > check all this and repeat
-
-
-minecart does check axis dir then -1 1 on opposite axis (x and z)
-
-minecart checks in front and above 
-
-minecart checks in front and below
-
-if in front above start moving up
-
-if in front below start moving down
-
-minecart checks if rail in front then if not check sides and if none then stop
-
-if a rail in front of minecart then when past center of node center, turn towards the available rail and then recenter self onto rail on the new axis
-
-
 keep it simple stupid
 
 make cart make noise
+
+make player able to push cart
+
+make carts push each other away --repel axis
+
+make chest and furnace cart
 
 ]]--
 local path = minetest.get_modpath("minecart")
@@ -55,12 +43,15 @@ function minecart:on_rightclick(clicker)
 		return
 	end
 	local player_name = clicker:get_player_name()
+	
 	if self.rider and player_name == self.rider then
 		self.rider = nil
-		carts:manage_attachment(clicker, nil)
+		--carts:manage_attachment(clicker, nil)
 	elseif not self.rider then
 		self.rider = player_name
-		carts:manage_attachment(clicker, self.object)
+		clicker:set_attach(self.object, "", {x=0, y=-4.5, z=0}, {x=0, y=0, z=0})
+		--player:set_eye_offset({x=0, y=-4, z=0},{x=0, y=-4, z=0})
+		--carts:manage_attachment(clicker, self.object)
 
 		-- player_api does not update the animation
 		-- when the player is attached, reset to default animation
@@ -101,7 +92,7 @@ end
 function minecart:push(self)
 	local pos = self.object:getpos()
 	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 2)) do
-		if object:is_player() then
+		if object:is_player() and object:get_player_name() ~= self.rider then
 			local player_pos = object:getpos()
 			pos.y = 0
 			player_pos.y = 0
@@ -143,19 +134,19 @@ function minecart:ride_rail(self)
 		
 		--go up
 		if is_rail(pos.x+xdir,pos.y+1,pos.z) or (not is_rail(pos.x,pos.y,pos.z) and is_rail(pos.x+xdir,pos.y,pos.z)) then
-			print("up")
+			--print("up")
 			dir.y = speed
 			dir.x = xdir*speed
 
 		--go down
 		elseif (is_rail(pos.x,pos.y-1,pos.z) or vel.y < 0) and not is_rail(pos.x+xdir,pos.y,pos.z) then
-			print("down")
+			--print("down")
 			dir.y = -speed
 			dir.x = xdir*speed
 		
 		--go flat
 		elseif is_rail(pos.x,pos.y,pos.z) then --currently on rail
-			print("flat")
+			--print("flat")
 			--print("forward inside")
 			--correct y position
 			if dir.y == 0 and self.object:getpos().y ~= pos.y then
@@ -207,28 +198,32 @@ function minecart:ride_rail(self)
 
 	if turnx and turnz and dir.y == 0 and not vector.equals(dir, vector.new(0,0,0)) and not is_rail(pos.x+turnx,pos.y-1,pos.z+turnz) and not is_rail(pos.x+turnx,pos.y,pos.z+turnz) and not is_rail(pos.x+turnx,pos.y+1,pos.z+turnz) then
 		if x > z then
-			if is_rail(pos.x,pos.y,pos.z+1) then
-				dir.z = speed
-				dir.x = 0
-				--recenter on the rail
-				self.object:moveto(pos)
-			elseif is_rail(pos.x,pos.y,pos.z-1) then
-				dir.z = -speed
-				dir.x = 0
-				--recenter on the rail
-				self.object:moveto(pos)
+			for y = -1,1 do
+				if is_rail(pos.x,pos.y+y,pos.z+1) then
+					dir.z = speed
+					dir.x = 0
+					--recenter on the rail
+					self.object:moveto(pos)
+				elseif is_rail(pos.x,pos.y+y,pos.z-1) then
+					dir.z = -speed
+					dir.x = 0
+					--recenter on the rail
+					self.object:moveto(pos)
+				end
 			end
 		elseif z > x then
-			if is_rail(pos.x+1,pos.y,pos.z) then
-				dir.x = speed
-				dir.z = 0
-				--recenter on the rail
-				self.object:moveto(pos)
-			elseif is_rail(pos.x-1,pos.y,pos.z) then
-				dir.x = -speed
-				dir.z = 0
-				--recenter on the rail
-				self.object:moveto(pos)
+			for y = -1,1 do
+				if is_rail(pos.x+1,pos.y+y,pos.z) then
+					dir.x = speed
+					dir.z = 0
+					--recenter on the rail
+					self.object:moveto(pos)
+				elseif is_rail(pos.x-1,pos.y+y,pos.z) then
+					dir.x = -speed
+					dir.z = 0
+					--recenter on the rail
+					self.object:moveto(pos)
+				end
 			end
 		end
 		
