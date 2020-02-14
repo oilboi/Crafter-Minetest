@@ -30,10 +30,14 @@ dofile(path.."/rail.lua")
 
 
 
+local function is_rail(x,y,z)
+	return(minetest.get_node_group(minetest.get_node(vector.new(x,y,z)).name,"rail")>0)
+end
+
 local minecart = {
 	initial_properties = {
 		physical = false, -- otherwise going uphill breaks
-		collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+		collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},--{-0.5, -0.4, -0.5, 0.5, 0.25, 0.5},
 		visual = "mesh",
 		mesh = "minecart.b3d",
 		visual_size = {x=1, y=1},
@@ -99,14 +103,132 @@ function minecart:push(self)
 	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 2)) do
 		if object:is_player() then
 			local player_pos = object:getpos()
+			pos.y = 0
+			player_pos.y = 0
+			
+			local vel = vector.subtract(pos, player_pos)
+			vel = vector.normalize(vel)
+			local distance = vector.distance(pos,player_pos)
+			
+			distance = (2-distance)*3
+			
+			vel = vector.multiply(vel,distance)
+			
+			self.object:setvelocity(vel)
+			
 		end
 	end
 end
 
 function minecart:ride_rail(self)
-	if self.goal then
-		print("goal: "..dump(self.goal))
+
+	--floor position!!!!
+	
+	local pos = vector.floor(vector.add(self.object:getpos(),0.5))
+	local speed = 5 --change to the cart speed soon
+	
+	local vel = self.object:getvelocity()
+	local x = math.abs(vel.x)
+	local z = math.abs(vel.z)
+	local xdir
+	local zer
+	local dir = {x=0,y=0,z=0}
+	
+	--check direction
+	--x axis
+	if x > z then
+		if vel.x>0 then xdir=1 elseif vel.x<0 then xdir=-1 end
+		
+		--print(minetest.get_node(vector.new(pos.x,pos.y,pos.z)).name)
+		
+		--go up
+		if is_rail(pos.x+xdir,pos.y+1,pos.z) or (not is_rail(pos.x,pos.y,pos.z) and is_rail(pos.x+xdir,pos.y,pos.z)) then
+			print("up")
+			dir.y = speed
+			dir.x = xdir*speed
+		end
+		
+		--go down
+		if dir.y == 0 and is_rail(pos.x,pos.y-1,pos.z) then
+			print("down")
+			dir.y = -speed
+			dir.x = xdir*speed
+		end
+		
+		--go flat
+		if is_rail(pos.x,pos.y,pos.z) then --currently on rail
+			print("forward inside")
+			--correct y position
+			if dir.y == 0 and self.object:getpos().y ~= pos.y then
+				print("correcting y")
+				local posser = self.object:getpos()
+				self.object:moveto(vector.new(posser.x,pos.y,posser.z))
+			end
+			dir.x = xdir*speed
+		end
+	--z axis
+	elseif z > x then
+		if vel.z>0 then zdir=1 elseif vel.z<0 then zdir=-1 end
+		
+		--print(minetest.get_node(vector.new(pos.x,pos.y,pos.z)).name)
+		
+		--go up
+		if is_rail(pos.x,pos.y+1,pos.z+zdir) or (not is_rail(pos.x,pos.y,pos.z) and is_rail(pos.x,pos.y,pos.z+zdir)) then
+			print("up")
+			dir.y = speed
+			dir.z = zdir*speed
+		end
+		
+		--go down
+		if dir.y == 0 and is_rail(pos.x,pos.y-1,pos.z) then
+			print("down")
+			dir.y = -speed
+			dir.z = zdir*speed
+		end
+		
+		--go flat
+		if is_rail(pos.x,pos.y,pos.z) then --currently on rail
+			print("forward inside")
+			--correct y position
+			if dir.y == 0 and self.object:getpos().y ~= pos.y then
+				print("correcting y")
+				local posser = self.object:getpos()
+				self.object:moveto(vector.new(posser.x,pos.y,posser.z))
+			end
+			dir.z = zdir*speed
+		end
 	end
+	--turn
+	if vector.equals(dir,vector.new(0,0,0)) then
+		if x > z then
+			if is_rail(pos.x,pos.y,pos.z+1) then
+				dir.z = 1
+				--recenter on the rail
+				self.object:moveto(pos)
+			elseif is_rail(pos.x,pos.y,pos.z-1) then
+				dir.z = -1
+				--recenter on the rail
+				self.object:moveto(pos)
+			end
+		--[[
+		elseif z > x then
+			if is_rail(pos.x+1,pos.y,pos.z) then
+				dir.x = 1
+				--recenter on the rail
+				self.object:moveto(pos)
+			elseif is_rail(pos.x-1,pos.y,pos.z) then
+				dir.x = -1
+				--recenter on the rail
+				self.object:moveto(pos)
+			end
+			]]--
+		end
+	end
+	--apply
+	--if not vector.equals(dir,vector.new(0,0,0)) then
+	self.object:setvelocity(dir)
+	--end
+	self.olddir=dir
 end
 
 
