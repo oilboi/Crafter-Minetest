@@ -125,7 +125,7 @@ function minecart:ride_rail(self)
 	--floor position!!!!
 	
 	local pos = vector.floor(vector.add(self.object:getpos(),0.5))
-	local speed = 5 --change to the cart speed soon
+	local speed = 10 --change to the cart speed soon
 	
 	local vel = self.object:getvelocity()
 	local x = math.abs(vel.x)
@@ -143,20 +143,19 @@ function minecart:ride_rail(self)
 		
 		--go up
 		if is_rail(pos.x+xdir,pos.y+1,pos.z) or (not is_rail(pos.x,pos.y,pos.z) and is_rail(pos.x+xdir,pos.y,pos.z)) then
-			--print("up")
+			print("up")
 			dir.y = speed
 			dir.x = xdir*speed
-		end
-		
+
 		--go down
-		if dir.y == 0 and is_rail(pos.x,pos.y-1,pos.z) then
-			--print("down")
+		elseif (is_rail(pos.x,pos.y-1,pos.z) or vel.y < 0) and not is_rail(pos.x+xdir,pos.y,pos.z) then
+			print("down")
 			dir.y = -speed
 			dir.x = xdir*speed
-		end
 		
 		--go flat
-		if is_rail(pos.x,pos.y,pos.z) then --currently on rail
+		elseif is_rail(pos.x,pos.y,pos.z) then --currently on rail
+			print("flat")
 			--print("forward inside")
 			--correct y position
 			if dir.y == 0 and self.object:getpos().y ~= pos.y then
@@ -177,17 +176,17 @@ function minecart:ride_rail(self)
 			--print("up")
 			dir.y = speed
 			dir.z = zdir*speed
-		end
 		
 		--go down
-		if dir.y == 0 and is_rail(pos.x,pos.y-1,pos.z) then
+		elseif (is_rail(pos.x,pos.y-1,pos.z) or vel.y < 0) and not is_rail(pos.x,pos.y,pos.z+zdir) then
 			--print("down")
 			dir.y = -speed
 			dir.z = zdir*speed
-		end
+		
 		
 		--go flat
-		if is_rail(pos.x,pos.y,pos.z) then --currently on rail
+		elseif is_rail(pos.x,pos.y,pos.z) then --currently on rail
+			--print("flat")
 			--print("forward inside")
 			--correct y position
 			if dir.y == 0 and self.object:getpos().y ~= pos.y then
@@ -243,10 +242,8 @@ function minecart:ride_rail(self)
 	
 	self.object:set_properties({mesh="minecart.obj"})
 	if vel.y <0  then
-		print("down")
 		self.object:set_properties({mesh="minecart_down.obj"})
 	elseif vel.y > 0 then
-		print("up")
 		self.object:set_properties({mesh="minecart_up.obj"})
 	end
 	return(self.object:set_animation(anim, 1, 0))
