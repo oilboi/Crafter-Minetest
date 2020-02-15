@@ -5,34 +5,44 @@ minetest.register_craft({
 	type = "cooking",
 	output = "main:diamond",
 	recipe = "main:diamondore",
+	cooktime = 12,
 })
 minetest.register_craft({
 	type = "cooking",
 	output = "main:coal 4",
 	recipe = "main:coalore",
+	cooktime = 3,
 })
 minetest.register_craft({
 	type = "cooking",
 	output = "main:gold",
 	recipe = "main:goldore",
+	cooktime = 9,
 })
 minetest.register_craft({
 	type = "cooking",
 	output = "main:iron",
 	recipe = "main:ironore",
+	cooktime = 6,
 })
 minetest.register_craft({
 	type = "cooking",
 	output = "main:stone",
 	recipe = "main:cobble",
+	cooktime = 3,
 })
---fuel
+
+--fuel fuel fuel
 minetest.register_craft({
 	type = "fuel",
 	recipe = "main:stick",
-	burntime = 3,
+	burntime = 1,
 })
-
+minetest.register_craft({
+	type = "fuel",
+	recipe = "main:tree",
+	burntime = 24,
+})
 minetest.register_craft({
 	type = "fuel",
 	recipe = "main:wood",

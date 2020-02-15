@@ -9,6 +9,7 @@
 --ores
 --vignette
 furnace
+add signs with vanessae's sign library
 crafting recipes
 make trees drop items on treecapitator
 crafting bench

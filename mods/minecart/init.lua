@@ -12,6 +12,9 @@ make carts push each other away --repel axis
 
 make chest and furnace cart
 
+
+minetest.dir_to_facedir(dir, is6d) - to get player direction converted and to convert the minecart direction
+
 ]]--
 local path = minetest.get_modpath("minecart")
 dofile(path.."/rail.lua")
