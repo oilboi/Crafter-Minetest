@@ -8,7 +8,7 @@
 --itemstack max 1000
 --ores
 --vignette
-furnace
+--furnace
 add signs with vanessae's sign library
 crafting recipes
 make trees drop items on treecapitator
