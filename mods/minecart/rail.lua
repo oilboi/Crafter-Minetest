@@ -28,3 +28,12 @@ minetest.register_node("minecart:rail",{
 	end,
 	groups={instant=1,rail=1},
 })
+
+minetest.register_craft({
+	output = "minecart:rail 32",
+	recipe = {
+		{"main:iron","","main:iron"},
+		{"main:iron","main:stick","main:iron"},
+		{"main:iron","","main:iron"}
+	}
+})

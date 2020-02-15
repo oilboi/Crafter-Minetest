@@ -84,6 +84,8 @@ function minecart:get_staticdata()
 	})
 end
 function minecart:on_punch(puncher, time_from_last_punch, tool_capabilities, dir, damage)
+	local obj = minetest.add_item(self.object:getpos(), "minecart:minecart")
+	obj:get_luaentity().collection_timer = 2
 	self.object:remove()
 end
 
@@ -259,32 +261,12 @@ function minecart:ride_rail(self)
 	
 end
 
-
-
 function minecart:on_step(dtime)
 	minecart:push(self)
 	minecart:ride_rail(self)
 end
 
 minetest.register_entity("minecart:minecart", minecart)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 minetest.register_craftitem("minecart:minecart", {

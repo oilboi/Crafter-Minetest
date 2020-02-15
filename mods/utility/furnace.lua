@@ -351,11 +351,11 @@ minetest.register_entity("utility:fuel", {
 						if goal_item_name ~= outputitem and goal_item_name ~= "utility:nothing" then
 							local pos2 = object2:get_pos()
 							local obj = minetest.add_item(pos2,object2:get_luaentity().itemstring)
-							local dir = vector.new(math.random(-2,2),math.random(2,4),math.random(-2,2))
-							dir = vector.multiply(dir,2)
+							local dir = vector.new(math.random(-3,3),math.random(3,6),math.random(-3,3))
+							--dir = vector.multiply(dir,2)
 														
 							if obj then
-								obj:setvelocity(vector.new(dir.x,dir.y+3.5,dir.z))
+								obj:setvelocity(vector.new(dir.x,dir.y,dir.z))
 								obj:get_luaentity().collection_timer = 2
 							else
 								print("ERROR FURNACE RELEASED NON ITEM")
@@ -412,6 +412,24 @@ minetest.register_entity("utility:fuel", {
 			texture = "flame.png",
 		})
 		
+		
+		minetest.add_particlespawner({
+			amount = math.floor(50*time),
+			time = time,
+			minpos = vector.new(pos.x-0.3,pos.y+0.3,pos.z-0.3),
+			maxpos = vector.new(pos.x+0.3,pos.y+0.6,pos.z+0.3),
+			minvel = {x=0, y=0.2, z=0},
+			maxvel = {x=0, y=0.7, z=0},
+			minacc = {x=0, y=0, z=0},
+			maxacc = {x=0, y=0, z=0},
+			minexptime = 1.1,
+			maxexptime = 1.5,
+			minsize = 1,
+			maxsize = 2,
+			collisiondetection = false,
+			vertical = false,
+			texture = "smoke.png",
+		})
 	end,
 	
 	
@@ -434,6 +452,8 @@ minetest.register_entity("utility:fuel", {
 			if fuel ~= 0 then
 				local cookie = self.check_cook(self)
 				if cookie ~= 0 then
+					print("starting timer")
+					self.spawn_particles(self,fuel)
 					self.cooking_timer = cookie
 					self.cooking = true
 					--set up the fuel timer
@@ -483,7 +503,6 @@ minetest.register_entity("utility:fuel", {
 				print("resetting timer")
 				local time = minetest.get_craft_result({method =  "fuel", width = 1, items = {ItemStack(self.itemstring)}}).time
 				self.fuel_timer = time
-				self.spawn_particles(self,time)
 			end
 		end
 	end,	
@@ -777,3 +796,11 @@ minetest.register_entity("utility:output", {
 })
 
 
+minetest.register_craft({
+	output = "utility:furnace",
+	recipe = {
+		{"main:cobble", "main:cobble", "main:cobble"},
+		{"main:cobble", "", "main:cobble"},
+		{"main:cobble", "main:cobble", "main:cobble"},
+	},
+})

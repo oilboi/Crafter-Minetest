@@ -17,6 +17,15 @@ signs_lib.register_sign("sign:sign", {
 	allow_yard = true
 })
 
+minetest.register_craft({
+	output = "sign:sign 3",
+	recipe = {
+		{"main:wood","main:wood","main:wood"},
+		{"main:wood","main:wood","main:wood"},
+		{"","main:stick",""}
+	}
+})
+
 --[[
 table.insert(signs_lib.lbm_restore_nodes, "signs:sign_hanging")
 table.insert(signs_lib.lbm_restore_nodes, "basic_signs:hanging_sign")
