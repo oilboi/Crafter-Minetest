@@ -187,7 +187,7 @@ minetest.register_entity(":__builtin:item", {
 			
 			self.delete_timer = self.delete_timer + dtime
 			--this is where the item gets removed from world
-			if self.delete_timer > 0.25 then
+			if self.delete_timer > 0.2 then
 				self.object:remove()
 			end
 			return
@@ -331,7 +331,7 @@ minetest.register_entity(":__builtin:item", {
 
 --The item collection magnet
 --Item collection
-local eye_height = 1.625
+local eye_height = 1.1
 minetest.register_globalstep(function(dtime)
 	--collection
 	for _,player in ipairs(minetest.get_connected_players()) do
