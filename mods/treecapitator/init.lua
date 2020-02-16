@@ -9,7 +9,7 @@ local function leafdecay_after_destruct(pos, oldnode, def)
 		local node = minetest.get_node(v)
 		local timer = minetest.get_node_timer(v)
 		if node.param2 ~= 1 and not timer:is_started() then
-			timer:start(math.random())
+			timer:start((math.random()+math.random())*math.random())
 		end
 	end
 end
@@ -42,22 +42,23 @@ local function leafdecay_on_timer(pos, def)
 	minetest.check_for_falling(pos)
 	
 	minetest.add_particlespawner({
-		amount = 40,
+		amount = 10,
 		time = 0.0001,
 		minpos = {x=pos.x-0.5, y=pos.y-0.5, z=pos.z-0.5},
 		maxpos = {x=pos.x+0.5, y=pos.y+0.5, z=pos.z+0.5},
-		minvel = {x=0, y=0, z=0},
-		maxvel = {x=0, y=0, z=0},
-		minacc = {x=0, y=0, z=0},
-		maxacc = {x=0, y=0, z=0},
+		minvel = vector.new(-0.5,0,-0.5),
+		maxvel = vector.new(0.5,0,0.5),
+		minacc = {x=0, y=-9.81, z=0},
+		maxacc = {x=0, y=-9.81, z=0},
 		minexptime = 0.5,
 		maxexptime = 1.5,
 		minsize = 1,
 		maxsize = 2,
-		collisiondetection = false,
+		collisiondetection = true,
 		vertical = false,
 		texture = "treecapitator.png"
 	})
+	minetest.sound_play("leaves", {pos=pos, gain = 1.0, max_hear_distance = 60,pitch = math.random(70,100)/100})
 	--random drops
 	if math.random() > 0.75 then
 		local obj = minetest.add_item(pos,dropper[math.random(1,3)])
