@@ -11,8 +11,9 @@
 --furnace
 --add signs with vanessae's sign library
 --crafting recipes
-beds - set respawn point
-make treecapitator cut down whole tree if using axe - make trees drop items on treecapitator
+--beds - set respawn point
+--make treecapitator cut down whole tree if using axe - make trees drop items on treecapitator
+--tnt
 crafting bench
 make a mob?
 fishing
