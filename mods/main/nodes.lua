@@ -57,6 +57,32 @@ minetest.register_node("main:tree", {
     tiles = {"treeCore.png","treeCore.png","treeOut.png","treeOut.png","treeOut.png","treeOut.png"},
     groups = {wood = 2, tree = 1, hard = 1, axe = 1, hand = 3},
     sounds = main.woodSound(),
+    --set metadata so treecapitator doesn't destroy houses
+    on_place = function(itemstack, placer, pointed_thing)
+		local pos = pointed_thing.above
+		minetest.item_place_node(itemstack, placer, pointed_thing)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("placed", "true")	
+		return(itemstack)
+	end,
+	--treecapitator - move treecapitator into own file using override
+	on_dig = function(pos, node, digger)
+	
+		--check if wielding axe?
+		
+		local meta = minetest.get_meta(pos)
+		if not meta:contains("placed") then
+			--remove tree
+			for y = -6,6 do
+				--print(y)
+				if minetest.get_node(vector.new(pos.x,pos.y+y,pos.z)).name == "main:tree" then
+					minetest.node_dig(vector.new(pos.x,pos.y+y,pos.z), node, digger)
+				end
+			end
+		else
+			minetest.node_dig(pos, node, digger)
+		end	
+	end
 })
 
 minetest.register_node("main:wood", {

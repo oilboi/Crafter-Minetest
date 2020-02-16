@@ -1,5 +1,7 @@
 treecaptitator = {}
 
+local dropper = {"main:leaves","main:stick","main:apple"}
+
 -- Leafdecay
 local function leafdecay_after_destruct(pos, oldnode, def)
 	for _, v in pairs(minetest.find_nodes_in_area(vector.subtract(pos, def.radius),
@@ -35,7 +37,7 @@ local function leafdecay_on_timer(pos, def)
 			}, item)
 		end
 	end
-
+	
 	minetest.remove_node(pos)
 	minetest.check_for_falling(pos)
 	
@@ -56,6 +58,11 @@ local function leafdecay_on_timer(pos, def)
 		vertical = false,
 		texture = "treecapitator.png"
 	})
+	--random drops
+	if math.random() > 0.75 then
+		local obj = minetest.add_item(pos,dropper[math.random(1,3)])
+		obj:get_luaentity().collection_timer = 2
+	end
 end
 
 function treecaptitator.register_leafdecay(def)
