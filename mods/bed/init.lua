@@ -1,14 +1,21 @@
 --remember to delete spawnpoint when bed removed
 
 local mod_storage = minetest.get_mod_storage()
-local time_night = {19500,4750}
+local time_night = {begin = 19000, ending = 5500}
 
 --node boxes are from mineclone2
 local function create_spawnpoint(pos,clicker)
-	local name = clicker:get_player_name()
-	local string_pos = minetest.pos_to_string(pos)
-	mod_storage:set_string(name, string_pos)
-	minetest.chat_send_player(name, "YOUR RESPAWN POINT HAS BEEN SET!")
+	local time = minetest.get_timeofday() * 24000
+	
+	if time > time_night.begin or time < time_night.ending then
+		local name = clicker:get_player_name()
+		local string_pos = minetest.pos_to_string(pos)
+		mod_storage:set_string(name, string_pos)
+		minetest.chat_send_player(name, "Your respawn point has been set!")
+		minetest.set_timeofday(time_night.ending/24000)
+	else
+		minetest.chat_send_player(clicker:get_player_name(), "You can only sleep at night!")
+	end
 end
 
 --delete player spawnpoint if remove bed
@@ -19,7 +26,7 @@ local function remove_spawnpoint(pos,clicker)
 		local pos2 = minetest.string_to_pos(string_pos)
 		if vector.equals(pos,pos2) then
 			mod_storage:set_string(name, "")
-			minetest.chat_send_player(name, "YOUR RESPAWN POINT HAS BEEN REMOVED!")
+			minetest.chat_send_player(name, "Your respawn point has been removed!")
 		end
 	end
 end
@@ -137,4 +144,11 @@ minetest.register_node("bed:bed_back", {
 		local facedir = minetest.facedir_to_dir(param2)	
 		create_spawnpoint(vector.add(pos,facedir),clicker)
 	end,
+})
+minetest.register_craft({
+	output = "bed:bed",
+	recipe = {
+		{"main:leaves", "main:leaves", "main:leaves"},
+		{"main:wood", "main:wood", "main:wood"},
+	},
 })
