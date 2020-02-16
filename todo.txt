@@ -16,7 +16,7 @@
 --tnt
 --sand fall down
 --tnt throw player - and items
-water flow faster
+--water flow faster
 torches with particle
 crafting bench
 make a mob?

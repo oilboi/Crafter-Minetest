@@ -3,9 +3,10 @@ local settings = minetest.settings
 local old = settings:get("dedicated_server_step")
 
 settings:set("dedicated_server_step", 0.00001)
-
+settings:set("liquid_update", 0.25)
 
 print("Changing server step from "..old.." to 0.00001")
+print("Changing liquid update to ")
 
 
 --make stack max 1000 for everything
