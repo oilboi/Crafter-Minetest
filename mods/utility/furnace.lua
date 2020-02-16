@@ -395,16 +395,16 @@ minetest.register_entity("utility:fuel", {
 		--print("time:"..time)
 		local pos = self.object:getpos()
 		minetest.add_particlespawner({
-			amount = math.floor(100*time),
+			amount = math.floor(10*time),
 			time = time,
 			minpos = vector.new(pos.x-0.3,pos.y-0.3,pos.z-0.3),
 			maxpos = vector.new(pos.x+0.3,pos.y+0.3,pos.z+0.3),
 			minvel = {x=0, y=0.2, z=0},
-			maxvel = {x=0, y=0.7, z=0},
+			maxvel = {x=0, y=0.5, z=0},
 			minacc = {x=0, y=0, z=0},
 			maxacc = {x=0, y=0, z=0},
 			minexptime = 1.1,
-			maxexptime = 1.5,
+			maxexptime = 1.3,
 			minsize = 1,
 			maxsize = 2,
 			collisiondetection = false,
@@ -414,7 +414,7 @@ minetest.register_entity("utility:fuel", {
 		
 		
 		minetest.add_particlespawner({
-			amount = math.floor(50*time),
+			amount = math.floor(10*time),
 			time = time,
 			minpos = vector.new(pos.x-0.3,pos.y+0.3,pos.z-0.3),
 			maxpos = vector.new(pos.x+0.3,pos.y+0.6,pos.z+0.3),
