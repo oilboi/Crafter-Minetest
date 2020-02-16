@@ -32,6 +32,29 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 	end
 end)
 
+--throw all items on death
+minetest.register_on_dieplayer(function(player, reason)
+	local pos = player:getpos()
+	print(reason)
+	local inv = player:get_inventory()
+	
+	for i = 1,inv:get_size("main") do
+		local stack = inv:get_stack("main", i)
+		local name = stack:get_name()
+		local count = stack:get_count()
+		print(name)
+		if name ~= "" then
+			local obj = minetest.add_item(pos, name.." "..count)
+			obj:setvelocity(vector.new(math.random(-3,3),math.random(4,8),math.random(-3,3)))
+			inv:set_stack("main", i, ItemStack(""))
+		end
+	end
+	for i = 1,inv:get_size("craft") do
+	
+	end 
+	
+
+end)
 
 minetest.register_globalstep(function(dtime)
 	--collection

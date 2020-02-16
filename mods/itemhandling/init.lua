@@ -187,7 +187,7 @@ minetest.register_entity(":__builtin:item", {
 			
 			self.delete_timer = self.delete_timer + dtime
 			--this is where the item gets removed from world
-			if self.delete_timer > 0.2 then
+			if self.delete_timer > 0.1 then
 				self.object:remove()
 			end
 			return
@@ -350,7 +350,7 @@ minetest.register_globalstep(function(dtime)
 								pitch = math.random(60,100)/100
 							})
 							inv:add_item("main", ItemStack(object:get_luaentity().itemstring))
-							object:moveto({x=pos.x,y=pos.y+eye_height,z=pos.z})
+							object:moveto({x=pos.x,y=pos.y+eye_height,z=pos.z,continuous=true})
 							object:get_luaentity().collected = true
 						end
 					end
