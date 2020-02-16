@@ -14,6 +14,10 @@
 --beds - set respawn point - only sleep at night
 --make treecapitator cut down whole tree if using axe - make trees drop items on treecapitator
 --tnt
+sand fall down
+tnt throw player
+water flow faster
+torches with particle
 crafting bench
 make a mob?
 fishing

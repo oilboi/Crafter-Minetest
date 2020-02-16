@@ -34,9 +34,9 @@ function main.sandSound(table)
 	table.footstep = table.footstep or
 			{name = "sand", gain = 0.2}
 	table.dug = table.dug or
-			{name = "", gain = 1.0}
+			{name = "sand", gain = 0.3}
 	table.place = table.place or
-			{name = "sand", gain = 0.5}
+			{name = "sand", gain = 0.3}
 	--default.node_sound_defaults(table)
 	return table
 end
@@ -51,6 +51,19 @@ function main.grassSound(table)
 			{name = "leaves", gain = 1.0}
 	table.place = table.place or
 			{name = "leaves", gain = 0.5}
+	--default.node_sound_defaults(table)
+	return table
+end
+function main.dirtSound(table)
+	table = table or {}
+	table.dig = table.dig or
+			{name = "dirt",gain=0.5}
+	table.footstep = table.footstep or
+			{name = "dirt", gain = 0.3}
+	table.dug = table.dug or
+			{name = "dirt", gain = 1.0}
+	table.place = table.place or
+			{name = "dirt", gain = 0.5}
 	--default.node_sound_defaults(table)
 	return table
 end

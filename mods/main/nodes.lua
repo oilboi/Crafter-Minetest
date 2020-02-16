@@ -34,21 +34,21 @@ minetest.register_node("main:dirt", {
     description = "Dirt",
     tiles = {"dirt.png"},
     groups = {dirt = 1, soft = 1, shovel = 1, hand = 1},
-    sounds = main.grassSound(),
+    sounds = main.dirtSound(),
 })
 
 minetest.register_node("main:grass", {
     description = "Grass",
     tiles = {"grass.png"},
     groups = {dirt = 1, soft = 1, shovel = 1, hand = 1},
-    sounds = main.grassSound(),
+    sounds = main.dirtSound(),
     drop="main:dirt",
 })
 
 minetest.register_node("main:sand", {
     description = "Sand",
     tiles = {"sand.png"},
-    groups = {dirt = 1, sand = 1, soft = 1, shovel = 1, hand = 1},
+    groups = {dirt = 1, sand = 1, soft = 1, shovel = 1, hand = 1, falling_node = 1},
     sounds = main.sandSound(),
 })
 
