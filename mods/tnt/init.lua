@@ -2,7 +2,26 @@
 
 local function tnt(pos,range)
 	local pos = vector.floor(vector.add(pos,0.5))
-
+	
+	--throw players and items
+	for _,object in ipairs(minetest.get_objects_inside_radius(pos, range)) do
+		if  object:is_player() then 
+			local ppos = object:getpos()
+			local power = (range - vector.distance(pos,ppos))*2
+			local distance = vector.subtract(ppos,pos)
+			local force = vector.multiply(distance,power)
+			object:add_player_velocity(force)
+		elseif object:get_luaentity() and object:get_luaentity().name == "__builtin:item" then
+			local ppos = object:getpos()
+			local power = (range - vector.distance(pos,ppos))*2
+			local distance = vector.subtract(pos,ppos)
+			local force = vector.multiply(distance,power)
+			object:setvelocity(force)
+		end
+	end
+			
+	
+	
 	local min = vector.add(pos,range)
 	local max = vector.subtract(pos,range)
 	local vm = minetest.get_voxel_manip()	
