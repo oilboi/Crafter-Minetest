@@ -10,11 +10,11 @@
 --vignette
 --furnace
 --add signs with vanessae's sign library
-crafting recipes
-make trees drop items on treecapitator
+--crafting recipes
+beds - set respawn point
+make treecapitator cut down whole tree if using axe - make trees drop items on treecapitator
 crafting bench
 make a mob?
 fishing
 bows
-beds - set respawn point
 3d character

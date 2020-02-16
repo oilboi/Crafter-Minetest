@@ -452,7 +452,7 @@ minetest.register_entity("utility:fuel", {
 			if fuel ~= 0 then
 				local cookie = self.check_cook(self)
 				if cookie ~= 0 then
-					print("starting timer")
+					--print("starting timer")
 					self.spawn_particles(self,fuel)
 					self.cooking_timer = cookie
 					self.cooking = true
@@ -500,7 +500,7 @@ minetest.register_entity("utility:fuel", {
 			
 			--reset timer
 			if self.cooking == true then
-				print("resetting timer")
+				--print("resetting timer")
 				local time = minetest.get_craft_result({method =  "fuel", width = 1, items = {ItemStack(self.itemstring)}}).time
 				self.fuel_timer = time
 			end

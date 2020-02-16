@@ -1,0 +1,1 @@
+--minetest.bulk_set_node({pos1, pos2, pos3, ...}, node) --use to create easy explosions!!
