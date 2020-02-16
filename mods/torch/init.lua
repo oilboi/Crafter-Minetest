@@ -1,15 +1,4 @@
-torches = {}
-torches.enable_ceiling = true
-local modpath = minetest.get_modpath("torch")
-
--- Reduce particles send to client if on Server
-local SERVER = minetest.is_singleplayer() or false
-SERVER = not SERVER
-local dur = 10
-
--- constants
-local rotat = {"I", "FX"}
-
+--get point where particle spawner is added
 local function get_offset(wdir)
 	local z = 0
 	local x = 0
@@ -124,6 +113,8 @@ minetest.register_craftitem("torch:torch", {
 		end
 		itemstack, retval = minetest.item_place(fakestack, placer, pointed_thing, wdir)
 		itemstack:set_name("torch:torch")
+		
+		minetest.sound_play("wood", {pos=pointed_thing.above, gain = 1.0})
 
 		return itemstack
 	end
@@ -154,6 +145,7 @@ minetest.register_node("torch:floor", {
 	on_destruct = function(pos)
 		delete_ps(pos)
 	end,
+	sounds = main.woodSound(),
 })
 
 minetest.register_node("torch:wall", {
@@ -182,4 +174,13 @@ minetest.register_node("torch:wall", {
 	on_destruct = function(pos)
 		delete_ps(pos)
 	end,
+	sounds = main.woodSound(),
+})
+
+minetest.register_craft({
+	output = "torch:torch 4",
+	recipe = {
+		{"main:coal"},
+		{"main:stick"}
+	}
 })

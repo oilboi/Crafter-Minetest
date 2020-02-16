@@ -35,3 +35,6 @@ Changelog:
 
 3.0.1
 - Fix global variable that caused rarely placing issues (thanks to tchncs for pointing out)
+
+4.0
+- brought mod back to life
