@@ -184,3 +184,10 @@ minetest.register_craft({
 		{"main:stick"}
 	}
 })
+minetest.register_craft({
+	output = "torch:torch 4",
+	recipe = {
+		{"main:charcoal"},
+		{"main:stick"}
+	}
+})

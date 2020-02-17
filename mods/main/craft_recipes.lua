@@ -15,6 +15,12 @@ minetest.register_craft({
 })
 minetest.register_craft({
 	type = "cooking",
+	output = "main:charcoal",
+	recipe = "main:tree",
+	cooktime = 2,
+})
+minetest.register_craft({
+	type = "cooking",
 	output = "main:gold",
 	recipe = "main:goldore",
 	cooktime = 9,
