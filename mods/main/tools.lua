@@ -24,7 +24,7 @@ for level,material in pairs(material) do
 				--full_punch_interval = 1.2,
 				--max_drop_level=0,
 				groupcaps=groupcaps2,
-				--damage_groups = {fleshy=2},
+				damage_groups = {fleshy=1},
 			},
 			sound = {breaks = {name="tool_break",gain=0.4}}, -- change this
 			groups = {flammable = 2, tool=1 }
@@ -38,7 +38,7 @@ for level,material in pairs(material) do
 			--full_punch_interval = 1.2,
 			--max_drop_level=0,
 			groupcaps={leaves = {times={[4]=0.7,[3]=0.7,[2]=0.7,[1]=0.7}, uses=level*20, maxlevel=4},},
-			damage_groups = {fleshy=3},
+			damage_groups = {fleshy=level},
 		},
 		sound = {breaks = {name="tool_break",gain=0.4}}, -- change this
 		groups = {weapon=1 }

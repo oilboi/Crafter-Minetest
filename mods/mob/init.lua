@@ -63,6 +63,9 @@ minetest.register_entity("mob:pig", {
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		self.jump(self,true)
 		local hurt = tool_capabilities.damage_groups.fleshy
+		if not hurt then
+			hurt = 1
+		end
 		local hp = self.object:get_hp()
 		self.object:set_hp(hp-hurt)
 		if hp > 1 then

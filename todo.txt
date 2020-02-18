@@ -19,7 +19,7 @@
 --water flow faster
 --torches with particle
 --make a mob
-fix tools causing crash on pigs with no fleshy definition
+--fix tools causing crash on pigs with no fleshy definition
 ladders - only placeable on walls
 eating animation - particles? - entity?
 fix torches not deleting particles when mounted node dug
