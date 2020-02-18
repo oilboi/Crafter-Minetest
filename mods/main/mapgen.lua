@@ -2,7 +2,7 @@ print("Initializing mapgen")
 minetest.register_alias("mapgen_stone", "main:stone")
 minetest.register_alias("mapgen_dirt", "main:dirt")
 minetest.register_alias("mapgen_dirt_with_grass", "main:grass")
-minetest.register_alias("mapgen_water_source", "main:waterSource")
+minetest.register_alias("mapgen_water_source", "main:water")
 minetest.register_alias("mapgen_sand", "main:sand")
 minetest.register_alias("mapgen_tree", "main:tree")
 minetest.register_alias("mapgen_leaves", "main:leaves")
@@ -72,7 +72,7 @@ minetest.register_biome({
 		depth_filler = 3,
 		node_riverbed = "main:sand",
 		depth_riverbed = 2,
-		node_cave_liquid = "main:waterSource",
+		node_cave_liquid = "main:water",
 		--node_dungeon = "main:cobble",
 		--node_dungeon_alt = "default:mossycobble",
 		--node_dungeon_stair = "stairs:stair_cobble",

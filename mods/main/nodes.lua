@@ -143,7 +143,7 @@ minetest.register_node("main:leaves", {
     },
 })
 
-minetest.register_node("main:waterSource", {
+minetest.register_node("main:water", {
 	description = "Water Source",
 	drawtype = "liquid",
 	waving = 3,
@@ -179,15 +179,15 @@ minetest.register_node("main:waterSource", {
 	drop = "",
 	drowning = 1,
 	liquidtype = "source",
-	liquid_alternative_flowing = "main:waterFlow",
-	liquid_alternative_source = "main:waterSource",
+	liquid_alternative_flowing = "main:waterflow",
+	liquid_alternative_source = "main:water",
 	liquid_viscosity = 1,
 	post_effect_color = {a = 103, r = 30, g = 60, b = 90},
 	groups = {water = 1, liquid = 1, cools_lava = 1, bucket = 1, source = 1},
 	--sounds = default.node_sound_water_defaults(),
 })
 
-minetest.register_node("main:waterFlow", {
+minetest.register_node("main:waterflow", {
 	description = "Water Flow",
 	drawtype = "flowingliquid",
 	waving = 3,
@@ -225,8 +225,8 @@ minetest.register_node("main:waterFlow", {
 	drop = "",
 	drowning = 1,
 	liquidtype = "flowing",
-	liquid_alternative_flowing = "main:waterFlow",
-	liquid_alternative_source = "main:waterSource",
+	liquid_alternative_flowing = "main:waterflow",
+	liquid_alternative_source = "main:water",
 	liquid_viscosity = 1,
 	post_effect_color = {a = 103, r = 30, g = 60, b = 90},
 	groups = {water = 1, liquid = 1, notInCreative = 1, cools_lava = 1},

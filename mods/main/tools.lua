@@ -9,13 +9,13 @@ for level,material in pairs(material) do
 		--print(id,tool,level,material)
 		local groupcaps
 		if group[id] == "dirt" then
-			groupcaps2={dirt = {times={[4]=4-level/2,[3]=3.5-level/2,[2]=3.0-level/2,[1]=2.8-level/2}, uses=level*20, maxlevel=level},}
+			groupcaps2={dirt = {times={[4]=4-level/2,[3]=3.5-level/2,[2]=3.0-level/2,[1]=2.8-level/2}, uses=(level/2)*5, maxlevel=level},}
 		end
 		if group[id] == "wood" then
-			groupcaps2={wood = {times={[4]=4-level/2,[3]=3.5-level/2,[2]=3.0-level/2,[1]=2.8-level/2}, uses=level*20, maxlevel=level},}
+			groupcaps2={wood = {times={[4]=4-level/2,[3]=3.5-level/2,[2]=3.0-level/2,[1]=2.8-level/2}, uses=(level/2)*5, maxlevel=level},}
 		end
 		if group[id] == "stone" then
-			groupcaps2={stone = {times={[4]=4-level/2,[3]=3.5-level/2,[2]=3.0-level/2,[1]=2.8-level/2}, uses=level*20, maxlevel=level},}
+			groupcaps2={stone = {times={[4]=4-level/2,[3]=3.5-level/2,[2]=3.0-level/2,[1]=2.8-level/2}, uses=(level/2)*5, maxlevel=level},}
 		end
 		minetest.register_tool("main:"..material..tool, {
 			description = material:gsub("^%l", string.upper).." "..tool:gsub("^%l", string.upper),
@@ -26,7 +26,7 @@ for level,material in pairs(material) do
 				groupcaps=groupcaps2,
 				--damage_groups = {fleshy=2},
 			},
-			sound = {breaks = "default_tool_breaks"}, -- change this
+			sound = {breaks = {name="tool_break",gain=0.4}}, -- change this
 			groups = {flammable = 2, tool=1 }
 		})
 	end
@@ -40,7 +40,7 @@ for level,material in pairs(material) do
 			groupcaps={leaves = {times={[4]=0.7,[3]=0.7,[2]=0.7,[1]=0.7}, uses=level*20, maxlevel=4},},
 			damage_groups = {fleshy=3},
 		},
-		sound = {breaks = "default_tool_breaks"}, -- change this
+		sound = {breaks = {name="tool_break",gain=0.4}}, -- change this
 		groups = {weapon=1 }
 	})
 end

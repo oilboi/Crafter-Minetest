@@ -34,6 +34,7 @@ local minecart = {
 		visual_size = {x=1, y=1},
 		textures = {"minecart.png"},
 		automatic_face_movement_dir = 90.0,
+		automatic_face_movement_max_rotation_per_sec = 600,
 	},
 
 	rider = nil,

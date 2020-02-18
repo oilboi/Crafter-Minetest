@@ -18,10 +18,12 @@
 --tnt throw player - and items
 --water flow faster
 --torches with particle
-ladders - only placeable on walls
 make a mob
+ladders - only placeable on walls
+fix torches not deleting particles when mounted node dug
 crafting bench
 fishing
 bows
 3d character
 boat
+shiftclick with tool tries to place torch

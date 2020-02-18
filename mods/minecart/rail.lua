@@ -23,6 +23,7 @@ minetest.register_node("minecart:rail",{
 		if minetest.registered_nodes[minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name].walkable then
 			minetest.set_node(pointed_thing.above, {name="minecart:rail"})
 			itemstack:take_item(1)
+			print(minetest.get_node(pointed_thing.above).param1)
 			return(itemstack)
 		end
 	end,

@@ -45,7 +45,7 @@ local function tnt(pos,range)
 				local obj = minetest.add_entity(vector.new(pos.x+x,pos.y+y,pos.z+z),"tnt:tnt")
 				obj:get_luaentity().range = 5
 				obj:get_luaentity().timer = math.random(1,10)*math.random()
-				minetest.sound_play("tnt_ignite", {object=obj, gain = 1.0, max_hear_distance = range*range*range})
+				--minetest.sound_play("tnt_ignite", {object=obj, gain = 1.0, max_hear_distance = range*range*range})
 			elseif n ~= "air" and n ~= "ignore" then
 				if math.random()>0.99 then
 					local item = minetest.get_node_drops(n, "main:diamondpick")[1]
@@ -107,6 +107,7 @@ minetest.register_entity("tnt:tnt", {
 	},
 
 	timer = 5,
+	range = 7,
 	
 	get_staticdata = function(self)
 		return minetest.serialize({
@@ -145,6 +146,7 @@ minetest.register_entity("tnt:tnt", {
 			texture = "smoke.png",
 			attached = self.object,
 		})
+		minetest.sound_play("tnt_ignite", {object = self.object, gain = 1.0, max_hear_distance = self.range*self.range*self.range})
 	end,
 		
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
@@ -183,7 +185,6 @@ minetest.register_node("tnt:tnt", {
 		local obj = minetest.add_entity(pos,"tnt:tnt")
 		local range = 7
 		obj:get_luaentity().range = range
-		minetest.sound_play("tnt_ignite", {object = obj, gain = 1.0, max_hear_distance = range*range*range})
 		minetest.remove_node(pos)
     end,
 })
