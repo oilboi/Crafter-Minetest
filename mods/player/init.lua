@@ -113,3 +113,66 @@ minetest.register_globalstep(function(dtime)
 		end
 	end
 end)
+
+minetest.register_globalstep(function(dtime)
+	--collection
+	for _,player in ipairs(minetest.get_connected_players()) do
+		if player:get_player_control().RMB then
+			local health = player:get_wielded_item():get_definition().health
+			if health then
+				local meta = player:get_meta()
+				local eating = meta:get_float("eating")
+				
+				if meta:get_int("eating_ps") == 0 then
+					local ps = minetest.add_particlespawner({
+						amount = 100,
+						time = 0,
+						minpos = {x=0, y=-1.5, z=0.5},
+						maxpos = {x=0, y=1.7, z=0.5},
+						minvel = vector.new(-0.5,0,-0.5),
+						maxvel = vector.new(0.5,0,0.5),
+						minacc = {x=0, y=-9.81, z=1},
+						maxacc = {x=0, y=-9.81, z=1},
+						minexptime = 0.5,
+						maxexptime = 1.5,
+						minsize = 1,
+						maxsize = 2,
+						attached = player,
+						collisiondetection = true,
+						vertical = false,
+						texture = "treecapitator.png"
+					})
+					meta:set_int("eating_ps", ps)
+				end
+					
+				if eating + dtime >= 2 then
+					local stack = player:get_wielded_item()
+					stack:take_item(1)
+					player:set_wielded_item(stack)
+					player:set_hp(player:get_hp() + health)
+					eating = 0
+					minetest.sound_play("eat", {
+						object = player,
+						gain = 1.0,  -- default
+						max_hear_distance = 32,  -- default, uses an euclidean metric
+						pitch = math.random(70,100)/100,
+					})
+				end
+				meta:set_float("eating", eating + dtime)
+			else
+				local meta = player:get_meta()
+				meta:set_float("eating", 0)
+				minetest.delete_particlespawner(meta:get_int("eating_ps"))
+				meta:set_int("eating_ps", 0)
+				
+			end
+		else
+			local meta = player:get_meta()
+			meta:set_float("eating", 0)
+			minetest.delete_particlespawner(meta:get_int("eating_ps"))
+			meta:set_int("eating_ps", 0)
+		end
+		
+	end
+end)
+

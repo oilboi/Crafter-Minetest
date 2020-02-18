@@ -3,6 +3,7 @@
 minetest.register_craftitem("main:apple", {
 	description = "Apple",
 	inventory_image = "apple.png",
+	health = 1,
 })
 
 minetest.register_craftitem("main:stick", {

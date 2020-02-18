@@ -2,10 +2,12 @@
 minetest.register_craftitem("mob:raw_porkchop", {
 	description = "Raw Porkchop",
 	inventory_image = "raw_porkchop.png",
+	health = 2,
 })
 minetest.register_craftitem("mob:cooked_porkchop", {
 	description = "Cooked Porkchop",
 	inventory_image = "cooked_porkchop.png",
+	health = 4,
 })
 
 --cooking
