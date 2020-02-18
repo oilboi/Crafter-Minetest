@@ -18,6 +18,7 @@
 --tnt throw player - and items
 --water flow faster
 --torches with particle
+ladders - only placeable on walls
 make a mob
 crafting bench
 fishing
