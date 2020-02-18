@@ -114,7 +114,9 @@ minetest.register_craftitem("torch:torch", {
 		itemstack, retval = minetest.item_place(fakestack, placer, pointed_thing, wdir)
 		itemstack:set_name("torch:torch")
 		
-		minetest.sound_play("wood", {pos=pointed_thing.above, gain = 1.0})
+		if retval then
+			minetest.sound_play("wood", {pos=pointed_thing.above, gain = 1.0})
+		end
 
 		return itemstack
 	end

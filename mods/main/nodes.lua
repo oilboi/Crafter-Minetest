@@ -327,3 +327,57 @@ minetest.register_node("default:lava_flowing", {
 })
 
 ]]--
+
+minetest.register_node("main:ladder", {
+	description = "Ladder",
+	drawtype = "signlike",
+	tiles = {"ladder.png"},
+	inventory_image = "ladder.png",
+	wield_image = "ladder.png",
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	sunlight_propagates = true,
+	walkable = false,
+	climbable = true,
+	is_ground_content = false,
+	node_placement_prediction = "",
+	selection_box = {
+		type = "wallmounted",
+		--wall_top = = <default>
+		--wall_bottom = = <default>
+		--wall_side = = <default>
+	},
+	groups = {wood = 2, flammable = 2, attached_node=1},
+	sounds = main.woodSound(),
+	on_place = function(itemstack, placer, pointed_thing)
+		--copy from torch
+		if pointed_thing.type ~= "node" then
+			return itemstack
+		end
+		
+		local wdir = minetest.dir_to_wallmounted(vector.subtract(pointed_thing.under,pointed_thing.above))
+
+		local fakestack = itemstack
+		local retval = false
+		if wdir > 1 then
+			retval = fakestack:set_name("main:ladder")
+		else
+			return itemstack
+		end
+		
+		if not retval then
+			return itemstack
+		end
+		
+		itemstack, retval = minetest.item_place(fakestack, placer, pointed_thing, wdir)
+		
+		if retval then
+			minetest.sound_play("wood", {pos=pointed_thing.above, gain = 1.0})
+		end
+		
+		print(itemstack, retval)
+		itemstack:set_name("main:ladder")
+
+		return itemstack
+	end,
+})
