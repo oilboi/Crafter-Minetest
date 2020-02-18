@@ -21,7 +21,7 @@
 --make a mob
 --fix tools causing crash on pigs with no fleshy definition
 --ladders - only placeable on walls
-eating animation - particles? - entity?
+--eating animation - particles? - entity?
 boats
 crafting bench
 fishing
