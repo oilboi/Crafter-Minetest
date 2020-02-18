@@ -21,6 +21,7 @@
 --make a mob
 fix tools causing crash on pigs with no fleshy definition
 ladders - only placeable on walls
+eating animation - particles? - entity?
 fix torches not deleting particles when mounted node dug
 boats
 crafting bench
@@ -31,3 +32,5 @@ fix full inventory collection deletion bug
 boat
 shiftclick with tool tries to place torch
 make tnt hurt player
+right click with tool places torch
+if placed last node put another stack into hand
