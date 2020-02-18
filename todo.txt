@@ -18,12 +18,15 @@
 --tnt throw player - and items
 --water flow faster
 --torches with particle
-make a mob
+--make a mob
+fix tools causing crash on pigs with no fleshy definition
 ladders - only placeable on walls
 fix torches not deleting particles when mounted node dug
+boats
 crafting bench
 fishing
 bows
 3d character
 boat
 shiftclick with tool tries to place torch
+make tnt hurt player
