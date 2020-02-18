@@ -26,6 +26,7 @@ boats
 crafting bench
 fishing
 bows
+fix full inventory collection deletion bug
 3d character
 boat
 shiftclick with tool tries to place torch
