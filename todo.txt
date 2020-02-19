@@ -23,6 +23,7 @@
 --ladders - only placeable on walls
 --eating animation - particles? - entity?
 boats
+redstone - make nodes drop multiple items individually
 crafting bench
 fishing
 bows

@@ -158,7 +158,7 @@ minetest.register_entity("mob:pig", {
 		local acceleration = vector.new(0,goal-vel.y,0)
 		self.swimming = false
 		
-		if node == ("main:water" or "main:water_flow") then
+		if node == ("main:water" or "main:waterflow") then
 			self.swimming = true
 			self.object:add_velocity(acceleration)
 		end
