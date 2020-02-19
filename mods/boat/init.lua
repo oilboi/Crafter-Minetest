@@ -113,7 +113,9 @@ minetest.register_entity("boat:boat", {
 				distance = (1-distance)*10
 				vel = vector.multiply(vel,distance)
 				local acceleration = vector.new(vel.x-currentvel.x,0,vel.z-currentvel.z)
-				self.object:add_velocity(acceleration)	
+				self.object:add_velocity(acceleration)
+				acceleration = vector.multiply(acceleration, -1)
+				object:add_player_velocity(acceleration)
 			end
 		end
 	end,
@@ -137,11 +139,13 @@ minetest.register_entity("boat:boat", {
 	--makes boats flow
 	flow = function(self)
 		local pos = self.object:getpos()
-		pos.y = pos.y - 0.37
+		pos.y = pos.y - 0.4
 		local node = minetest.get_node(pos).name
+		local node_above = minetest.get_node(vector.new(pos.x,pos.y+1,pos.z)).name
 		local goalx = 0
 		local goalz = 0
-		if (node == "main:waterflow" or node == "main:water" ) and not self.moving == true and not self.on_land == true then
+		print(node_above)
+		if (node == "main:waterflow" or node == "main:water" ) and not self.moving == true and (node_above ~= "main:water" and node_above ~= "main:waterflow") then
 			local currentvel = self.object:getvelocity()
 			local level = minetest.get_node_level(pos)
 			local pos = self.object:getpos()
@@ -151,10 +155,9 @@ minetest.register_entity("boat:boat", {
 						if (x == 0 and z ~= 0) or (z == 0 and x ~=0) then
 							local nodename = minetest.get_node(vector.new(pos.x+x,pos.y+y,pos.z+z)).name
 							local level2 = minetest.get_node_level(vector.new(pos.x+x,pos.y+y,pos.z+z))
-							print(node)
 							if (level2 < level and nodename == "main:waterflow") or (nodename == "main:water" and level2 == 7)  then
-								goalx = x*5
-								goalz = z*5
+								goalx = x*7
+								goalz = z*7
 								--break
 							end
 						end

@@ -912,6 +912,10 @@ function signs_lib.register_sign(name, raw_def)
 	def.sounds              = raw_def.sounds              or signs_lib.standard_wood_sign_sounds
 	def.paramtype2          = raw_def.paramtype2          or "wallmounted"
 	def.on_rotate           = raw_def.on_rotate           or signs_lib.handle_rotation
+	def.walkable = false
+	
+	
+	raw_def.walkable = false
 
 	if raw_def.groups then
 		def.groups = raw_def.groups
