@@ -127,3 +127,12 @@ for id,tool in pairs(tool) do
 		}
 	})
 end
+
+minetest.register_craft({
+	output = "main:ladder",
+	recipe = {
+		{"main:stick","", "main:stick"},
+		{"main:stick","main:stick", "main:stick"},
+		{"main:stick", "", "main:stick"}
+	}
+})
