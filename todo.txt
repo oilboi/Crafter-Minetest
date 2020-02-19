@@ -34,6 +34,8 @@ shiftclick with tool tries to place torch
 make tnt hurt player
 right click with tool places torch
 if placed last node put another stack into hand
+add a function to set a velocity goal to entities and then implement it with all entities
+^make a value if below then stop?
 
 
 open bugs:

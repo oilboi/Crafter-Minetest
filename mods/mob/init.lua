@@ -151,14 +151,14 @@ minetest.register_entity("mob:pig", {
 	--makes the mob swim
 	swim = function(self)
 		local pos = self.object:getpos()
-		pos.y = pos.y + 0.4
+		pos.y = pos.y + 0.7
 		local node = minetest.get_node(pos).name
 		local vel = self.object:getvelocity()
-		local goal = 1
+		local goal = 3
 		local acceleration = vector.new(0,goal-vel.y,0)
 		self.swimming = false
 		
-		if node == ("main:water" or "main:waterflow") then
+		if node == "main:water" or node =="main:waterflow" then
 			self.swimming = true
 			self.object:add_velocity(acceleration)
 		end
