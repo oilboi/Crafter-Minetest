@@ -22,7 +22,9 @@
 --fix tools causing crash on pigs with no fleshy definition
 --ladders - only placeable on walls
 --eating animation - particles? - entity?
-boats
+--boats
+--make entities push against players
+rewrite minecart
 redstone - make nodes drop multiple items individually
 crafting bench
 fishing
@@ -40,3 +42,34 @@ add a function to set a velocity goal to entities and then implement it with all
 
 open bugs:
 fix torches not deleting particles when mounted node dug <- meta glitch?
+
+possible applications:
+
+causes object to magnetize towards player or other objects and stop after an inner radius
+use for better item magnet?
+
+if object:is_player() and object:get_player_name() ~= self.rider then
+	local player_pos = object:getpos()
+	pos.y = 0
+	player_pos.y = 0
+	
+	local currentvel = self.object:getvelocity()
+	local vel = vector.subtract(pos, player_pos)
+	vel = vector.normalize(vel)
+	local distance = vector.distance(pos,player_pos)
+	distance = (1-distance)*10
+	vel = vector.multiply(vel,distance)
+	local acceleration = vector.new(vel.x-currentvel.x,0,vel.z-currentvel.z)
+	
+	
+	if self.axis == "x"	then
+		self.object:add_velocity(vector.new(acceleration.x,0,0))
+	elseif self.axis == "z" then
+		self.object:add_velocity(vector.new(0,0,acceleration.z))
+	else
+		self.object:add_velocity(acceleration)
+	end
+	
+	--acceleration = vector.multiply(acceleration, -1)
+	--object:add_player_velocity(acceleration)
+end

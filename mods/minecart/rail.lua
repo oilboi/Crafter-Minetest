@@ -2,9 +2,15 @@ minetest.register_node("minecart:rail",{
 	description = "Rail",
 	wield_image = "rail.png",
 	tiles = {
+		"stone.png", "stone.png",
+		"stone.png", "stone.png"
+	},
+	--[[
+	tiles = {
 		"rail.png", "railcurve.png",
 		"railt.png", "railcross.png"
 	},
+	]]--
 	drawtype = "raillike",
 	paramtype = "light",
 	sunlight_propagates = true,
