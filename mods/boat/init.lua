@@ -144,7 +144,7 @@ minetest.register_entity("boat:boat", {
 		local node_above = minetest.get_node(vector.new(pos.x,pos.y+1,pos.z)).name
 		local goalx = 0
 		local goalz = 0
-		print(node_above)
+		--print(node_above)
 		if (node == "main:waterflow" or node == "main:water" ) and not self.moving == true and (node_above ~= "main:water" and node_above ~= "main:waterflow") then
 			local currentvel = self.object:getvelocity()
 			local level = minetest.get_node_level(pos)
@@ -192,4 +192,34 @@ minetest.register_entity("boat:boat", {
 		self.flow(self)
 		self.slowdown(self)
 	end,
+})
+
+minetest.register_craftitem("boat:boat", {
+	description = "Boat",
+	inventory_image = "boatitem.png",
+	wield_image = "boatitem.png",
+	liquids_pointable = true,
+	on_place = function(itemstack, placer, pointed_thing)
+		if not pointed_thing.type == "node" then
+			return
+		end
+		
+		if minetest.get_item_group(minetest.get_node(pointed_thing.under).name, "water")>0 then
+			minetest.add_entity(pointed_thing.under, "boat:boat")
+		else
+			return
+		end
+
+		itemstack:take_item()
+
+		return itemstack
+	end,
+})
+
+minetest.register_craft({
+	output = "boat:boat",
+	recipe = {
+		{"main:wood", "", "main:wood"},
+		{"main:wood", "main:wood", "main:wood"},
+	},
 })
