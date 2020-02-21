@@ -238,10 +238,7 @@ minetest.register_entity(":__builtin:item", {
                         local pos = self.object:getpos()
                         local pos2 = collector:getpos()
                         pos2.y = pos2.y + self.collection_height
-                        
-                        
-                        
-                        
+                                                
                         local direction = vector.normalize(vector.subtract(pos2,pos))
                         local distance = vector.distance(pos2,pos)
                         

@@ -30,13 +30,15 @@ end
 function main.sandSound(table)
       table = table or {}
       table.dig = table.dig or
-                  {name = "sand",gain=0.3}
+                  {name = "sand",gain=0.09}
       table.footstep = table.footstep or
-                  {name = "sand", gain = 0.2}
+                  {name = "sand", gain = 0.07}
       table.dug = table.dug or
-                  {name = "sand", gain = 0.3}
+                  {name = "sand", gain = 0.09}
       table.place = table.place or
-                  {name = "sand", gain = 0.3}
+                  {name = "sand", gain = 0.09}
+      table.fall = table.fall or
+                  {name = "sand", gain = 0.01}
       --default.node_sound_defaults(table)
       return table
 end

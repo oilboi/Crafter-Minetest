@@ -13,4 +13,5 @@ dofile(path.."/mapgen.lua")
 dofile(path.."/tools.lua")
 dofile(path.."/settings.lua")
 dofile(path.."/craft_recipes.lua")
+dofile(path.."/falling.lua")
 

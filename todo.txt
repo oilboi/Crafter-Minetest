@@ -37,6 +37,7 @@ make tnt hurt player
 rewrite minecart - halfway - make go up and down hills
 right click with tool places torch
 if placed last node put another stack into hand
+have falling node hurt player?
 add a function to set a velocity goal to entities and then implement it with all entities
 ^make a value if below then stop?
 
