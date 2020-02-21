@@ -20,7 +20,6 @@ minetest.register_item(":", {
       }
 })
 
-
 -- This is a fake node that should never be placed in the world
 local def = minetest.registered_items[""]
 minetest.register_node("hand:player", {

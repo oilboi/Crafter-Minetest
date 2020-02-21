@@ -1,3 +1,12 @@
+collection = {}
+collection.collection_height = 0.5 -- the height of the collection based off the player's origin y height
+collection.magnet_radius = 2 -- the radius of the item magnet
+collection.allow_lower = false -- false = items below origin y of player will not be collected --true = player will collect all objects in radius --false = minecraft style --true = pilzadam style
+collection.collection_time = 2.5 --the time which the item will be collected
+
+local path = minetest.get_modpath("itemhandling")
+dofile(path.."/magnet.lua")
+
 --handle node drops
 function minetest.handle_node_drops(pos, drops, digger)
       for _,item in ipairs(drops) do
@@ -21,7 +30,7 @@ function minetest.handle_node_drops(pos, drops, digger)
             end
       end
 end
-
+    
 
 -- Minetest: builtin/item_entity.lua
 
@@ -85,10 +94,13 @@ minetest.register_entity(":__builtin:item", {
       force_out_start = nil,
       --Collection Variables
       collection_timer = 0,
+      collection_timer_goal = collection.collection_time,
+      collection_height = collection.collection_height,
       collectable = false,
       try_timer = 0,
       collected = false,
       delete_timer = 0,
+      radius = collection.magnet_radius,
 
       set_item = function(self, item)
             local stack = ItemStack(item or self.itemstring)
@@ -181,20 +193,50 @@ minetest.register_entity(":__builtin:item", {
       end,
       on_step = function(self, dtime)
       
+            --if item set to be collected then only execute go to player
             if self.collected == true then
-                  self.object:setvelocity(vector.new(0,0,0))
-                  self.object:setacceleration(vector.new(0,0,0))
-                  
-                  self.delete_timer = self.delete_timer + dtime
-                  --this is where the item gets removed from world
-                  if self.delete_timer > 0.1 then
+                  if not self.collector then
+                        self.collected = false
+                        print("throwing exception")
+                        return
+                  end
+                  local collector = minetest.get_player_by_name(self.collector)
+                  if collector then
+                        self.object:setacceleration(vector.new(0,0,0))
+                        self.disable_physics(self)
+                        --get the variables
+                        local pos = self.object:getpos()
+                        local pos2 = collector:getpos()
+                        pos2.y = pos2.y + self.collection_height
+                        
+                        
+                        
+                        
+                        local direction = vector.normalize(vector.subtract(pos2,pos))
+                        local distance = vector.distance(pos2,pos)
+                        local multiplier = (self.radius*5) - distance
+                        local velocity = vector.multiply(direction,multiplier)
+                        self.object:setvelocity(velocity)
+                        
+                        if distance < 0.2 then
+                              self.object:remove()
+                        end
+                        
+                        
+                        --self.delete_timer = self.delete_timer + dtime
+                        --this is where the item gets removed from world
+                        --if self.delete_timer > 1 then
+                        --      self.object:remove()
+                        --end
+                        return
+                  else
+                        print(self.collector.." does not exist")
                         self.object:remove()
                   end
-                  return
             end
-      
+            
             --allow entity to be collected after timer
-            if self.collectable == false and self.collection_timer >= 2.5 then
+            if self.collectable == false and self.collection_timer >= self.collection_timer_goal then
                   self.collectable = true
             elseif self.collectable == false then
                   self.collection_timer = self.collection_timer + dtime
@@ -327,35 +369,3 @@ minetest.register_entity(":__builtin:item", {
             end
       end,
 })
-
-
---The item collection magnet
---Item collection
-local eye_height = 1.1
-minetest.register_globalstep(function(dtime)
-      --collection
-      for _,player in ipairs(minetest.get_connected_players()) do
-            --don't magnetize to dead players
-            if player:get_hp() > 0 then
-                  local pos = player:getpos()
-                  local inv = player:get_inventory()
-                  --radial detection
-                  for _,object in ipairs(minetest.get_objects_inside_radius({x=pos.x,y=pos.y+eye_height,z=pos.z}, 3)) do
-                        if not object:is_player() and object:get_luaentity() and object:get_luaentity().name == "__builtin:item" then
-                              if inv and inv:room_for_item("main", ItemStack(object:get_luaentity().itemstring)) then
-                                    if object:get_luaentity().collectable == true and object:get_luaentity().collected == false then
-                                          minetest.sound_play("pickup", {
-                                                to_player = player,
-                                                gain = 0.4,
-                                                pitch = math.random(60,100)/100
-                                          })
-                                          inv:add_item("main", ItemStack(object:get_luaentity().itemstring))
-                                          object:moveto({x=pos.x,y=pos.y+eye_height,z=pos.z,continuous=true})
-                                          object:get_luaentity().collected = true
-                                    end
-                              end
-                        end
-                  end
-            end
-      end
-end)
