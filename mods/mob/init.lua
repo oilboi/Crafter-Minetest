@@ -98,7 +98,6 @@ minetest.register_entity("mob:pig", {
                   texture = "smoke.png",
             })
             local obj = minetest.add_item(pos,"mob:raw_porkchop")
-            obj:get_luaentity().collection_timer = 2
       end,
       
       --repel from players

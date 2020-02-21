@@ -25,7 +25,6 @@ function minetest.handle_node_drops(pos, drops, digger)
                         local y=math.random(2,5)
                         local z=math.random(-2,2)*math.random()
                         obj:setvelocity({x=x, y=y, z=z})
-                        obj:get_luaentity().collection_timer = 2.3
                   end
             end
       end
@@ -56,9 +55,34 @@ function minetest.throw_item(pos, item)
             local y=math.random(2,5)
             local z=math.random(-2,2)*math.random()
             obj:setvelocity({x=x, y=y, z=z})
-            obj:get_luaentity().collection_timer = 2.3
       end
       return obj
+end
+
+--override drops
+function minetest.item_drop(itemstack, dropper, pos)
+	local dropper_is_player = dropper and dropper:is_player()
+	local p = table.copy(pos)
+	local cnt = itemstack:get_count()
+	if dropper_is_player then
+		p.y = p.y + 1.2
+	end
+	local item = itemstack:take_item(cnt)
+	local obj = core.add_item(p, item)
+	if obj then
+		if dropper_is_player then
+			local dir = dropper:get_look_dir()
+			dir.x = dir.x * 2.9
+			dir.y = dir.y * 2.9 + 2
+			dir.z = dir.z * 2.9
+			obj:set_velocity(dir)
+			obj:get_luaentity().dropped_by = dropper:get_player_name()
+                  obj:get_luaentity().collection_timer = 0
+		end
+		return itemstack
+	end
+	-- If we reach this, adding the object to the
+	-- environment failed
 end
 
 -- If item_entity_ttl is not set, enity will have default life time
@@ -93,7 +117,7 @@ minetest.register_entity(":__builtin:item", {
       force_out = nil,
       force_out_start = nil,
       --Collection Variables
-      collection_timer = 0,
+      collection_timer = 2,
       collection_timer_goal = collection.collection_time,
       collection_height = collection.collection_height,
       collectable = false,
@@ -141,13 +165,12 @@ minetest.register_entity(":__builtin:item", {
                   itemstring = self.itemstring,
                   age = self.age,
                   dropped_by = self.dropped_by,
-                  
                   collection_timer = self.collection_timer,
                   collectable = self.collectable,
                   try_timer = self.try_timer,
                   collected = self.collected,
                   delete_timer = self.delete_timer,
-                  
+                  collector = self.collector,
             })
       end,
 
@@ -164,9 +187,17 @@ minetest.register_entity(":__builtin:item", {
                         self.try_timer = data.try_timer
                         self.collected = data.collected
                         self.delete_timer = data.delete_timer
+                        self.collector = data.collector
+                        --print("restored timer: "..self.collection_timer)
                   end
             else
                   self.itemstring = staticdata
+                  
+                  local x=math.random(-2,2)*math.random()
+                  local y=math.random(2,5)
+                  local z=math.random(-2,2)*math.random()
+                  self.object:setvelocity(vector.new(x,y,z))
+                 -- print(self.collection_timer)
             end
             self.object:set_armor_groups({immortal = 1})
             self.object:set_velocity({x = 0, y = 2, z = 0})
@@ -192,7 +223,6 @@ minetest.register_entity(":__builtin:item", {
             end
       end,
       on_step = function(self, dtime)
-      
             --if item set to be collected then only execute go to player
             if self.collected == true then
                   if not self.collector then
@@ -214,8 +244,16 @@ minetest.register_entity(":__builtin:item", {
                         
                         local direction = vector.normalize(vector.subtract(pos2,pos))
                         local distance = vector.distance(pos2,pos)
+                        
+                        --remove if too far away
+                        if distance > self.radius then
+                              distance = 0
+                        end
+                                                
                         local multiplier = (self.radius*5) - distance
                         local velocity = vector.multiply(direction,multiplier)
+                        
+                        
                         self.object:setvelocity(velocity)
                         
                         if distance < 0.2 then

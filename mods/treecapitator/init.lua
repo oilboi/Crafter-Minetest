@@ -62,7 +62,6 @@ local function leafdecay_on_timer(pos, def)
       --random drops
       if math.random() > 0.75 then
             local obj = minetest.add_item(pos,dropper[math.random(1,3)])
-            obj:get_luaentity().collection_timer = 2
       end
 end
 

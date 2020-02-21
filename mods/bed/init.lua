@@ -61,7 +61,6 @@ minetest.register_node("bed:bed", {
             if minetest.get_node(vector.add(pos,facedir)).name ~= "air" then
                   minetest.remove_node(pos)
                   local obj = minetest.add_item(pos, "bed:bed")
-                  obj:get_luaentity().collection_timer = 2
                   return
             end
             
@@ -100,7 +99,6 @@ minetest.register_node("bed:bed_front", {
             local facedir = minetest.facedir_to_dir(param2)      
             facedir = vector.multiply(facedir,-1)
             local obj = minetest.add_item(pos, "bed:bed")
-            obj:get_luaentity().collection_timer = 2
             minetest.remove_node(pos)
             minetest.remove_node(vector.add(pos,facedir))
             remove_spawnpoint(pos,digger)
@@ -133,7 +131,6 @@ minetest.register_node("bed:bed_back", {
             local param2 = minetest.get_node(pos).param2
             local facedir = minetest.facedir_to_dir(param2)      
             local obj = minetest.add_item(pos, "bed:bed")
-            obj:get_luaentity().collection_timer = 2
             minetest.remove_node(pos)
             minetest.remove_node(vector.add(pos,facedir))
             remove_spawnpoint(pos,digger)

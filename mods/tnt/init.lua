@@ -151,7 +151,6 @@ minetest.register_entity("tnt:tnt", {
             
       on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
             local obj = minetest.add_item(self.object:getpos(), "tnt:tnt")
-            obj:get_luaentity().collection_timer = 2
             self.object:remove()
       end,
 

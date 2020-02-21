@@ -69,8 +69,7 @@ local function furnace_remove(pos)
                   local pos = object:getpos()
                   local item = object:get_luaentity().itemstring
                   if item ~= "utility:nothing" then
-                        local obj = minetest.add_item(pos,item)
-                        obj:get_luaentity().collection_timer = 2                        
+                        local obj = minetest.add_item(pos,item)                      
                   end
                   object:remove()
             end
@@ -81,7 +80,6 @@ local function furnace_remove(pos)
                   local item = object:get_luaentity().itemstring
                   if item ~= "utility:nothing" then
                         local obj = minetest.add_item(pos,item)
-                        obj:get_luaentity().collection_timer = 2
                   end
                   object:remove()
             end
@@ -92,7 +90,6 @@ local function furnace_remove(pos)
                   local item = object:get_luaentity().itemstring
                   if item ~= "utility:nothing" then
                         local obj = minetest.add_item(pos,item)
-                        obj:get_luaentity().collection_timer = 2
                   end
                   object:remove()
             end
@@ -245,7 +242,6 @@ minetest.register_entity("utility:fuel", {
                   
                   if obj then
                         obj:setvelocity(vector.new(dir.x,dir.y+3.5,dir.z))
-                        obj:get_luaentity().collection_timer = 2
                   else
                         print("ERROR FURNACE RELEASED NON ITEM")
                   end
@@ -296,7 +292,6 @@ minetest.register_entity("utility:fuel", {
             
             if obj then
                   obj:setvelocity(vector.new(dir.x,dir.y+3.5,dir.z))
-                  obj:get_luaentity().collection_timer = 2
             else
                   print("ERROR FURNACE RELEASED NON ITEM")
             end
@@ -356,7 +351,6 @@ minetest.register_entity("utility:fuel", {
                                                                                     
                                           if obj then
                                                 obj:setvelocity(vector.new(dir.x,dir.y,dir.z))
-                                                obj:get_luaentity().collection_timer = 2
                                           else
                                                 print("ERROR FURNACE RELEASED NON ITEM")
                                           end
@@ -611,7 +605,6 @@ minetest.register_entity("utility:cook", {
                   
                   if obj then
                         obj:setvelocity(vector.new(dir.x,dir.y+3.5,dir.z))
-                        obj:get_luaentity().collection_timer = 2
                   else
                         print("ERROR FURNACE RELEASED NON ITEM")
                   end
@@ -662,7 +655,6 @@ minetest.register_entity("utility:cook", {
             
             if obj then
                   obj:setvelocity(vector.new(dir.x,dir.y+3.5,dir.z))
-                  obj:get_luaentity().collection_timer = 2
             else
                   print("ERROR FURNACE RELEASED NON ITEM")
             end
@@ -782,7 +774,6 @@ minetest.register_entity("utility:output", {
             
             if obj then
                   obj:setvelocity(vector.new(dir.x,dir.y+3.5,dir.z))
-                  obj:get_luaentity().collection_timer = 2
             else
                   print("ERROR FURNACE RELEASED NON ITEM")
             end

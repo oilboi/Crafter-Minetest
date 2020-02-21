@@ -372,7 +372,6 @@ minetest.register_entity("minecart:minecart", {
       
       on_punch = function(self,puncher, time_from_last_punch, tool_capabilities, dir, damage)
             local obj = minetest.add_item(self.object:getpos(), "minecart:minecart")
-            obj:get_luaentity().collection_timer = 2
             self.object:remove()
       end,
 
