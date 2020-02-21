@@ -23,9 +23,9 @@
 --ladders - only placeable on walls
 --eating animation - particles? - entity?
 --boats
---make entities push against players
-rewrite minecart
+make entities push against players
 redstone - make nodes drop multiple items individually
+rewrite the item collection to magnetize using the possible application below
 crafting bench
 fishing
 bows
@@ -34,6 +34,7 @@ fix full inventory collection deletion bug
 boat
 shiftclick with tool tries to place torch
 make tnt hurt player
+rewrite minecart - halfway - make go up and down hills
 right click with tool places torch
 if placed last node put another stack into hand
 add a function to set a velocity goal to entities and then implement it with all entities
@@ -49,27 +50,27 @@ causes object to magnetize towards player or other objects and stop after an inn
 use for better item magnet?
 
 if object:is_player() and object:get_player_name() ~= self.rider then
-	local player_pos = object:getpos()
-	pos.y = 0
-	player_pos.y = 0
-	
-	local currentvel = self.object:getvelocity()
-	local vel = vector.subtract(pos, player_pos)
-	vel = vector.normalize(vel)
-	local distance = vector.distance(pos,player_pos)
-	distance = (1-distance)*10
-	vel = vector.multiply(vel,distance)
-	local acceleration = vector.new(vel.x-currentvel.x,0,vel.z-currentvel.z)
-	
-	
-	if self.axis == "x"	then
-		self.object:add_velocity(vector.new(acceleration.x,0,0))
-	elseif self.axis == "z" then
-		self.object:add_velocity(vector.new(0,0,acceleration.z))
-	else
-		self.object:add_velocity(acceleration)
-	end
-	
-	--acceleration = vector.multiply(acceleration, -1)
-	--object:add_player_velocity(acceleration)
+      local player_pos = object:getpos()
+      pos.y = 0
+      player_pos.y = 0
+      
+      local currentvel = self.object:getvelocity()
+      local vel = vector.subtract(pos, player_pos)
+      vel = vector.normalize(vel)
+      local distance = vector.distance(pos,player_pos)
+      distance = (1-distance)*10
+      vel = vector.multiply(vel,distance)
+      local acceleration = vector.new(vel.x-currentvel.x,0,vel.z-currentvel.z)
+      
+      
+      if self.axis == "x"      then
+            self.object:add_velocity(vector.new(acceleration.x,0,0))
+      elseif self.axis == "z" then
+            self.object:add_velocity(vector.new(0,0,acceleration.z))
+      else
+            self.object:add_velocity(acceleration)
+      end
+      
+      --acceleration = vector.multiply(acceleration, -1)
+      --object:add_player_velocity(acceleration)
 end
