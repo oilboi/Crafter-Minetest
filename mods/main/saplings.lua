@@ -8,7 +8,7 @@ minetest.register_node("main:sapling", {
       paramtype = "light",
       is_ground_content = false,      
       tiles = {"sapling.png"},
-      groups = {leaves = 1, plant = 1, axe = 1, hand = 0,instant=1, sapling=1},
+      groups = {leaves = 1, plant = 1, axe = 1, hand = 0,instant=1, sapling=1, attached_node=1},
       sounds = main.grassSound(),
       drop = "main:sapling",
       node_placement_prediction = "",
@@ -33,8 +33,12 @@ minetest.register_node("main:sapling", {
 
 --make sapling grow
 local function sapling_grow(pos)
+      if minetest.get_node_light(pos, nil) < 10 then
+            --print("failed to grow at "..dump(pos))
+            return
+      end
+      --print("growing at "..dump(pos))
       if minetest.get_node_group(minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name, "soil") > 0 then
-            
             local good_to_grow = true
             --check if room to grow (leaves or air)
             for i = 1,4 do
@@ -59,8 +63,8 @@ minetest.register_abm({
       label = "Tree Grow",
       nodenames = {"group:sapling"},
       neighbors = {"group:soil"},
-      interval = 0.1,
-      chance = 1,
+      interval = 3,
+      chance = 2000,
       action = function(pos)
             sapling_grow(pos)
       end,
