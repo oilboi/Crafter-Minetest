@@ -29,7 +29,6 @@ function redstone.update(pos,oldnode)
       local old_max_level = minetest.registered_nodes[minetest.get_node(pos).name].power
       --recover old info
       if not old_max_level then
-            print("recovering")
             old_max_level = minetest.registered_nodes[oldnode.name].power
       end
 
@@ -55,6 +54,8 @@ function redstone.update(pos,oldnode)
       --change to dust
       if minetest.get_node_group(minetest.get_node(pos).name, "redstone_dust") > 0 then
             minetest.set_node(pos, {name="redstone:dust_"..max_level})
+      elseif minetest.get_node_group(minetest.get_node(pos).name, "redstone_wire") > 0 then
+            minetest.set_node(pos, {name="redstone:wire_"..max_level})
       end
 
       for x = -1,1 do
@@ -73,8 +74,6 @@ function redstone.update(pos,oldnode)
 end
 
 
-
-
 minetest.register_craftitem("redstone:dust", {
       description = "Redstone Dust",
       inventory_image = "redstone_dust_item.png",
@@ -91,7 +90,7 @@ minetest.register_craftitem("redstone:dust", {
                   itemstack:take_item(1)
                   --print(minetest.get_node(pointed_thing.above).param1)
                   minetest.after(0,function(pointed_thing)
-                        minetest.punch_node(pointed_thing.above)
+                        redstone.update(pos)
                   end,pointed_thing)
                   return(itemstack)
             end
@@ -123,13 +122,15 @@ for i = 0,8 do
             },
             groups={instant=1,attached=1,redstone_dust=1,redstone=1},
             drop="redstone:dust",
-            on_punch = function(pos, node, puncher, pointed_thing)
+            on_place = function(itemstack, placer, pointed_thing)
+                  minetest.item_place_node(itemstack, placer, pointed_thing)
                   redstone.update(pos)
             end,
             on_dig = function(pos, node, digger)
                   minetest.node_dig(pos, node, digger)
                   redstone.update(pos,node)
             end,
+            connects_to = {"group:redstone"},
       })
       color= color +31.875
 end
