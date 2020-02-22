@@ -75,6 +75,7 @@ local function create_ps(pos)
       meta:set_int("pss", pss)
 end
 
+--[[
 --reload smoke and flame on load
 minetest.register_lbm({
       name = "torch:torch",
@@ -84,7 +85,7 @@ minetest.register_lbm({
             create_ps(pos)
       end,
 })
-
+]]--
 -- Item definitions
 minetest.register_craftitem("torch:torch", {
       description = "Torch",
@@ -142,10 +143,10 @@ minetest.register_node("torch:floor", {
             fixed = {-1/16, -0.5, -1/16, 1/16, 2/16, 1/16},
       },
       on_construct = function(pos)
-            create_ps(pos)
+            --create_ps(pos)
       end,
       on_destruct = function(pos)
-            delete_ps(pos)
+            --delete_ps(pos)
       end,
       sounds = main.woodSound(),
 })
@@ -171,10 +172,10 @@ minetest.register_node("torch:wall", {
             wall_side = {-0.5, -0.3, -0.1, -0.2, 0.3, 0.1},
       },
       on_construct = function(pos)
-            create_ps(pos)
+           -- create_ps(pos)
       end,
       on_destruct = function(pos)
-            delete_ps(pos)
+           -- delete_ps(pos)
       end,
       sounds = main.woodSound(),
 })

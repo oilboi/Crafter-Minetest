@@ -1,3 +1,5 @@
+ALPHA STATE CHANGELOG
+0.1
 --make a grass biome
 --make trees
 --make hand - mod another mod
@@ -19,23 +21,19 @@
 --water flow faster
 --torches with particle
 --make a mob
-
+--0.2
 --fix tools causing crash on pigs with no fleshy definition
 --ladders - only placeable on walls
 --eating animation - particles? - entity?
 --boats
 --make falling item have fall soundspec
 --rebalance sand audio
+--rewrite the item collection better
+(not finished) redstone - make nodes drop multiple items individually
+make item collection move with the player's speed too
 
-
-
-redstone - make nodes drop multiple items individually
-
-
-
-
+saplings
 make entities push against players
-rewrite the item collection to magnetize using the possible application below
 crafting bench
 fishing
 bows
@@ -54,11 +52,16 @@ colored chat messages
 check if everyone is in bed before going to next night
 also lock player in bed until they get out or daytime
 
+
+
+
 open bugs:
 fix torches not deleting particles when mounted node dug <- meta glitch?
+--fixing with abm
+
+
 
 possible applications:
-
 causes object to magnetize towards player or other objects and stop after an inner radius
 use for better item magnet?
 

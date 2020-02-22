@@ -237,10 +237,12 @@ minetest.register_entity(":__builtin:item", {
                         --get the variables
                         local pos = self.object:getpos()
                         local pos2 = collector:getpos()
+                        local player_velocity = collector:get_player_velocity()
                         pos2.y = pos2.y + self.collection_height
                                                 
                         local direction = vector.normalize(vector.subtract(pos2,pos))
                         local distance = vector.distance(pos2,pos)
+                                                
                         
                         --remove if too far away
                         if distance > self.radius then
@@ -250,6 +252,7 @@ minetest.register_entity(":__builtin:item", {
                         local multiplier = (self.radius*5) - distance
                         local velocity = vector.multiply(direction,multiplier)
                         
+                        local velocity = vector.add(player_velocity,velocity)
                         
                         self.object:setvelocity(velocity)
                         
