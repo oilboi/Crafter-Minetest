@@ -35,6 +35,7 @@ minetest.register_node("main:dirt", {
     tiles = {"dirt.png"},
     groups = {dirt = 1, soft = 1, shovel = 1, hand = 1, soil=1},
     sounds = main.dirtSound(),
+    paramtype = "light",
 })
 
 minetest.register_node("main:grass", {
