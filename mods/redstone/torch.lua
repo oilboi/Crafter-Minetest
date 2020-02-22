@@ -41,7 +41,7 @@ local function create_ps(pos)
             maxsize = 3,
             collisiondetection = false,
             vertical = true,
-            texture = "torch_animated.png",
+            texture = "redstone_torch_animated.png",
             animation = {type = "vertical_frames",
 
                   aspect_w = 16,
@@ -77,8 +77,8 @@ end
 
 --reload smoke and flame on load
 minetest.register_lbm({
-      name = "torch:torch",
-      nodenames = {"torch:floor","torch:wall"},
+      name = "redstone:torch",
+      nodenames = {"redstone:torch_floor","redstone:torch_wall"},
       run_at_every_load = true,
       action = function(pos, node)
             create_ps(pos)
@@ -86,12 +86,13 @@ minetest.register_lbm({
 })
 
 -- Item definitions
-minetest.register_craftitem("torch:torch", {
-      description = "Torch",
-      inventory_image = "torches_torch.png",
-      wield_image = "torches_torch.png",
+minetest.register_craftitem("redstone:torch", {
+      description = "Redstone Torch",
+      inventory_image = "redstone_torch.png",
+      wield_image = "redstone_torch.png",
       wield_scale = {x = 1, y = 1, z = 1 + 1/16},
       liquids_pointable = false,
+      power = 8,
       on_place = function(itemstack, placer, pointed_thing)
             if pointed_thing.type ~= "node" then
                   return itemstack
@@ -104,15 +105,15 @@ minetest.register_craftitem("torch:torch", {
             if wdir < 1 then
                   return itemstack
             elseif wdir == 1 then
-                  retval = fakestack:set_name("torch:floor")
+                  retval = fakestack:set_name("redstone:torch_floor")
             else
-                  retval = fakestack:set_name("torch:wall")
+                  retval = fakestack:set_name("redstone:torch_wall")
             end
             if not retval then
                   return itemstack
             end
             itemstack, retval = minetest.item_place(fakestack, placer, pointed_thing, wdir)
-            itemstack:set_name("torch:torch")
+            itemstack:set_name("redstone:torch")
 
             if retval then
                   minetest.sound_play("wood", {pos=pointed_thing.above, gain = 1.0})
@@ -122,20 +123,21 @@ minetest.register_craftitem("torch:torch", {
       end
 })
 
-minetest.register_node("torch:floor", {
-      inventory_image = "default_torch.png",
-      wield_image = "torches_torch.png",
+minetest.register_node("redstone:torch_floor", {
+      inventory_image = "redstone_torch.png",
+      wield_image = "redstone_torch.png",
       wield_scale = {x = 1, y = 1, z = 1 + 2/16},
       drawtype = "mesh",
       mesh = "torch_floor.obj",
-      tiles = {"torches_torch.png"},
+      tiles = {"redstone_torch.png"},
       paramtype = "light",
       paramtype2 = "none",
+      power = 8,
       sunlight_propagates = true,
-      drop = "torch:torch",
+      drop = "redstone:torch",
       walkable = false,
       light_source = 13,
-      groups = {choppy=2, dig_immediate=3, flammable=1, not_in_creative_inventory=1, attached_node=1, torch=1},
+      groups = {choppy=2, dig_immediate=3, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,connect_to_raillike=1},
       legacy_wallmounted = true,
       selection_box = {
             type = "fixed",
@@ -143,6 +145,10 @@ minetest.register_node("torch:floor", {
       },
       on_construct = function(pos)
             create_ps(pos)
+            redstone.update(pos)
+      end,
+      after_destruct = function(pos, oldnode)
+            redstone.update(pos,oldnode)
       end,
       on_destruct = function(pos)
             delete_ps(pos)
@@ -150,20 +156,21 @@ minetest.register_node("torch:floor", {
       sounds = main.woodSound(),
 })
 
-minetest.register_node("torch:wall", {
-      inventory_image = "default_torch.png",
-      wield_image = "torches_torch.png",
+minetest.register_node("redstone:torch_wall", {
+      inventory_image = "redstone_torch.png",
+      wield_image = "redstone_torch.png",
       wield_scale = {x = 1, y = 1, z = 1 + 1/16},
       drawtype = "mesh",
       mesh = "torch_wall.obj",
-      tiles = {"torches_torch.png"},
+      tiles = {"redstone_torch.png"},
       paramtype = "light",
       paramtype2 = "wallmounted",
       sunlight_propagates = true,
       walkable = false,
       light_source = 13,
-      groups = {choppy=2, dig_immediate=3, flammable=1, not_in_creative_inventory=1, attached_node=1, torch=1},
-      drop = "torch:torch",
+      power = 8,
+      groups = {choppy=2, dig_immediate=3, flammable=1, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,redstone_torch=1,connect_to_raillike=1},
+      drop = "redstone:torch",
       selection_box = {
             type = "wallmounted",
             wall_top = {-0.1, -0.1, -0.1, 0.1, 0.5, 0.1},
@@ -172,6 +179,10 @@ minetest.register_node("torch:wall", {
       },
       on_construct = function(pos)
             create_ps(pos)
+            redstone.update(pos)
+      end,
+      after_destruct = function(pos, oldnode)
+            redstone.update(pos,oldnode)
       end,
       on_destruct = function(pos)
             delete_ps(pos)
@@ -180,16 +191,9 @@ minetest.register_node("torch:wall", {
 })
 
 minetest.register_craft({
-      output = "torch:torch 4",
+      output = "redstone:torch 4",
       recipe = {
-            {"main:coal"},
-            {"main:stick"}
-      }
-})
-minetest.register_craft({
-      output = "torch:torch 4",
-      recipe = {
-            {"main:charcoal"},
+            {"redstone:dust"},
             {"main:stick"}
       }
 })

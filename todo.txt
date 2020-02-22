@@ -19,12 +19,22 @@
 --water flow faster
 --torches with particle
 --make a mob
+
 --fix tools causing crash on pigs with no fleshy definition
 --ladders - only placeable on walls
 --eating animation - particles? - entity?
 --boats
-make entities push against players
+--make falling item have fall soundspec
+--rebalance sand audio
+
+
+
 redstone - make nodes drop multiple items individually
+
+
+
+
+make entities push against players
 rewrite the item collection to magnetize using the possible application below
 crafting bench
 fishing
@@ -40,7 +50,9 @@ if placed last node put another stack into hand
 have falling node hurt player?
 add a function to set a velocity goal to entities and then implement it with all entities
 ^make a value if below then stop?
-
+colored chat messages
+check if everyone is in bed before going to next night
+also lock player in bed until they get out or daytime
 
 open bugs:
 fix torches not deleting particles when mounted node dug <- meta glitch?

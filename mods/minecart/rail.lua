@@ -2,15 +2,9 @@ minetest.register_node("minecart:rail",{
       description = "Rail",
       wield_image = "rail.png",
       tiles = {
-            "stone.png", "stone.png",
-            "stone.png", "stone.png"
-      },
-      --[[
-      tiles = {
             "rail.png", "railcurve.png",
             "railt.png", "railcross.png"
       },
-      ]]--
       drawtype = "raillike",
       paramtype = "light",
       sunlight_propagates = true,
@@ -26,10 +20,10 @@ minetest.register_node("minecart:rail",{
                   return
             end
             local pos = pointed_thing.above
-            if minetest.registered_nodes[minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name].walkable then
+            if minetest.registered_nodes[minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name].walkable and minetest.get_node(pointed_thing.above).name == "air" then
                   minetest.set_node(pointed_thing.above, {name="minecart:rail"})
                   itemstack:take_item(1)
-                  print(minetest.get_node(pointed_thing.above).param1)
+                  --print(minetest.get_node(pointed_thing.above).param1)
                   return(itemstack)
             end
       end,
