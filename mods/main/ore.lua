@@ -4,7 +4,7 @@ depth = initial level found
 
       
 -- Dirt
-
+--[[
 minetest.register_ore({
       ore_type        = "blob",
       ore             = "main:dirt",
@@ -44,11 +44,11 @@ minetest.register_ore({
             persist = 0.0
       },
 })
-
+]]--
 -- Scatter ores
 
 -- Coal
-
+for i = 1,3 do
 minetest.register_ore({
       ore_type       = "scatter",
       ore            = "main:coalore",
@@ -93,6 +93,17 @@ minetest.register_ore({
       clust_size     = 3,
       y_max          = 31000,
       y_min          = 1025,
+})
+
+minetest.register_ore({
+      ore_type       = "scatter",
+      ore            = "main:ironore",
+      wherein        = "main:stone",
+      clust_scarcity = 7 * 7 * 7,
+      clust_num_ores = 5,
+      clust_size     = 3,
+      y_max          = 64,
+      y_min          = -127,
 })
 
 minetest.register_ore({
@@ -221,4 +232,4 @@ minetest.register_ore({
       y_max          = -2048,
       y_min          = -31000,
 })
-
+end

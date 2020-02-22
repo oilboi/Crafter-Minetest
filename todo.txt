@@ -51,6 +51,7 @@ add a function to set a velocity goal to entities and then implement it with all
 colored chat messages
 check if everyone is in bed before going to next night
 also lock player in bed until they get out or daytime
+create a function to check if a node or group is below
 
 
 

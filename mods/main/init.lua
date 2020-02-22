@@ -6,6 +6,7 @@ local path = minetest.get_modpath("main")
 
 dofile(path.."/sounds.lua")
 dofile(path.."/nodes.lua")
+dofile(path.."/saplings.lua")
 dofile(path.."/ore.lua")
 dofile(path.."/items.lua")
 dofile(path.."/schematics.lua")

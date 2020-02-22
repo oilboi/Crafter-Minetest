@@ -33,14 +33,14 @@ minetest.register_node("main:cobble", {
 minetest.register_node("main:dirt", {
     description = "Dirt",
     tiles = {"dirt.png"},
-    groups = {dirt = 1, soft = 1, shovel = 1, hand = 1},
+    groups = {dirt = 1, soft = 1, shovel = 1, hand = 1, soil=1},
     sounds = main.dirtSound(),
 })
 
 minetest.register_node("main:grass", {
     description = "Grass",
     tiles = {"grass.png"},
-    groups = {dirt = 1, soft = 1, shovel = 1, hand = 1},
+    groups = {dirt = 1, soft = 1, shovel = 1, hand = 1, soil=1},
     sounds = main.dirtSound(),
     drop="main:dirt",
 })
@@ -106,6 +106,16 @@ minetest.register_node("main:leaves", {
     drop = {
             max_items = 1,
             items= {
+             {
+                  -- Only drop if using a tool whose name is identical to one
+                  -- of these.
+                  rarity = 10,
+                  items = {"main:sapling"},
+                  -- Whether all items in the dropped item list inherit the
+                  -- hardware coloring palette color from the dug node.
+                  -- Default is 'false'.
+                  --inherit_color = true,
+            },
             {
                   -- Only drop if using a tool whose name is identical to one
                   -- of these.

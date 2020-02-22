@@ -60,9 +60,10 @@ minetest.register_globalstep(function(dtime)
       --collection
       for _,player in ipairs(minetest.get_connected_players()) do
             local run = player:get_player_control().aux1
+            local walk = player:get_player_control().up
             local sneak = player:get_player_control().sneak
             
-            if run then
+            if run and walk and not sneak then
                   --[[ I'll impliment this in later
                   local meta = player:get_meta()
                   
