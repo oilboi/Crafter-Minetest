@@ -92,7 +92,7 @@ minetest.register_craftitem("redstone:torch", {
       wield_image = "redstone_torch.png",
       wield_scale = {x = 1, y = 1, z = 1 + 1/16},
       liquids_pointable = false,
-      power = 8,
+      power = 9,
       on_place = function(itemstack, placer, pointed_thing)
             if pointed_thing.type ~= "node" then
                   return itemstack
@@ -132,7 +132,7 @@ minetest.register_node("redstone:torch_floor", {
       tiles = {"redstone_torch.png"},
       paramtype = "light",
       paramtype2 = "none",
-      power = 8,
+      power = 9,
       sunlight_propagates = true,
       drop = "redstone:torch",
       walkable = false,
@@ -168,7 +168,7 @@ minetest.register_node("redstone:torch_wall", {
       sunlight_propagates = true,
       walkable = false,
       light_source = 13,
-      power = 8,
+      power = 9,
       groups = {choppy=2, dig_immediate=3, flammable=1, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,redstone_torch=1,connect_to_raillike=1},
       drop = "redstone:torch",
       selection_box = {

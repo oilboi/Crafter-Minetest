@@ -47,7 +47,7 @@ for i = 0,8 do
             groups = {redstone =1, instant=1,redstone=1,redstone_wire=1},
             on_place = function(itemstack, placer, pointed_thing)
                   minetest.item_place_node(itemstack, placer, pointed_thing)
-                  redstone.update(pos)
+                  redstone.update(pointed_thing.above)
             end,
             on_dig = function(pos, node, digger)
                   minetest.node_dig(pos, node, digger)
