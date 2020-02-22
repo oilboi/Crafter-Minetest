@@ -31,10 +31,29 @@ ALPHA STATE CHANGELOG
 --rewrite the item collection better
 (not finished) redstone - make nodes drop multiple items individually
 --make item collection move with the player's speed
+--made saplings
+--make grass spread
+buckets
 
-saplings
-make entities push against players
 crafting bench
+
+make torches abm that checks if player in area
+make furnace abm that checks if player in area
+
+
+farming - 
+- tall grass spawns on regular grass 
+- drops seeds 
+- add hoe 
+- add fertilizer (pig drops bone randomly) 
+- fertilizer is made out of bone - 
+- fertilizer can make tall grass grow on regular grass
+- bread - 3 bread in a row
+- make sandwich with bread and cooked porkchop
+- fertilizer used on saplings randomly make tree grow (make sapling growth a function)
+
+
+
 fishing
 bows
 fix full inventory collection deletion bug
@@ -50,10 +69,17 @@ add a function to set a velocity goal to entities and then implement it with all
 ^make a value if below then stop?
 colored chat messages
 check if everyone is in bed before going to next night
-also lock player in bed until they get out or daytime
-create a function to check if a node or group is below
+- also lock player in bed until they get out or daytime
+- create a function to check if a node or group is below
 
-
+minecart car train? - off rail use
+- automatic step height for off rail use
+- make cars follow each other
+- oil which spawns underground in pools
+- powered minecart car (engine car)
+- chest minecart car
+- player controls engine car
+make entities push against players
 
 
 open bugs:

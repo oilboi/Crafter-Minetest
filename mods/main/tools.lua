@@ -9,7 +9,10 @@ for level,material in pairs(material) do
             --print(id,tool,level,material)
             local groupcaps
             if group[id] == "dirt" then
-                  groupcaps2={dirt = {times={[4]=4-level/2,[3]=3.5-level/2,[2]=3.0-level/2,[1]=2.8-level/2}, uses=(level/2)*5, maxlevel=level},}
+                  groupcaps2={
+                  dirt = {times={[4]=4-level/2,[3]=3.5-level/2,[2]=3.0-level/2,[1]=2.8-level/2}, uses=(level/2)*5, maxlevel=level},
+                  sand = {times={[4]=4-level/2,[3]=3.5-level/2,[2]=3.0-level/2,[1]=2.8-level/2}, uses=(level/2)*5, maxlevel=level},
+                  }
             end
             if group[id] == "wood" then
                   groupcaps2={wood = {times={[4]=4-level/2,[3]=3.5-level/2,[2]=3.0-level/2,[1]=2.8-level/2}, uses=(level/2)*5, maxlevel=level},}

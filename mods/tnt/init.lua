@@ -188,6 +188,21 @@ minetest.register_node("tnt:tnt", {
     end,
 })
 
+minetest.register_node("tnt:uranium_tnt", {
+    description = "Cobblestone",
+    tiles = {"tnt_top.png^[colorize:green:100", "tnt_bottom.png^[colorize:green:100",
+                  "tnt_side.png^[colorize:green:100", "tnt_side.png^[colorize:green:100",
+                  "tnt_side.png^[colorize:green:100", "tnt_side.png^[colorize:green:100"},
+    groups = {stone = 2, hard = 1, pickaxe = 2, hand = 4},
+    sounds = main.stoneSound(),
+    on_punch = function(pos, node, puncher, pointed_thing)
+            local obj = minetest.add_entity(pos,"tnt:tnt")
+            local range = 145
+            obj:get_luaentity().range = range
+            minetest.remove_node(pos)
+    end,
+})
+
 minetest.register_node("tnt:uh_oh", {
     description = "Cobblestone",
     tiles = {"tnt_top.png", "tnt_bottom.png",

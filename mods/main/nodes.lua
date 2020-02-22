@@ -49,7 +49,7 @@ minetest.register_node("main:grass", {
 minetest.register_node("main:sand", {
     description = "Sand",
     tiles = {"sand.png"},
-    groups = {dirt = 1, sand = 1, soft = 1, shovel = 1, hand = 1, falling_node = 1},
+    groups = {sand = 1, soft = 1, shovel = 1, hand = 1, falling_node = 1},
     sounds = main.sandSound(),
 })
 

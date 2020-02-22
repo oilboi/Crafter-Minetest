@@ -15,6 +15,7 @@ minetest.register_item(":", {
                   wood = {times={[4]=11.5,[3]=8.5,[2]=6.70,[1]=5.5}, uses=0, maxlevel=1},
                   leaves = {times={[4]=4.5,[3]=3.2,[2]=2.20,[1]=1.2}, uses=0, maxlevel=0},
                   instant = {times={[1]=0.1,},uses=0,maxlevel=1},
+                  dig_immediate = {times={[1]=0,},uses=0,maxlevel=1},
             },
             damage_groups = {fleshy=1},
       }

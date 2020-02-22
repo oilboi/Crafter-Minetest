@@ -394,6 +394,7 @@ minetest.register_entity("minecart:minecart", {
                               vel = vector.multiply(vel,distance)
                               local acceleration = vector.new(vel.x-currentvel.x,0,vel.z-currentvel.z)
                               
+                              --note : set a maximum velocity that can be added to the cart to limit extreme glitches
                               
                               if self.axis == "x"      then
                                     self.object:add_velocity(vector.new(acceleration.x,0,0))
@@ -403,8 +404,8 @@ minetest.register_entity("minecart:minecart", {
                                     self.object:add_velocity(acceleration)
                               end
                               
-                              acceleration = vector.multiply(acceleration, -0.5)
-                              object:add_player_velocity(acceleration)
+                              --acceleration = vector.multiply(acceleration, -0.5)
+                              --object:add_player_velocity(acceleration)
                         end
                   end
             end

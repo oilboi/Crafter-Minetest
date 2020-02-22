@@ -4,7 +4,7 @@ minetest.register_abm({
       nodenames = {"main:dirt"},
       neighbors = {"main:grass"},
       interval = 10,
-      chance = 2600,
+      chance = 2000,
       action = function(pos)
             local light = minetest.get_node_light(pos, nil)
             --print(light)
