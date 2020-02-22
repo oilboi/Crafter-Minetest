@@ -30,7 +30,7 @@ ALPHA STATE CHANGELOG
 --rebalance sand audio
 --rewrite the item collection better
 (not finished) redstone - make nodes drop multiple items individually
-make item collection move with the player's speed too
+--make item collection move with the player's speed
 
 saplings
 make entities push against players
