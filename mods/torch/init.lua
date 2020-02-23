@@ -23,9 +23,9 @@ end
 
 --add in smoke and fire
 local function create_ps(pos)
+      local meta = minetest.get_meta(pos)
       local dir = get_offset(minetest.get_node(pos).param2)
       local ppos = vector.add(dir,pos)
-      local meta = minetest.get_meta(pos)
       local psf = minetest.add_particlespawner({
             amount = 2,
             time = 0,
@@ -75,17 +75,32 @@ local function create_ps(pos)
       meta:set_int("pss", pss)
 end
 
---[[
+
 --reload smoke and flame on load
-minetest.register_lbm({
-      name = "torch:torch",
-      nodenames = {"torch:floor","torch:wall"},
-      run_at_every_load = true,
-      action = function(pos, node)
-            create_ps(pos)
+minetest.register_abm({
+      label = "Torch Particle",
+      nodenames = {"group:torch"},
+      neighbors = {"air"},
+      interval = 0.1,
+      chance = 1,
+      action = function(pos, node, active_object_count, active_object_count_wider)
+            local found_player = false
+            for _,object in ipairs(minetest.get_objects_inside_radius(pos, 3)) do
+                  local pos2 = object:getpos()
+                  if object:is_player() then
+                        found_player = true
+                  end
+            end
+            if found_player == true then
+                  print("creating ps")
+                  create_ps(pos)
+            else
+                  print("deleting ps")
+                  delete_ps(pos)
+            end
       end,
 })
-]]--
+
 -- Item definitions
 minetest.register_craftitem("torch:torch", {
       description = "Torch",

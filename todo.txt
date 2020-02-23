@@ -33,12 +33,11 @@ ALPHA STATE CHANGELOG
 --make item collection move with the player's speed
 --made saplings
 --make grass spread
-buckets
+--water buckets
+--buckets water farmland
 
 crafting bench
 
-make torches abm that checks if player in area
-make furnace abm that checks if player in area
 
 
 farming - 
@@ -52,6 +51,8 @@ farming -
 - make sandwich with bread and cooked porkchop
 - fertilizer used on saplings randomly make tree grow (make sapling growth a function)
 
+make torches abm that checks if player in area
+make furnace abm that checks if player in area
 
 
 fishing

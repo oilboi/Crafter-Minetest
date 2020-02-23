@@ -22,7 +22,10 @@ for level,material in pairs(material) do
             tool_capabilities = {
                   --full_punch_interval = 1.2,
                   --max_drop_level=0,
-                  groupcaps={dirt = {times={[4]=4-level/4,[3]=3.5-level/4,[2]=3.0-level/4,[1]=2.8-level/4}, uses=(level/2)*3, maxlevel=level},},
+                  groupcaps={
+                  dirt = {times={[4]=4-level/4,[3]=3.5-level/4,[2]=3.0-level/4,[1]=2.8-level/4}, uses=(level/2)*3, maxlevel=level},
+                  sand = {times={[4]=4-level/4,[3]=3.5-level/4,[2]=3.0-level/4,[1]=2.8-level/4}, uses=(level/2)*3, maxlevel=level},
+                  },
                   damage_groups = {fleshy=1},
             },
             sound = {breaks = {name="tool_break",gain=0.4}}, -- change this
@@ -181,7 +184,35 @@ minetest.register_abm({
 })
 for i = 0,wheat_max do
       local drop = ""
-      if i == wheat_max then drop = "farming:wheat" end
+      if i == wheat_max then 
+            drop = {
+                  max_items = 2,
+                  items= {
+                   {
+                        -- Only drop if using a tool whose name is identical to one
+                        -- of these.
+                        --rarity = 10,
+                        items = {"farming:wheat"},
+                        -- Whether all items in the dropped item list inherit the
+                        -- hardware coloring palette color from the dug node.
+                        -- Default is 'false'.
+                        --inherit_color = true,
+                  },
+                  {
+                        -- Only drop if using a tool whose name is identical to one
+                        -- of these.
+                        rarity = 3,
+                        items = {"farming:seeds"},
+                        -- Whether all items in the dropped item list inherit the
+                        -- hardware coloring palette color from the dug node.
+                        -- Default is 'false'.
+                        --inherit_color = true,
+                  },
+                  },
+                  }
+            
+           
+      end
       
       minetest.register_node("farming:wheat_"..i, {
           description = "Wheat Stage "..i,
