@@ -1,3 +1,6 @@
+local particle_time = 5 -- how many seconds torches will wait to check if player is near
+local check_radius = 10
+
 --get point where particle spawner is added
 local function get_offset(wdir)
       local z = 0
@@ -13,32 +16,17 @@ local function get_offset(wdir)
       end
       return {x = x, y = 0.27, z = z}      
 end
-
---remove smoke and fire
-local function delete_ps(pos)
-      local meta = minetest.get_meta(pos)
-      minetest.delete_particlespawner(meta:get_int("psf"))
-      minetest.delete_particlespawner(meta:get_int("pss"))
-end
-
 --add in smoke and fire
 local function create_ps(pos)
-      local meta = minetest.get_meta(pos)
+      print("test")
       local dir = get_offset(minetest.get_node(pos).param2)
       local ppos = vector.add(dir,pos)
-      local psf = minetest.add_particlespawner({
-            amount = 2,
-            time = 0,
-            minpos = ppos,
-            maxpos = ppos,
-            minvel = vector.new(0,0,0),
-            maxvel = vector.new(0,0,0),
-            minacc = {x=0, y=0, z=0},
-            maxacc = {x=0, y=0, z=0},
-            minexptime = 1,
-            maxexptime = 1,
-            minsize = 3,
-            maxsize = 3,
+      minetest.add_particle({
+            pos = ppos,
+            velocity = vector.new(0,0,0),
+            acceleration = vector.new(0,0,0),
+            expirationtime = particle_time*3,
+            size = 3,
             collisiondetection = false,
             vertical = true,
             texture = "torch_animated.png",
@@ -54,9 +42,10 @@ local function create_ps(pos)
                   -- Full loop length
             },
       })
-      local pss = minetest.add_particlespawner({
-            amount = 2,
-            time = 0,
+      --[[
+      minetest.add_particlespawner({
+            amount = particle_time*6,
+            time = particle_time*2,
             minpos = ppos,
             maxpos = ppos,
             minvel = vector.new(-0.1,0.1,-0.1),
@@ -71,35 +60,32 @@ local function create_ps(pos)
             vertical = false,
             texture = "smoke.png",
       })
-      meta:set_int("psf", psf)
-      meta:set_int("pss", pss)
+      ]]--
 end
 
 
 --reload smoke and flame on load
+--[[
 minetest.register_abm({
       label = "Torch Particle",
       nodenames = {"group:torch"},
       neighbors = {"air"},
-      interval = 0.1,
+      interval = particle_time,
       chance = 1,
       action = function(pos, node, active_object_count, active_object_count_wider)
             local found_player = false
-            for _,object in ipairs(minetest.get_objects_inside_radius(pos, 3)) do
+            for _,object in ipairs(minetest.get_objects_inside_radius(pos, check_radius)) do
                   local pos2 = object:getpos()
                   if object:is_player() then
                         found_player = true
                   end
             end
             if found_player == true then
-                  print("creating ps")
                   create_ps(pos)
-            else
-                  print("deleting ps")
-                  delete_ps(pos)
             end
       end,
 })
+]]--
 
 -- Item definitions
 minetest.register_craftitem("torch:torch", {
@@ -157,12 +143,6 @@ minetest.register_node("torch:floor", {
             type = "fixed",
             fixed = {-1/16, -0.5, -1/16, 1/16, 2/16, 1/16},
       },
-      on_construct = function(pos)
-            --create_ps(pos)
-      end,
-      on_destruct = function(pos)
-            --delete_ps(pos)
-      end,
       sounds = main.woodSound(),
 })
 
@@ -186,12 +166,6 @@ minetest.register_node("torch:wall", {
             wall_bottom = {-0.1, -0.5, -0.1, 0.1, 0.1, 0.1},
             wall_side = {-0.5, -0.3, -0.1, -0.2, 0.3, 0.1},
       },
-      on_construct = function(pos)
-           -- create_ps(pos)
-      end,
-      on_destruct = function(pos)
-           -- delete_ps(pos)
-      end,
       sounds = main.woodSound(),
 })
 
