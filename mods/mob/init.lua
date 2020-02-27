@@ -142,15 +142,67 @@ minetest.register_entity("mob:pig", {
             end
       end,
       
+      
       --this sets a random direction and speed when walking
       walk_random = function(self)
-            if self.change_direction == true then
-                  self.direction_goal = vector.new(math.random(-2,2),0,math.random(-2,2))
-                  self.speed = math.random(1,2)
-                  
-                  --print(dump(self.direction_goal))
+            if not self.goal_position then
+				self.find_position(self)
             end
+            self.path_find(self)
+            if self.path then
+				local pos = self.object:getpos()
+				local pos2 = self.path[1]
+				local direction = vector.normalize(vector.subtract(pos,pos2))
+				self.direction_goal = direction
+				print("GOOOAL")
+			end
       end,
+      
+      path_find = function(self)
+		if not self.path and self.goal_position then
+			local pos = vector.floor(vector.add(self.object:getpos(),0.5))
+			local pos2 = self.goal_position
+			local path = minetest.find_path(pos,pos2,10,1,3,"A*")
+			if path then
+				self.path = path
+				for _,p in pairs(path) do
+					minetest.add_particle({
+						pos = p,
+						velocity = {x=0, y=0, z=0},
+						acceleration = {x=0, y=0, z=0},
+						expirationtime = 1,
+						size = 1,
+						collisiondetection = false,
+						vertical = false,
+						texture = "wood.png",
+					})
+				end
+			end
+		end
+      end,
+      
+      
+      --this sets a random position for the mob to go to when randomly walking around
+      find_position = function(self)
+                              
+			local int = {-1,1}
+			local pos = vector.floor(vector.add(self.object:getpos(),0.5))
+			local x = pos.x + math.random(-10,10)
+			local z = pos.z + math.random(-10,10)
+			
+			
+			local location = minetest.find_nodes_in_area_under_air(vector.new(x,pos.y-32,z), vector.new(x,pos.y+32,z), {"group:pathable"})
+			
+			--print(dump(spawner))
+			if table.getn(location) > 0 then
+				  local goal_pos = location[1]
+				  goal_pos.y = goal_pos.y + 1
+				  print("found: "..minetest.pos_to_string(goal_pos))
+				  self.goal_position = goal_pos
+			end
+      end,
+      
+      
       
       
       --This makes the mob walk at a certain speed
