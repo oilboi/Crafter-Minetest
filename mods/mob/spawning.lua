@@ -8,7 +8,11 @@ local timer = 0
 local inner = 24
 local outer = 128
 
+--for debug testing to isolate mobs
+local spawn = false
+
 minetest.register_globalstep(function(dtime)
+      if spawn then
       timer = timer + dtime
       if timer >= tick and math.random(1,chance) == chance then
             print("ticking")
@@ -51,5 +55,6 @@ minetest.register_globalstep(function(dtime)
             end
       elseif timer > tick then
             timer = 0
+      end
       end
 end)

@@ -126,57 +126,51 @@ minetest.register_entity("mob:pig", {
                   end
             end
       end,
-      
-      --this makes the mob change it's direction when aimlessly walking
-      direction = function(self,dtime)
-            self.direction_timer = self.direction_timer + dtime
             
-            self.change_direction = false
-            
-            --change direction
-            if self.direction_timer >= self.direction_timer_goal then
-                  --print("changing direction")
-                  self.direction_timer = 0
-                  self.direction_timer_goal = math.random(2,4)
-                  self.change_direction = true
+      --this is the brain of the mob
+      logic = function(self,dtime)
+            if not self.path then
+                  self.path_find(self)
+            else
+                  self.delete_path_node(self)
+                  self.move(self)
+                  if self.path and table.getn(self.path) > 0 then
+                        for _,p in pairs(self.path) do
+                              minetest.add_particle({
+                                    pos = p,
+                                    velocity = {x=0, y=0, z=0},
+                                    acceleration = {x=0, y=0, z=0},
+                                    expirationtime = 0.1,
+                                    size = 1,
+                                    collisiondetection = false,
+                                    vertical = false,
+                                    texture = "wood.png",
+                              })
+                        end
+                  end
             end
+            
       end,
       
-      
-      --this sets a random direction and speed when walking
-      walk_random = function(self)
-            if not self.goal_position then
-				self.find_position(self)
+      delete_path_node = function(self)
+            local pos = vector.floor(vector.add(self.object:getpos(),0.5))
+            local goalnode = self.path[1]
+            if vector.equals(pos,goalnode) then
+                  table.remove(self.path, 1)
+            end 
+            if table.getn(self.path) < 1 then
+                  self.path = nil
             end
-            self.path_find(self)
-            if self.path then
-				local pos = self.object:getpos()
-				local pos2 = self.path[1]
-				local direction = vector.normalize(vector.subtract(pos,pos2))
-				self.direction_goal = direction
-				print("GOOOAL")
-			end
-      end,
-      
+      end,  
+            
       path_find = function(self)
-		if not self.path and self.goal_position then
+            local pos2 = self.find_position(self)
+		if not self.path and pos2 then
 			local pos = vector.floor(vector.add(self.object:getpos(),0.5))
-			local pos2 = self.goal_position
 			local path = minetest.find_path(pos,pos2,10,1,3,"A*")
 			if path then
+                        print("found path")
 				self.path = path
-				for _,p in pairs(path) do
-					minetest.add_particle({
-						pos = p,
-						velocity = {x=0, y=0, z=0},
-						acceleration = {x=0, y=0, z=0},
-						expirationtime = 1,
-						size = 1,
-						collisiondetection = false,
-						vertical = false,
-						texture = "wood.png",
-					})
-				end
 			end
 		end
       end,
@@ -195,10 +189,9 @@ minetest.register_entity("mob:pig", {
 			
 			--print(dump(spawner))
 			if table.getn(location) > 0 then
-				  local goal_pos = location[1]
-				  goal_pos.y = goal_pos.y + 1
-				  print("found: "..minetest.pos_to_string(goal_pos))
-				  self.goal_position = goal_pos
+				local goal_pos = location[1]
+				goal_pos.y = goal_pos.y + 1
+                        return(goal_pos)
 			end
       end,
       
@@ -207,24 +200,30 @@ minetest.register_entity("mob:pig", {
       
       --This makes the mob walk at a certain speed
       move = function(self)
-            local vel = self.object:getvelocity()
-            local goal = self.direction_goal
-            local acceleration = vector.new(goal.x-vel.x,0,goal.z-vel.z)
-            self.object:add_velocity(acceleration)
+            if self.path then
+                  local vel = self.object:getvelocity()
+                  local pos = self.object:getpos()
+                  local dir = vector.normalize(vector.subtract(self.path[1],pos))
+                  local goal = vector.multiply(dir,2)
+                  
+                  local acceleration = vector.new(goal.x-vel.x,0,goal.z-vel.z)
+                  self.object:add_velocity(acceleration)
+            end
       end,
       
       --make the mob jump
       jump = function(self,punched)
-            local pos = self.object:getpos()
-            local ray = Raycast(pos, vector.add(pos,self.direction_goal), false, false)
-            local vel = self.object:getvelocity()
-            
-            if (punched or ray:next()) and minetest.get_node(vector.new(pos.x,pos.y-0.02,pos.z)).name ~= "air" and self.swimming == false then
-                  --print("jump")
-                  local vel = self.object:getvelocity()
-                  local goal = 5
-                  local acceleration = vector.new(0,goal-vel.y,0)
-                  self.object:add_velocity(acceleration)
+            if self.path then
+                  local pos = self.object:getpos()
+                  local pos2  = self.path[1]
+                  print(pos.y - pos2.y)
+                  if pos2.y - pos.y > 1 then
+                        --print("jump")
+                        local vel = self.object:getvelocity()
+                        local goal = 5
+                        local acceleration = vector.new(0,goal-vel.y,0)
+                        self.object:add_velocity(acceleration)
+                  end
             end
       end,
 
@@ -246,19 +245,14 @@ minetest.register_entity("mob:pig", {
       
       --sets the mob animation and speed
       set_animation = function(self)
-            local distance = vector.distance(vector.new(0,0,0), self.direction_goal)
+            local distance = vector.distance(vector.new(0,0,0), self.object:getvelocity())
             self.object:set_animation_frame_speed(distance*20)
       end,
 
       on_step = function(self, dtime)
-            self.push(self)
-            self.direction(self,dtime)
-            if not self.path then
-                  self.walk_random(self)
-            end
-            
-            self.move(self)
-            self.swim(self)
+            --self.push(self)
+            self.logic(self,dtime)
+            --self.swim(self)
             self.jump(self,false)
             self.set_animation(self)
       end,
