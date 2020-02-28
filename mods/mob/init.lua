@@ -13,7 +13,7 @@ minetest.register_entity("mob:pig", {
             hp_max = 1,
             physical = true,
             collide_with_objects = false,
-            collisionbox = {-0.45, -0.01, -0.45, 0.45, 0.865, 0.45},
+            collisionbox = {-0.37, -0.01, -0.37, 0.37, 0.865, 0.37},
             visual = "mesh",
             visual_size = {x = 3, y = 3},
             mesh = "pig.b3d",
@@ -153,9 +153,14 @@ minetest.register_entity("mob:pig", {
       end,
       
       delete_path_node = function(self)
-            local pos = vector.floor(vector.add(self.object:getpos(),0.5))
+            local pos = self.object:getpos()
+            pos.y = 0
             local goalnode = self.path[1]
-            if vector.equals(pos,goalnode) then
+            goalnode.y = 0
+            local distance = vector.distance(pos,goalnode)
+            print(distance)
+            if distance < 0.01 then
+                  print("deleting path node")
                   table.remove(self.path, 1)
             end 
             if table.getn(self.path) < 1 then
@@ -203,8 +208,14 @@ minetest.register_entity("mob:pig", {
             if self.path then
                   local vel = self.object:getvelocity()
                   local pos = self.object:getpos()
-                  local dir = vector.normalize(vector.subtract(self.path[1],pos))
+                  pos.y = 0
+                  local goal = self.path[1]
+                  goal.y = 0
+                  
+                  local dir = vector.normalize(vector.subtract(goal,pos))
                   local goal = vector.multiply(dir,2)
+                  
+                  --print(dump(goal))
                   
                   local acceleration = vector.new(goal.x-vel.x,0,goal.z-vel.z)
                   self.object:add_velocity(acceleration)
@@ -216,8 +227,10 @@ minetest.register_entity("mob:pig", {
             if self.path then
                   local pos = self.object:getpos()
                   local pos2  = self.path[1]
-                  print(pos.y - pos2.y)
-                  if pos2.y - pos.y > 1 then
+                  
+                  --print(pos.y, pos2.y)
+                  --print(pos.y - pos2.y)
+                  if pos2.y > pos.y then
                         --print("jump")
                         local vel = self.object:getvelocity()
                         local goal = 5
