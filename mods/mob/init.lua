@@ -136,6 +136,7 @@ minetest.register_entity("mob:pig", {
                   self.move(self)
                   if self.path and table.getn(self.path) > 0 then
                         for _,p in pairs(self.path) do
+                              --[[
                               minetest.add_particle({
                                     pos = p,
                                     velocity = {x=0, y=0, z=0},
@@ -146,6 +147,7 @@ minetest.register_entity("mob:pig", {
                                     vertical = false,
                                     texture = "wood.png",
                               })
+                              ]]--
                         end
                   end
             end
@@ -153,26 +155,14 @@ minetest.register_entity("mob:pig", {
       end,
       
       delete_path_node = function(self)
-            local pos = self.object:getpos()
-            pos.y = 0
-            local goalnode = self.path[1]
-            goalnode.y = 0
-            local distance = vector.distance(pos,goalnode)
-            print(distance)
-            if distance < 0.01 then
-                  print("deleting path node")
-                  table.remove(self.path, 1)
-            end 
-            if table.getn(self.path) < 1 then
-                  self.path = nil
-            end
+           entity.delete_path_node(self)
       end,  
             
       path_find = function(self)
             local pos2 = self.find_position(self)
 		if not self.path and pos2 then
 			local pos = vector.floor(vector.add(self.object:getpos(),0.5))
-			local path = minetest.find_path(pos,pos2,10,1,3,"A*")
+			local path = minetest.find_path(pos,pos2,10,1,3,"Dijkstra")
 			if path then
                         print("found path")
 				self.path = path
@@ -205,39 +195,12 @@ minetest.register_entity("mob:pig", {
       
       --This makes the mob walk at a certain speed
       move = function(self)
-            if self.path then
-                  local vel = self.object:getvelocity()
-                  local pos = self.object:getpos()
-                  pos.y = 0
-                  local goal = self.path[1]
-                  goal.y = 0
-                  
-                  local dir = vector.normalize(vector.subtract(goal,pos))
-                  local goal = vector.multiply(dir,2)
-                  
-                  --print(dump(goal))
-                  
-                  local acceleration = vector.new(goal.x-vel.x,0,goal.z-vel.z)
-                  self.object:add_velocity(acceleration)
-            end
+            entity.move(self)
       end,
       
       --make the mob jump
       jump = function(self,punched)
-            if self.path then
-                  local pos = self.object:getpos()
-                  local pos2  = self.path[1]
-                  
-                  --print(pos.y, pos2.y)
-                  --print(pos.y - pos2.y)
-                  if pos2.y > pos.y then
-                        --print("jump")
-                        local vel = self.object:getvelocity()
-                        local goal = 5
-                        local acceleration = vector.new(0,goal-vel.y,0)
-                        self.object:add_velocity(acceleration)
-                  end
-            end
+            entity.jump(self)
       end,
 
       --makes the mob swim
