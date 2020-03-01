@@ -26,14 +26,10 @@ entity.jump = function(self)
             local pos = vector.floor(vector.add(self.object:getpos(), 0.5))
             local pos2  = self.path[1]
             
-            print("-----------")
             
-            print(dump(pos))
-            
-            print(dump(pos2))
             
             if pos2.y > pos.y then
-                  print("jump")
+                  --print("jump")
                   local vel = self.object:getvelocity()
                   local goal = 5
                   local acceleration = vector.new(0,goal-vel.y,0)
@@ -50,7 +46,7 @@ entity.delete_path_node = function(self)
       
       
       if at_goal then
-            print("deleting path node")
+            --print("deleting path node")
             table.remove(self.path, 1)
       end 
       

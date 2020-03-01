@@ -162,9 +162,9 @@ minetest.register_entity("mob:pig", {
             local pos2 = self.find_position(self)
 		if not self.path and pos2 then
 			local pos = vector.floor(vector.add(self.object:getpos(),0.5))
-			local path = minetest.find_path(pos,pos2,10,1,3,"Dijkstra")
+			local path = minetest.find_path(pos,pos2,10,1,3,"A*_noprefetch")
 			if path then
-                        print("found path")
+                        --print("found path")
 				self.path = path
 			end
 		end

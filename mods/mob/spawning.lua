@@ -9,7 +9,7 @@ local inner = 24
 local outer = 128
 
 --for debug testing to isolate mobs
-local spawn = false
+local spawn = true
 
 minetest.register_globalstep(function(dtime)
       if spawn then
