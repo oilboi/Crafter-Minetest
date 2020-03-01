@@ -1,17 +1,17 @@
 print("Initializing nodes")
 
-minetest.register_node("main:stone", {
-    description = "Stone",
-    tiles = {"stone.png"},
-    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1},
-    sounds = main.stoneSound(),
-    drop="main:cobble",
-})
-
+--ore def with required tool
 local ores = {"coal","iron","gold","diamond"}
+local tool = {"main:woodpick","main:stonepick","main:ironpick","main:goldpick","main:diamondpick"}
 for id,ore in pairs(ores) do
-      local drop = "main:"..ore.."ore"
-      if ore == "diamond" then drop = "main:diamond" elseif ore == "coal" then drop = "main:coal" end
+      local tool_required = {}
+      for i = id,5 do
+            table.insert(tool_required, tool[i])
+      end
+
+      local drops = {"main:"..ore.."ore"}
+      if ore == "diamond" then drops = {"main:diamond"} elseif ore == "coal" then drops = {"main:coal"} end
+      
       
       minetest.register_node("main:"..ore.."ore", {
             description = ore:gsub("^%l", string.upper).." Ore",
@@ -19,15 +19,51 @@ for id,ore in pairs(ores) do
             groups = {stone = id, hard = id, pickaxe = 1, hand = 4,pathable = 1},
             sounds = main.stoneSound(),
             --light_source = 14,--debugging ore spawn
-            drop = drop,
-      })
+            drop = {
+                  max_items = 1,
+                  items= {
+                        {
+                              rarity = 0,
+                              tools = tool_required,
+                              items = drops,
+                        },
+                        },
+                  },
+            })
 end
+
+minetest.register_node("main:stone", {
+    description = "Stone",
+    tiles = {"stone.png"},
+    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1},
+    sounds = main.stoneSound(),
+    drop = {
+            max_items = 1,
+            items= {
+                  {
+                        rarity = 0,
+                        tools = tool,
+                        items = {"main:cobble"},
+                  },
+                  },
+            },
+      })
 
 minetest.register_node("main:cobble", {
     description = "Cobblestone",
     tiles = {"cobble.png"},
     groups = {stone = 2, hard = 1, pickaxe = 2, hand = 4,pathable = 1},
     sounds = main.stoneSound(),
+    drop = {
+            max_items = 1,
+            items= {
+                  {
+                        rarity = 0,
+                        tools = tool,
+                        items = {"main:cobble"},
+                  },
+                  },
+            },
 })
 
 minetest.register_node("main:dirt", {
