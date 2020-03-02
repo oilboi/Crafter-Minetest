@@ -136,7 +136,7 @@ minetest.register_entity("mob:pig", {
                   self.move(self)
                   if self.path and table.getn(self.path) > 0 then
                         for _,p in pairs(self.path) do
-                              --[[
+                              
                               minetest.add_particle({
                                     pos = p,
                                     velocity = {x=0, y=0, z=0},
@@ -147,7 +147,7 @@ minetest.register_entity("mob:pig", {
                                     vertical = false,
                                     texture = "wood.png",
                               })
-                              ]]--
+                              
                         end
                   end
             end
@@ -160,7 +160,10 @@ minetest.register_entity("mob:pig", {
             
       path_find = function(self)
             local pos2 = self.find_position(self)
+            
 		if not self.path and pos2 then
+                  print("updated goal position")
+                  self.goal_position = pos2
 			local pos = vector.floor(vector.add(self.object:getpos(),0.5))
 			local path = minetest.find_path(pos,pos2,10,1,3,"A*_noprefetch")
 			if path then
@@ -168,6 +171,23 @@ minetest.register_entity("mob:pig", {
 				self.path = path
 			end
 		end
+      end,
+      
+      
+      update_path = function(self)
+            local pos2 = self.goal_position
+            
+            if self.path then
+                  print("updated goal position")
+                  self.goal_position = pos2
+			local pos = vector.floor(vector.add(self.object:getpos(),0.5))
+			local path = minetest.find_path(pos,pos2,10,1,3,"A*_noprefetch")
+			if path then
+                        --print("found path")
+				self.path = path
+			end
+		end
+      
       end,
       
       
