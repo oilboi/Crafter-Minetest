@@ -5,7 +5,7 @@ function main.stoneSound(table)
       table.footstep = table.footstep or
                   {name = "stone", gain = 0.2}
       table.dug = table.dug or
-                  {name = "stone", gain = 1.0}
+                  {name = "stone_break", gain = 1.0}
       table.place = table.place or
                   {name = "stone", gain = 1.0}
       --default.node_sound_defaults(table)
