@@ -36,6 +36,9 @@ ALPHA STATE CHANGELOG
 --water buckets
 --buckets water farmland
 
+make mobs pathfind again when moving into new node
+
+
 crafting bench
 
 

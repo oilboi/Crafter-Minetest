@@ -6,6 +6,67 @@ local path = minetest.get_modpath(minetest.get_current_modname())
 dofile(path.."/spawning.lua")
 dofile(path.."/items.lua")
 
+
+--these are helpers to create entities
+
+local entity = {}
+
+
+entity.move = function(self)
+      if self.path then
+            local vel = self.object:getvelocity()
+            local pos = self.object:getpos()
+            pos.y = 0
+            local goal = table.copy(self.path[1])
+            goal.y = 0
+            
+            local dir = vector.normalize(vector.subtract(goal,pos))
+            local goal = vector.multiply(dir,2)
+            
+            local acceleration = vector.new(goal.x-vel.x,0,goal.z-vel.z)
+            
+            self.object:add_velocity(acceleration)
+      end
+end
+
+
+entity.jump = function(self)
+      if self.path then
+            local pos = vector.floor(vector.add(self.object:getpos(), 0.5))
+            local pos2  = self.path[1]
+            
+            
+            
+            if pos2.y > pos.y then
+                  --print("jump")
+                  local vel = self.object:getvelocity()
+                  local goal = 5
+                  local acceleration = vector.new(0,goal-vel.y,0)
+                  self.object:add_velocity(acceleration)
+            end
+      end
+end
+
+
+entity.delete_path_node = function(self)
+      local pos = vector.floor(vector.add(self.object:getpos(), 0.5))
+      local goalnode = self.path[1]
+      local at_goal = vector.equals(pos, goalnode)
+      
+      
+      if at_goal then
+            --print("deleting path node")
+            table.remove(self.path, 1)
+      end 
+      
+      if table.getn(self.path) == 0 then
+            self.path = nil
+      end
+end
+
+
+
+
 local max_speed = 0.5
 
 minetest.register_entity("mob:pig", {
@@ -162,7 +223,7 @@ minetest.register_entity("mob:pig", {
             local pos2 = self.find_position(self)
             
 		if not self.path and pos2 then
-                  print("updated goal position")
+                  --print("updated goal position")
                   self.goal_position = pos2
 			local pos = vector.floor(vector.add(self.object:getpos(),0.5))
 			local path = minetest.find_path(pos,pos2,10,1,3,"A*_noprefetch")
@@ -178,7 +239,7 @@ minetest.register_entity("mob:pig", {
             local pos2 = self.goal_position
             
             if self.path then
-                  print("updated goal position")
+                  --print("updated goal position")
                   self.goal_position = pos2
 			local pos = vector.floor(vector.add(self.object:getpos(),0.5))
 			local path = minetest.find_path(pos,pos2,10,1,3,"A*_noprefetch")

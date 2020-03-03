@@ -15,7 +15,7 @@ minetest.register_globalstep(function(dtime)
       if spawn then
       timer = timer + dtime
       if timer >= tick and math.random(1,chance) == chance then
-            print("ticking")
+            --print("ticking")
             timer = 0
             --check through players
             for _,player in ipairs(minetest.get_connected_players()) do
@@ -48,7 +48,7 @@ minetest.register_globalstep(function(dtime)
                         if table.getn(spawner) > 0 then
                               local mob_pos = spawner[1]
                               mob_pos.y = mob_pos.y + 1
-                              print("Spawning at: "..minetest.pos_to_string(mob_pos))
+                              --print("Spawning at: "..minetest.pos_to_string(mob_pos))
                               minetest.add_entity(mob_pos,"mob:pig")
                         end
                   end
