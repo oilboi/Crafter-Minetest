@@ -37,14 +37,12 @@ end)
 --throw all items on death
 minetest.register_on_dieplayer(function(player, reason)
       local pos = player:getpos()
-      print(reason)
       local inv = player:get_inventory()
       
       for i = 1,inv:get_size("main") do
             local stack = inv:get_stack("main", i)
             local name = stack:get_name()
             local count = stack:get_count()
-            print(name)
             if name ~= "" then
                   local obj = minetest.add_item(pos, name.." "..count)
                   obj:setvelocity(vector.new(math.random(-3,3),math.random(4,8),math.random(-3,3)))
@@ -256,4 +254,14 @@ minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
 			end
 		end
 	end,pos, newnode, placer, oldnode, itemstack, pointed_thing,old)
+end)
+
+--play sound to keep up with player's placing vs inconsistent client placing sound 
+minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
+	local sound = minetest.registered_nodes[newnode.name].sounds.placing
+	minetest.sound_play(sound.name, {
+		  pos = pos,
+		  gain = sound.gain,
+		  --pitch = math.random(60,100)/100
+	})
 end)
