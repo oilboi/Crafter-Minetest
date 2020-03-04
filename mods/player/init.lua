@@ -4,13 +4,15 @@ running - set fov set_fov(fov, is_multiplier) set_breath(value)
 sneaking --set eye offset
 
 ]]--
+crafter_version = 0.03
+
 minetest.register_on_joinplayer(function(player)
       --add in info
       player:hud_set_flags({minimap=true})
       player:hud_add({
             hud_elem_type = "text",
             position = {x=0,y=0},
-            text = "Crafter Alpha 0.1",
+            text = "Crafter Alpha "..crafter_version,
             number = 000000,
             alignment = {x=1,y=1},
             offset = {x=2, y=2},
@@ -18,7 +20,7 @@ minetest.register_on_joinplayer(function(player)
       player:hud_add({
             hud_elem_type = "text",
             position = {x=0,y=0},
-            text = "Crafter Alpha 0.1",
+            text = "Crafter Alpha "..crafter_version,
             number = 0xffffff,
             alignment = {x=1,y=1},
             offset = {x=0, y=0},

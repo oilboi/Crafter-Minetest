@@ -1,5 +1,5 @@
 ALPHA STATE CHANGELOG
-0.1
+0.01
 --make a grass biome
 --make trees
 --make hand - mod another mod
@@ -21,7 +21,8 @@ ALPHA STATE CHANGELOG
 --water flow faster
 --torches with particle
 --make a mob
---0.2
+
+--0.02
 --fix tools causing crash on pigs with no fleshy definition
 --ladders - only placeable on walls
 --eating animation - particles? - entity?
@@ -32,9 +33,16 @@ ALPHA STATE CHANGELOG
 (not finished) redstone - make nodes drop multiple items individually
 --make item collection move with the player's speed
 --made saplings
+
+
+0.03
 --make grass spread
 --water buckets
 --buckets water farmland
+-pickaxe required to mine stone based nodes
+-Crafting bench
+-Farming with hoes, grass drops seeds, bread, etc
+running out of a node when placing tries to replace it with another of the same item in inventory
 
 make mobs pathfind again when moving into new node
 
@@ -44,9 +52,6 @@ crafting bench
 
 
 farming - 
-- tall grass spawns on regular grass 
-- drops seeds 
-- add hoe 
 - add fertilizer (pig drops bone randomly) 
 - fertilizer is made out of bone - 
 - fertilizer can make tall grass grow on regular grass
