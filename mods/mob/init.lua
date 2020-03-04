@@ -9,66 +9,6 @@ dofile(path.."/items.lua")
 
 --these are helpers to create entities
 
-local entity = {}
-
-
-entity.move = function(self)
-      if self.path then
-            local vel = self.object:getvelocity()
-            local pos = self.object:getpos()
-            pos.y = 0
-            local goal = table.copy(self.path[1])
-            goal.y = 0
-            
-            local dir = vector.normalize(vector.subtract(goal,pos))
-            local goal = vector.multiply(dir,2)
-            
-            local acceleration = vector.new(goal.x-vel.x,0,goal.z-vel.z)
-            
-            self.object:add_velocity(acceleration)
-      end
-end
-
-
-entity.jump = function(self)
-      if self.path then
-            local pos = vector.floor(vector.add(self.object:getpos(), 0.5))
-            local pos2  = self.path[1]
-            
-            
-            
-            if pos2.y > pos.y then
-                  --print("jump")
-                  local vel = self.object:getvelocity()
-                  local goal = 5
-                  local acceleration = vector.new(0,goal-vel.y,0)
-                  self.object:add_velocity(acceleration)
-            end
-      end
-end
-
-
-entity.delete_path_node = function(self)
-      local pos = vector.floor(vector.add(self.object:getpos(), 0.5))
-      local goalnode = self.path[1]
-      local at_goal = vector.equals(pos, goalnode)
-      
-      
-      if at_goal then
-            --print("deleting path node")
-            table.remove(self.path, 1)
-      end 
-      
-      if table.getn(self.path) == 0 then
-            self.path = nil
-      end
-end
-
-
-
-
-local max_speed = 0.5
-
 minetest.register_entity("mob:pig", {
       initial_properties = {
             hp_max = 1,
@@ -86,17 +26,9 @@ minetest.register_entity("mob:pig", {
             is_visible = true,
             pointable = true,
             automatic_face_movement_dir = -90.0,
-            automatic_face_movement_max_rotation_per_sec = 300,
+            automatic_face_movement_max_rotation_per_sec = 600,
       },
-
-      timer = 0,
       hp = 5,
-      direction_timer = 0,
-      direction_timer_goal = 0,
-      direction_change = false,
-      change_direction = false,
-      speed = 0,
-      direction_goal = vector.new(0,0,0),
       mob = true,
       hostile = false,
 
@@ -121,10 +53,11 @@ minetest.register_entity("mob:pig", {
             end
             self.object:set_animation({x=0,y=40}, 20, 0, true)
             self.object:set_hp(self.hp)
+            self.direction = vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1))
       end,
             
       on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-            self.jump(self,true)
+            
             local hurt = tool_capabilities.damage_groups.fleshy
             if not hurt then
                   hurt = 1
@@ -214,75 +147,39 @@ minetest.register_entity("mob:pig", {
             end
             
       end,
+           
       
-      delete_path_node = function(self)
-           entity.delete_path_node(self)
-      end,  
-            
-      path_find = function(self)
-            local pos2 = self.find_position(self)
-            
-		if not self.path and pos2 then
-                  --print("updated goal position")
-                  self.goal_position = pos2
-			local pos = vector.floor(vector.add(self.object:getpos(),0.5))
-			local path = minetest.find_path(pos,pos2,10,1,3,"A*_noprefetch")
-			if path then
-                        --print("found path")
-				self.path = path
-			end
+      timer = math.random(1,3),
+      direction = vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1)),
+      
+      --This makes the mob walk at a certain speed and jump
+      move = function(self,dtime)
+		self.timer = self.timer - dtime
+		if self.timer <= 0 then
+			self.timer = math.random(1,3)
+			self.direction = vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1))
+		end
+		local pos1 = self.object:getpos()
+		local currentvel = self.object:getvelocity()
+		local goal = vector.multiply(self.direction,5)
+		local acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
+		acceleration = vector.multiply(acceleration, 0.5)
+		self.object:add_velocity(acceleration)
+		--try to jump
+		local in_front = minetest.raycast(pos1, vector.add(pos1,vector.multiply(self.direction,3)), false, false):next()
+		local below = minetest.raycast(pos1, vector.add(pos1, vector.new(0,-0.02,0)), false, false):next()
+		if in_front then
+			in_front = minetest.registered_nodes[minetest.get_node(in_front.under).name].walkable
+		end
+		if below then
+			below = minetest.registered_nodes[minetest.get_node(below.under).name].walkable
+		end
+		
+		if in_front and below then
+			self.object:add_velocity(vector.new(0,5,0))
 		end
       end,
       
-      
-      update_path = function(self)
-            local pos2 = self.goal_position
-            
-            if self.path then
-                  --print("updated goal position")
-                  self.goal_position = pos2
-			local pos = vector.floor(vector.add(self.object:getpos(),0.5))
-			local path = minetest.find_path(pos,pos2,10,1,3,"A*_noprefetch")
-			if path then
-                        --print("found path")
-				self.path = path
-			end
-		end
-      
-      end,
-      
-      
-      --this sets a random position for the mob to go to when randomly walking around
-      find_position = function(self)
-                              
-			local int = {-1,1}
-			local pos = vector.floor(vector.add(self.object:getpos(),0.5))
-			local x = pos.x + math.random(-10,10)
-			local z = pos.z + math.random(-10,10)
-			
-			
-			local location = minetest.find_nodes_in_area_under_air(vector.new(x,pos.y-32,z), vector.new(x,pos.y+32,z), {"group:pathable"})
-			
-			--print(dump(spawner))
-			if table.getn(location) > 0 then
-				local goal_pos = location[1]
-				goal_pos.y = goal_pos.y + 1
-                        return(goal_pos)
-			end
-      end,
-      
-      
-      
-      
-      --This makes the mob walk at a certain speed
-      move = function(self)
-            entity.move(self)
-      end,
-      
-      --make the mob jump
-      jump = function(self,punched)
-            entity.jump(self)
-      end,
 
       --makes the mob swim
       swim = function(self)
@@ -307,10 +204,7 @@ minetest.register_entity("mob:pig", {
       end,
 
       on_step = function(self, dtime)
-            --self.push(self)
-            self.logic(self,dtime)
-            --self.swim(self)
-            self.jump(self,false)
+			self.move(self,dtime)
             self.set_animation(self)
       end,
 })
