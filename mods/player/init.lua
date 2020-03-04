@@ -219,7 +219,7 @@ local dump_craft = function(player)
 	end
 end
 
-
+--this resets the craft table
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local inv = player:get_inventory()
 	dump_craft(player)
@@ -227,7 +227,33 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	inv:set_size("craft", 4)
 end)
 
-minetest.register_on_player_inventory_action(function(player, action, inventory, inventory_info)
-	print("inv test")
-
+--replace stack when empty (building)
+minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
+	local old = itemstack:get_name()
+	--pass through to check
+	minetest.after(0,function(pos, newnode, placer, oldnode, itemstack, pointed_thing,old)
+		local new = placer:get_wielded_item():get_name()
+		if old ~= new and new == "" then
+			local inv = placer:get_inventory()
+			--check if another stack
+			if inv:contains_item("main", old) then
+				--print("moving stack")
+				--run through inventory
+				for i = 1,inv:get_size("main") do
+					--if found set wielded item and remove old stack
+					if inv:get_stack("main", i):get_name() == old then
+						local count = inv:get_stack("main", i):get_count()
+						placer:set_wielded_item(old.." "..count)
+						inv:set_stack("main",i,ItemStack(""))	
+						minetest.sound_play("pickup", {
+							  to_player = player,
+							  gain = 0.7,
+							  pitch = math.random(60,100)/100
+						})
+						return				
+					end
+				end
+			end
+		end
+	end,pos, newnode, placer, oldnode, itemstack, pointed_thing,old)
 end)

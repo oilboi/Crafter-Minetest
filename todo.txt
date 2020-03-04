@@ -42,6 +42,7 @@ ALPHA STATE CHANGELOG
 -pickaxe required to mine stone based nodes
 -Crafting bench
 -Farming with hoes, grass drops seeds, bread, etc
+-simplify mobs ai
 running out of a node when placing tries to replace it with another of the same item in inventory
 
 make mobs pathfind again when moving into new node
