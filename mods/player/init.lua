@@ -178,17 +178,49 @@ minetest.register_globalstep(function(dtime)
 end)
 
 
-local inv =	"size[8,7.5]"..
-    "image[1,0.6;1,2;player.png]"..
-    "list[current_player;main;0,3.5;8,4;]"..
-    "list[current_player;craftpreview;7,1;1,1;]"..
-    "listring[]"..
-    "list[current_player;craft;3,0;3,3;]"
-    
+local inv =	"size[9,8.75]"..
+    --"image[1,0.6;1,2;player.png]"..
+    "list[current_player;main;0,4.5;9,1;]".. --hot bar
+	"list[current_player;main;0,6;9,3;9]".. --big part
+    "list[current_player;craft;2.5,1;2,2;]"..
+    "list[current_player;craftpreview;6.1,1.5;1,1;]"..
+    "listring[current_player;main]"..
+	"listring[current_player;craft]"
+ 
 
 
 minetest.register_on_joinplayer(function(player)
 	player:set_inventory_formspec(inv)
+	local inv = player:get_inventory()
+	inv:set_width("craft", 2)
+	inv:set_width("main", 9)
+	inv:set_size("main", 9*4)
+	player:hud_set_hotbar_itemcount(9)
+end)
+
+--this dumps the players crafting table on closing the inventory
+local dump_craft = function(player)
+	local inv = player:get_inventory()
+	local pos = player:getpos()
+	pos.y = pos.y + player:get_properties().eye_height
+	for i = 1,inv:get_size("craft") do
+		local item = inv:get_stack("craft", i)
+		local obj = minetest.add_item(pos, item)
+		if obj then
+			local x=math.random(-2,2)*math.random()
+            local y=math.random(2,5)
+            local z=math.random(-2,2)*math.random()
+            obj:setvelocity({x=x, y=y, z=z})
+		end
+		inv:set_stack("craft", i, nil)
+	end
+end
+
+
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+	local inv = player:get_inventory()
+	dump_craft(player)
+	inv:set_width("craft", 2)
 end)
 
 minetest.register_on_player_inventory_action(function(player, action, inventory, inventory_info)
