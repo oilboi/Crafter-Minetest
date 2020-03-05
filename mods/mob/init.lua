@@ -121,36 +121,8 @@ minetest.register_entity("mob:pig", {
             end
       end,
             
-      --this is the brain of the mob
-      logic = function(self,dtime)
-            if not self.path then
-                  self.path_find(self)
-            else
-                  self.delete_path_node(self)
-                  self.move(self)
-                  if self.path and table.getn(self.path) > 0 then
-                        for _,p in pairs(self.path) do
-                              
-                              minetest.add_particle({
-                                    pos = p,
-                                    velocity = {x=0, y=0, z=0},
-                                    acceleration = {x=0, y=0, z=0},
-                                    expirationtime = 0.1,
-                                    size = 1,
-                                    collisiondetection = false,
-                                    vertical = false,
-                                    texture = "wood.png",
-                              })
-                              
-                        end
-                  end
-            end
-            
-      end,
-           
       
-      timer = math.random(1,3),
-      direction = vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1)),
+      timer = 0,
       
       --This makes the mob walk at a certain speed and jump
       move = function(self,dtime)
@@ -166,17 +138,19 @@ minetest.register_entity("mob:pig", {
 		acceleration = vector.multiply(acceleration, 0.5)
 		self.object:add_velocity(acceleration)
 		--try to jump
-		local in_front = minetest.raycast(pos1, vector.add(pos1,vector.multiply(self.direction,3)), false, false):next()
-		local below = minetest.raycast(pos1, vector.add(pos1, vector.new(0,-0.02,0)), false, false):next()
-		if in_front then
-			in_front = minetest.registered_nodes[minetest.get_node(in_front.under).name].walkable
-		end
-		if below then
-			below = minetest.registered_nodes[minetest.get_node(below.under).name].walkable
-		end
-		
-		if in_front and below then
-			self.object:add_velocity(vector.new(0,5,0))
+		if currentvel.y <= 0 then
+			local in_front = minetest.raycast(pos1, vector.add(pos1,vector.multiply(self.direction,3)), false, false):next()
+			local below = minetest.raycast(pos1, vector.add(pos1, vector.new(0,-0.02,0)), false, false):next()
+			if in_front then
+				in_front = minetest.registered_nodes[minetest.get_node(in_front.under).name].walkable
+			end
+			if below then
+				below = minetest.registered_nodes[minetest.get_node(below.under).name].walkable
+			end
+			
+			if in_front and below then
+				self.object:add_velocity(vector.new(0,5,0))
+			end
 		end
       end,
       
