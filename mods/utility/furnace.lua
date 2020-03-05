@@ -45,11 +45,13 @@ end
 -- Node callback functions that are the same for active and inactive furnace
 --
 
+--[[
 local function can_dig(pos, player)
 	local meta = minetest.get_meta(pos);
 	local inv = meta:get_inventory()
 	return inv:is_empty("fuel") and inv:is_empty("dst") and inv:is_empty("src")
 end
+]]--
 
 local function allow_metadata_inventory_put(pos, listname, index, stack, player)
 	if minetest.is_protected(pos, player:get_player_name()) then
@@ -264,6 +266,19 @@ local function furnace_node_timer(pos, elapsed)
 
 	return result
 end
+--throw all items in furnace out on destroy
+local function destroy_furnace(pos)
+	local meta = minetest.get_meta(pos)
+	local inv = meta:get_inventory()
+	local lists = inv:get_lists()
+	for listname,_ in pairs(lists) do
+		local size = inv:get_size(listname)
+		for i = 1,size do
+			local stack = inv:get_stack(listname, i)
+			minetest.add_item(pos, stack)
+		end
+	end
+end
 
 --
 -- Node definitions
@@ -282,7 +297,7 @@ minetest.register_node("utility:furnace", {
 	is_ground_content = false,
 	sounds = main.stoneSound(),
 
-	can_dig = can_dig,
+	--can_dig = can_dig,
 
 	on_timer = furnace_node_timer,
 
@@ -302,6 +317,7 @@ minetest.register_node("utility:furnace", {
 		-- start timer function, it will sort out whether furnace can burn or not.
 		minetest.get_node_timer(pos):start(1.0)
 	end,
+	--[[
 	on_blast = function(pos)
 		local drops = {}
 		furnace.get_inventory_drops(pos, "src", drops)
@@ -311,7 +327,10 @@ minetest.register_node("utility:furnace", {
 		minetest.remove_node(pos)
 		return drops
 	end,
-
+	]]--
+	on_destruct = function(pos)
+		destroy_furnace(pos)
+	end,
 	allow_metadata_inventory_put = allow_metadata_inventory_put,
 	allow_metadata_inventory_move = allow_metadata_inventory_move,
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
@@ -343,11 +362,14 @@ minetest.register_node("utility:furnace_active", {
 	sounds = main.stoneSound(),
 	on_timer = furnace_node_timer,
 
-	can_dig = can_dig,
+	--can_dig = can_dig,
 
 	allow_metadata_inventory_put = allow_metadata_inventory_put,
 	allow_metadata_inventory_move = allow_metadata_inventory_move,
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
+	on_destruct = function(pos)
+		destroy_furnace(pos)
+	end,
 })
 
 minetest.register_craft({
