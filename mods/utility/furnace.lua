@@ -1,7 +1,7 @@
 local furnace = {}
 
 function furnace.get_furnace_active_formspec(fuel_percent, item_percent)
-	return "size[8,8.5]"..
+	return "size[9,8.75]"..
 		"list[context;src;2.75,0.5;1,1;]"..
 		"list[context;fuel;2.75,2.5;1,1;]"..
 		"image[2.75,1.5;1,1;default_furnace_fire_bg.png^[lowpart:"..
@@ -9,33 +9,34 @@ function furnace.get_furnace_active_formspec(fuel_percent, item_percent)
 		"image[3.75,1.5;1,1;gui_furnace_arrow_bg.png^[lowpart:"..
 		(item_percent)..":gui_furnace_arrow_fg.png^[transformR270]"..
 		"list[context;dst;4.75,0.96;2,2;]"..
-		"list[current_player;main;0,4.25;8,1;]"..
-		"list[current_player;main;0,5.5;8,3;8]"..
+		"list[current_player;main;0,4.5;9,1;]".. --hotbar
+		"list[current_player;main;0,6;9,3;8]".. --inventory
+		
 		"listring[context;dst]"..
 		"listring[current_player;main]"..
 		"listring[context;src]"..
 		"listring[current_player;main]"..
 		"listring[context;fuel]"..
-		"listring[current_player;main]"..
-		furnace.get_hotbar_bg(0, 4.25)
+		"listring[current_player;main]"
+		--furnace.get_hotbar_bg(0, 4.25)
 end
 
 function furnace.get_furnace_inactive_formspec()
-	return "size[8,8.5]"..
+	return "size[9,8.75]"..
 		"list[context;src;2.75,0.5;1,1;]"..
 		"list[context;fuel;2.75,2.5;1,1;]"..
 		"image[2.75,1.5;1,1;default_furnace_fire_bg.png]"..
 		"image[3.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]"..
 		"list[context;dst;4.75,0.96;2,2;]"..
-		"list[current_player;main;0,4.25;8,1;]"..
-		"list[current_player;main;0,5.5;8,3;8]"..
+		"list[current_player;main;0,4.5;9,1;]"..
+		"list[current_player;main;0,6;9,3;8]"..
 		"listring[context;dst]"..
 		"listring[current_player;main]"..
 		"listring[context;src]"..
 		"listring[current_player;main]"..
 		"listring[context;fuel]"..
-		"listring[current_player;main]"..
-		furnace.get_hotbar_bg(0, 4.25)
+		"listring[current_player;main]"
+		--furnace.get_hotbar_bg(0, 4.25)
 end
 
 --
@@ -56,9 +57,9 @@ local function allow_metadata_inventory_put(pos, listname, index, stack, player)
 	local inv = meta:get_inventory()
 	if listname == "fuel" then
 		if minetest.get_craft_result({method="fuel", width=1, items={stack}}).time ~= 0 then
-			if inv:is_empty("src") then
-				meta:set_string("infotext", "Furnace is empty")
-			end
+			--if inv:is_empty("src") then
+			--	meta:set_string("infotext", "Furnace is empty")
+			--end
 			return stack:get_count()
 		else
 			return 0
@@ -241,6 +242,7 @@ local function furnace_node_timer(pos, elapsed)
 	end
 
 
+	--[[
 	local infotext
 	if active then
 		infotext = ("Furnace active")
@@ -248,7 +250,7 @@ local function furnace_node_timer(pos, elapsed)
 		infotext = ("Furnace inactive")
 	end
 	infotext = infotext .. "\n" .. "Item:"..item_state.. "Fuel:"..fuel_state
-
+	]]--
 	--
 	-- Set meta values
 	--
@@ -256,7 +258,7 @@ local function furnace_node_timer(pos, elapsed)
 	meta:set_float("fuel_time", fuel_time)
 	meta:set_float("src_time", src_time)
 	meta:set_string("formspec", formspec)
-	meta:set_string("infotext", infotext)
+	--meta:set_string("infotext", infotext)
 
 	return result
 end
@@ -268,12 +270,12 @@ end
 minetest.register_node("utility:furnace", {
 	description = ("Furnace"),
 	tiles = {
-		"default_furnace_top.png", "default_furnace_bottom.png",
-		"default_furnace_side.png", "default_furnace_side.png",
-		"default_furnace_side.png", "default_furnace_front.png"
+		"furnace_top.png", "furnace_bottom.png",
+		"furnace_side.png", "furnace_side.png",
+		"furnace_side.png", "furnace_front.png"
 	},
 	paramtype2 = "facedir",
-	groups = {cracky=2},
+	groups = {stone=2},
 	legacy_facedir_simple = true,
 	is_ground_content = false,
 	sounds = main.stoneSound(),
@@ -316,11 +318,11 @@ minetest.register_node("utility:furnace", {
 minetest.register_node("utility:furnace_active", {
 	description = ("Furnace"),
 	tiles = {
-		"default_furnace_top.png", "default_furnace_bottom.png",
-		"default_furnace_side.png", "default_furnace_side.png",
-		"default_furnace_side.png",
+		"furnace_top.png", "furnace_bottom.png",
+		"furnace_side.png", "furnace_side.png",
+		"furnace_side.png",
 		{
-			image = "default_furnace_front_active.png",
+			image = "furnace_front_active.png",
 			backface_culling = false,
 			animation = {
 				type = "vertical_frames",
@@ -333,7 +335,7 @@ minetest.register_node("utility:furnace_active", {
 	paramtype2 = "facedir",
 	light_source = 8,
 	drop = "utility:furnace",
-	groups = {cracky=2, not_in_creative_inventory=1},
+	groups = {stone=2},
 	legacy_facedir_simple = true,
 	is_ground_content = false,
 	sounds = main.stoneSound(),
