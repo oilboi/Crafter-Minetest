@@ -197,6 +197,8 @@ minetest.register_on_joinplayer(function(player)
 	inv:set_size("main", 9*4)
 	inv:set_size("craft", 4)
 	player:hud_set_hotbar_itemcount(9)
+	player:hud_set_hotbar_image("inventory_hotbar.png")
+	player:hud_set_hotbar_selected_image("hotbar_selected.png")
 end)
 
 --this dumps the players crafting table on closing the inventory
