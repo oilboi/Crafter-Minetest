@@ -262,12 +262,12 @@ end)
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
 	local node = minetest.registered_nodes[newnode.name]
 	local sound = node.sounds
-	local placing = {}
+	local placing = ""
 	if sound then
 		placing = sound.placing
 	end
 	--only play the sound when is defined
-	if table.getn(placing) > 0 then
+	if type(placing) == "table" then
 		minetest.sound_play(placing.name, {
 			  pos = pos,
 			  gain = placing.gain,
