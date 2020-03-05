@@ -179,7 +179,7 @@ end)
 
 
 local inv =	"size[9,8.75]"..
-    --"image[1,0.6;1,2;player.png]"..
+    "background[-0.19,-0.25;9.41,9.49;main_inventory.png]"..
     "list[current_player;main;0,4.5;9,1;]".. --hot bar
 	"list[current_player;main;0,6;9,3;9]".. --big part
     "list[current_player;craft;2.5,1;2,2;]"..

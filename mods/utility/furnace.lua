@@ -2,6 +2,7 @@ local furnace = {}
 
 function furnace.get_furnace_active_formspec(fuel_percent, item_percent)
 	return "size[9,8.75]"..
+		"background[-0.19,-0.25;9.41,9.49;gui_hb_bg.png]"..
 		"list[context;src;2.75,0.5;1,1;]"..
 		"list[context;fuel;2.75,2.5;1,1;]"..
 		"image[2.75,1.5;1,1;default_furnace_fire_bg.png^[lowpart:"..
@@ -23,6 +24,7 @@ end
 
 function furnace.get_furnace_inactive_formspec()
 	return "size[9,8.75]"..
+		"background[-0.19,-0.25;9.41,9.49;gui_hb_bg.png]"..
 		"list[context;src;2.75,0.5;1,1;]"..
 		"list[context;fuel;2.75,2.5;1,1;]"..
 		"image[2.75,1.5;1,1;default_furnace_fire_bg.png]"..

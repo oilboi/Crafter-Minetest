@@ -11,7 +11,7 @@ minetest.register_node("craftingtable:craftingtable", {
 		player:get_inventory():set_size("craft", 9)
 
 		local form = "size[9,8.75]"..
-		--"background[-0.19,-0.25;9.41,9.49;crafting_formspec_bg.png^crafting_inventory_workbench.png]"..
+		"background[-0.19,-0.25;9.41,9.49;crafting_inventory_workbench.png]"..
 		"list[current_player;main;0,4.5;9,1;]".. --hot bar
 		"list[current_player;main;0,6;9,3;9]".. --big part
 		
