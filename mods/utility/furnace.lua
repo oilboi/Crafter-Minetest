@@ -1,797 +1,356 @@
---[[
-Mechanic ideology
-
-spawn 3 entities - cook fuel output
-
-detect on x or z axis
-
-use recipe cook time
-
-then pass output to cooked entity
-
-when player hits entity then drop item towards player
-
-when cooking have fire and smoke on cooking item
-
-]]--
-
---furnace class
-minetest.register_craftitem("utility:nothing", {
-      description = "Nothing",
-      inventory_image = "wood.png",
-})
-
 local furnace = {}
---gap = 0.55
-local fuel_height = 0.75
-local cook_height = 1.3
-local output_height = 1.85
 
---furnace
-function furnace.get_hotbar_bg(x,y)
-      local out = ""
-      for i=0,7,1 do
-            out = out .."image["..x+i..","..y..";1,1;gui_furnace_arrow_bg.png]"
-      end
-      return(out)
+function furnace.get_furnace_active_formspec(fuel_percent, item_percent)
+	return "size[8,8.5]"..
+		"list[context;src;2.75,0.5;1,1;]"..
+		"list[context;fuel;2.75,2.5;1,1;]"..
+		"image[2.75,1.5;1,1;default_furnace_fire_bg.png^[lowpart:"..
+		(fuel_percent)..":default_furnace_fire_fg.png]"..
+		"image[3.75,1.5;1,1;gui_furnace_arrow_bg.png^[lowpart:"..
+		(item_percent)..":gui_furnace_arrow_fg.png^[transformR270]"..
+		"list[context;dst;4.75,0.96;2,2;]"..
+		"list[current_player;main;0,4.25;8,1;]"..
+		"list[current_player;main;0,5.5;8,3;8]"..
+		"listring[context;dst]"..
+		"listring[current_player;main]"..
+		"listring[context;src]"..
+		"listring[current_player;main]"..
+		"listring[context;fuel]"..
+		"listring[current_player;main]"..
+		furnace.get_hotbar_bg(0, 4.25)
 end
 
-function furnace.get_inventory_drops(pos, inventory, drops)
-      local inv = minetest.get_meta(pos):get_inventory()
-      local n = #drops
-      for i = 1, inv:get_size(inventory) do
-            local stack = inv:get_stack(inventory, i)
-            if stack:get_count() > 0 then
-                  drops[n+1] = stack:to_table()
-                  n = n + 1
-            end
-      end
+function furnace.get_furnace_inactive_formspec()
+	return "size[8,8.5]"..
+		"list[context;src;2.75,0.5;1,1;]"..
+		"list[context;fuel;2.75,2.5;1,1;]"..
+		"image[2.75,1.5;1,1;default_furnace_fire_bg.png]"..
+		"image[3.75,1.5;1,1;gui_furnace_arrow_bg.png^[transformR270]"..
+		"list[context;dst;4.75,0.96;2,2;]"..
+		"list[current_player;main;0,4.25;8,1;]"..
+		"list[current_player;main;0,5.5;8,3;8]"..
+		"listring[context;dst]"..
+		"listring[current_player;main]"..
+		"listring[context;src]"..
+		"listring[current_player;main]"..
+		"listring[context;fuel]"..
+		"listring[current_player;main]"..
+		furnace.get_hotbar_bg(0, 4.25)
 end
---local aftercooked
---cooked, aftercooked = minetest.get_craft_result({method = "cooking", width = 1, items = srclist})
---cookable = cooked.time ~= 0
+
+--
+-- Node callback functions that are the same for active and inactive furnace
+--
+
+local function can_dig(pos, player)
+	local meta = minetest.get_meta(pos);
+	local inv = meta:get_inventory()
+	return inv:is_empty("fuel") and inv:is_empty("dst") and inv:is_empty("src")
+end
+
+local function allow_metadata_inventory_put(pos, listname, index, stack, player)
+	if minetest.is_protected(pos, player:get_player_name()) then
+		return 0
+	end
+	local meta = minetest.get_meta(pos)
+	local inv = meta:get_inventory()
+	if listname == "fuel" then
+		if minetest.get_craft_result({method="fuel", width=1, items={stack}}).time ~= 0 then
+			if inv:is_empty("src") then
+				meta:set_string("infotext", "Furnace is empty")
+			end
+			return stack:get_count()
+		else
+			return 0
+		end
+	elseif listname == "src" then
+		return stack:get_count()
+	elseif listname == "dst" then
+		return 0
+	end
+end
+
+local function allow_metadata_inventory_move(pos, from_list, from_index, to_list, to_index, count, player)
+	local meta = minetest.get_meta(pos)
+	local inv = meta:get_inventory()
+	local stack = inv:get_stack(from_list, from_index)
+	return allow_metadata_inventory_put(pos, to_list, to_index, stack, player)
+end
+
+local function allow_metadata_inventory_take(pos, listname, index, stack, player)
+	if minetest.is_protected(pos, player:get_player_name()) then
+		return 0
+	end
+	return stack:get_count()
+end
+
+local function swap_node(pos, name)
+	local node = minetest.get_node(pos)
+	if node.name == name then
+		return
+	end
+	node.name = name
+	minetest.swap_node(pos, node)
+end
+
+local function furnace_node_timer(pos, elapsed)
+	--
+	-- Initialize metadata
+	--
+	local meta = minetest.get_meta(pos)
+	local fuel_time = meta:get_float("fuel_time") or 0
+	local src_time = meta:get_float("src_time") or 0
+	local fuel_totaltime = meta:get_float("fuel_totaltime") or 0
+
+	local inv = meta:get_inventory()
+	local srclist, fuellist
+	local dst_full = false
+
+	local cookable, cooked
+	local fuel
+
+	local update = true
+	while elapsed > 0 and update do
+		update = false
+
+		srclist = inv:get_list("src")
+		fuellist = inv:get_list("fuel")
+
+		--
+		-- Cooking
+		--
+
+		-- Check if we have cookable content
+		local aftercooked
+		cooked, aftercooked = minetest.get_craft_result({method = "cooking", width = 1, items = srclist})
+		cookable = cooked.time ~= 0
+
+		local el = math.min(elapsed, fuel_totaltime - fuel_time)
+		if cookable then -- fuel lasts long enough, adjust el to cooking duration
+			el = math.min(el, cooked.time - src_time)
+		end
+
+		-- Check if we have enough fuel to burn
+		if fuel_time < fuel_totaltime then
+			-- The furnace is currently active and has enough fuel
+			fuel_time = fuel_time + el
+			-- If there is a cookable item then check if it is ready yet
+			if cookable then
+				src_time = src_time + el
+				if src_time >= cooked.time then
+					-- Place result in dst list if possible
+					if inv:room_for_item("dst", cooked.item) then
+						inv:add_item("dst", cooked.item)
+						inv:set_stack("src", 1, aftercooked.items[1])
+						src_time = src_time - cooked.time
+						update = true
+					else
+						dst_full = true
+					end
+				else
+					-- Item could not be cooked: probably missing fuel
+					update = true
+				end
+			end
+		else
+			-- Furnace ran out of fuel
+			if cookable then
+				-- We need to get new fuel
+				local afterfuel
+				fuel, afterfuel = minetest.get_craft_result({method = "fuel", width = 1, items = fuellist})
+
+				if fuel.time == 0 then
+					-- No valid fuel in fuel list
+					fuel_totaltime = 0
+					src_time = 0
+				else
+					-- Take fuel from fuel list
+					inv:set_stack("fuel", 1, afterfuel.items[1])
+					-- Put replacements in dst list or drop them on the furnace.
+					local replacements = fuel.replacements
+					if replacements[1] then
+						local leftover = inv:add_item("dst", replacements[1])
+						if not leftover:is_empty() then
+							local above = vector.new(pos.x, pos.y + 1, pos.z)
+							local drop_pos = minetest.find_node_near(above, 1, {"air"}) or above
+							minetest.item_drop(replacements[1], nil, drop_pos)
+						end
+					end
+					update = true
+					fuel_totaltime = fuel.time + (fuel_totaltime - fuel_time)
+				end
+			else
+				-- We don't need to get new fuel since there is no cookable item
+				fuel_totaltime = 0
+				src_time = 0
+			end
+			fuel_time = 0
+		end
+
+		elapsed = elapsed - el
+	end
+
+	if fuel and fuel_totaltime > fuel.time then
+		fuel_totaltime = fuel.time
+	end
+	if srclist and srclist[1]:is_empty() then
+		src_time = 0
+	end
+
+	--
+	-- Update formspec, infotext and node
+	--
+	local formspec
+	local item_state
+	local item_percent = 0
+	if cookable then
+		item_percent = math.floor(src_time / cooked.time * 100)
+		if dst_full then
+			item_state = ("100% (output full)")
+		else
+			item_state = (item_percent)
+		end
+	else
+		if srclist and not srclist[1]:is_empty() then
+			item_state = ("Not cookable")
+		else
+			item_state = ("Empty")
+		end
+	end
+
+	local fuel_state = ("Empty")
+	local active = false
+	local result = false
+
+	if fuel_totaltime ~= 0 then
+		active = true
+		local fuel_percent = 100 - math.floor(fuel_time / fuel_totaltime * 100)
+		fuel_state = (fuel_percent)
+		formspec = furnace.get_furnace_active_formspec(fuel_percent, item_percent)
+		swap_node(pos, "utility:furnace_active")
+		-- make sure timer restarts automatically
+		result = true
+	else
+		if fuellist and not fuellist[1]:is_empty() then
+			fuel_state = (0)
+		end
+		formspec = furnace.get_furnace_inactive_formspec()
+		swap_node(pos, "utility:furnace")
+		-- stop timer on the inactive furnace
+		minetest.get_node_timer(pos):stop()
+	end
+
+
+	local infotext
+	if active then
+		infotext = ("Furnace active")
+	else
+		infotext = ("Furnace inactive")
+	end
+	infotext = infotext .. "\n" .. "Item:"..item_state.. "Fuel:"..fuel_state
+
+	--
+	-- Set meta values
+	--
+	meta:set_float("fuel_totaltime", fuel_totaltime)
+	meta:set_float("fuel_time", fuel_time)
+	meta:set_float("src_time", src_time)
+	meta:set_string("formspec", formspec)
+	meta:set_string("infotext", infotext)
+
+	return result
+end
+
 --
 -- Node definitions
 --
 
-local function furnace_setup(pos)
-      local obj = minetest.add_entity(vector.new(pos.x,pos.y+fuel_height,pos.z), "utility:fuel")
-      obj:get_luaentity().set_item(obj:get_luaentity(),"utility:nothing")
-      local obj = minetest.add_entity(vector.new(pos.x,pos.y+cook_height,pos.z), "utility:cook")
-      obj:get_luaentity().set_item(obj:get_luaentity(),"utility:nothing")
-      local obj = minetest.add_entity(vector.new(pos.x,pos.y+output_height,pos.z), "utility:output")
-      obj:get_luaentity().set_item(obj:get_luaentity(),"utility:nothing")
-end
-
-local function furnace_remove(pos)
-      for _,object in ipairs(minetest.get_objects_inside_radius(vector.new(pos.x,pos.y+fuel_height,pos.z), 0.1)) do
-            if not object:is_player() and object:get_luaentity() and object:get_luaentity().name == "utility:fuel" then
-                  local pos = object:getpos()
-                  local item = object:get_luaentity().itemstring
-                  if item ~= "utility:nothing" then
-                        local obj = minetest.add_item(pos,item)                      
-                  end
-                  object:remove()
-            end
-      end
-      for _,object in ipairs(minetest.get_objects_inside_radius(vector.new(pos.x,pos.y+cook_height,pos.z), 0.1)) do
-            if not object:is_player() and object:get_luaentity() and object:get_luaentity().name == "utility:cook" then
-                  local pos = object:getpos()
-                  local item = object:get_luaentity().itemstring
-                  if item ~= "utility:nothing" then
-                        local obj = minetest.add_item(pos,item)
-                  end
-                  object:remove()
-            end
-      end
-      for _,object in ipairs(minetest.get_objects_inside_radius(vector.new(pos.x,pos.y+output_height,pos.z), 0.1)) do
-            if not object:is_player() and object:get_luaentity() and object:get_luaentity().name == "utility:output" then
-                  local pos = object:getpos()
-                  local item = object:get_luaentity().itemstring
-                  if item ~= "utility:nothing" then
-                        local obj = minetest.add_item(pos,item)
-                  end
-                  object:remove()
-            end
-      end
-end
-
 minetest.register_node("utility:furnace", {
-      description = "Furnace",
-      tiles = {
-            "furnace_top.png", "furnace_bottom.png",
-            "furnace_side.png", "furnace_side.png",
-            "furnace_side.png", "furnace_front.png"
-      },
-      paramtype2 = "facedir",
-      groups = {stone=2},
-      legacy_facedir_simple = true,
-      is_ground_content = false,
-      sounds = main.stoneSound(),
-      on_construct = function(pos)
-            furnace_setup(pos)
-      end,
-      on_destruct = function(pos)
-            furnace_remove(pos)
-      end,
+	description = ("Furnace"),
+	tiles = {
+		"default_furnace_top.png", "default_furnace_bottom.png",
+		"default_furnace_side.png", "default_furnace_side.png",
+		"default_furnace_side.png", "default_furnace_front.png"
+	},
+	paramtype2 = "facedir",
+	groups = {cracky=2},
+	legacy_facedir_simple = true,
+	is_ground_content = false,
+	sounds = main.stoneSound(),
+
+	can_dig = can_dig,
+
+	on_timer = furnace_node_timer,
+
+	on_construct = function(pos)
+		local meta = minetest.get_meta(pos)
+		local inv = meta:get_inventory()
+		inv:set_size('src', 1)
+		inv:set_size('fuel', 1)
+		inv:set_size('dst', 4)
+		furnace_node_timer(pos, 0)
+	end,
+
+	on_metadata_inventory_move = function(pos)
+		minetest.get_node_timer(pos):start(1.0)
+	end,
+	on_metadata_inventory_put = function(pos)
+		-- start timer function, it will sort out whether furnace can burn or not.
+		minetest.get_node_timer(pos):start(1.0)
+	end,
+	on_blast = function(pos)
+		local drops = {}
+		furnace.get_inventory_drops(pos, "src", drops)
+		furnace.get_inventory_drops(pos, "fuel", drops)
+		furnace.get_inventory_drops(pos, "dst", drops)
+		drops[#drops+1] = "utility:furnace"
+		minetest.remove_node(pos)
+		return drops
+	end,
+
+	allow_metadata_inventory_put = allow_metadata_inventory_put,
+	allow_metadata_inventory_move = allow_metadata_inventory_move,
+	allow_metadata_inventory_take = allow_metadata_inventory_take,
+})
+
+minetest.register_node("utility:furnace_active", {
+	description = ("Furnace"),
+	tiles = {
+		"default_furnace_top.png", "default_furnace_bottom.png",
+		"default_furnace_side.png", "default_furnace_side.png",
+		"default_furnace_side.png",
+		{
+			image = "default_furnace_front_active.png",
+			backface_culling = false,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 1.5
+			},
+		}
+	},
+	paramtype2 = "facedir",
+	light_source = 8,
+	drop = "utility:furnace",
+	groups = {cracky=2, not_in_creative_inventory=1},
+	legacy_facedir_simple = true,
+	is_ground_content = false,
+	sounds = main.stoneSound(),
+	on_timer = furnace_node_timer,
+
+	can_dig = can_dig,
+
+	allow_metadata_inventory_put = allow_metadata_inventory_put,
+	allow_metadata_inventory_move = allow_metadata_inventory_move,
+	allow_metadata_inventory_take = allow_metadata_inventory_take,
 })
 
 minetest.register_craft({
-      output = "utility:furnace",
-      recipe = {
-            {"main:stone", "main:stone", "main:stone"},
-            {"main:stone", "",           "main:stone"},
-            {"main:stone", "main:stone", "main:stone"},
-      }
-})
-
---------------------------------------------------------------------------------------------------
---[[
-
-minetest.get_craft_result({method = "cooking", width = 1, items = srclist}) --check if cookable
-
-minetest.get_craft_result({method = "fuel", width = 1, items = fuellist}) --check if fuel
-
-space in between = 0.55
-
-]]--
-
-
---fuel entity
-minetest.register_entity("utility:fuel", {
-      initial_properties = {
-            hp_max = 1,
-            physical = true,
-            collide_with_objects = false,
-            collisionbox = {-0.3, -0.3, -0.3, 0.3, 0.3, 0.3},
-            visual = "wielditem",
-            visual_size = {x = 0.6, y = 0.6},
-            textures = {""},
-            spritediv = {x = 1, y = 1},
-            initial_sprite_basepos = {x = 0, y = 0},
-            is_visible = false,
-            pointable = true,
-      },
-
-      itemstring = "",
-      count = 0,
-      cooking = false,
-      cook_timer = false,
-      fuel_timer = 0,
-
-      set_item = function(self, item)
-            local stack = ItemStack(item or self.itemstring)
-            self.itemstring = stack:to_string()
-            --if self.itemstring == "" then
-                  -- item not yet known
-            --      return
-            --end
-            
-            local count = stack:get_count()
-            self.count = count
-
-            -- Backwards compatibility: old clients use the texture
-            -- to get the type of the item
-            local itemname = stack:is_known() and stack:get_name() or "unknown"
-
-            local max_count = stack:get_stack_max()
-            local size = 0.25
-            local coll_height = size * 0.75
-            local def = minetest.registered_nodes[itemname]
-            --local glow = def and def.light_source
-
-            self.object:set_properties({
-                  is_visible = true,
-                  visual = "wielditem",
-                  textures = {itemname},
-                  visual_size = {x = size, y = size},
-                  --collisionbox = {-size, -coll_height, -size,
-                  --      size, coll_height, size},
-                  selectionbox = {-size, -size, -size, size, size, size},
-                  automatic_rotate = math.pi * 0.5 * 0.2 / size,
-                  wield_item = self.itemstring,
-                  glow = glow,
-            })
-      end,
-
-      get_staticdata = function(self)
-            return minetest.serialize({
-                  itemstring = self.itemstring,
-                  count = self.count,                  
-            })
-      end,
-
-      on_activate = function(self, staticdata, dtime_s)
-            if string.sub(staticdata, 1, string.len("return")) == "return" then
-                  local data = minetest.deserialize(staticdata)
-                  if data and type(data) == "table" then
-                        self.itemstring = data.itemstring
-                        self.count = data.count
-                  end
-            else
-                  self.itemstring = staticdata
-            end
-            self.object:set_armor_groups({immortal = 1})
-            self.object:set_velocity({x = 0, y = 0, z = 0})
-            self.object:set_acceleration({x = 0, y = 0, z = 0})
-            self:set_item()
-      end,
-      
-      on_rightclick = function(self, clicker)
-            
-            if not clicker or not clicker:is_player() then
-                  return
-            end
-            
-            local stack = clicker:get_wielded_item()
-            
-            local item = stack:get_name()
-            local count = stack:get_count()
-            if stack:get_name() == "utility:nothing" then
-                  count = 0
-            end
-            
-            --shoot out existing item
-            if self.itemstring ~= item.." "..count and self.itemstring ~= "utility:nothing" then
-                  local pos = self.object:getpos()
-                  local pos2 = clicker:getpos()
-                  pos2.y = pos2.y + 1.25
-                  local obj = minetest.add_item(pos,self.itemstring)
-                  local dir = vector.subtract(pos2,pos)
-                  vector.multiply(dir,5)
-                  
-                  if obj then
-                        obj:setvelocity(vector.new(dir.x,dir.y+3.5,dir.z))
-                  else
-                        print("ERROR FURNACE RELEASED NON ITEM")
-                  end
-            end
-            
-            if (item == "" or item == "hand:player") then
-                  self.set_item(self,"utility:nothing")
-                  self.object:set_nametag_attributes({
-                        color = "red",
-                        text = "",
-                  })
-                  return
-            end
-                        
-            self.set_item(self, item.." "..count)
-            
-            self.object:set_nametag_attributes({
-                  color = "red",
-                  text = minetest.registered_items[item].description.." "..count,
-            })
-            
-            stack = stack:clear()
-            clicker:set_wielded_item("")
-      end,
-      
-      on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-            if not puncher or not puncher:is_player() then
-                  return
-            end
-            
-            if self.itemstring == "utility:nothing" then
-                  return
-            end
-            
-            local pos = self.object:getpos()
-            local pos2 = puncher:getpos()
-            pos2.y = pos2.y + 1.25
-                        
-            local obj = minetest.add_item(pos,self.itemstring)
-            local dir = vector.subtract(pos2,pos)
-            vector.multiply(dir,5)
-            
-            self.set_item(self,"utility:nothing")
-            self.object:set_nametag_attributes({
-                  color = "red",
-                  text = "",
-            })
-            
-            if obj then
-                  obj:setvelocity(vector.new(dir.x,dir.y+3.5,dir.z))
-            else
-                  print("ERROR FURNACE RELEASED NON ITEM")
-            end
-      end,
-
-      check_cook = function(self)
-            local pos = self.object:getpos()
-            --check the cook timer
-            for _,object in ipairs(minetest.get_objects_inside_radius(vector.new(pos.x,pos.y+0.55,pos.z), 0.1)) do
-                  if not object:is_player() and object:get_luaentity() and object:get_luaentity().name == "utility:cook" then
-                        local item = object:get_luaentity().itemstring
-                        return(minetest.get_craft_result({method = "cooking", width = 1, items = {ItemStack(item)}}).time)
-                  end
-            end
-      end,
-      
-      cook_item = function(self)
-            local pos = self.object:getpos()
-            for _,object in ipairs(minetest.get_objects_inside_radius(vector.new(pos.x,pos.y+0.55,pos.z), 0.1)) do
-                  if not object:is_player() and object:get_luaentity() and object:get_luaentity().name == "utility:cook" then
-                        local item = ItemStack(object:get_luaentity().itemstring)
-                        if not item then
-                              return
-                        end
-                        local count = object:get_luaentity().count
-                        local output = minetest.get_craft_result({method = "cooking", width = 1, items = {ItemStack(item)}}).item
-                        local outputitem =  output:get_name()
-                        local outputcount = output:get_count()
-                        
-                        
-                        local itemname = item:get_name()
-                        
-                        count = count - 1
-                        
-                        object:get_luaentity().count = count
-                        
-                        local pos = self.object:getpos()
-                        
-                        --add to output
-                        for _,object2 in ipairs(minetest.get_objects_inside_radius(vector.new(pos.x,pos.y+1.10,pos.z), 0.1)) do
-                              if not object2:is_player() and object2:get_luaentity() and object2:get_luaentity().name == "utility:output" then
-                                    local goal_item = ItemStack(object2:get_luaentity().itemstring)
-                                    local goal_item_name = goal_item:get_name()
-                                    local goal_item_count = goal_item:get_count()
-                                    
-                                    --cancel out if player took item
-                                    if outputitem == "" then
-                                          return
-                                    end
-                                    
-                                    --add item to output or throw existing item out if not matched
-                                    if goal_item_name ~= outputitem and goal_item_name ~= "utility:nothing" then
-                                          local pos2 = object2:get_pos()
-                                          local obj = minetest.add_item(pos2,object2:get_luaentity().itemstring)
-                                          local dir = vector.new(math.random(-3,3),math.random(3,6),math.random(-3,3))
-                                          --dir = vector.multiply(dir,2)
-                                                                                    
-                                          if obj then
-                                                obj:setvelocity(vector.new(dir.x,dir.y,dir.z))
-                                          else
-                                                print("ERROR FURNACE RELEASED NON ITEM")
-                                          end
-                                          object2:get_luaentity().count = 0
-                                    end
-                                    
-                                    object2:get_luaentity().count =  object2:get_luaentity().count + outputcount
-                                    object2:get_luaentity().set_item(object2:get_luaentity(), outputitem.." "..object2:get_luaentity().count)
-                                    object2:set_nametag_attributes({
-                                          color = "blue",
-                                          text = outputitem.." "..object2:get_luaentity().count,
-                                    })
-                                    
-                              end
-                        end
-                        
-                        --update count and nametag
-                        if object:get_luaentity().count == 0 then
-                              object:get_luaentity().set_item(object:get_luaentity(), "utility:nothing")
-                              object:set_nametag_attributes({
-                                    color = "blue",
-                                    text = "",
-                              })
-                        else
-                              object:get_luaentity().set_item(object:get_luaentity(), itemname.." "..count)
-                              object:set_nametag_attributes({
-                                    color = "blue",
-                                    text = itemname.." "..count,
-                              })
-                        end
-                  end
-            end
-      end,
-      
-      spawn_particles = function(self,time)
-            --print("time:"..time)
-            local pos = self.object:getpos()
-            minetest.add_particlespawner({
-                  amount = math.floor(10*time),
-                  time = time,
-                  minpos = vector.new(pos.x-0.3,pos.y-0.3,pos.z-0.3),
-                  maxpos = vector.new(pos.x+0.3,pos.y+0.3,pos.z+0.3),
-                  minvel = {x=0, y=0.2, z=0},
-                  maxvel = {x=0, y=0.5, z=0},
-                  minacc = {x=0, y=0, z=0},
-                  maxacc = {x=0, y=0, z=0},
-                  minexptime = 1.1,
-                  maxexptime = 1.3,
-                  minsize = 1,
-                  maxsize = 2,
-                  collisiondetection = false,
-                  vertical = true,
-                  texture = "flame.png",
-            })
-            
-            
-            minetest.add_particlespawner({
-                  amount = math.floor(10*time),
-                  time = time,
-                  minpos = vector.new(pos.x-0.3,pos.y+0.3,pos.z-0.3),
-                  maxpos = vector.new(pos.x+0.3,pos.y+0.6,pos.z+0.3),
-                  minvel = {x=0, y=0.2, z=0},
-                  maxvel = {x=0, y=0.7, z=0},
-                  minacc = {x=0, y=0, z=0},
-                  maxacc = {x=0, y=0, z=0},
-                  minexptime = 1.1,
-                  maxexptime = 1.5,
-                  minsize = 1,
-                  maxsize = 2,
-                  collisiondetection = false,
-                  vertical = false,
-                  texture = "smoke.png",
-            })
-      end,
-      
-      
-      
-      --check if item is in the input then cook if so
-      on_step = function(self, dtime)
-            if self.cooking == true then
-                  self.cooking_timer = self.cooking_timer - dtime
-                  if self.cooking_timer < 0 then
-                        self.cooking_timer = 0
-                        self.cook_item(self)
-                        self.cooking = false
-                  end                              
-            end
-            
-            --check to start cooking countdown
-            if self.cooking == false then
-                  local stack = ItemStack(self.itemstring)
-                  local fuel = minetest.get_craft_result({method =  "fuel", width = 1, items = {stack}}).time
-                  if fuel ~= 0 then
-                        local cookie = self.check_cook(self)
-                        if cookie ~= 0 then
-                              --print("starting timer")
-                              self.spawn_particles(self,fuel)
-                              self.cooking_timer = cookie
-                              self.cooking = true
-                              --set up the fuel timer
-                              if self.fuel_timer == 0 then
-                                    self.fuel_timer = fuel
-                              end
-                        end
-                  end
-            end
-            
-            --deplete fuel
-            if self.fuel_timer >= 0 then
-                  self.fuel_timer = self.fuel_timer - dtime
-                  --print(self.fuel_timer)
-            elseif self.fuel_timer < 0 then
-                  if ItemStack(self.itemstring):get_name() == "utility:nothing" then
-                        return
-                  end
-                  if self.cooking == false then
-                        return
-                  end
-                  self.count = self.count - 1
-                  
-                  local count = self.count
-                  local itemname = ItemStack(self.itemstring):get_name()
-                  
-                  if self.count == 0 then
-                        self.set_item(self, "utility:nothing")
-                        self.object:set_nametag_attributes({
-                              color = "red",
-                              text = "",
-                        })
-                  else
-                        self.set_item(self, itemname.." "..count)
-                        self.object:set_nametag_attributes({
-                              color = "red",
-                              text = itemname.." "..count,
-                        })
-                  end
-                  
-                  if self.count == 0 then 
-                        return
-                  end
-                  
-                  --reset timer
-                  if self.cooking == true then
-                        --print("resetting timer")
-                        local time = minetest.get_craft_result({method =  "fuel", width = 1, items = {ItemStack(self.itemstring)}}).time
-                        self.fuel_timer = time
-                  end
-            end
-      end,      
-})
-
-----------------------------------------------------------------------------
---cook entity
-minetest.register_entity("utility:cook", {
-      initial_properties = {
-            hp_max = 1,
-            physical = true,
-            collide_with_objects = false,
-            collisionbox = {-0.3, -0.3, -0.3, 0.3, 0.3, 0.3},
-            visual = "wielditem",
-            visual_size = {x = 0.6, y = 0.6},
-            textures = {""},
-            spritediv = {x = 1, y = 1},
-            initial_sprite_basepos = {x = 0, y = 0},
-            is_visible = false,
-            pointable = true,
-      },
-
-      itemstring = "",
-      count = 0,
-
-      set_item = function(self, item)
-            local stack = ItemStack(item or self.itemstring)
-            self.itemstring = stack:to_string()
-            --if self.itemstring == "" then
-                  -- item not yet known
-            --      return
-            --end
-            
-            local count = stack:get_count()
-            if stack:get_name() == "utility:nothing" then
-                  count = 0
-            end
-            self.count = count
-
-            -- Backwards compatibility: old clients use the texture
-            -- to get the type of the item
-            local itemname = stack:is_known() and stack:get_name() or "unknown"
-
-            local max_count = stack:get_stack_max()
-            local size = 0.25
-            local coll_height = size * 0.75
-            local def = minetest.registered_nodes[itemname]
-            --local glow = def and def.light_source
-
-            self.object:set_properties({
-                  is_visible = true,
-                  visual = "wielditem",
-                  textures = {itemname},
-                  visual_size = {x = size, y = size},
-                  --collisionbox = {-size, -coll_height, -size,
-                  --      size, coll_height, size},
-                  selectionbox = {-size, -size, -size, size, size, size},
-                  automatic_rotate = math.pi * 0.5 * 0.2 / size,
-                  wield_item = self.itemstring,
-                  glow = glow,
-            })
-      end,
-
-      get_staticdata = function(self)
-            return minetest.serialize({
-                  itemstring = self.itemstring,
-                  count = self.count,                  
-            })
-      end,
-
-      on_activate = function(self, staticdata, dtime_s)
-            if string.sub(staticdata, 1, string.len("return")) == "return" then
-                  local data = minetest.deserialize(staticdata)
-                  if data and type(data) == "table" then
-                        self.itemstring = data.itemstring
-                        self.count = data.count
-                  end
-            else
-                  self.itemstring = staticdata
-            end
-            self.object:set_armor_groups({immortal = 1})
-            self.object:set_velocity({x = 0, y = 0, z = 0})
-            self.object:set_acceleration({x = 0, y = 0, z = 0})
-            self:set_item()
-      end,
-      
-      on_rightclick = function(self, clicker)
-            
-            if not clicker or not clicker:is_player() then
-                  return
-            end
-            
-            local stack = clicker:get_wielded_item()
-            
-            local item = stack:get_name()
-            local count = stack:get_count()
-            
-            --shoot out existing item
-            if self.itemstring ~= item.." "..count and self.itemstring ~= "utility:nothing" then
-                  local pos = self.object:getpos()
-                  local pos2 = clicker:getpos()
-                  pos2.y = pos2.y + 1.25
-                  local obj = minetest.add_item(pos,self.itemstring)
-                  local dir = vector.subtract(pos2,pos)
-                  vector.multiply(dir,5)
-                  
-                  if obj then
-                        obj:setvelocity(vector.new(dir.x,dir.y+3.5,dir.z))
-                  else
-                        print("ERROR FURNACE RELEASED NON ITEM")
-                  end
-            end
-            
-            if (item == "" or item == "hand:player") then
-                  self.set_item(self,"utility:nothing")
-                  self.object:set_nametag_attributes({
-                        color = "blue",
-                        text = "",
-                  })
-                  return
-            end
-                        
-            self.set_item(self, item.." "..count)
-            
-            self.object:set_nametag_attributes({
-                  color = "blue",
-                  text = minetest.registered_items[item].description.." "..count,
-            })
-            
-            stack = stack:clear()
-            clicker:set_wielded_item("")
-      end,
-      
-      on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-            if not puncher or not puncher:is_player() then
-                  return
-            end
-            
-            if self.itemstring == "utility:nothing" then
-                  return
-            end
-            
-            local pos = self.object:getpos()
-            local pos2 = puncher:getpos()
-            pos2.y = pos2.y + 1.25
-                        
-            local obj = minetest.add_item(pos,self.itemstring)
-            local dir = vector.subtract(pos2,pos)
-            vector.multiply(dir,5)
-            
-            self.set_item(self,"utility:nothing")
-            self.object:set_nametag_attributes({
-                  color = "blue",
-                  text = "",
-            })
-            
-            if obj then
-                  obj:setvelocity(vector.new(dir.x,dir.y+3.5,dir.z))
-            else
-                  print("ERROR FURNACE RELEASED NON ITEM")
-            end
-      end,
-
-
-      on_step = function(self, dtime)
-            --set glow if cooking
-            --local glow = def and def.light_source
-      end,
-})
-----------------------------------------------------------------------------
---ouput entity
-minetest.register_entity("utility:output", {
-      initial_properties = {
-            hp_max = 1,
-            physical = true,
-            collide_with_objects = false,
-            collisionbox = {-0.3, -0.3, -0.3, 0.3, 0.3, 0.3},
-            visual = "wielditem",
-            visual_size = {x = 0.6, y = 0.6},
-            textures = {""},
-            spritediv = {x = 1, y = 1},
-            initial_sprite_basepos = {x = 0, y = 0},
-            is_visible = false,
-            pointable = true,
-      },
-
-      itemstring = "",
-      count = 0,
-
-      set_item = function(self, item)
-            local stack = ItemStack(item or self.itemstring)
-            self.itemstring = stack:to_string()
-            --if self.itemstring == "" then
-                  -- item not yet known
-            --      return
-            --end
-            
-            local count = stack:get_count()
-            if stack:get_name() == "utility:nothing" then
-                  count = 0
-            end
-            self.count = count
-
-            -- Backwards compatibility: old clients use the texture
-            -- to get the type of the item
-            local itemname = stack:is_known() and stack:get_name() or "unknown"
-
-            local max_count = stack:get_stack_max()
-            local size = 0.25
-            local coll_height = size * 0.75
-            local def = minetest.registered_nodes[itemname]
-            --local glow = def and def.light_source
-
-            self.object:set_properties({
-                  is_visible = true,
-                  visual = "wielditem",
-                  textures = {itemname},
-                  visual_size = {x = size, y = size},
-                  --collisionbox = {-size, -coll_height, -size,
-                  --      size, coll_height, size},
-                  selectionbox = {-size, -size, -size, size, size, size},
-                  automatic_rotate = math.pi * 0.5 * 0.2 / size,
-                  wield_item = self.itemstring,
-                  glow = glow,
-            })
-      end,
-
-      get_staticdata = function(self)
-            return minetest.serialize({
-                  itemstring = self.itemstring,
-                  count = self.count,                  
-            })
-      end,
-
-      on_activate = function(self, staticdata, dtime_s)
-            if string.sub(staticdata, 1, string.len("return")) == "return" then
-                  local data = minetest.deserialize(staticdata)
-                  if data and type(data) == "table" then
-                        self.itemstring = data.itemstring
-                        self.count = data.count
-                  end
-            else
-                  self.itemstring = staticdata
-            end
-            self.object:set_armor_groups({immortal = 1})
-            self.object:set_velocity({x = 0, y = 0, z = 0})
-            self.object:set_acceleration({x = 0, y = 0, z = 0})
-            self:set_item()
-      end,
-            
-      on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-            if not puncher or not puncher:is_player() then
-                  return
-            end
-            
-            if self.itemstring == "utility:nothing" then
-                  return
-            end
-            
-            self.count = 0
-            
-            local pos = self.object:getpos()
-            local pos2 = puncher:getpos()
-            pos2.y = pos2.y + 1.25
-                        
-            local obj = minetest.add_item(pos,self.itemstring)
-            local dir = vector.subtract(pos2,pos)
-            vector.multiply(dir,5)
-            
-            self.set_item(self,"utility:nothing")
-            self.object:set_nametag_attributes({
-                  color = "blue",
-                  text = "",
-            })
-            
-            if obj then
-                  obj:setvelocity(vector.new(dir.x,dir.y+3.5,dir.z))
-            else
-                  print("ERROR FURNACE RELEASED NON ITEM")
-            end
-      end,
-
-
-      on_step = function(self, dtime)
-            --set glow if cooking
-            --local glow = def and def.light_source
-      end,
-})
-
-
-minetest.register_craft({
-      output = "utility:furnace",
-      recipe = {
-            {"main:cobble", "main:cobble", "main:cobble"},
-            {"main:cobble", "", "main:cobble"},
-            {"main:cobble", "main:cobble", "main:cobble"},
-      },
+	output = "utility:furnace",
+	recipe = {
+		{"group:stone", "group:stone", "group:stone"},
+		{"group:stone", "", "group:stone"},
+		{"group:stone", "group:stone", "group:stone"},
+	}
 })

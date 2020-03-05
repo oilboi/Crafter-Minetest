@@ -258,10 +258,18 @@ end)
 
 --play sound to keep up with player's placing vs inconsistent client placing sound 
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
-	local sound = minetest.registered_nodes[newnode.name].sounds.placing
-	minetest.sound_play(sound.name, {
-		  pos = pos,
-		  gain = sound.gain,
-		  --pitch = math.random(60,100)/100
-	})
+	local node = minetest.registered_nodes[newnode.name]
+	local sound = node.sounds
+	local placing = {}
+	if sound then
+		placing = sound.placing
+	end
+	--only play the sound when is defined
+	if table.getn(placing) > 0 then
+		minetest.sound_play(placing.name, {
+			  pos = pos,
+			  gain = placing.gain,
+			  --pitch = math.random(60,100)/100
+		})
+	end
 end)
