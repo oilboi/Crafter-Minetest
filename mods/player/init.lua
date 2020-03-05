@@ -92,7 +92,9 @@ minetest.register_globalstep(function(dtime)
                   end
                   
                   if fov < 1.2 then
-                        player:set_fov(fov + 0.05, true)
+                        player:set_fov(fov + dtime, true)
+                  elseif fov > 1.2 then
+						player:set_fov(1.2, true)
                   end
                   
                   player:set_physics_override({speed=1.5})
@@ -100,7 +102,9 @@ minetest.register_globalstep(function(dtime)
                   local meta = player:get_meta()
                   local fov = player:get_fov()
                   if fov > 1 then
-                        player:set_fov(fov - 0.05, true)
+                        player:set_fov(fov - dtime, true)
+                  elseif fov < 1 then
+						player:set_fov(1, true)
                   end
                   
                   player:set_physics_override({speed=1})
