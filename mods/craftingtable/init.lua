@@ -24,9 +24,9 @@ minetest.register_node("craftingtable:craftingtable", {
 	end,
 })
 minetest.register_craft({
-      output = "craftingtable:craftingtable",
-      recipe = {
-            {"main:wood","main:wood"},
-            {"main:wood","main:wood"}
-      }
+	output = "craftingtable:craftingtable",
+	recipe = {
+		{"main:wood","main:wood"},
+		{"main:wood","main:wood"}
+	}
 })
