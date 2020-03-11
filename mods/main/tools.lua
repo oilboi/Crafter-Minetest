@@ -31,8 +31,26 @@ for level,material in pairs(material) do
 			},
 			sound = {breaks = {name="tool_break",gain=0.4}}, -- change this
 			groups = {flammable = 2, tool=1 },
+			--torch rightclick - hacked in since api doesn't call on_place correctly
 			on_place = function(itemstack, placer, pointed_thing)
-				
+				local inv = placer:get_inventory()
+				local torch = inv:contains_item("main", "torch:torch")
+				local is_air = minetest.get_node(pointed_thing.above).name == "air"
+				local dir = vector.subtract(pointed_thing.under, pointed_thing.above)
+				local diff = dir.y
+				if torch and is_air then
+					if diff == 0 then
+						local param2 = minetest.dir_to_wallmounted(dir)
+						minetest.set_node(pointed_thing.above, {name="torch:wall",param2=param2})
+						minetest.sound_play("wood", {pos=pointed_thing.above, gain = 1.0})
+					elseif diff == -1 then
+						minetest.place_node(pointed_thing.above,{name="torch:floor"})
+					end
+					--take item
+					if diff == 0 or diff == -1 then
+						inv:remove_item("main", "torch:torch")
+					end	
+				end
 			end,
 		})
 	end

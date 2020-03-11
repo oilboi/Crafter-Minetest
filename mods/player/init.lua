@@ -236,6 +236,9 @@ minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
 	local old = itemstack:get_name()
 	--pass through to check
 	minetest.after(0,function(pos, newnode, placer, oldnode, itemstack, pointed_thing,old)
+		if not placer then
+			return
+		end
 		local new = placer:get_wielded_item():get_name()
 		if old ~= new and new == "" then
 			local inv = placer:get_inventory()

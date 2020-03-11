@@ -18,7 +18,6 @@ local function get_offset(wdir)
 end
 --add in smoke and fire
 local function create_ps(pos)
-	print("test")
 	local dir = get_offset(minetest.get_node(pos).param2)
 	local ppos = vector.add(dir,pos)
 	minetest.add_particle({
