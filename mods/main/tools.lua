@@ -38,7 +38,16 @@ for level,material in pairs(material) do
 				local is_air = minetest.get_node(pointed_thing.above).name == "air"
 				local dir = vector.subtract(pointed_thing.under, pointed_thing.above)
 				local diff = dir.y
-				if torch and is_air then
+				local noddef = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
+				local walkable = noddef.walkable
+				local sneak = placer:get_player_control().sneak
+				
+				if not sneak and noddef.on_rightclick then
+					minetest.item_place(itemstack, placer, pointed_thing)
+					return
+				end
+				
+				if torch and is_air and walkable then
 					if diff == 0 then
 						local param2 = minetest.dir_to_wallmounted(dir)
 						minetest.set_node(pointed_thing.above, {name="torch:wall",param2=param2})
