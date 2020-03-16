@@ -138,7 +138,7 @@ minetest.register_node("redstone:torch_floor", {
 	drop = "redstone:torch",
 	walkable = false,
 	light_source = 13,
-	groups = {choppy=2, dig_immediate=3, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,connect_to_raillike=1},
+	groups = {choppy=2, dig_immediate=3, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,redstone_torch=1,connect_to_raillike=1},
 	legacy_wallmounted = true,
 	selection_box = {
 		type = "fixed",
@@ -183,10 +183,10 @@ minetest.register_node("redstone:torch_wall", {
 		redstone.update(pos)
 	end,
 	after_destruct = function(pos, oldnode)
-		--redstone.update(pos,oldnode)
+		redstone.update(pos,oldnode)
 	end,
 	on_destruct = function(pos)
-		delete_ps(pos)
+		--delete_ps(pos)
 	end,
 	sounds = main.woodSound(),
 })
@@ -271,12 +271,14 @@ for i = 0,1 do
 			type = "fixed",
 			fixed = {-1/16, -0.5, -1/16, 1/16, 2/16, 1/16},
 		},
+		--[[
 		on_construct = function(pos)
 			redstone.update(pos)
 		end,
 		after_destruct = function(pos, oldnode)
 			redstone.update(pos,oldnode)
 		end,
+		]]--
 		sounds = main.woodSound(),
 	})
 
@@ -301,12 +303,14 @@ for i = 0,1 do
 			wall_bottom = {-0.1, -0.5, -0.1, 0.1, 0.1, 0.1},
 			wall_side = {-0.5, -0.3, -0.1, -0.2, 0.3, 0.1},
 		},
+		--[[
 		on_construct = function(pos)
 			redstone.update(pos)
 		end,
 		after_destruct = function(pos, oldnode)
 			redstone.update(pos,oldnode)
 		end,
+		]]--
 		sounds = main.woodSound(),
 	})
 
