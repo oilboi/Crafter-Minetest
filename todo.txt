@@ -48,6 +48,9 @@ ALPHA STATE CHANGELOG
 -add in default furnace
 --add backgrounds to all gui elements
 --make furnaces drop all items on destroy instead of not allowing you to mine them
+--added glass - smelt sand
+--added boat 
+--rightclicking with tool places torch
 chest
 make chest drop all items when you mine them
 
@@ -68,8 +71,6 @@ fishing
 bows
 fix full inventory collection deletion bug
 3d character
-boat
-shiftclick with tool tries to place torch
 make tnt hurt player
 rewrite minecart - halfway - make go up and down hills
 right click with tool places torch

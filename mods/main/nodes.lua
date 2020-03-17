@@ -66,6 +66,22 @@ minetest.register_node("main:cobble", {
 		},
 })
 
+minetest.register_node("main:glass", {
+    description = "Glass",
+    tiles = {"glass.png"},
+    drawtype = "glasslike",
+	paramtype = "light",
+	--paramtype2 = "glasslikeliquidlevel",
+	sunlight_propagates = true,
+	is_ground_content = false,
+    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1},
+    sounds = main.stoneSound({
+		footstep = {name = "glass_footstep", gain = 0.4},
+        dug =  {name = "break_glass", gain = 0.4},
+	}),
+    drop = "",
+	})
+
 minetest.register_node("main:dirt", {
     description = "Dirt",
     tiles = {"dirt.png"},

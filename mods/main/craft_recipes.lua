@@ -35,8 +35,16 @@ minetest.register_craft({
 	type = "cooking",
 	output = "main:stone",
 	recipe = "main:cobble",
-	cooktime = 3,
+	cooktime = 2,
 })
+
+minetest.register_craft({
+	type = "cooking",
+	output = "main:glass",
+	recipe = "main:sand",
+	cooktime = 1,
+})
+
 
 --fuel fuel fuel
 minetest.register_craft({
