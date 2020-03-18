@@ -61,6 +61,24 @@ function redstone.collect_info(pos)
 					table.insert(r_index,i)
 					--redstone.collect_info(i,pos)
 				end
+			--index objects that activate
+			elseif minetest.get_node_group(minetest.get_node(i).name, "redstone_activation") > 0 then
+				--check the index
+				--do not add duplicates with this methods
+				local already_in = false
+				for _,t in ipairs(r_index) do
+					for _,tabler in ipairs(r_index) do
+						if already_in == false and vector.equals(tabler,i) then
+							already_in = true
+						end
+					end
+				end
+				--add if not already in
+				if already_in == false then
+					i.type = "redstone_activation"
+					table.insert(r_index,i)
+					--redstone.collect_info(i,pos)
+				end
 			end
 		end
 	end
@@ -101,7 +119,10 @@ function redstone.calculate()
 			if not temp_table[i.x] then temp_table[i.x] = {} end
 			if not temp_table[i.x][i.y] then temp_table[i.x][i.y] = {} end
 			temp_table[i.x][i.y][i.z] = 0
-			
+		elseif i.type == "redstone_activation" then
+			if not temp_table[i.x] then temp_table[i.x] = {} end
+			if not temp_table[i.x][i.y] then temp_table[i.x][i.y] = {} end
+			temp_table[i.x][i.y][i.z] = ""
 		end
 	end
 	
@@ -128,7 +149,11 @@ function redstone.calculate()
 		for y,datay in pairs(datax) do
 			for z,level in pairs(datay) do
 				--print(dump(z),dump(dataz))
-				minetest.set_node(vector.new(x,y,z),{name="redstone:dust_"..level})
+				if type(level) == "number" then
+					minetest.set_node(vector.new(x,y,z),{name="redstone:dust_"..level})
+				elseif type(level) == "string" and level == "activate" then
+					minetest.registered_nodes[minetest.get_node(vector.new(x,y,z)).name].redstone_activation(vector.new(x,y,z))
+				end
 			end
 		end
 	end	
@@ -143,11 +168,21 @@ function redstone.pathfind(temp_table,source,source_level)
 		i = vector.add(vector.new(source.x,source.y,source.z),vector.new(x,y,z))
 		if temp_table and temp_table[i.x] and temp_table[i.x][i.y] and temp_table[i.x][i.y][i.z] then
 			level = temp_table[i.x][i.y][i.z]
-			if level < source_level then
-				passed_on_level = source_level - 1
-				temp_table[i.x][i.y][i.z] = passed_on_level
-				if passed_on_level > 0 then
-					redstone.pathfind(temp_table,i,passed_on_level)
+			
+			--normal redstone
+			if type(level) == "number" then
+				if level < source_level then
+					local passed_on_level = source_level - 1
+					temp_table[i.x][i.y][i.z] = passed_on_level
+					if passed_on_level > 0 then
+						redstone.pathfind(temp_table,i,passed_on_level)
+					end
+				end
+			--activators
+			elseif type(level) == "string" then
+				local passed_on_level = source_level - 1
+				if source_level > 0 then
+					temp_table[i.x][i.y][i.z] = "activate"
 				end
 			end
 		end
@@ -156,30 +191,6 @@ function redstone.pathfind(temp_table,source,source_level)
 	end
 	return(temp_table)
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
