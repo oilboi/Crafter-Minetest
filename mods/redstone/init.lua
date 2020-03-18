@@ -1,15 +1,5 @@
 --[[
-
-redstone powder is raillike
-
-check if solid block above
---if so, do not conduct above
-
-uses height level to do powerlevel
-
-uses lightlevel
-a function for adding and removing redstone level
-
+might have to calculate this in a local memory table then set the nodes using a voxelmanip
 ]]--
 
 
@@ -25,102 +15,86 @@ dofile(path.."/torch.lua")
 redstone = {}
 
 --this is the internal check for getting the max_power 
-function redstone.update_everything(pos)
-	local range = 1
-	local min = vector.add(pos,range)
-	local max = vector.subtract(pos,range)
-	local vm = minetest.get_voxel_manip()	
-	local emin, emax = vm:read_from_map(min,max)
-	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
-	local data = vm:get_data()
-	local content_id = minetest.get_name_from_content_id
-	local origin_pos = area:index(pos.x,pos.y,pos.z)
-	local origin_n = content_id(data[origin_pos])
-	local origin_level = minetest.registered_nodes[origin_n].power
-	local max_level = 0
+function redstone.add(pos)
+	local max = 0
+	local current = 0
 	
-	for x=-range, range do
-	for y=-range, range do
-	for z=-range, range do
-			if not vector.equals(pos, vector.add(pos,vector.new(x,y,z))) then
-				local p_pos = area:index(pos.x+x,pos.y+y,pos.z+z)							
-				local n = content_id(data[p_pos])
-				
-				local level2 = minetest.registered_nodes[n].power
-				
-				if level2 and level2 > max_level then
-					max_level = level2 - 1
+	--chargup
+	for x = -1,1 do
+	for y = -1,1 do
+	for z = -1,1 do
+		if not vector.equals(vector.new(0,0,0),vector.new(x,y,z)) then
+			local pos2 = vector.add(pos,vector.new(x,y,z))
+			local power = minetest.registered_nodes[minetest.get_node(pos2).name].power
+			if power then
+				if power > max then
+					max = power
+					current = max - 1
 				end
 			end
+		end
 	end
 	end
-	end
-	--print("Max level:",max_level,"origin level:",origin_level)
-	
-	if not origin_level or (origin_level and max_level < origin_level) then
-		max_level = 0
 	end
 	
-	
-	if minetest.get_node_group(origin_n, "redstone_dust") > 0 then
-		data[origin_pos] = minetest.get_content_id("redstone:dust_"..max_level)
-	end
-
-	--update lower power level redstone
-	--print("------------------------")
-	for x=-range, range do
-	for y=-range, range do
-	for z=-range, range do
-			if not vector.equals(pos, vector.add(pos,vector.new(x,y,z))) then
-				local p_pos = area:index(pos.x+x,pos.y+y,pos.z+z)							
-				local n = content_id(data[p_pos])
-				
-				local level2 = minetest.registered_nodes[n].power
-				
-				if level2 and level2 < max_level then
-					if minetest.get_node_group(n, "redstone_dust") > 0 then
-						--data[p_pos] = minetest.get_content_id("redstone:dust_"..max_level-1)
-						minetest.after(0,function(pos,x,y,z)
-							redstone.update_everything(vector.add(pos,vector.new(x,y,z)))
-						end,pos,x,y,z)
-					end
-				end
-				if level2 and max_level < level2 and origin_level ~= max_level then
-					minetest.after(0,function(pos,x,y,z)
-							redstone.update_everything(vector.add(pos,vector.new(x,y,z)))
-						end,pos,x,y,z)
-				end
+	minetest.set_node(pos,{name="redstone:dust_"..current})	
+	--transfer
+	for x = -1,1 do
+	for y = -1,1 do
+	for z = -1,1 do
+		local pos2 = vector.add(pos,vector.new(x,y,z))
+		local power = minetest.registered_nodes[minetest.get_node(pos2).name].power
+		if power then
+			if power < current then
+				minetest.after(0,function(pos2)
+					redstone.add(pos2)
+				end,pos2)
 			end
+		end
 	end
 	end
 	end
-	
-	
-	vm:set_data(data)
-	vm:write_to_map()
-	vm:update_map()
 end
 
-
-
-
---3d plane direct neighbor
-function redstone.update(pos,oldnode)
-
-	--local old_max_level = minetest.registered_nodes[minetest.get_node(pos).name].power	
-	--change to dust
-	--[[
-	if minetest.get_node_group(minetest.get_node(pos).name, "redstone_dust") > 0 then
-		minetest.set_node(pos, {name="redstone:dust_"..max_level})
-	elseif minetest.get_node_group(minetest.get_node(pos).name, "redstone_wire") > 0 then
-		minetest.set_node(pos, {name="redstone:wire_"..max_level})
+function redstone.remove(pos,oldpower)
+	local max = 0
+	
+	--chargup
+	for x = -1,1 do
+	for y = -1,1 do
+	for z = -1,1 do
+		if not vector.equals(vector.new(0,0,0),vector.new(x,y,z)) then
+			local pos2 = vector.add(pos,vector.new(x,y,z))
+			local power = minetest.registered_nodes[minetest.get_node(pos2).name].power
+			if power and power ~= 9 then
+				--print(power)
+				if power > max then
+					max = power
+				end
+			end
+		end
 	end
-	]]--
-	
-	
-	--updating the other redstone
-	redstone.update_everything(pos)
-
+	end
+	end
+	for x = -1,1 do
+	for y = -1,1 do
+	for z = -1,1 do
+		if not vector.equals(vector.new(0,0,0),vector.new(x,y,z)) then
+			local pos2 = vector.add(pos,vector.new(x,y,z))
+			local power = minetest.registered_nodes[minetest.get_node(pos2).name].power
+			if power then
+				if power < oldpower then
+					minetest.set_node(pos,{name="redstone:dust_0"})
+					
+					minetest.after(0,function(pos2)
+						redstone.remove(pos2,power)
+					end,pos2)
+				end
+			end
+		end
+	end
+	end
+	end
 end
 
 minetest.register_craftitem("redstone:dust", {
@@ -139,7 +113,7 @@ minetest.register_craftitem("redstone:dust", {
 			itemstack:take_item(1)
 			--print(minetest.get_node(pointed_thing.above).param1)
 			minetest.after(0,function(pointed_thing)
-				redstone.update(pos)
+				redstone.add(pos)
 			end,pointed_thing)
 			return(itemstack)
 		end
@@ -173,11 +147,11 @@ for i = 0,8 do
 		drop="redstone:dust",
 		on_place = function(itemstack, placer, pointed_thing)
 			minetest.item_place_node(itemstack, placer, pointed_thing)
-			redstone.update(pos)
+			redstone.add(pos)
 		end,
 		on_dig = function(pos, node, digger)
+			redstone.remove(pos,minetest.registered_nodes[minetest.get_node(pos).name].power)
 			minetest.node_dig(pos, node, digger)
-			redstone.update(pos,node)
 		end,
 		connects_to = {"group:redstone"},
 	})
