@@ -1,71 +1,91 @@
-minetest.register_node("redstone:wire",{
-      description = "Redstone Dust",
-      wield_image = "redstone_dust_item.png",
-      paramtype = "light",
-      drawtype = "nodebox",
-      --paramtype2 = "wallmounted",
-      walkable = false,
-      node_box = {
-            type = "connected",
-            --{xmin, ymin, zmin, xmax, ymax, zmax}
+--this is the internal check for getting the max_power 
+function redstone.add(pos,torch)
+	local max = 0
+	local current = 0
+	
+	--chargup
+	for x = -1,1 do
+	for y = -1,1 do
+	for z = -1,1 do
+		if not vector.equals(vector.new(0,0,0),vector.new(x,y,z)) then
+			local pos2 = vector.add(pos,vector.new(x,y,z))
+			local power = minetest.registered_nodes[minetest.get_node(pos2).name].power
+			if power then
+				if power > max then
+					max = power
+					current = max - 1
+				end
+			end
+		end
+	end
+	end
+	end
+	if torch == true then
+		current = 9
+	else
+		if minetest.get_node_group(minetest.get_node(pos).name, "redstone_dust") > 0 then
+			minetest.set_node(pos,{name="redstone:dust_"..current})	
+		end
+	end
+	--transfer
+	for x = -1,1 do
+	for y = -1,1 do
+	for z = -1,1 do
+		local pos2 = vector.add(pos,vector.new(x,y,z))
+		local power = minetest.registered_nodes[minetest.get_node(pos2).name].power
+		if power then
+			if power < current then
+				minetest.after(0,function(pos2)
+					redstone.add(pos2)
+				end,pos2)
+			end
+		end
+	end
+	end
+	end
+end
 
-            fixed = {-1/16, -1/2, -1/16, 1/16, -7/16, 1/16},
-            
-            disconnected_sides  = {-1/16, -1/2, -1/16, 1/16, 1/2, 1/16},
-
-            connect_top = {-1/16, -1/2, -1/16, 1/16, 1/2, 1/16},
-            -- connect_bottom =
-            connect_front = {-1/16, -1/2, -1/2, 1/16, -7/16, 1/16},
-            connect_left =  {-1/2, -1/2, -1/16, 1/16, -7/16, 1/16},
-            connect_back =  {-1/16, -1/2, -1/16, 1/16, -7/16, 1/2},
-            connect_right = {-1/16, -1/2, -1/16, 1/2, -7/16, 1/16},
-      },
-      collision_box = {
-            type = "connected",
-            --{xmin, ymin, zmin, xmax, ymax, zmax}
-
-            fixed = {-1/16, -1/2, -1/16, 1/16, -7/16, 1/16},
-            -- connect_top =
-            -- connect_bottom =
-            connect_front = {-1/16, -1/2, -1/2, 1/16, -7/16, 1/16},
-            connect_left =  {-1/2, -1/2, -1/16, 1/16, -7/16, 1/16},
-            connect_back =  {-1/16, -1/2, -1/16, 1/16, -7/16, 1/2},
-            connect_right = {-1/16, -1/2, -1/16, 1/2, -7/16, 1/16},
-      },
-      connects_to = {"group:redstone"},
-      inventory_image = fence_texture,
-      wield_image = fence_texture,
-      tiles = {"redstone_dust.png"},
-      sunlight_propagates = true,
-      is_ground_content = false,
-      groups = {redstone =1, instant=1},
-      on_place = function(itemstack, placer, pointed_thing)
-            if pointed_thing.type ~= "node" then
-                  return itemstack
-            end
-
-            local wdir = minetest.dir_to_wallmounted(vector.subtract(pointed_thing.under,pointed_thing.above))
-
-            local fakestack = itemstack
-            local retval = false
-            if wdir < 1 then
-                  return itemstack
-            elseif wdir == 1 then
-                  retval = fakestack:set_name("redstone:dust")
-            else
-                  retval = fakestack:set_name("redstone:dust")
-            end
-            if not retval then
-                  return itemstack
-            end
-            itemstack, retval = minetest.item_place(fakestack, placer, pointed_thing, wdir)
-            itemstack:set_name("redstone:dust")
-
-            if retval then
-                  minetest.sound_play("stone", {pos=pointed_thing.above, gain = 1.0})
-            end
-
-            return itemstack
-            
-      end,
-})
+function redstone.remove(pos,oldpower,torch)
+	local max = 0
+	
+	--chargup
+	for x = -1,1 do
+	for y = -1,1 do
+	for z = -1,1 do
+		if not vector.equals(vector.new(0,0,0),vector.new(x,y,z)) then
+			local pos2 = vector.add(pos,vector.new(x,y,z))
+			local power = minetest.registered_nodes[minetest.get_node(pos2).name].power
+			if power and power ~= 9 then
+				--print(power)
+				if power > max then
+					max = power
+				end
+			end
+		end
+	end
+	end
+	end
+	for x = -1,1 do
+	for y = -1,1 do
+	for z = -1,1 do
+		if not vector.equals(vector.new(0,0,0),vector.new(x,y,z)) then
+			local pos2 = vector.add(pos,vector.new(x,y,z))
+			local power = minetest.registered_nodes[minetest.get_node(pos2).name].power
+			if power then
+				if power < oldpower then
+					if not torch == true then
+						if minetest.get_node_group(minetest.get_node(pos).name, "redstone_dust") > 0 then
+							minetest.set_node(pos,{name="redstone:dust_0"})
+						end
+					end
+					
+					minetest.after(0,function(pos2)
+						redstone.remove(pos2,power)
+					end,pos2)
+				end
+			end
+		end
+	end
+	end
+	end
+end
