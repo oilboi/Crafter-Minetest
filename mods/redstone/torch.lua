@@ -146,6 +146,7 @@ minetest.register_node("redstone:torch_floor", {
 	},
 	
 	on_construct = function(pos)
+		redstone.torch_activate(pos)
 		redstone.collect_info(pos)
 	end,
 	after_destruct = function(pos, oldnode)
@@ -176,6 +177,7 @@ minetest.register_node("redstone:torch_wall", {
 		wall_side = {-0.5, -0.3, -0.1, -0.2, 0.3, 0.1},
 	},
 	on_construct = function(pos)
+		redstone.torch_activate(pos)
 		redstone.collect_info(pos)
 	end,
 	after_destruct = function(pos, oldnode)

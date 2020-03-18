@@ -193,6 +193,21 @@ function redstone.pathfind(temp_table,source,source_level)
 end
 
 
+--make torches activate activators when placed
+function redstone.torch_activate(pos)
+	print("test")
+	for x = -1,1 do
+	for y = -1,1 do
+	for z = -1,1 do
+		local i = vector.add(pos,vector.new(x,y,z))
+		if minetest.get_node_group(minetest.get_node(i).name, "redstone_activation") > 0 then
+			minetest.registered_nodes[minetest.get_node(i).name].redstone_activation(i)
+		end
+	end
+	end
+	end
+end
+
 
 minetest.register_craftitem("redstone:dust", {
 	description = "Redstone Dust",
