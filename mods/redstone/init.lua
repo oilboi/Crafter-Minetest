@@ -255,7 +255,7 @@ for i = 0,8 do
 			type = "fixed",
 			fixed = {-1/2, -1/2, -1/2, 1/2, -1/2+1/16, 1/2},
 		},
-		groups={instant=1,attached=1,redstone_dust=1,redstone=1},
+		groups={dig_immediate=1,attached=1,redstone_dust=1,redstone=1},
 		drop="redstone:dust",
 		on_construct = function(pos)
 			redstone.collect_info(pos)
