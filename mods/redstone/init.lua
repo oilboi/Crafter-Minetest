@@ -15,7 +15,7 @@ dofile(path.."/torch.lua")
 redstone = {}
 
 --this is the internal check for getting the max_power 
-function redstone.add(pos)
+function redstone.add(pos,torch)
 	local max = 0
 	local current = 0
 	
@@ -36,8 +36,13 @@ function redstone.add(pos)
 	end
 	end
 	end
-	
-	minetest.set_node(pos,{name="redstone:dust_"..current})	
+	if torch == true then
+		current = 9
+	else
+		if minetest.get_node_group(minetest.get_node(pos).name, "redstone_dust") > 0 then
+			minetest.set_node(pos,{name="redstone:dust_"..current})	
+		end
+	end
 	--transfer
 	for x = -1,1 do
 	for y = -1,1 do
@@ -56,7 +61,7 @@ function redstone.add(pos)
 	end
 end
 
-function redstone.remove(pos,oldpower)
+function redstone.remove(pos,oldpower,torch)
 	local max = 0
 	
 	--chargup
@@ -84,7 +89,11 @@ function redstone.remove(pos,oldpower)
 			local power = minetest.registered_nodes[minetest.get_node(pos2).name].power
 			if power then
 				if power < oldpower then
-					minetest.set_node(pos,{name="redstone:dust_0"})
+					if not torch == true then
+						if minetest.get_node_group(minetest.get_node(pos).name, "redstone_dust") > 0 then
+							minetest.set_node(pos,{name="redstone:dust_0"})
+						end
+					end
 					
 					minetest.after(0,function(pos2)
 						redstone.remove(pos2,power)

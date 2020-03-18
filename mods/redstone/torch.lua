@@ -144,15 +144,14 @@ minetest.register_node("redstone:torch_floor", {
 		type = "fixed",
 		fixed = {-1/16, -0.5, -1/16, 1/16, 2/16, 1/16},
 	},
-	--[[
+	
 	on_construct = function(pos)
 		--create_ps(pos)
-		redstone.update(pos)
+		redstone.add(pos,true)
 	end,
 	after_destruct = function(pos, oldnode)
-		redstone.update(pos,oldnode)
+		redstone.remove(pos,9,true)
 	end,
-	]]--
 	sounds = main.woodSound(),
 })
 
@@ -177,15 +176,14 @@ minetest.register_node("redstone:torch_wall", {
 		wall_bottom = {-0.1, -0.5, -0.1, 0.1, 0.1, 0.1},
 		wall_side = {-0.5, -0.3, -0.1, -0.2, 0.3, 0.1},
 	},
-	--[[
 	on_construct = function(pos)
 		--create_ps(pos)
-		redstone.update(pos)
+		redstone.add(pos,true)
 	end,
 	after_destruct = function(pos, oldnode)
-		redstone.update(pos,oldnode)
+		redstone.remove(pos,9,true)
 	end,
-	]]--
+	sounds = main.woodSound(),
 })
 
 
@@ -238,7 +236,7 @@ for i = 0,1 do
 		tiles = {"redstone_torch.png^[colorize:black:"..coloring},
 		paramtype = "light",
 		paramtype2 = "none",
-		power = 8*i,
+		power = 9*i,
 		sunlight_propagates = true,
 		drop = "redstone:torch",
 		walkable = false,
@@ -249,14 +247,14 @@ for i = 0,1 do
 			type = "fixed",
 			fixed = {-1/16, -0.5, -1/16, 1/16, 2/16, 1/16},
 		},
-		--[[
+		--there is no way for a player to get blink torch off
+		--so shortcut is to add this to both states
 		on_construct = function(pos)
-			redstone.update(pos)
+			redstone.add(pos,true)
 		end,
 		after_destruct = function(pos, oldnode)
-			redstone.update(pos,oldnode)
+			redstone.remove(pos,9,true)
 		end,
-		]]--
 		sounds = main.woodSound(),
 	})
 
@@ -272,7 +270,7 @@ for i = 0,1 do
 		sunlight_propagates = true,
 		walkable = false,
 		light_source = 13*i,
-		power = 8*i,
+		power = 9*i,
 		groups = {choppy=2, dig_immediate=3, flammable=1, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,redstone_torch=1,connect_to_raillike=1,blinker_torch = 1},
 		drop = "redstone:torch",
 		selection_box = {
@@ -281,14 +279,12 @@ for i = 0,1 do
 			wall_bottom = {-0.1, -0.5, -0.1, 0.1, 0.1, 0.1},
 			wall_side = {-0.5, -0.3, -0.1, -0.2, 0.3, 0.1},
 		},
-		--[[
 		on_construct = function(pos)
-			redstone.update(pos)
+			redstone.add(pos,true)
 		end,
 		after_destruct = function(pos, oldnode)
-			redstone.update(pos,oldnode)
+			redstone.remove(pos,9,true)
 		end,
-		]]--
 		sounds = main.woodSound(),
 	})
 
@@ -299,15 +295,19 @@ minetest.register_abm{
 	label = "Torch Blink",
 	nodenames = {"group:blinker_torch"},
 	--neighbors = {"group:redstone"},
-	interval = 0.4,
+	interval = 0.7,
 	chance = 1,
 	action = function(pos, node, active_object_count, active_object_count_wider)
 		--minetest.set_node(pos,{name=node.name:sub(1, -2)..0})
 		--redstone.update(pos)
-		print("tests")
 		local inversion = math.abs(tonumber(node.name:sub(#node.name, #node.name))-1) --never do this
 		minetest.set_node(pos,{name=node.name:sub(1, #node.name-1)..inversion})
-		redstone.update(pos)
+		if inversion == 1 then
+			redstone.add(pos,true)
+		elseif inversion == 0 then
+			redstone.remove(pos,9,true)
+		end
+		
 	end,
 }
 minetest.register_craft({
@@ -465,3 +465,4 @@ minetest.register_craft({
 	}
 })
 ]]--
+
