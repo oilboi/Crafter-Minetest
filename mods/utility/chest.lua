@@ -4,6 +4,7 @@ function chest.get_chest_formspec(pos)
 	local spos = pos.x .. "," .. pos.y .. "," .. pos.z
 	local formspec =
 		"size[9,8.75]" ..
+		"listcolors[#8b8a89;#c9c3c6;#3e3d3e;#000000;#FFFFFF]"..
 		"background[-0.19,-0.25;9.41,9.49;gui_hb_bg.png]"..
 		"list[nodemeta:" .. spos .. ";main;0,0.3;9,4;]" ..
 		"list[current_player;main;0,4.5;9,1;]" ..

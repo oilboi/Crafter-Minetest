@@ -12,6 +12,7 @@ minetest.register_node("craftingtable:craftingtable", {
 
 		local form = "size[9,8.75]"..
 		"background[-0.19,-0.25;9.41,9.49;crafting_inventory_workbench.png]"..
+		"listcolors[#8b8a89;#c9c3c6;#3e3d3e;#000000;#FFFFFF]"..
 		"list[current_player;main;0,4.5;9,1;]".. --hot bar
 		"list[current_player;main;0,6;9,3;9]".. --big part
 		
