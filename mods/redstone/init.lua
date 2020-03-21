@@ -11,6 +11,7 @@ might have to calculate this in a local memory table then set the nodes using a 
 local path = minetest.get_modpath("redstone")
 dofile(path.."/wire.lua")
 dofile(path.."/torch.lua")
+dofile(path.."/switches.lua")
 
 redstone = {}
 

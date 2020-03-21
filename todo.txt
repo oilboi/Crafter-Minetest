@@ -51,9 +51,9 @@ ALPHA STATE CHANGELOG
 --added glass - smelt sand
 --added boat 
 --rightclicking with tool places torch
-chest
-make chest drop all items when you mine them
-
+--add chest
+--make chest drop all items when you mine them
+--add in switches
 
 farming - 
 - add fertilizer (pig drops bone randomly) 
@@ -94,6 +94,7 @@ make entities push against players
 
 
 open bugs:
+--ghost chest bug
 fix torches not deleting particles when mounted node dug <- meta glitch?
 --fixing with abm
 
