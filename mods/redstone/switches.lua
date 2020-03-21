@@ -35,7 +35,7 @@ end
 minetest.register_node("redstone:switch_off", {
     description = "Crafting Table",
     tiles = {"stone.png"},
-    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4},
+    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1},
     sounds = main.stoneSound(),
     paramtype = "light",
 	paramtype2 = "wallmounted",
@@ -70,7 +70,7 @@ minetest.register_node("redstone:switch_off", {
 minetest.register_node("redstone:switch_on", {
     description = "Crafting Table",
     tiles = {"stone.png"},
-    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4},
+    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1},
     sounds = main.stoneSound(),
     paramtype = "light",
 	paramtype2 = "wallmounted",
