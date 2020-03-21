@@ -37,6 +37,9 @@ minetest.register_node("main:stone", {
     tiles = {"stone.png"},
     groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1, redstone_activation=1},
     sounds = main.stoneSound(),
+    redstone_activation = function(pos)
+		--pass
+    end,
     redstone_deactivation = function(pos)
 		minetest.set_node(pos,{name="main:cobble"})
     end,
@@ -59,6 +62,9 @@ minetest.register_node("main:cobble", {
     sounds = main.stoneSound(),
     redstone_activation = function(pos)
 		minetest.set_node(pos,{name="main:stone"})
+    end,
+    redstone_deactivation = function(pos)
+		--pass
     end,
     drop = {
 		max_items = 1,
