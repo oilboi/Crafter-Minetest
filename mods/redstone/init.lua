@@ -137,13 +137,15 @@ function redstone.calculate()
 				if type(level) == "number" then
 					data[p_pos] = minetest.get_content_id("redstone:dust_"..level)
 				elseif type(level) == "string" and level == "activate" then
-					print("activating")
+					--print("activating")
 					local name = content_id(data[p_pos])
-					minetest.after(0,function(name,x,y,z)
-						minetest.registered_nodes[name].redstone_activation(vector.new(x,y,z))
-					end,name,x,y,z)
+					if minetest.registered_nodes[name].redstone_activation then
+						minetest.after(0,function(name,x,y,z)
+							minetest.registered_nodes[name].redstone_activation(vector.new(x,y,z))
+						end,name,x,y,z)
+					end
 				elseif type(level) == "string" and level == "deactivate" then
-					print("deactivating")
+					--print("deactivating")
 					local name = content_id(data[p_pos])
 					if minetest.registered_nodes[name].redstone_deactivation then
 						minetest.after(0,function(name,x,y,z)
