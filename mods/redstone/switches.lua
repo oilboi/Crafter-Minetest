@@ -57,7 +57,6 @@ minetest.register_node("redstone:switch_off", {
 		local dir = minetest.wallmounted_to_dir(node.param2)
 		local pos = vector.add(dir,pos)
 		local name = minetest.get_node(pos).name
-		print(name)
 		local def = minetest.registered_nodes[name]
 		
 		if def.drawtype == "normal" and string.match(name, "main:") then
