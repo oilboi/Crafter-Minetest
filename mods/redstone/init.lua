@@ -62,7 +62,7 @@ function redstone.collect_info(pos)
 				elseif get_group(i,"redstone_activation") > 0 then
 					if not r_index[i.x] then r_index[i.x] = {} end
 					if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-					r_index[i.x][i.y][i.z] = ""
+					r_index[i.x][i.y][i.z] = "activate"
 				end
 			end
 				
@@ -85,19 +85,10 @@ end)
 
 --make all power sources push power out
 function redstone.calculate()
-	
-	--create base power variable and table
-	local power_sources = {}
-	local power = false
-	
-	--index sources
-	
-	
-	
+	--pathfind through memory map	
 	for x,index_x in pairs(r_index) do
 		for y,index_y in pairs(index_x) do
 			for z,data in pairs(index_y) do
-				--print(x,y,z)
 				if data == "torch" then
 					redstone.pathfind(vector.new(x,y,z),9)
 				end
@@ -105,22 +96,57 @@ function redstone.calculate()
 		end
 	end
 	
-	print("ended power distrobution")
-	
+	--calculate values for voxel manip
+	local x_min,x_max,y_min,y_max,z_min,z_max
+	for x,index_x in pairs(r_index) do
+		for y,index_y in pairs(index_x) do
+			for z,_ in pairs(index_y) do
+				--do this because the root (x) will always come first
+				if not x_min then
+					x_min = x
+					x_max = x
+					y_min = y
+					y_max = y
+					z_min = z
+					z_max = z
+				end
+				if x < x_min then x_min = x end
+				if x > x_max then x_max = x end
+				if y < y_min then y_min = y end
+				if y > y_max then y_max = y end
+				if z < z_min then z_min = z end
+				if z > z_max then z_max = z end
+			end
+		end
+	end
+
+	local min = vector.new(x_min,y_min,z_min)
+	local max = vector.new(x_max,y_max,z_max)
+	local vm = minetest.get_voxel_manip()	
+	local emin, emax = vm:read_from_map(min,max)
+	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
+	local data = vm:get_data()
+	local content_id = minetest.get_name_from_content_id
 	
 	--reassemble the table into a position list minetest can understand
 	for x,datax in pairs(r_index) do
 		for y,datay in pairs(datax) do
 			for z,level in pairs(datay) do
+				local p_pos = area:index(x,y,z)
 				--print(dump(z),dump(dataz))
 				if type(level) == "number" then
-					minetest.set_node(vector.new(x,y,z),{name="redstone:dust_"..level})
+					data[p_pos] = minetest.get_content_id("redstone:dust_"..level)
 				elseif type(level) == "string" and level == "activate" then
-					--minetest.registered_nodes[minetest.get_node(vector.new(x,y,z)).name].redstone_activation(vector.new(x,y,z))
+					local name = content_id(data[p_pos])
+					minetest.after(0,function(name,x,y,z)
+						minetest.registered_nodes[name].redstone_activation(vector.new(x,y,z))
+					end,name,x,y,z)
 				end
 			end
 		end
-	end	
+	end
+	vm:set_data(data)
+	vm:write_to_map()
 end
 
 --make redstone wire pass on current one level lower than it is
@@ -142,7 +168,7 @@ function redstone.pathfind(source,source_level)
 					end
 				end
 			--activators
-			elseif type(level) == "string" then
+			elseif type(level) == "string" and level == "activate" then
 				local passed_on_level = source_level - 1
 				if source_level > 0 then
 					r_index[i.x][i.y][i.z] = "activate"
@@ -153,6 +179,16 @@ function redstone.pathfind(source,source_level)
 	end
 	end
 end
+
+
+
+
+
+
+
+
+
+
 
 
 --make torches activate activators when placed
