@@ -34,7 +34,7 @@ function redstone.collect_info(pos)
 	for y = -1,1 do
 	for z = -1,1 do
 		--do not index self
-		if not vector.equals(vector.new(x,y,z),vector.new(0,0,0)) then
+		--if not vector.equals(vector.new(x,y,z),vector.new(0,0,0)) then
 			local r_type = ""
 			local i = vector.add(pos,vector.new(x,y,z))
 			local execute_collection = true
@@ -62,11 +62,11 @@ function redstone.collect_info(pos)
 				elseif get_group(i,"redstone_activation") > 0 then
 					if not r_index[i.x] then r_index[i.x] = {} end
 					if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-					r_index[i.x][i.y][i.z] = "activate"
+					r_index[i.x][i.y][i.z] = "deactivate"
 				end
 			end
 				
-		end
+		--end
 	end
 	end
 	end
@@ -137,10 +137,19 @@ function redstone.calculate()
 				if type(level) == "number" then
 					data[p_pos] = minetest.get_content_id("redstone:dust_"..level)
 				elseif type(level) == "string" and level == "activate" then
+					print("activating")
 					local name = content_id(data[p_pos])
 					minetest.after(0,function(name,x,y,z)
 						minetest.registered_nodes[name].redstone_activation(vector.new(x,y,z))
 					end,name,x,y,z)
+				elseif type(level) == "string" and level == "deactivate" then
+					print("deactivating")
+					local name = content_id(data[p_pos])
+					if minetest.registered_nodes[name].redstone_deactivation then
+						minetest.after(0,function(name,x,y,z)
+							minetest.registered_nodes[name].redstone_deactivation(vector.new(x,y,z))
+						end,name,x,y,z)
+					end
 				end
 			end
 		end
@@ -168,7 +177,7 @@ function redstone.pathfind(source,source_level)
 					end
 				end
 			--activators
-			elseif type(level) == "string" and level == "activate" then
+			elseif type(level) == "string" and level == "deactivate" then
 				local passed_on_level = source_level - 1
 				if source_level > 0 then
 					r_index[i.x][i.y][i.z] = "activate"
