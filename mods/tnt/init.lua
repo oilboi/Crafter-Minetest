@@ -38,7 +38,7 @@ local function tnt(pos,range)
 	for y=-range, range do
 	for z=-range, range do
 		if vector.distance(pos2, vector.new(x,y,z)) <= range then
-			local p_pos = area:index(pos.x+x,pos.y+y,pos.z+z)							
+			local p_pos = area:index(pos.x+x,pos.y+y,pos.z+z)						
 			local n = content_id(data[p_pos])
 			if n == "tnt:tnt" then
 				--print("adding tnt")
@@ -61,7 +61,6 @@ local function tnt(pos,range)
 	
 	vm:set_data(data)
 	vm:write_to_map()
-	vm:update_map()
 	
 	minetest.sound_play("tnt_explode", {pos = pos, gain = 1.0, max_hear_distance = range*range*range})
 	

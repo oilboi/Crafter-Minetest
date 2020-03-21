@@ -19,67 +19,53 @@ local r_index = {}
 --collect all nodes that are local to the modified
 --node of redstone dust and store in memory
 function redstone.collect_info(pos)
+	--if table.getn(r_index) == 0 then
+		--print("-----------------------")
+		--print("started indexing")
+	--end
+	local get_name = minetest.get_node
+	local group = minetest.get_node_group
+	
+	local function get_group(i,gotten_group)
+		return(group(get_name(i).name, gotten_group))
+	end
+	
 	for x = -1,1 do
 	for y = -1,1 do
 	for z = -1,1 do
 		--do not index self
-		if not vector.equals(vector.new(x,y,z),vector.new(0,0,0)) then 
+		if not vector.equals(vector.new(x,y,z),vector.new(0,0,0)) then
+			local r_type = ""
 			local i = vector.add(pos,vector.new(x,y,z))
-			--index dust
-			if minetest.get_node_group(minetest.get_node(i).name, "redstone_dust") > 0 then
-				--check the index
-				--do not add duplicates with this methods
-				local already_in = false
-				for _,t in ipairs(r_index) do
-					for _,tabler in ipairs(r_index) do
-						if already_in == false and vector.equals(tabler,i) then
-							already_in = true
-						end
-					end
-				end
-				--add if not already in
-				if already_in == false then
-					i.type = "dust"
-					table.insert(r_index,i)
-					redstone.collect_info(i)
-				end
-			--index power sources
-			elseif minetest.get_node_group(minetest.get_node(i).name, "redstone_torch") > 0 then
-				--check the index
-				--do not add duplicates with this methods
-				local already_in = false
-				for _,t in ipairs(r_index) do
-					for _,tabler in ipairs(r_index) do
-						if already_in == false and vector.equals(tabler,i) then
-							already_in = true
-						end
-					end
-				end
-				--add if not already in
-				if already_in == false then
-					i.type = "torch"
-					table.insert(r_index,i)
-					--redstone.collect_info(i,pos)
-				end
-			--index objects that activate
-			elseif minetest.get_node_group(minetest.get_node(i).name, "redstone_activation") > 0 then
-				--check the index
-				--do not add duplicates with this methods
-				local already_in = false
-				for _,t in ipairs(r_index) do
-					for _,tabler in ipairs(r_index) do
-						if already_in == false and vector.equals(tabler,i) then
-							already_in = true
-						end
-					end
-				end
-				--add if not already in
-				if already_in == false then
-					i.type = "redstone_activation"
-					table.insert(r_index,i)
-					--redstone.collect_info(i,pos)
+			local execute_collection = true
+			if r_index[i.x] and r_index[i.x][i.y] then
+				if r_index[i.x][i.y][i.z] then
+					execute_collection = false
 				end
 			end
+			
+			if execute_collection == true then
+				--index dust
+				if get_group(i,"redstone_dust") > 0 then
+					if not r_index[i.x] then r_index[i.x] = {} end
+					if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
+					r_index[i.x][i.y][i.z] = 0
+					--the data to the 3d array must be written to memory before this is executed
+					--or a stack overflow occurs!!!
+					redstone.collect_info(i)
+				--index power sources
+				elseif get_group(i,"redstone_torch") > 0 then
+					if not r_index[i.x] then r_index[i.x] = {} end
+					if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
+					r_index[i.x][i.y][i.z] = "torch"
+				--index objects that activate
+				elseif get_group(i,"redstone_activation") > 0 then
+					if not r_index[i.x] then r_index[i.x] = {} end
+					if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
+					r_index[i.x][i.y][i.z] = ""
+				end
+			end
+				
 		end
 	end
 	end
@@ -89,15 +75,8 @@ end
 --check if index table contains items
 --then execute an update
 minetest.register_globalstep(function(dtime)
-	local indexer = 0
-	--check if indexes exist
-	for test,test2 in pairs(r_index) do
-		if test then
-			indexer = indexer + 1
-		end
-	end
 	--if indexes exist then calculate redstone
-	if indexer > 0 then
+	if r_index and next(r_index) then
 		redstone.calculate()
 	end
 	--clear the index to avoid cpu looping wasting processing power
@@ -106,53 +85,38 @@ end)
 
 --make all power sources push power out
 function redstone.calculate()
-	local temp_table = {}
-	
-	--create blank table for torches to navigate through
-	--convert it into different style 3d array to index easier 
-	--in pathfinding
-	for _,i in pairs(r_index) do
-		if i.type == "dust" then
-			--local value = vector.new(i.x,i.y,i.z)
-			--value.level = 0
-			
-			if not temp_table[i.x] then temp_table[i.x] = {} end
-			if not temp_table[i.x][i.y] then temp_table[i.x][i.y] = {} end
-			temp_table[i.x][i.y][i.z] = 0
-		elseif i.type == "redstone_activation" then
-			if not temp_table[i.x] then temp_table[i.x] = {} end
-			if not temp_table[i.x][i.y] then temp_table[i.x][i.y] = {} end
-			temp_table[i.x][i.y][i.z] = ""
-		end
-	end
 	
 	--create base power variable and table
 	local power_sources = {}
 	local power = false
 	
 	--index sources
-	for _,i in pairs(r_index) do
-		if i.type == "torch" then
-			power = true
-			table.insert(power_sources,vector.new(i.x,i.y,i.z))
+	
+	
+	
+	for x,index_x in pairs(r_index) do
+		for y,index_y in pairs(index_x) do
+			for z,data in pairs(index_y) do
+				--print(x,y,z)
+				if data == "torch" then
+					redstone.pathfind(vector.new(x,y,z),9)
+				end
+			end
 		end
 	end
 	
-	--push power out into dust
-	for _,source in pairs(power_sources) do
-		temp_table = redstone.pathfind(temp_table,source,9)
-	end
+	print("ended power distrobution")
 	
 	
 	--reassemble the table into a position list minetest can understand
-	for x,datax in pairs(temp_table) do
+	for x,datax in pairs(r_index) do
 		for y,datay in pairs(datax) do
 			for z,level in pairs(datay) do
 				--print(dump(z),dump(dataz))
 				if type(level) == "number" then
 					minetest.set_node(vector.new(x,y,z),{name="redstone:dust_"..level})
 				elseif type(level) == "string" and level == "activate" then
-					minetest.registered_nodes[minetest.get_node(vector.new(x,y,z)).name].redstone_activation(vector.new(x,y,z))
+					--minetest.registered_nodes[minetest.get_node(vector.new(x,y,z)).name].redstone_activation(vector.new(x,y,z))
 				end
 			end
 		end
@@ -160,42 +124,40 @@ function redstone.calculate()
 end
 
 --make redstone wire pass on current one level lower than it is
-function redstone.pathfind(temp_table,source,source_level)
-	--print(dump(temp_table))
+function redstone.pathfind(source,source_level)
 	for x = -1,1 do
 	for y = -1,1 do
 	for z = -1,1 do
 		i = vector.add(vector.new(source.x,source.y,source.z),vector.new(x,y,z))
-		if temp_table and temp_table[i.x] and temp_table[i.x][i.y] and temp_table[i.x][i.y][i.z] then
-			level = temp_table[i.x][i.y][i.z]
+		if r_index and r_index[i.x] and r_index[i.x][i.y] and r_index[i.x][i.y][i.z] then
+			level = r_index[i.x][i.y][i.z]
 			
 			--normal redstone
 			if type(level) == "number" then
 				if level < source_level then
 					local passed_on_level = source_level - 1
-					temp_table[i.x][i.y][i.z] = passed_on_level
+					r_index[i.x][i.y][i.z] = passed_on_level
 					if passed_on_level > 0 then
-						redstone.pathfind(temp_table,i,passed_on_level)
+						redstone.pathfind(i,passed_on_level)
 					end
 				end
 			--activators
 			elseif type(level) == "string" then
 				local passed_on_level = source_level - 1
 				if source_level > 0 then
-					temp_table[i.x][i.y][i.z] = "activate"
+					r_index[i.x][i.y][i.z] = "activate"
 				end
 			end
 		end
 	end
 	end
 	end
-	return(temp_table)
 end
 
 
 --make torches activate activators when placed
 function redstone.torch_activate(pos)
-	print("test")
+	--print("test")
 	for x = -1,1 do
 	for y = -1,1 do
 	for z = -1,1 do
@@ -268,4 +230,3 @@ for i = 0,8 do
 	})
 	color= color +31.875
 end
-

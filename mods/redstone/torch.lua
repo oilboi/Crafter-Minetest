@@ -338,7 +338,6 @@ minetest.register_craft({
 
 
 --[[
-
 minetest.register_craftitem("redstone:blink_torch", {
 	description = "Redstone Blink Torch",
 	inventory_image = "redstone_torch.png",
@@ -350,9 +349,7 @@ minetest.register_craftitem("redstone:blink_torch", {
 		if pointed_thing.type ~= "node" then
 			return itemstack
 		end
-
 		local wdir = minetest.dir_to_wallmounted(vector.subtract(pointed_thing.under,pointed_thing.above))
-
 		local fakestack = itemstack
 		local retval = false
 		if wdir < 1 then
@@ -367,18 +364,15 @@ minetest.register_craftitem("redstone:blink_torch", {
 		end
 		itemstack, retval = minetest.item_place(fakestack, placer, pointed_thing, wdir)
 		itemstack:set_name("redstone:blink_torch")
-
 		if retval then
 			minetest.sound_play("wood", {pos=pointed_thing.above, gain = 1.0})
 		end
-
 		return itemstack
 	end
 })
 for i = 0,1 do
 	local coloring = 160*(1-i)
 	-- BLINK TORCH
-
 	minetest.register_node("redstone:blink_torch_floor_"..i, {
 		inventory_image = "redstone_torch.png",
 		wield_image = "redstone_torch.png",
@@ -407,7 +401,6 @@ for i = 0,1 do
 		end,
 		sounds = main.woodSound(),
 	})
-
 	minetest.register_node("redstone:blink_torch_wall_"..i, {
 		inventory_image = "redstone_torch.png",
 		wield_image = "redstone_torch.png",
@@ -437,10 +430,7 @@ for i = 0,1 do
 		end,
 		sounds = main.woodSound(),
 	})
-
 end
-
-
 minetest.register_abm{
 	label = "Torch Blink",
 	nodenames = {"group:blinker_torch"},
@@ -465,4 +455,3 @@ minetest.register_craft({
 	}
 })
 ]]--
-
