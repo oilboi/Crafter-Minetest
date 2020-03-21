@@ -13,6 +13,7 @@ dofile(path.."/wire.lua")
 dofile(path.."/torch.lua")
 dofile(path.."/switches.lua")
 dofile(path.."/button.lua")
+dofile(path.."/repeater.lua")
 
 redstone = {}
 

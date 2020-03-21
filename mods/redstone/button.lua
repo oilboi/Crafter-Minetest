@@ -2,7 +2,7 @@
 local function on_button_destroy(pos)
 	local param2 = minetest.get_node(pos).param2
 	local self = minetest.get_node(pos)
-	local dir = minetest.facedir_to_dir(self.param2)
+	local dir = minetest.wallmounted_to_dir(self.param2)
 	
 	local pos = vector.add(dir,pos)
 	local node = minetest.get_node(pos)
@@ -38,7 +38,7 @@ minetest.register_node("redstone:button_off", {
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		minetest.sound_play("lever", {pos=pos})
 		minetest.set_node(pos, {name="redstone:button_on",param2=node.param2})
-		local dir = minetest.facedir_to_dir(node.param2)
+		local dir = minetest.wallmounted_to_dir(node.param2)
 		local c_pos = table.copy(pos)
 		local pos = vector.add(dir,pos)
 		local name = minetest.get_node(pos).name

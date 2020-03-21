@@ -17,7 +17,7 @@ end
 local function on_lever_destroy(pos)
 	local param2 = minetest.get_node(pos).param2
 	local self = minetest.get_node(pos)
-	local dir = minetest.facedir_to_dir(self.param2)
+	local dir = minetest.wallmounted_to_dir(self.param2)
 	
 	local pos = vector.add(dir,pos)
 	local node = minetest.get_node(pos)
@@ -54,9 +54,10 @@ minetest.register_node("redstone:switch_off", {
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		minetest.sound_play("lever", {pos=pos})
 		minetest.set_node(pos, {name="redstone:switch_on",param2=node.param2})
-		local dir = minetest.facedir_to_dir(node.param2)
+		local dir = minetest.wallmounted_to_dir(node.param2)
 		local pos = vector.add(dir,pos)
 		local name = minetest.get_node(pos).name
+		print(name)
 		local def = minetest.registered_nodes[name]
 		
 		if def.drawtype == "normal" and string.match(name, "main:") then
