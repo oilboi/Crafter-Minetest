@@ -74,3 +74,13 @@ for _,door in pairs({"top","bottom"}) do
     end,
 })
 end
+
+minetest.register_craft({
+	output = "door:bottom",
+	recipe = {
+		{"main:wood","main:wood"},
+		{"main:wood","main:wood"},
+		{"main:wood","main:wood"}
+	}
+})
+
