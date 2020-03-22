@@ -31,6 +31,8 @@ for _,door in pairs({"top","bottom"}) do
 	minetest.register_node("door:"..door, {
     description = "Door",
     tiles = tiles,
+    wield_image = "door_inv.png",
+    inventory_image = "door_inv.png",
     drawtype = "nodebox",
     paramtype = "light",
     paramtype2 = "facedir",

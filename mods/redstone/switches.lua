@@ -33,7 +33,7 @@ end
 
 
 minetest.register_node("redstone:switch_off", {
-    description = "Crafting Table",
+    description = "Switch",
     tiles = {"stone.png"},
     groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1},
     sounds = main.stoneSound(),
