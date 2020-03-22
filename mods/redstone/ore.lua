@@ -1,40 +1,62 @@
-minetest.register_node("main:"..ore.."ore", {
-	description = ore:gsub("^%l", string.upper).." Ore",
-	tiles = {"stone.png^redstoneore.png"},
-	groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1},
-	sounds = main.stoneSound(),
-	light_source = 8,--debugging ore spawn
-	drop = {
-		max_items = 1,
-		items= {
-			{
-				rarity = 0,
-				tools = tool_required,
-				items = drops,
+--create on and off redstone ore
+for i = 0,1 do
+	local light_level = i * 9
+	local groups
+	local on_punch = nil
+	if i == 0 then
+		groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1}
+		on_punch = function(pos, node, puncher, pointed_thing)
+			minetest.set_node(pos, {name="redstone:ore_1"})
+		end
+	else
+		groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1,redstone=1,redstone_torch=1}
+	end
+	minetest.register_node("redstone:ore_"..i, {
+		description = "Redstone Ore",
+		tiles = {"redstone_ore.png"},
+		groups = groups,
+		sounds = main.stoneSound(),
+		light_source = light_level,
+		drop = {
+			max_items = 5,
+			items= {
+				{
+					--rarity = 0,
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"redstone:dust"},
+				},
+				{
+					--rarity = 0,
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"redstone:dust"},
+				},
+				{
+					--rarity = 0,
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"redstone:dust"},
+				},
+				{
+					--rarity = 0,
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"redstone:dust"},
+				},
+				{
+					rarity = 5,
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"redstone:dust"},
+				},
 			},
 		},
-	},
-})
-
+		on_punch = on_punch,
+	})
+end
+--redstone ore
 minetest.register_ore({
 	ore_type	 = "scatter",
-	ore		= "main:goldore",
-	wherein	  = "main:stone",
-	clust_scarcity = 13 * 13 * 13,
-	clust_num_ores = 5,
-	clust_size     = 3,
-	y_max	    = -128,
-	y_min	    = -31000,
-})
-
--- Mese crystal
-
-minetest.register_ore({
-	ore_type	 = "scatter",
-	ore		= "main:diamondore",
+	ore		= "redstone:ore_0",
 	wherein	  = "main:stone",
 	clust_scarcity = 14 * 14 * 14,
-	clust_num_ores = 5,
+	clust_num_ores = 10,
 	clust_size     = 3,
 	y_max	    = 31000,
 	y_min	    = 1025,
@@ -42,22 +64,22 @@ minetest.register_ore({
 
 minetest.register_ore({
 	ore_type	 = "scatter",
-	ore		= "main:diamondore",
+	ore		= "redstone:ore_0",
 	wherein	  = "main:stone",
-	clust_scarcity = 18 * 18 * 18,
-	clust_num_ores = 3,
-	clust_size     = 2,
+	clust_scarcity = 8 * 8 * 8,
+	clust_num_ores = 8,
+	clust_size     = 5,
 	y_max	    = -128,
-	y_min	    = -1023,
+	y_min	    = -31000,
 })
 
 minetest.register_ore({
 	ore_type	 = "scatter",
-	ore		= "main:diamondore",
+	ore		= "redstone:ore_0",
 	wherein	  = "main:stone",
-	clust_scarcity = 14 * 14 * 14,
-	clust_num_ores = 5,
-	clust_size     = 3,
-	y_max	    = -128,
+	clust_scarcity = 8 * 8 * 8,
+	clust_num_ores = 8,
+	clust_size     = 5,
+	y_max	    = -256,
 	y_min	    = -31000,
 })

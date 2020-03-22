@@ -18,6 +18,7 @@ dofile(path.."/light.lua")
 dofile(path.."/piston.lua")
 dofile(path.."/comparator.lua")
 dofile(path.."/craft.lua")
+dofile(path.."/ore.lua")
 
 redstone = {}
 
