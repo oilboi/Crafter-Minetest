@@ -5,7 +5,7 @@ for name,def in pairs(minetest.registered_nodes) do
 		def2.groups.redstone_torch = 1
 		def2.drop = name
 		def2.mod_origin = "redstone"
-		def2.textures = "dirt.png"
+		--def2.textures = "dirt.png"
 		local newname = "redstone:"..string.gsub(name, "main:", "")
 		def2.name = newname
 		minetest.register_node(newname,def2)
