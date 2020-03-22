@@ -44,14 +44,16 @@ local function comparator_logic(pos)
 		
 	--charge
 	if getgroup(input_node_straight,"redstone_dust")>0 and getgroup(output_node,"redstone_dust")>0 then
+		print("charge")
 		if input_level > 0 and input_level >= compare_level then
 			minetest.set_node(output_pos, {name="redstone:dust_powered"})
-		else
+		elseif input_level > 0 and getgroup(output_node,"redstone_hack") > 0 then
 			minetest.set_node(output_pos, {name="redstone:dust_0"})
 		end
 	end
 	--discharge
 	if getgroup(input_node_straight,"redstone_dust")>0 and getgroup(output_node,"redstone_hack")>0 then
+		print("discharge")
 		if input_level == 0 then
 			minetest.set_node(output_pos, {name="redstone:dust_0"})
 		end
@@ -101,15 +103,10 @@ minetest.register_node("redstone:comparator", {
 		redstone.collect_info(pos)
 	end,
 	on_destruct = function(pos)
-		--redstone.remove(pos,minetest.registered_nodes[minetest.get_node(pos).name].power)
 		local param2 = minetest.get_node(pos).param2
 		local dir = minetest.facedir_to_dir(param2)
 		local output_pos = vector.add(pos,dir)
-		--check if powered redstone before
-		if minetest.get_node_group(minetest.get_node(output_pos).name, "repeater") > 0 then
-			local timer = minetest.get_node_timer(output_pos)
-			timer:start((level+1)/2)
-		elseif minetest.get_node_group(minetest.get_node(output_pos).name, "redstone_hack") > 0 then
+		if minetest.get_node_group(minetest.get_node(output_pos).name, "redstone_hack") > 0 then
 			minetest.set_node(output_pos, {name="redstone:dust_0"})
 		end
 		redstone.collect_info(output_pos)
