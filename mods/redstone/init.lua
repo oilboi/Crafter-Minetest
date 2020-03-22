@@ -16,6 +16,7 @@ dofile(path.."/button.lua")
 dofile(path.."/repeater.lua")
 dofile(path.."/light.lua")
 dofile(path.."/piston.lua")
+dofile(path.."/comparator.lua")
 
 redstone = {}
 
@@ -39,7 +40,7 @@ function redstone.collect_info(pos)
 	for y = -1,1 do
 	for z = -1,1 do
 		--do not index self
-		--if not vector.equals(vector.new(x,y,z),vector.new(0,0,0)) then
+		if not (math.abs(x)+math.abs(z) > 1) then
 			local r_type = ""
 			local i = vector.add(pos,vector.new(x,y,z))
 			local execute_collection = true
@@ -71,7 +72,7 @@ function redstone.collect_info(pos)
 				end
 			end
 				
-		--end
+		end
 	end
 	end
 	end
