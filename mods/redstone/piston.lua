@@ -44,6 +44,7 @@ minetest.register_node("redstone:piston_off", {
 		local piston_location = vector.add(pos,dir)
 		local worked = piston_move(pos,dir)
 		if worked == true then
+			minetest.sound_play("piston", {pos=pos,pitch=math.random(85,100)/100})
 			minetest.set_node(piston_location,{name="redstone:actuator",param2=facedir})
 			minetest.set_node(pos,{name="redstone:piston_on",param2=facedir})
 		end
@@ -82,6 +83,7 @@ minetest.register_node("redstone:piston_on", {
 		minetest.set_node(pos,{name="redstone:piston_off",param2=facedir})
 		piston_location.y = piston_location.y + 1
 		minetest.punch_node(piston_location)
+		minetest.sound_play("piston", {pos=pos,pitch=math.random(85,100)/100})
     end,
     after_dig_node = function(pos, oldnode, oldmetadata, digger)
 		local facedir = oldnode.param2
