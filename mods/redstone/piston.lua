@@ -16,6 +16,9 @@ local function piston_move(pos,dir)
 		elseif name == "air" then
 			space = true
 			break
+		else
+			space = false
+			break
 		end		
 	end
 	--check if room to move and objects in log
