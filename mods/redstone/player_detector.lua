@@ -40,8 +40,10 @@ minetest.register_abm{
 				local level = minetest.get_node_group(minetest.get_node(pos).name, "redstone_power")
 				found_player = true
 				local pos2 = object:get_pos()
+				pos2 = vector.floor(vector.add(pos2,0.5))
 				local distance = math.floor(vector.distance(pos2,pos))
 				distance = math.abs(distance - 9)
+				--print(distance)
 				if level ~= distance then
 					minetest.set_node(pos,{name="redstone:player_detector_"..distance})
 					redstone.collect_info(pos)
