@@ -68,37 +68,6 @@ function repeater_on_timer(pos)
 	end
 	
 	repeater_set_buffer(pos,0)
-	--[[
-	local new_power = repeater_get_new_power(pos)
-	local self_repeater_level = minetest.get_node_group(minetest.get_node(pos).name, "repeater_level")
-	local param2 = minetest.get_node(pos).param2
-	
-	if new_power == 0 then
-		minetest.swap_node(pos,{name="redstone:repeater_off_"..self_repeater_level,param2=param2})
-	elseif new_power > 0 then
-		minetest.swap_node(pos,{name="redstone:repeater_on_"..self_repeater_level,param2=param2})
-	end
-	
-	local param2 = minetest.get_node(pos).param2
-	local input = minetest.facedir_to_dir(param2)
-	input = vector.multiply(input,-1)
-	input = vector.add(pos,input)
-	local output = minetest.facedir_to_dir(param2)
-	output = vector.add(pos,output)
-	local input_node = minetest.get_node(input)
-	local output_node = minetest.get_node(output)	
-	
-	--minetest.after(0.5, function(pos,param2,input,output,input_node,output_node)
-	if minetest.get_node_group(output_node.name, "redstone_dust") > 0 then
-		redstone.collect_info(output)
-	elseif minetest.get_node_group(output_node.name, "repeater") > 0 then
-		local timer = minetest.get_node_timer(output)
-		timer:start(repeater_level/2)
-	elseif minetest.get_node_group(output_node.name, "redstone_activation") > 0 then
-		redstone.collect_info(output)
-	end
-	--end,pos,param2,input,output,input_node,output_node)
-	]]--
 end
 
 function repeater_input(pos)
@@ -117,31 +86,6 @@ function repeater_input(pos)
 	local timer = minetest.get_node_timer(pos)
 	timer:start(self_repeater_level/2)
 	
-	--[[
-	local param2 = minetest.get_node(pos).param2
-	local input = minetest.facedir_to_dir(param2)
-	input = vector.multiply(input,-1)
-	input = vector.add(pos,input)
-	local input_node = minetest.get_node(input)
-	
-	local self_repeater_level = minetest.get_node_group(minetest.get_node(pos).name, "repeater_level")
-	
-	if minetest.get_node_group(input_node.name, "redstone_power") == 0 then
-		minetest.swap_node(pos,{name="redstone:repeater_off_"..self_repeater_level,param2=param2})
-	elseif minetest.get_node_group(input_node.name, "redstone_power") > 0 then
-		minetest.swap_node(pos,{name="redstone:repeater_on_"..self_repeater_level,param2=param2})
-	end
-	
-	set_old_power(pos,old_power)
-	
-	local output = minetest.facedir_to_dir(param2)
-	output = vector.add(pos,output)
-	
-	local timer = minetest.get_node_timer(output)
-	timer:start(level/2)
-	
-	repeater_pass_new_power(output,old_power)
-	]]--
 	set_old_power(pos,power)
 end
 

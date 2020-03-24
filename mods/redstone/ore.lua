@@ -7,9 +7,16 @@ for i = 0,1 do
 		groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1}
 		on_punch = function(pos, node, puncher, pointed_thing)
 			minetest.set_node(pos, {name="redstone:ore_1"})
+			redstone.collect_info(pos)
+			local timer = minetest.get_node_timer(pos)
+			timer:start(math.random(10,50))
 		end
 	else
-		groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1,redstone=1,redstone_torch=1}
+		groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1,redstone=1,redstone_torch=1,redstone_power=9}
+		on_timer = function(pos, elapsed)
+			minetest.set_node(pos, {name="redstone:ore_0"})
+			redstone.collect_info(pos)
+		end
 	end
 	minetest.register_node("redstone:ore_"..i, {
 		description = "Redstone Ore",
@@ -48,6 +55,7 @@ for i = 0,1 do
 			},
 		},
 		on_punch = on_punch,
+		on_timer = on_timer,
 	})
 end
 --redstone ore
