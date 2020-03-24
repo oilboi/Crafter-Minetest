@@ -53,7 +53,9 @@ ALPHA STATE CHANGELOG
 --rightclicking with tool places torch
 --add chest
 --make chest drop all items when you mine them
---add in switches
+--add in redstone:
+torch, repeater, comparator, inverter, piston, player detector,light,
+redstone ore - drops 4,5 redstone dust, turns on when punched
 
 farming - 
 - add fertilizer (pig drops bone randomly) 
