@@ -3,9 +3,13 @@ for name,def in pairs(minetest.registered_nodes) do
 	if def.drawtype == "normal" and string.match(name, "main:") then
 		local def2 = table.copy(def)
 		def2.groups.redstone_torch = 1
+		def2.groups.redstone_power=9
 		def2.drop = name
 		def2.mod_origin = "redstone"
 		--def2.textures = "dirt.png"
+		def2.after_destruct = function(pos, oldnode)
+			redstone.collect_info(pos)
+		end
 		local newname = "redstone:"..string.gsub(name, "main:", "")
 		def2.name = newname
 		minetest.register_node(newname,def2)

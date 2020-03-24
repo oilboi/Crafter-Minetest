@@ -48,14 +48,13 @@ minetest.register_node("redstone:piston_off", {
 			minetest.set_node(pos,{name="redstone:piston_on",param2=facedir})
 		end
     end,
-    redstone_deactivation = function(pos)		
-    end,
     --reverse the direction to face the player
     after_place_node = function(pos, placer, itemstack, pointed_thing)
 		local look = placer:get_look_dir()
 		look = vector.multiply(look,-1)
 		dir = minetest.dir_to_facedir(look, true)
 		minetest.set_node(pos,{name="redstone:piston_off",param2=dir})
+		redstone.collect_info(pos)
     end,
 })
 minetest.register_node("redstone:piston_on", {
@@ -74,8 +73,6 @@ minetest.register_node("redstone:piston_on", {
 				{-0.5, -0.5,  -0.5, 0.5,  0.5, 3/16},
 			},
 		},
-    redstone_activation = function(pos)		
-    end,
     redstone_deactivation = function(pos)
 		--this is where the piston deactivates
 		local facedir = minetest.get_node(pos).param2

@@ -27,6 +27,13 @@ minetest.register_craft({
 	}
 })
 minetest.register_craft({
+	output = "redstone:inverter_off",
+	recipe = {
+		{"redstone:dust","redstone:torch","redstone:dust"},
+		{"main:stone","main:stone","main:stone"},
+	}
+})
+minetest.register_craft({
 	output = "redstone:comparator",
 	recipe = {
 		{"","redstone:torch",""},

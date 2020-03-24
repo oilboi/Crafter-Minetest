@@ -1,83 +1,3 @@
---create torch versions of the nodes
-local function turn_torch_off(pos)
-	local found_dust = false
-	print("finding dust")
-	for x = -1,1 do
-	for z = -1,1 do
-		if not (math.abs(x)+math.abs(z) > 1) then
-			local index_pos = vector.add(pos,vector.new(x,0,z))
-			local node = minetest.get_node(index_pos)
-			if minetest.get_node_group(node.name,"redstone_dust")>0 then
-				local level = string.gsub(minetest.get_node(index_pos).name, "redstone:dust_", "")
-				level = tonumber(level)
-				print(level)
-				if level > 0 then
-					found_dust = true
-				end
-			end
-		end
-	end
-	end
-	if found_dust == true then
-		for x = -1,1 do
-		for z = -1,1 do
-			if not (math.abs(x)+math.abs(z) > 1) then
-				local index_pos = vector.add(pos,vector.new(x,0,z))
-				local node = minetest.get_node(index_pos)
-				if node.name == "redstone:torch_wall" then
-					minetest.set_node(index_pos,{name="redstone:torch_wall_off",param2=node.param2})
-				end
-			end
-		end
-		end
-	end
-end
-local function turn_torch_on(pos)
-	local found_dust = false
-	for x = -1,1 do
-	for z = -1,1 do
-		if not (math.abs(x)+math.abs(z) > 1) then
-			local index_pos = vector.add(pos,vector.new(x,0,z))
-			local node = minetest.get_node(index_pos)
-			if minetest.get_node_group(node.name,"redstone_dust")>0 and node.name == "redstone:dust_0" then
-				found_dust = true
-			end
-		end
-	end
-	end
-	if found_dust == true then
-		for x = -1,1 do
-		for z = -1,1 do
-			if not (math.abs(x)+math.abs(z) > 1) then
-				local index_pos = vector.add(pos,vector.new(x,0,z))
-				local node = minetest.get_node(index_pos)
-				if node.name == "redstone:torch_wall_off" then
-					minetest.set_node(index_pos,{name="redstone:torch_wall",param2=node.param2})
-				end
-			end
-		end
-		end
-	end
-end
-for name,def in pairs(minetest.registered_nodes) do
-	if def.drawtype == "normal" and string.match(name, "main:") then
-		local def2 = table.copy(def)
-		def2.groups.redstone_activation = 1
-		def2.drop = name
-		def2.mod_origin = "redstone"
-		def2.redstone_activation = function(pos)
-			turn_torch_off(pos)
-		end
-		def2.redstone_deactivation = function(pos)
-			turn_torch_on(pos)
-		end
-		--def2.textures = "dirt.png"
-		local newname = "redstone:"..string.gsub(name, "main:", "").."_deactivator"
-		def2.name = newname
-		minetest.register_node(newname,def2)
-	end
-end
-
 --get point where particle spawner is added
 local function get_offset(wdir)
 	local z = 0
@@ -189,11 +109,11 @@ minetest.register_craftitem("redstone:torch", {
 			retval = fakestack:set_name("redstone:torch_floor")
 		else
 			retval = fakestack:set_name("redstone:torch_wall")
-			local name = minetest.get_node(pointed_thing.under).name
-			local def = minetest.registered_nodes[name]
-			if def.drawtype == "normal" and string.match(name, "main:") then
-				minetest.set_node(pointed_thing.under,{name="redstone:"..string.gsub(name, "main:", "").."_deactivator"})
-			end
+			--local name = minetest.get_node(pointed_thing.under).name
+			--local def = minetest.registered_nodes[name]
+			--if def.drawtype == "normal" and string.match(name, "main:") then
+			--	minetest.set_node(pointed_thing.under,{name="redstone:"..string.gsub(name, "main:", "").."_deactivator"})
+			--end
 		end
 		if not retval then
 			return itemstack
@@ -223,7 +143,7 @@ minetest.register_node("redstone:torch_floor", {
 	drop = "redstone:torch",
 	walkable = false,
 	light_source = 13,
-	groups = {choppy=2, dig_immediate=3, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,redstone_torch=1,connect_to_raillike=1},
+	groups = {choppy=2, dig_immediate=3, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,redstone_torch=1,redstone_power=9},
 	legacy_wallmounted = true,
 	selection_box = {
 		type = "fixed",
@@ -253,7 +173,7 @@ minetest.register_node("redstone:torch_wall", {
 	walkable = false,
 	light_source = 13,
 	power = 9,
-	groups = {choppy=2, dig_immediate=3, flammable=1, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,redstone_torch=1,connect_to_raillike=1},
+	groups = {choppy=2, dig_immediate=3, flammable=1, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,redstone_torch=1,redstone_power=9},
 	drop = "redstone:torch",
 	selection_box = {
 		type = "wallmounted",
@@ -263,67 +183,6 @@ minetest.register_node("redstone:torch_wall", {
 	},
 	on_construct = function(pos)
 		--redstone.torch_activate(pos)
-		redstone.collect_info(pos)
-	end,
-	after_destruct = function(pos, oldnode)
-		redstone.collect_info(pos)
-	end,
-	sounds = main.woodSound(),
-})
-
-
-minetest.register_node("redstone:torch_floor_off", {
-	inventory_image = "redstone_torch.png",
-	wield_image = "redstone_torch.png",
-	wield_scale = {x = 1, y = 1, z = 1 + 2/16},
-	drawtype = "mesh",
-	mesh = "torch_floor.obj",
-	tiles = {"redstone_torch.png^[colorize:black:150"},
-	paramtype = "light",
-	paramtype2 = "none",
-	power = 9,
-	sunlight_propagates = true,
-	drop = "redstone:torch",
-	walkable = false,
-	light_source = 13,
-	groups = {choppy=2, dig_immediate=3, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,connect_to_raillike=1},
-	legacy_wallmounted = true,
-	selection_box = {
-		type = "fixed",
-		fixed = {-1/16, -0.5, -1/16, 1/16, 2/16, 1/16},
-	},
-	
-	on_construct = function(pos)
-		redstone.collect_info(pos)
-	end,
-	after_destruct = function(pos, oldnode)
-		redstone.collect_info(pos)
-	end,
-	sounds = main.woodSound(),
-})
-
-minetest.register_node("redstone:torch_wall_off", {
-	inventory_image = "redstone_torch.png",
-	wield_image = "redstone_torch.png",
-	wield_scale = {x = 1, y = 1, z = 1 + 1/16},
-	drawtype = "mesh",
-	mesh = "torch_wall.obj",
-	tiles = {"redstone_torch.png^[colorize:black:150"},
-	paramtype = "light",
-	paramtype2 = "wallmounted",
-	sunlight_propagates = true,
-	walkable = false,
-	light_source = 13,
-	power = 9,
-	groups = {choppy=2, dig_immediate=3, flammable=1, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,connect_to_raillike=1},
-	drop = "redstone:torch",
-	selection_box = {
-		type = "wallmounted",
-		wall_top = {-0.1, -0.1, -0.1, 0.1, 0.5, 0.1},
-		wall_bottom = {-0.1, -0.5, -0.1, 0.1, 0.1, 0.1},
-		wall_side = {-0.5, -0.3, -0.1, -0.2, 0.3, 0.1},
-	},
-	on_construct = function(pos)
 		redstone.collect_info(pos)
 	end,
 	after_destruct = function(pos, oldnode)

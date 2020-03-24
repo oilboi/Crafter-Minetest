@@ -97,7 +97,7 @@ for _,door in pairs({"top","bottom"}) do
 end
 end
 minetest.register_craft({
-	output = "door:wood_bottom",
+	output = "door:bottom_wood",
 	recipe = {
 		{"main:wood","main:wood"},
 		{"main:wood","main:wood"},
@@ -105,7 +105,7 @@ minetest.register_craft({
 	}
 })
 minetest.register_craft({
-	output = "door:iron_bottom",
+	output = "door:bottom_iron",
 	recipe = {
 		{"main:iron","main:iron"},
 		{"main:iron","main:iron"},
