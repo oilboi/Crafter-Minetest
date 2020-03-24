@@ -56,6 +56,9 @@ for i = 0,1 do
 		},
 		on_punch = on_punch,
 		on_timer = on_timer,
+		after_dig_node = function(pos, oldnode, oldmetadata, digger)
+			redstone.collect_info(pos)
+		end,
 	})
 end
 --redstone ore
