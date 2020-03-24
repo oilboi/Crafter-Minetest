@@ -42,7 +42,7 @@ minetest.register_craft({
 	}
 })
 minetest.register_craft({
-	output = "redstone:comparator_off",
+	output = "redstone:comparator_0",
 	recipe = {
 		{"","redstone:torch",""},
 		{"redstone:torch","redstone:dust","redstone:torch"},
