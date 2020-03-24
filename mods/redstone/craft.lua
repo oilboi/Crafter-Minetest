@@ -27,6 +27,14 @@ minetest.register_craft({
 	}
 })
 minetest.register_craft({
+	output = "redstone:player_detector_0",
+	recipe = {
+		{"main:stone","main:stone","main:stone"},
+		{"main:stone","redstone:torch","main:stone"},
+		{"main:stone","main:stone","main:stone"},
+	}
+})
+minetest.register_craft({
 	output = "redstone:inverter_off",
 	recipe = {
 		{"redstone:dust","redstone:torch","redstone:dust"},
