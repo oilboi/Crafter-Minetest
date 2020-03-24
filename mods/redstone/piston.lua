@@ -47,7 +47,7 @@ minetest.register_node("redstone:piston_off", {
 			--push player
 			for _,object in ipairs(minetest.get_objects_inside_radius(piston_location, 0.7)) do
 				if object:is_player() and object:get_hp() > 0 then
-					print("adding player velocity")
+					--print("adding player velocity")
 					object:add_player_velocity(vector.multiply(dir,15))
 				end
 			end
