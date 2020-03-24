@@ -44,6 +44,13 @@ minetest.register_node("redstone:piston_off", {
 		local piston_location = vector.add(pos,dir)
 		local worked = piston_move(pos,dir)
 		if worked == true then
+			--push player
+			for _,object in ipairs(minetest.get_objects_inside_radius(piston_location, 0.7)) do
+				if object:is_player() and object:get_hp() > 0 then
+					print("adding player velocity")
+					object:add_player_velocity(vector.multiply(dir,15))
+				end
+			end
 			minetest.sound_play("piston", {pos=pos,pitch=math.random(85,100)/100})
 			minetest.set_node(piston_location,{name="redstone:actuator",param2=facedir})
 			minetest.set_node(pos,{name="redstone:piston_on",param2=facedir})
