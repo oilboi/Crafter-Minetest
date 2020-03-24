@@ -1,6 +1,3 @@
-# Crafter
-A game based off my memories of Minecraft Beta 1.2-1.5
-
 ALPHA STATE CHANGELOG
 0.01
 --make a grass biome
@@ -59,6 +56,7 @@ ALPHA STATE CHANGELOG
 --add in redstone:
 torch, repeater, comparator, inverter, piston, player detector,light,
 redstone ore - drops 4,5 redstone dust, turns on when punched
+pressure plate, detects players (output max), detects items (output based on number of items)
 
 farming - 
 - add fertilizer (pig drops bone randomly) 
@@ -134,4 +132,3 @@ if object:is_player() and object:get_player_name() ~= self.rider then
       --acceleration = vector.multiply(acceleration, -1)
       --object:add_player_velocity(acceleration)
 end
-
