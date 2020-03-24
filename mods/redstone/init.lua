@@ -21,6 +21,7 @@ dofile(path.."/craft.lua")
 dofile(path.."/ore.lua")
 dofile(path.."/inverter.lua")
 dofile(path.."/player_detector.lua")
+dofile(path.."/space_maker.lua")
 
 redstone = {}
 
