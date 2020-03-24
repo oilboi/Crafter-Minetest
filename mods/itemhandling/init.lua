@@ -68,7 +68,7 @@ function minetest.item_drop(itemstack, dropper, pos)
 		p.y = p.y + 1.2
 	end
 	local item = itemstack:take_item(cnt)
-	local obj = core.add_item(p, item)
+	local obj = minetest.add_item(p, item)
 	if obj then
 		if dropper_is_player then
 			local dir = dropper:get_look_dir()
@@ -140,7 +140,8 @@ minetest.register_entity(":__builtin:item", {
 
 		local max_count = stack:get_stack_max()
 		local count = math.min(stack:get_count(), max_count)
-		local size = 0.2 + 0.1 * (count / max_count) ^ (1 / 3)
+
+		local size = 0.21
 		local coll_height = size * 0.75
 		local def = minetest.registered_nodes[itemname]
 		local glow = def and def.light_source

@@ -63,3 +63,10 @@ minetest.register_craft({
 		{"main:stone","redstone:dust","main:stone"},
 	}
 })
+
+minetest.register_craft({
+	output = "redstone:pressure_plate_0",
+	recipe = {
+		{"main:stone","main:stone"},
+	}
+})
