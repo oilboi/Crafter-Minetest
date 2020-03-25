@@ -10,7 +10,8 @@ function create_craft_formspec(item)
 		"background[-0.19,-0.25;9.41,9.49;gui_hb_bg.png]"..
 		"listcolors[#8b8a89;#c9c3c6;#3e3d3e;#000000;#FFFFFF]"..
 		"list[current_player;main;0,4.5;9,1;]".. --hot bar
-		"list[current_player;main;0,6;9,3;9]" --big part
+		"list[current_player;main;0,6;9,3;9]".. --big part
+		"button[5,3.5;1,1;back;back]"
 		
 		local width = recipe.width
 		local i = 1
@@ -78,6 +79,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		
 		set_inventory_page(player,form)
 		
+		minetest.show_formspec(player:get_player_name(),id, form..inv["page_"..page])
+	elseif fields.back then
+		local page = get_player_page(player)
 		minetest.show_formspec(player:get_player_name(),id, form..inv["page_"..page])
 	--this resets the craft table
 	elseif fields.quit then

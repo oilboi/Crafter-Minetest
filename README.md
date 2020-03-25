@@ -59,7 +59,7 @@
 - pressure plate, detects players (output max), detects items (output based on number of items)
 - fix item size based on number of items in stack to fixed size
 - add hoppers
-
+- Add TooManyItems
 
 
 
