@@ -83,6 +83,7 @@ minetest.register_abm{
 			end	
 		end
 		if level ~= power_level then
+			minetest.sound_play("lever", {pos=pos})
 			minetest.swap_node(pos,{name="redstone:pressure_plate_"..power_level})
 			redstone.collect_info(pos)
 		end
