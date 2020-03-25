@@ -115,21 +115,6 @@ minetest.register_node("hopper:hopper", {
 		minetest.show_formspec(clicker:get_player_name(),
 			"hopper_formspec:"..minetest.pos_to_string(pos), get_hopper_formspec(pos))
 	end,
-
-	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
-		minetest.log("action", S("@1 moves stuff in hopper at @2",
-			player:get_player_name(), minetest.pos_to_string(pos)))
-	end,
-
-	on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		minetest.log("action", S("@1 moves stuff to hopper at @2",
-			player:get_player_name(), minetest.pos_to_string(pos)))
-	end,
-
-	on_metadata_inventory_take = function(pos, listname, index, stack, player)
-		minetest.log("action", S("@1 moves stuff from hopper at @2",
-			player:get_player_name(), minetest.pos_to_string(pos)))
-	end,
 })
 
 local hopper_side_drop
@@ -206,20 +191,5 @@ minetest.register_node("hopper:hopper_side", {
 		end
 		minetest.show_formspec(clicker:get_player_name(),
 			"hopper_formspec:"..minetest.pos_to_string(pos), get_hopper_formspec(pos))
-	end,
-
-	on_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
-		minetest.log("action", S("@1 moves stuff in hopper at @2",
-			player:get_player_name(), minetest.pos_to_string(pos)))
-	end,
-
-	on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		minetest.log("action", S("@1 moves stuff to hopper at @2",
-			player:get_player_name(), minetest.pos_to_string(pos)))
-	end,
-
-	on_metadata_inventory_take = function(pos, listname, index, stack, player)
-		minetest.log("action", S("@1 moves stuff from hopper at @2",
-			player:get_player_name(), minetest.pos_to_string(pos)))
 	end,
 })

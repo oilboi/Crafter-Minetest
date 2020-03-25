@@ -72,9 +72,6 @@ minetest.register_node("hopper:chute", {
 	end,
 
 	on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		minetest.log("action", S("@1 moves stuff to chute at @2",
-			player:get_player_name(), minetest.pos_to_string(pos)))
-
 		local timer = minetest.get_node_timer(pos)
 		if not timer:is_started() then
 			timer:start(1)

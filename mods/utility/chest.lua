@@ -29,10 +29,12 @@ function chest.chest_lid_close(pn)
 	end
 
 	local node = minetest.get_node(pos)
-	minetest.after(0.2, minetest.swap_node, pos, { name = "utility:" .. swap,
-			param2 = node.param2 })
-	minetest.sound_play(sound, {gain = 0.3, pos = pos,
-		max_hear_distance = 10}, true)
+	minetest.after(0.2, function(pos,swap,node)
+		if minetest.get_node(pos).name == "utility:chest_open" then
+			minetest.swap_node(pos,{name = "utility:"..swap,param2=node.param2})
+			minetest.sound_play(sound, {gain = 0.3, pos = pos, max_hear_distance = 10},true)
+		end
+	end,pos,swap,node)
 end
 
 chest.open_chests = {}
@@ -185,14 +187,14 @@ function chest.register_chest(name, d)
 		end
 		
 		def.on_rightclick = function(pos, node, clicker)
-			minetest.sound_play(def.sound_open, {gain = 0.3, pos = pos,
-					max_hear_distance = 10}, true)
-				minetest.swap_node(pos, {
-						name = "utility:" .. name .. "_open",
-						param2 = node.param2 })
-			 minetest.show_formspec(clicker:get_player_name(),"utility:chest", chest.get_chest_formspec(pos))
-			chest.open_chests[clicker:get_player_name()] = { pos = pos,
-					sound = def.sound_close, swap = name }
+			if minetest.get_node(pos).name ~= "utility:chest" and  minetest.get_node(pos).name ~= "utility:chest_open" then
+				return
+			end
+			minetest.sound_play(def.sound_open, {gain = 0.3, pos = pos, max_hear_distance = 10}, true)	
+			minetest.swap_node(pos, {name = "utility:" .. name .. "_open", param2 = node.param2 })
+				
+			minetest.show_formspec(clicker:get_player_name(),"utility:chest", chest.get_chest_formspec(pos))
+			chest.open_chests[clicker:get_player_name()] = { pos = pos,sound = def.sound_close, swap = name }
 		end
 		def.on_blast = function(pos)
 			local drops = {}
@@ -201,22 +203,6 @@ function chest.register_chest(name, d)
 			minetest.remove_node(pos)
 			return drops
 		end
-	end
-
-	def.on_metadata_inventory_move = function(pos, from_list, from_index,
-			to_list, to_index, count, player)
-		minetest.log("action", player:get_player_name() ..
-			" moves stuff in chest at " .. minetest.pos_to_string(pos))
-	end
-	def.on_metadata_inventory_put = function(pos, listname, index, stack, player)
-		minetest.log("action", player:get_player_name() ..
-			" moves " .. stack:get_name() ..
-			" to chest at " .. minetest.pos_to_string(pos))
-	end
-	def.on_metadata_inventory_take = function(pos, listname, index, stack, player)
-		minetest.log("action", player:get_player_name() ..
-			" takes " .. stack:get_name() ..
-			" from chest at " .. minetest.pos_to_string(pos))
 	end
 	
 	def.on_destruct = function(pos)

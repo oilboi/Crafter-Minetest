@@ -81,6 +81,10 @@ hopper:add_container({
 	{"top", "utility:chest", "main"},
 	{"bottom", "utility:chest", "main"},
 	{"side", "utility:chest", "main"},
+	
+	{"top", "utility:chest_open", "main"},
+	{"bottom", "utility:chest_open", "main"},
+	{"side", "utility:chest_open", "main"},
 
 	{"top", "utility:furnace", "dst"},
 	{"bottom", "utility:furnace", "src"},
