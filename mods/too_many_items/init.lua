@@ -2,39 +2,37 @@
 --[[this is a recreation of an old minecraft mod]]--
 
 --THIS IS EXTREMELY sloppy because it's a prototype
-
 function create_craft_formspec(item)
 	local recipe = minetest.get_craft_recipe(item)
 	local output = ""
 	if recipe.method == "normal" then
-		output = "size[17.2,8.75]"
-		--recipe.width
-			--output = output.."item_image_button["..1+x..","..y..";1,1;"..data.name..";"..data.name..";]"
-				
-		local sorted_recipe = {}
-		print(dump(recipe))
+		output = "size[17.2,8.75]"..
+		"background[-0.19,-0.25;9.41,9.49;gui_hb_bg.png]"..
+		"listcolors[#8b8a89;#c9c3c6;#3e3d3e;#000000;#FFFFFF]"..
+		"list[current_player;main;0,4.5;9,1;]".. --hot bar
+		"list[current_player;main;0,6;9,3;9]" --big part
+		
 		local width = recipe.width
-		for index,item in ipairs(recipe.items) do
-			local y = index
-			local x = 1
-			
-			local i = index
-			if i > width and i <= width*2 then
-				y = i - width
-				x = 2
-			elseif i > width*2 then
-				y = i - width*2
-				x = 3
+		local i = 1
+		
+		local base_x = 0.75
+		local base_y = -0.5
+		
+		for x = 1,width do
+		for y = 1,3 do
+			for index,item in pairs(recipe.items) do
+				if index == i then
+					if width > 1 then
+						output = output.."item_image_button["..base_x+y..","..base_y+x..";1,1;"..item..";"..item..";]"
+					else
+						output = output.."item_image_button["..base_x+x..","..base_y+y..";1,1;"..item..";"..item..";]"
+					end
+				end
 			end
-			--if sorted_recipe[i] then
-				--print("adding item")
-			print(dump(item),y,x)
-			output = output.."item_image_button["..y..","..x..";1,1;"..item..";"..item..";]"
-			--end
-			--i = i + 1
+			i = i + 1
+		end
 		end
 	end
-	
 	return(output)
 end
 

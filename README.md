@@ -1,5 +1,5 @@
-ALPHA STATE CHANGELOG
-0.01
+# ALPHA STATE CHANGELOG
+## 0.01
 - make a grass biome
 - make trees
 - make hand - mod another mod
@@ -22,7 +22,7 @@ ALPHA STATE CHANGELOG
 - torches with particle
 - make a mob
 
-- 0.02
+## 0.02
 - fix tools causing crash on pigs with no fleshy definition
 - ladders - only placeable on walls
 - eating animation - particles? - entity?
@@ -35,7 +35,7 @@ ALPHA STATE CHANGELOG
 - made saplings
 
 
-0.03
+## 0.03
 - make grass spread
 - water buckets
 - buckets water farmland
@@ -58,10 +58,13 @@ ALPHA STATE CHANGELOG
 - redstone ore - drops 4,5 redstone dust, turns on when punched
 - pressure plate, detects players (output max), detects items (output based on number of items)
 - fix item size based on number of items in stack to fixed size
+- add hoppers
 
 
 
-IDEAS:
+
+
+# IDEAS:
 
 farming - 
 - add fertilizer (pig drops bone randomly) 
