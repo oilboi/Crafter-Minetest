@@ -181,34 +181,8 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
-
-local inv =	"size[9,8.75]"..
-    "background[-0.19,-0.25;9.41,9.49;main_inventory.png]"..
-    --listcolors[<slot_bg_normal>;<slot_bg_hover>;<slot_border>;<tooltip_bgcolor>;<tooltip_fontcolor>]
-    "listcolors[#8b8a89;#c9c3c6;#3e3d3e;#000000;#FFFFFF]"..
-    "list[current_player;main;0,4.5;9,1;]".. --hot bar
-	"list[current_player;main;0,6;9,3;9]".. --big part
-    "list[current_player;craft;2.5,1;2,2;]"..
-    "list[current_player;craftpreview;6.1,1.5;1,1;]"..
-    "listring[current_player;main]"..
-	"listring[current_player;craft]"
- 
-
-
-minetest.register_on_joinplayer(function(player)
-	player:set_inventory_formspec(inv)
-	local inv = player:get_inventory()
-	inv:set_width("craft", 2)
-	inv:set_width("main", 9)
-	inv:set_size("main", 9*4)
-	inv:set_size("craft", 4)
-	player:hud_set_hotbar_itemcount(9)
-	player:hud_set_hotbar_image("inventory_hotbar.png")
-	player:hud_set_hotbar_selected_image("hotbar_selected.png")
-end)
-
 --this dumps the players crafting table on closing the inventory
-local dump_craft = function(player)
+dump_craft = function(player)
 	local inv = player:get_inventory()
 	local pos = player:getpos()
 	pos.y = pos.y + player:get_properties().eye_height
@@ -217,21 +191,13 @@ local dump_craft = function(player)
 		local obj = minetest.add_item(pos, item)
 		if obj then
 			local x=math.random(-2,2)*math.random()
-		local y=math.random(2,5)
-		local z=math.random(-2,2)*math.random()
-		obj:setvelocity({x=x, y=y, z=z})
+			local y=math.random(2,5)
+			local z=math.random(-2,2)*math.random()
+			obj:setvelocity({x=x, y=y, z=z})
 		end
 		inv:set_stack("craft", i, nil)
 	end
 end
-
---this resets the craft table
-minetest.register_on_player_receive_fields(function(player, formname, fields)
-	local inv = player:get_inventory()
-	dump_craft(player)
-	inv:set_width("craft", 2)
-	inv:set_size("craft", 4)
-end)
 
 --replace stack when empty (building)
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
