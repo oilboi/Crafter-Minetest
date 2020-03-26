@@ -2,8 +2,107 @@
 --[[this is a recreation of an old minecraft mod]]--
 
 --THIS IS EXTREMELY sloppy because it's a prototype
+
+--this is from linuxdirk
+local recipe_converter = function (items, width)
+    local usable_recipe = { {}, {}, {} }
+
+    -- The recipe is a shapeless recipe so all items are in one table
+    if width == 0 then
+        usable_recipe = items
+    end
+
+    -- x _ _
+    -- x _ _
+    -- x _ _
+    if width == 1 then
+        usable_recipe[1][1] = items[1] or ''
+        usable_recipe[2][1] = items[2] or ''
+        usable_recipe[3][1] = items[3] or ''
+    end
+
+    -- x x _
+    -- x x _
+    -- x x _
+    if width == 2 then
+        usable_recipe[1][1] = items[1] or ''
+        usable_recipe[1][2] = items[2] or ''
+        usable_recipe[2][1] = items[3] or ''
+        usable_recipe[2][2] = items[4] or ''
+        usable_recipe[3][1] = items[5] or ''
+        usable_recipe[3][2] = items[6] or ''
+    end
+
+    -- x x x
+    -- x x x
+    -- x x x
+    if width == 3 then
+        usable_recipe[1][1] = items[1] or ''
+        usable_recipe[1][2] = items[2] or ''
+        usable_recipe[1][3] = items[3] or ''
+        usable_recipe[2][1] = items[4] or ''
+        usable_recipe[2][2] = items[5] or ''
+        usable_recipe[2][3] = items[6] or ''
+        usable_recipe[3][1] = items[7] or ''
+        usable_recipe[3][2] = items[8] or ''
+        usable_recipe[3][3] = items[9] or ''
+    end
+
+    return(usable_recipe)
+end
+
 function create_craft_formspec(item)
+	--don't do air
+	if item == "" then
+		return("")
+	end
 	local recipe = minetest.get_craft_recipe(item)
+	local usable_table = recipe_converter(recipe.items, recipe.width)
+	output = "size[17.2,8.75]"..
+		"background[-0.19,-0.25;9.41,9.49;gui_hb_bg.png]"..
+		"listcolors[#8b8a89;#c9c3c6;#3e3d3e;#000000;#FFFFFF]"..
+		"list[current_player;main;0,4.5;9,1;]".. --hot bar
+		"list[current_player;main;0,6;9,3;9]".. --big part
+		"button[5,3.5;1,1;back;back]"
+	
+	local base_x = 0.75
+	local base_y = -0.5
+	if recipe.method == "normal" then
+		if usable_table then
+			--shaped (regular)
+			if recipe.width > 0 then
+				for x = 1,3 do
+				for y = 1,3 do
+					local item = usable_table[x][y]
+					if item then
+						output = output.."item_image_button["..base_x+y..","..base_y+x..";1,1;"..item..";"..item..";]"
+					else
+						output = output.."item_image_button["..base_x+y..","..base_y+x..";1,1;;;]"
+					end
+				end
+				end
+			--shapeless
+			else
+				local i = 1
+				for x = 1,3 do
+				for y = 1,3 do
+					local item = usable_table[i]
+					if item then
+						output = output.."item_image_button["..base_x+y..","..base_y+x..";1,1;"..item..";"..item..";]"
+					else
+						output = output.."item_image_button["..base_x+y..","..base_y+x..";1,1;;;]"
+					end
+					i = i + 1
+				end
+				end
+			end
+		end
+	end
+	return(output)
+	--print(dump(usable_table))
+	
+	
+	--[[
 	local output = ""
 	if recipe.method == "normal" then
 		output = "size[17.2,8.75]"..
@@ -35,6 +134,7 @@ function create_craft_formspec(item)
 		end
 	end
 	return(output)
+	]]--
 end
 
 
@@ -101,7 +201,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		
 		local craft_inv = create_craft_formspec(next(fields))
 		
-		if craft_inv ~= "" then
+		if craft_inv and craft_inv ~= "" then
 			minetest.show_formspec(player:get_player_name(),id, craft_inv..inv["page_"..page])
 		end
 	end

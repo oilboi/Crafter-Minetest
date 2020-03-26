@@ -26,9 +26,7 @@ minetest.register_node("buildtest:glass_pipe", {
 			},
 		connect_right = {
 			{-3/16,-3/16,-3/16,8/16,3/16,3/16}
-			},
-			
-			
+			},	
 		connect_front = {
 			{-3/16,-3/16,-8/16,3/16,3/16,3/16}
 			},
