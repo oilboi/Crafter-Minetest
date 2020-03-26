@@ -67,6 +67,11 @@ function create_craft_formspec(item)
 		return("")
 	end
 	local recipe = minetest.get_craft_recipe(item)
+	--don't do node drops (yet)
+	if not recipe.items then
+		return("")
+	end
+	
 	local usable_table = recipe_converter(recipe.items, recipe.width)
 	output = "size[17.2,8.75]"..
 		"background[-0.19,-0.25;9.41,9.49;gui_hb_bg.png]"..
@@ -74,6 +79,7 @@ function create_craft_formspec(item)
 		"list[current_player;main;0,4.5;9,1;]".. --hot bar
 		"list[current_player;main;0,6;9,3;9]".. --big part
 		"button[5,3.5;1,1;back;back]"
+	
 	
 	local base_x = 0.75
 	local base_y = -0.5
@@ -113,42 +119,6 @@ function create_craft_formspec(item)
 		output = output.."image[2.75,1.5;1,1;default_furnace_fire_fg.png]"
 	end
 	return(output)
-	--print(dump(usable_table))
-	
-	
-	--[[
-	local output = ""
-	if recipe.method == "normal" then
-		output = "size[17.2,8.75]"..
-		"background[-0.19,-0.25;9.41,9.49;gui_hb_bg.png]"..
-		"listcolors[#8b8a89;#c9c3c6;#3e3d3e;#000000;#FFFFFF]"..
-		"list[current_player;main;0,4.5;9,1;]".. --hot bar
-		"list[current_player;main;0,6;9,3;9]".. --big part
-		"button[5,3.5;1,1;back;back]"
-		
-		local width = recipe.width
-		local i = 1
-		
-		local base_x = 0.75
-		local base_y = -0.5
-		
-		for x = 1,width do
-		for y = 1,3 do
-			for index,item in pairs(recipe.items) do
-				if index == i then
-					if width > 1 then
-						output = output.."item_image_button["..base_x+y..","..base_y+x..";1,1;"..item..";"..item..";]"
-					else
-						output = output.."item_image_button["..base_x+x..","..base_y+y..";1,1;"..item..";"..item..";]"
-					end
-				end
-			end
-			i = i + 1
-		end
-		end
-	end
-	return(output)
-	]]--
 end
 
 
