@@ -1,7 +1,8 @@
 --this converts a vector into absolute value
-function vector.abs(vector)
-	vector.x = math.abs(vector.x)
-	vector.y = math.abs(vector.y)
-	vector.z = math.abs(vector.z)
-	return(vector)
+function vector.abs(v)
+	return {
+		x = math.abs(v.x),
+		y = math.abs(v.y),
+		z = math.abs(v.z)
+	}
 end

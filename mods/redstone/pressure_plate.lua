@@ -59,7 +59,7 @@ minetest.register_abm{
 				local compare = vector.subtract(pos2,pos)
 				local real_y = compare.y
 				compare = vector.abs(compare)
-				if real_y <= -0.4 and real_y > -0.5 and compare.x < 0.8 and compare.z < 0.8 then
+				if real_y <= -0.35 and real_y > -0.5 and compare.x < 0.8 and compare.z < 0.8 then
 					power_level = 9
 				end
 			end
