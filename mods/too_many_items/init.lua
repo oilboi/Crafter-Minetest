@@ -3,7 +3,7 @@
 
 --THIS IS EXTREMELY sloppy because it's a prototype
 
---this is from linuxdirk
+--this is from Linuxdirk, thank you AspireMint for showing me this
 local recipe_converter = function (items, width)
     local usable_recipe = { {}, {}, {} }
 
