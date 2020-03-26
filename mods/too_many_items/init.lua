@@ -50,6 +50,16 @@ local recipe_converter = function (items, width)
 
     return(usable_recipe)
 end
+get_if_group = function(item)
+	 if item == "group:stone" then
+		return("main:cobble")
+	elseif item == "group:wood" then
+		return("main:wood")
+	else
+		return(item)
+	end
+end
+	
 
 function create_craft_formspec(item)
 	--don't do air
@@ -73,7 +83,7 @@ function create_craft_formspec(item)
 			if recipe.width > 0 then
 				for x = 1,3 do
 				for y = 1,3 do
-					local item = usable_table[x][y]
+					local item = get_if_group(usable_table[x][y])
 					if item then
 						output = output.."item_image_button["..base_x+y..","..base_y+x..";1,1;"..item..";"..item..";]"
 					else
@@ -86,7 +96,7 @@ function create_craft_formspec(item)
 				local i = 1
 				for x = 1,3 do
 				for y = 1,3 do
-					local item = usable_table[i]
+					local item = get_if_group(usable_table[i])
 					if item then
 						output = output.."item_image_button["..base_x+y..","..base_y+x..";1,1;"..item..";"..item..";]"
 					else
@@ -97,6 +107,10 @@ function create_craft_formspec(item)
 				end
 			end
 		end
+	elseif recipe.method == "cooking" then
+		local item = recipe.items[1]
+		output = output.."item_image_button["..(base_x+2)..","..(base_y+1)..";1,1;"..item..";"..item..";]"
+		output = output.."image[2.75,1.5;1,1;default_furnace_fire_fg.png]"
 	end
 	return(output)
 	--print(dump(usable_table))
@@ -256,19 +270,21 @@ local y = 0
 
 --dump all the items in
 for index,data in pairs(minetest.registered_items) do
-	local recipe = minetest.get_craft_recipe(data.name)
-	--only put in craftable items
-	if recipe.method then
-		inv["page_"..page] = inv["page_"..page].."item_image_button["..9.25+x..","..y..";1,1;"..data.name..";"..data.name..";]"
-		x = x + 1
-		if x > 7 then
-			x = 0
-			y = y + 1
-		end
-		if y > 7 then
-			y = 0
-			page = page + 1
-			inv["page_"..page] = ""
+	if data.name ~= "" then
+		local recipe = minetest.get_craft_recipe(data.name)
+		--only put in craftable items
+		if recipe.method then
+			inv["page_"..page] = inv["page_"..page].."item_image_button["..9.25+x..","..y..";1,1;"..data.name..";"..data.name..";]"
+			x = x + 1
+			if x > 7 then
+				x = 0
+				y = y + 1
+			end
+			if y > 7 then
+				y = 0
+				page = page + 1
+				inv["page_"..page] = ""
+			end
 		end
 	end
 end

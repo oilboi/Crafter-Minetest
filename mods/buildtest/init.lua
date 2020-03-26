@@ -36,3 +36,12 @@ minetest.register_node("buildtest:glass_pipe", {
 			},
 	},
 })
+
+minetest.register_craft({
+	output = "buildtest:glass_pipe 20",
+	recipe = {
+		{"main:glass","","main:glass"},
+		{"main:glass","","main:glass"},
+		{"main:glass","","main:glass"},
+	}
+})
