@@ -4,7 +4,7 @@ for name,def in pairs(minetest.registered_nodes) do
 		local def2 = table.copy(def)
 		def2.groups.redstone_torch = 1
 		def2.groups.redstone_power=9
-		def2.drop = name
+		def2.drop = def.drop
 		def2.mod_origin = "redstone"
 		--def2.textures = "dirt.png"
 		def2.after_destruct = function(pos, oldnode)
@@ -12,6 +12,7 @@ for name,def in pairs(minetest.registered_nodes) do
 		end
 		local newname = "redstone:"..string.gsub(name, "main:", "")
 		def2.name = newname
+		def2.description = "Redstone "..def.description
 		minetest.register_node(newname,def2)
 	end
 end

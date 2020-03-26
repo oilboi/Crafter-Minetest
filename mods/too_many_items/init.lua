@@ -2,7 +2,52 @@
 --[[this is a recreation of an old minecraft mod]]--
 
 --THIS IS EXTREMELY sloppy because it's a prototype
+minetest.register_on_mods_loaded(function()
+	for index,data in pairs(minetest.registered_items) do
+		if data.name ~= "" then
+			if data.drop and data.drop ~= "" then
+				--single drop parents
+				if type(data.drop) == "string" then
+					--add parent to dropped items
+					local droppers = minetest.registered_items[data.drop].parent_dropper
+					if not droppers then
+						--print(data.name)
+						droppers = {}
+					end
+					
+					table.insert(droppers, data.name)
+					minetest.override_item(data.drop, {
+						parent_dropper = droppers
+					})
+				--multiple drop parents
+				elseif type(data.drop) == "table" then
+					if data.drop.items then
+						for index2,dropdata in pairs(data.drop.items) do
+							if dropdata.items then
+								for index3,drop_item in pairs(dropdata.items) do
+									--add parent to dropped items
+									local droppers = minetest.registered_items[drop_item].parent_dropper
+									if not droppers then
+										droppers = {}
+									end
+									
+									table.insert(droppers, data.name)
+									minetest.override_item(drop_item, {
+										parent_dropper = droppers
+									})
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end)
 
+function minetest.get_dropper_nodes(node)
+	return(minetest.registered_items[node].parent_dropper)
+end
 --this is from Linuxdirk, thank you AspireMint for showing me this
 local recipe_converter = function (items, width)
     local usable_recipe = { {}, {}, {} }
@@ -67,10 +112,6 @@ function create_craft_formspec(item)
 		return("")
 	end
 	local recipe = minetest.get_craft_recipe(item)
-	--don't do node drops (yet)
-	if not recipe.items then
-		return("")
-	end
 	
 	local usable_table = recipe_converter(recipe.items, recipe.width)
 	output = "size[17.2,8.75]"..
@@ -117,6 +158,23 @@ function create_craft_formspec(item)
 		local item = recipe.items[1]
 		output = output.."item_image_button["..(base_x+2)..","..(base_y+1)..";1,1;"..item..";"..item..";]"
 		output = output.."image[2.75,1.5;1,1;default_furnace_fire_fg.png]"
+	--this is an escape to check if diggable
+	else
+		local dropper = minetest.get_dropper_nodes(item)
+		local dug_node = nil
+		if type(dropper) == "table" and table.getn(dropper) > 0 then
+			local amount_of_droppers = table.getn(dropper)
+			dug_node = dropper[math.random(1,amount_of_droppers)]
+		else
+			--print("failed")
+		end		
+		if dug_node then
+			output = output.."item_image_button["..(base_x+2)..","..(base_y+1)..";1,1;"..dug_node..";"..dug_node..";]"
+			output = output.."image[2.75,1.5;1,1;diamondpick.png]"
+			
+		else
+			return("")
+		end
 	end
 	return(output)
 end
