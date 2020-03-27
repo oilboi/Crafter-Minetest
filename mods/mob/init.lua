@@ -20,9 +20,7 @@ mob.initial_properties = {
 	visual_size = {x = 3, y = 3},
 	mesh = "pig.b3d",
 	textures = {
-		"nothing.png", -- baby
-		"pig.png", -- base
-		"nothing.png", -- saddle
+		"pig.png","pig.png","pig.png","pig.png","pig.png","pig.png","pig.png","pig.png","pig.png","pig.png"
 	},
 	is_visible = true,
 	pointable = true,

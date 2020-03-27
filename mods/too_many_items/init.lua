@@ -119,8 +119,7 @@ function create_craft_formspec(item)
 		"listcolors[#8b8a89;#c9c3c6;#3e3d3e;#000000;#FFFFFF]"..
 		"list[current_player;main;0,4.5;9,1;]".. --hot bar
 		"list[current_player;main;0,6;9,3;9]".. --big part
-		"button[5,3.5;1,1;back;back]"
-	
+		"button[5,3.5;1,1;back;back]" --back button
 	
 	local base_x = 0.75
 	local base_y = -0.5
@@ -180,6 +179,15 @@ function create_craft_formspec(item)
 end
 
 
+function show_cheat_button(player)
+	local cheat = get_player_cheat(player)
+	if cheat == 1 then
+		return("button[11.5,7.6;2,2;cheat;cheat:on]")
+	else
+		return("button[11.5,7.6;2,2;cheat;cheat:off]")
+	end
+end
+
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	--print(dump(fields))
 	local form
@@ -193,6 +201,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 	
 	
+	
+	
+	local cheating = get_player_cheat(player)
 	--"next" button
 	if fields.next then
 		local page = get_player_page(player)
@@ -206,8 +217,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		set_player_page(player,page)
 		
 		set_inventory_page(player,form)
-		
-		minetest.show_formspec(player:get_player_name(),id, form..inv["page_"..page])
+		local cheat_button = show_cheat_button(player)	
+		minetest.show_formspec(player:get_player_name(),id, form..inv["page_"..page]..cheat_button)
+		minetest.sound_play("lever", {to_player = player:get_player_name(),gain=0.7})
 	--"prev" button
 	elseif fields.prev then
 		local page = get_player_page(player)
@@ -217,14 +229,17 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		if page < 0 then
 			page = pages
 		end	
+		
 		set_player_page(player,page)
-		
 		set_inventory_page(player,form)
-		
-		minetest.show_formspec(player:get_player_name(),id, form..inv["page_"..page])
+		local cheat_button = show_cheat_button(player)	
+		minetest.show_formspec(player:get_player_name(),id, form..inv["page_"..page]..cheat_button)
+		minetest.sound_play("lever", {to_player = player:get_player_name(),gain=0.7})
 	elseif fields.back then
 		local page = get_player_page(player)
-		minetest.show_formspec(player:get_player_name(),id, form..inv["page_"..page])
+		local cheat_button = show_cheat_button(player)
+		minetest.show_formspec(player:get_player_name(),id, form..inv["page_"..page]..cheat_button)
+		minetest.sound_play("lever", {to_player = player:get_player_name(),gain=0.7})
 	--this resets the craft table
 	elseif fields.quit then
 		local inv = player:get_inventory()
@@ -233,18 +248,50 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		inv:set_size("craft", 4)
 		--reset the player inv
 		set_inventory_page(player,base_inv)
+	elseif fields.cheat then
+		--check if the player has the give priv
+		local privved = minetest.get_player_privs(player:get_player_name()).give
+		local cheating = get_player_cheat(player)
+		if (cheating == 0 and privved == true) or cheating == 1 then
+			local cheating = math.abs(cheating - 1)
+			set_player_cheat(player,cheating)
+			local cheat_button = show_cheat_button(player)
+			local page = get_player_page(player)
+			minetest.show_formspec(player:get_player_name(),id, form..inv["page_"..page]..cheat_button)
+			minetest.sound_play("lever", {to_player = player:get_player_name(),gain=0.7})
+		else
+			minetest.chat_send_player(player:get_player_name(), minetest.colorize("red", "YOU DO NOT HAVE THE 'GIVE' PRIVELAGE"))
+			minetest.sound_play("lever", {to_player = player:get_player_name(),gain=0.7,pitch=0.7})
+		end
 	else
-		--local pos = player:getpos()
-		
-		--minetest.add_item(pos,next(fields))
-		--this is not a good idea
-		--create packed table to decode instead
-		local page = get_player_page(player)
-		
-		local craft_inv = create_craft_formspec(next(fields))
-		
-		if craft_inv and craft_inv ~= "" then
-			minetest.show_formspec(player:get_player_name(),id, craft_inv..inv["page_"..page])
+		--this is the "cheating" aka giveme function
+		local privved = minetest.get_player_privs(player:get_player_name()).give
+		local cheating = get_player_cheat(player)		
+		if cheating == 1 and privved == true then
+			local pos = player:getpos()
+			local inv = player:get_inventory()
+			local stack = ItemStack(next(fields).." 64")
+			
+			--room for item
+			if inv and inv:room_for_item("main",stack) then
+				inv:add_item("main", stack)
+				minetest.sound_play("pickup", {to_player = player:get_player_name(),gain=0.7,pitch = math.random(60,100)/100})
+			--no room for item
+			else
+				local namer = string.upper(minetest.registered_items[next(fields)].description)
+				minetest.chat_send_player(player:get_player_name(), minetest.colorize("red", "THERE IS NO ROOM FOR "..namer.." IN YOUR INVENTORY!"))
+				minetest.sound_play("lever", {to_player = player:get_player_name(),gain=0.7,pitch=0.7})
+			end
+			--minetest.show_formspec(player:get_player_name(),id, inv["page_"..page])
+		--this is to get the craft recipe
+		else
+			local page = get_player_page(player)
+			local craft_inv = create_craft_formspec(next(fields))
+			if craft_inv and craft_inv ~= "" then
+				local cheat_button = show_cheat_button(player)	
+				minetest.show_formspec(player:get_player_name(),id, craft_inv..inv["page_"..page]..cheat_button)
+				minetest.sound_play("lever", {to_player = player:get_player_name(),gain=0.7})
+			end
 		end
 	end
 end)
@@ -257,6 +304,18 @@ end
 set_player_page = function(player,page)
 	local meta = player:get_meta()
 	meta:set_int("page",page)
+end
+
+--
+
+get_player_cheat = function(player)
+	local meta = player:get_meta()
+	return(meta:get_int("cheating"))
+end
+
+set_player_cheat = function(player,truth)
+	local meta = player:get_meta()
+	meta:set_int("cheating",truth)
 end
 
 local max = 7*7
@@ -323,7 +382,7 @@ for i = 0,page do
 	inv["page_"..i] = inv["page_"..i].."button[9.25,7.6;2,2;prev;prev]"..
 	"button[15.25,7.6;2,2;next;next]"..
 	--this is +1 so it makes more sense
-	"label[12.75,8.25;page "..(i+1).."/"..(page+1).."]"
+	"label[13.75,8.25;page "..(i+1).."/"..(page+1).."]"
 end
 
 --override crafting table
@@ -342,11 +401,19 @@ end)
 --this is how the player "turns" the page
 set_inventory_page = function(player,inventory)
 	local page = get_player_page(player)
+	local cheat = get_player_cheat(player)
+	if cheat == 1 then
+		inventory = inventory.."button[11.5,7.6;2,2;cheat;cheat:on]"
+	else
+		inventory = inventory.."button[11.5,7.6;2,2;cheat;cheat:off]"
+	end
+		
 	player:set_inventory_formspec(inventory..inv["page_"..page])
 end
 
 --set new players inventory up
 minetest.register_on_joinplayer(function(player)
+	set_player_cheat(player, 0) -- this resets the cheating to false
 	set_player_page(player,0) -- this sets the meta "page" to remember what page they're on
 	set_inventory_page(player,base_inv) --this sets the "" (inventory button/main) inventory
 	
