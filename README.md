@@ -60,6 +60,8 @@
 - fix item size based on number of items in stack to fixed size
 - add hoppers
 - Add TooManyItems
+- add function to check which nodes drop the item
+- fix hoppers not activating furnace
 
 
 
@@ -93,6 +95,7 @@ farming -
 - check if everyone is in bed before going to next night
 - also lock player in bed until they get out or daytime
 - create a function to check if a node or group is below
+
 
 - minecart car train? - off rail use
 - automatic step height for off rail use
