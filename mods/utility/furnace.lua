@@ -313,11 +313,17 @@ minetest.register_node("utility:furnace", {
 	end,
 
 	on_metadata_inventory_move = function(pos)
-		minetest.get_node_timer(pos):start(1.0)
+		local timer = minetest.get_node_timer(pos)
+		if timer:is_started() == false then
+			timer:start(1.0)
+		end
 	end,
 	on_metadata_inventory_put = function(pos)
 		-- start timer function, it will sort out whether furnace can burn or not.
-		minetest.get_node_timer(pos):start(1.0)
+		local timer = minetest.get_node_timer(pos)
+		if timer:is_started() == false then
+			timer:start(1.0)
+		end
 	end,
 	--[[
 	on_blast = function(pos)
