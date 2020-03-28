@@ -113,13 +113,13 @@ minecart.movement = function(self)
 		
 		--speed up going downhill
 		if self.dir and (self.dir.y == -1 or self.rider) and self.speed < 10 then
-			self.speed = self.speed + 0.05
+			self.speed = self.speed + 0.03
 		--slow down going uphill
 		elseif self.dir and self.speed > 1 and self.dir.y == 1 then
-			self.speed = self.speed - 0.06
+			self.speed = self.speed - 0.05
 		--normal flat friction slowdown
 		elseif self.speed > 1 then
-			self.speed = self.speed - 0.009
+			self.speed = self.speed - 0.01
 		end
 	--stop the minecart from flying off into the distance
 	elseif not vector.equals(self.object:get_velocity(), vector.new(0,0,0)) and (self.speed == 0 or not self.speed) then
