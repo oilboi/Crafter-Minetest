@@ -151,7 +151,7 @@ minetest.register_entity(":__builtin:item", {
 			visual = "wielditem",
 			textures = {itemname},
 			visual_size = {x = size, y = size},
-			collisionbox = {-size, -coll_height, -size,
+			collisionbox = {-size, -0.21, -size,
 				size, coll_height, size},
 			selectionbox = {-size, -size, -size, size, size, size},
 			automatic_rotate = math.pi * 0.5 * 0.2 / size,
@@ -228,7 +228,6 @@ minetest.register_entity(":__builtin:item", {
 		if self.collected == true then
 			if not self.collector then
 				self.collected = false
-				print("throwing exception")
 				return
 			end
 			local collector = minetest.get_player_by_name(self.collector)
@@ -294,6 +293,7 @@ minetest.register_entity(":__builtin:item", {
 			y = pos.y + self.object:get_properties().collisionbox[2] - 0.05,
 			z = pos.z
 		})
+		
 		-- Delete in 'ignore' nodes
 		if node and node.name == "ignore" then
 			self.itemstring = ""
@@ -388,18 +388,39 @@ minetest.register_entity(":__builtin:item", {
 				})
 			elseif vel.y == 0 then
 				is_moving = false
+				--[[
+				local collisionbox = self.object:get_properties().collisionbox
+				local move_y = collisionbox[2]
+				if self.move_up == nil then
+					self.move_up = true
+				end
+				local addition = 0
+				if self.move_up == true then
+					move_y = move_y + (dtime/10)
+					addition = (dtime/8)
+					if move_y > -0.21 then
+						self.move_up = false
+					end
+				elseif self.move_up == false then
+					move_y = move_y - (dtime/10)
+					if move_y < -0.5 then
+						self.move_up = true
+					end
+				end
+				collisionbox[2] = move_y
+				self.object:set_properties({collisionbox=collisionbox,physical = true})
+				]]--
 			end
 		end
 
-		if self.moving_state == is_moving and
-				self.slippery_state == is_slippery then
+		if self.moving_state == is_moving and self.slippery_state == is_slippery then
 			-- Do not update anything until the moving state changes
 			return
 		end
 
 		self.moving_state = is_moving
 		self.slippery_state = is_slippery
-
+		
 		if is_moving then
 			self.object:set_acceleration({x = 0, y = -gravity, z = 0})
 		else

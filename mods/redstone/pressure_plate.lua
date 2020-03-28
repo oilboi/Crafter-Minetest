@@ -69,10 +69,11 @@ minetest.register_abm{
 			for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1.2)) do
 				if not object:is_player() and object:get_luaentity() and object:get_luaentity().name == "__builtin:item" then
 					local pos2 = object:get_pos()
+					pos2.y = pos2.y + object:get_properties().collisionbox[2]
 					local compare = vector.subtract(pos2,pos)
 					local real_y = compare.y
 					compare = vector.abs(compare)
-					if real_y <= -0.2 and real_y > -0.5 and compare.x < 0.6 and compare.z < 0.6 then
+					if real_y <= -0.35 and real_y > -0.5 and compare.x < 0.6 and compare.z < 0.6 then
 						if power_level < 9 then
 							power_level = power_level + 1
 						else
