@@ -113,7 +113,7 @@ minecart.movement = function(self)
 		
 		--speed up going downhill
 		if self.dir and (self.dir.y == -1 or self.rider) and self.speed < 10 then
-			self.speed = self.speed + 0.03
+			self.speed = self.speed + 0.05
 		--slow down going uphill
 		elseif self.dir and self.speed > 1 and self.dir.y == 1 then
 			self.speed = self.speed - 0.05
