@@ -8,6 +8,7 @@ local minecart = {}
 --these are the variables for the minecart
 minecart.max_speed = 15
 minecart.speed = 0
+minecart.rider = nil
 
 --binary direction
 minecart.get_dir = function(pos,pos2)
@@ -102,12 +103,19 @@ minecart.movement = function(self)
 		end
 		
 		--make minecart slow down, but only so much
-		if self.dir and self.dir.y == -1 and self.speed < 10 then
+		if self.dir and (self.dir.y == -1 or self.rider) and self.speed < 10 then
 			self.speed = self.speed + 0.05
 		elseif self.speed > 1 then
 			self.speed = self.speed - 0.005
 		end
+	--stop the minecart from flying off into the distance
+	elseif not vector.equals(self.object:get_velocity(), vector.new(0,0,0)) then
+		if self.speed == 0 then
+			self.object:set_velocity(vector.new(0,0,0))
+		end
 	end
+	
+	
 end
 
 --this simply sets the mesh based on if the minecart is moving up or down
@@ -127,7 +135,7 @@ minecart.on_step = function(self,dtime)
 	
 	--get player input (standing next to the minecart)
 	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
-		if self.object ~= object and object:is_player() then
+		if self.object ~= object and object:is_player() and object:get_player_name() ~= self.rider then
 			local pos2 = object:get_pos()
 			minecart.set_direction(self, minecart.get_dir(pos,pos2))
 			self.speed = 7
@@ -142,6 +150,63 @@ minecart.on_step = function(self,dtime)
 	minecart.set_mesh(self)
 end
 
+--make the player ride the minecart
+--or make the player get off
+minecart.on_rightclick = function(self,clicker)
+	if not clicker or not clicker:is_player() then return end
+	local name = clicker:get_player_name()
+	
+	--get on the minecart
+	if not self.rider then
+		self.rider = name
+		clicker:set_attach(self.object, "", {x=0, y=0, z=0}, {x=0, y=0, z=0})
+	--get off the minecart
+	elseif name == self.rider then
+		self.rider = nil
+		clicker:set_detach()
+	end
+end
+
+--get old data
+minecart.on_activate = function(self,staticdata, dtime_s)
+	self.object:set_armor_groups({immortal=1})
+	if string.sub(staticdata, 1, string.len("return")) ~= "return" then
+		return
+	end
+	local data = minetest.deserialize(staticdata)
+	if type(data) ~= "table" then
+		return
+	end
+	self.dir = data.dir
+	self.goal = data.goal
+	self.speed = data.speed
+	
+	--run through if there was a rider then check if they exist and put them back on
+	--and if they don't exist then nillify the rider value
+	if data.rider then
+		if minetest.player_exists(data.rider) then
+			self.rider = data.rider
+			local player = minetest.get_player_by_name(data.rider)
+			player:set_attach(self.object, "", {x=0, y=0, z=0}, {x=0, y=0, z=0})
+		else
+			self.rider = nil
+		end
+	else
+		self.rider = nil
+	end
+	
+	
+end
+--remember data
+minecart.get_staticdata = function(self)
+	return minetest.serialize({
+		dir = self.dir,
+		goal = self.goal,
+		speed = self.speed,
+		rider = self.rider
+	})
+end
+
 
 
 minecart.initial_properties = {
@@ -152,24 +217,9 @@ minecart.initial_properties = {
 	visual_size = {x=1, y=1},
 	textures = {"minecart.png"},
 	automatic_face_movement_dir = 90.0,
-	automatic_face_movement_max_rotation_per_sec = 600,
+	automatic_face_movement_max_rotation_per_sec = 1200,
 }
 
-minecart.on_activate = function(self,staticdata, dtime_s)
-	self.object:set_armor_groups({immortal=1})
-	if string.sub(staticdata, 1, string.len("return")) ~= "return" then
-		return
-	end
-	local data = minetest.deserialize(staticdata)
-	if type(data) ~= "table" then
-		return
-	end
-end
-
-minecart.get_staticdata = function(self)
-	return minetest.serialize({
-	})
-end
 
 minecart.on_punch = function(self,puncher, time_from_last_punch, tool_capabilities, dir, damage)
 	local obj = minetest.add_item(self.object:getpos(), "minecart:minecart")
