@@ -72,11 +72,18 @@ minecart.movement = function(self)
 			--self.object:move_to(minecart.round_pos(self.object:get_pos()))
 			
 			--if the minecart is slowed down below 1 nph (node per hour)
-			--then stop it
+			--try to flip direction if pointing up
+			--then stop it if failed
 			if self.speed < 1 then
-				self.speed = 0
-				self.dir = nil
-				self.goal = nil
+				if self.dir.y == 1 then
+					self.dir = vector.multiply(self.dir, -1)
+					minecart.set_direction(self,self.dir)
+				else
+					self.speed = 0
+					self.dir = nil
+					self.goal = nil
+				end
+				
 			--otherwise try to keep going
 			else
 				--test to see if minecart will keep moving
@@ -103,16 +110,25 @@ minecart.movement = function(self)
 		end
 		
 		--make minecart slow down, but only so much
+		
+		--speed up going downhill
 		if self.dir and (self.dir.y == -1 or self.rider) and self.speed < 10 then
 			self.speed = self.speed + 0.05
+		--slow down going uphill
+		elseif self.dir and self.speed > 1 and self.dir.y == 1 then
+			self.speed = self.speed - 0.06
+		--normal flat friction slowdown
 		elseif self.speed > 1 then
-			self.speed = self.speed - 0.005
+			self.speed = self.speed - 0.009
 		end
 	--stop the minecart from flying off into the distance
-	elseif not vector.equals(self.object:get_velocity(), vector.new(0,0,0)) then
-		if self.speed == 0 then
-			self.object:set_velocity(vector.new(0,0,0))
-		end
+	elseif not vector.equals(self.object:get_velocity(), vector.new(0,0,0)) and (self.speed == 0 or not self.speed) then
+		self.object:set_velocity(vector.new(0,0,0))
+	--this is when the minecart is stopped
+	--gotta figure out some way to apply gravity and make it physical
+	--without breaking the rest of it
+	elseif self.speed == 0 then
+		--self.object:add_velocity(vector.new(0,-10,0))
 	end
 	
 	
