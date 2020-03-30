@@ -39,6 +39,7 @@ mob.get_staticdata = function(self)
 		hp = self.hp,		
 	})
 end
+
 mob.on_activate = function(self, staticdata, dtime_s)
 	self.object:set_armor_groups({immortal = 1})
 	--self.object:set_velocity({x = math.random(-5,5), y = 5, z = math.random(-5,5)})
@@ -56,8 +57,9 @@ mob.on_activate = function(self, staticdata, dtime_s)
 	
 	local head = minetest.add_entity(self.object:get_pos(), "mob:head")
 	if head then
-		head:set_attach(self.object, "", vector.new(2.4,1.2,0),vector.new(180,0,180))
 		self.child = head
+		self.child:get_luaentity().parent = self.object
+		self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180,0,0))
 	end
 	
 	--self.object:set_yaw(math.pi*math.random(-1,1)*math.random())
@@ -96,6 +98,7 @@ mob.on_death = function(self, killer)
 		texture = "smoke.png",
 	})
 	local obj = minetest.add_item(pos,"mob:raw_porkchop")
+	self.child:get_luaentity().parent = nil
 end
 --repel from players
 mob.push = function(self)
@@ -118,7 +121,7 @@ mob.push = function(self)
 			
 			self.object:add_velocity(acceleration)
 			
-			acceleration = vector.multiply(acceleration, -0.5)
+			acceleration = vector.multiply(acceleration, 5)
 			object:add_player_velocity(acceleration)
 		end
 	end
@@ -127,7 +130,7 @@ end
 mob.move = function(self,dtime)
 	self.timer = self.timer - dtime
 	if self.timer <= 0 then
-		self.timer = math.random(1,3)
+		self.timer = math.random(5,10)
 		self.direction = vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1))
 		--local yaw = self.object:get_yaw() + dtime
 		
@@ -194,59 +197,78 @@ local radians_to_degrees = function(radians)
 end
 
 --a movement test to move the head
-mob.move_head = function(self)
+mob.move_head = function(self,pos2)
 	if self.child then
-		local pos = self.object:get_pos()
-		local body_yaw = self.object:get_yaw() - (math.pi/2)
-		local dir = vector.multiply(minetest.yaw_to_dir(body_yaw),0.72)
-		local real_dir = minetest.yaw_to_dir(body_yaw)
-		local body_yaw = degree_round(degrees(minetest.dir_to_yaw(dir)))
-		
-		pos = vector.add(pos,dir)
-		pos.y = pos.y + 0.36
-		
-		--pos is where the head actually is
-		--STARE O_O
-		for _,object in ipairs(minetest.get_objects_inside_radius(pos, 6)) do
-			if object:is_player() then
-				local pos2 = object:get_pos()
-				pos2.y = pos2.y + 1.625
-				
-				local head_yaw  = degree_round(degrees(minetest.dir_to_yaw(vector.direction(pos,pos2))))			
-				
-				local new_yaw = (head_yaw-body_yaw)
+		--if passed a direction to look
+		if pos2 then
+			local pos = self.object:get_pos()
+			local body_yaw = self.object:get_yaw() - (math.pi/2)
+			local dir = vector.multiply(minetest.yaw_to_dir(body_yaw),0.72)
+			local real_dir = minetest.yaw_to_dir(body_yaw)
+			local body_yaw = degree_round(degrees(minetest.dir_to_yaw(dir)))
+			
+			--pos is where the head actually is
+			pos = vector.add(pos,dir)
+			pos.y = pos.y + 0.36
+					
+			
+			local head_yaw  = degree_round(degrees(minetest.dir_to_yaw(vector.direction(pos,pos2))))			
+			
+			local new_yaw = (body_yaw-head_yaw)
 
-				local pitch = 0				
-				if math.abs(new_yaw) <= 90 or math.abs(new_yaw) >= 270 then
-					--do other calculations on pitch and roll
-					
-					local triangle = vector.new(vector.distance(pos,pos2),0,pos2.y-pos.y)
-					
-					local tri_yaw = minetest.dir_to_yaw(triangle)+(math.pi/2)
-					
-					pitch = radians_to_degrees(tri_yaw)
-									
-					modifier = 0	
-					if new_yaw > 0 then
-						modifier = 1
-					else
-						modifier = -1
-					end
-				else
-					new_yaw = 0
-				end
-				--                                                                      roll        newyaw      pitch
-				self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180,     new_yaw,    180+pitch))				
-				--self.head_rotation = vector.new(180,new_yaw,180)
+			local pitch = 0	
+			local roll = 0	
+			if math.abs(new_yaw) <= 90 or math.abs(new_yaw) >= 270 then
+				--do other calculations on pitch and roll
+				
+				local triangle = vector.new(vector.distance(pos,pos2),0,pos2.y-pos.y)
+				
+				local tri_yaw = minetest.dir_to_yaw(triangle)+(math.pi/2)
+				
+				pitch = radians_to_degrees(tri_yaw)
+				
+				pitch = pitch+90
+			else
+				new_yaw = 0
+				pitch = 90
 			end
+			--                                                                      roll        newyaw      pitch
+			self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180,    180+(-new_yaw),    180))
+			self.child:set_animation({x=pitch,y=pitch}, 15, 0, true)	
+			self.head_rotation = vector.new(180,    180+(-new_yaw),    180)
+		--if nothing to look at
+		else
+			--print("not looking")
+			self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180,    180,    180))
+			self.child:set_animation({x=90,y=90}, 15, 0, true)
 		end
+	end
+end
+
+mob.look_around = function(self)
+	local pos = self.object:get_pos()
+	--STARE O_O
+	local player_found = false
+	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 6)) do
+		if object:is_player() and player_found == false then
+			--print("test")
+			player_found = true
+			--look at player's camera
+			local pos2 = object:get_pos()
+			pos2.y = pos2.y + 1.625
+			self.move_head(self,pos2)
+		end
+	end
+	--stare straight if not found
+	if player_found == false then
+		self.move_head(self,nil)
 	end
 end
 
 mob.on_step = function(self, dtime)
 	self.move(self,dtime)
 	self.set_animation(self)
-	self.move_head(self)
+	self.look_around(self)
 end
 
 minetest.register_entity("mob:pig", mob)
@@ -272,7 +294,7 @@ head.initial_properties = {
 
 --remove the head if no body
 head.on_step = function(self, dtime)
-	if not self.object:get_attach() then
+	if self.parent == nil then
 		self.object:remove()
 	end
 end
