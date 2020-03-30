@@ -143,7 +143,7 @@ mob.move = function(self,dtime)
 	local pos1 = self.object:getpos()
 	pos1.y = pos1.y + 0.37
 	local currentvel = self.object:getvelocity()
-	local goal = vector.multiply(self.direction,5)
+	local goal = vector.multiply(self.direction,1)
 	local acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
 	acceleration = vector.multiply(acceleration, 0.05)
 	self.object:add_velocity(acceleration)
@@ -242,6 +242,10 @@ mob.move_head = function(self,pos2)
 					goal_yaw = goal_yaw + 360
 				end
 				
+				if goal_yaw > 360 then
+					goal_yaw = goal_yaw - 360
+				end
+				
 				local current_yaw = self.head_rotation.y
 				
 				if goal_yaw > current_yaw then
@@ -249,6 +253,8 @@ mob.move_head = function(self,pos2)
 				elseif goal_yaw < current_yaw then
 					current_yaw = current_yaw - 4
 				end
+				
+				--print(current_yaw)
 				
 				--stop jittering
 				if math.abs(math.abs(goal_yaw) - math.abs(current_yaw)) <= 4 then
