@@ -55,11 +55,14 @@ mob.on_activate = function(self, staticdata, dtime_s)
 	self.object:set_hp(self.hp)
 	self.direction = vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1))
 	
+	--set the head up
 	local head = minetest.add_entity(self.object:get_pos(), "mob:head")
 	if head then
 		self.child = head
 		self.child:get_luaentity().parent = self.object
-		self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180,0,0))
+		self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180,0,180))
+		self.head_rotation = vector.new(180,180,90)
+		self.child:set_animation({x=90,y=90}, 15, 0, true)
 	end
 	
 	--self.object:set_yaw(math.pi*math.random(-1,1)*math.random())
@@ -130,8 +133,8 @@ end
 mob.move = function(self,dtime)
 	self.timer = self.timer - dtime
 	if self.timer <= 0 then
-		self.timer = math.random(5,10)
-		self.direction = vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1))
+		self.timer = math.random(1,3)
+		self.direction = vector.new(0,0,-1)--vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1))
 		--local yaw = self.object:get_yaw() + dtime
 		
 		--self.object:set_yaw(yaw)
@@ -199,6 +202,7 @@ end
 --a movement test to move the head
 mob.move_head = function(self,pos2)
 	if self.child then
+		--print(self.head_rotation.y)
 		--if passed a direction to look
 		if pos2 then
 			local pos = self.object:get_pos()
@@ -217,7 +221,9 @@ mob.move_head = function(self,pos2)
 			local new_yaw = (body_yaw-head_yaw)
 
 			local pitch = 0	
-			local roll = 0	
+			local roll = 0
+			
+			--print(self.head_rotation.y)
 			if math.abs(new_yaw) <= 90 or math.abs(new_yaw) >= 270 then
 				--do other calculations on pitch and roll
 				
@@ -227,22 +233,95 @@ mob.move_head = function(self,pos2)
 				
 				pitch = radians_to_degrees(tri_yaw)
 				
-				pitch = pitch+90
+				pitch = math.floor(pitch+90 + 0.5)
+				
+				
+				local goal_yaw = 180-new_yaw
+				
+				if goal_yaw < 0 then
+					goal_yaw = goal_yaw + 360
+				end
+				
+				local current_yaw = self.head_rotation.y
+				
+				if goal_yaw > current_yaw then
+					current_yaw = current_yaw + 4
+				elseif goal_yaw < current_yaw then
+					current_yaw = current_yaw - 4
+				end
+				
+				--stop jittering
+				if math.abs(math.abs(goal_yaw) - math.abs(current_yaw)) <= 4 then
+					--print("skipping:")
+					--print(math.abs(goal_yaw) - math.abs(current_yaw))
+					current_yaw = goal_yaw
+				else
+					--print(" NOT SKIPPING")
+					--print(math.abs(goal_yaw) - math.abs(current_yaw))
+				end
+				
+				
+				local goal_pitch = pitch
+				
+				local current_pitch = self.head_rotation.z
+				
+				if goal_pitch > current_pitch then
+					current_pitch = current_pitch + 1
+				elseif goal_pitch < current_pitch then
+					current_pitch = current_pitch - 1
+				end
+				
+				self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180,    current_yaw,    180))
+				self.child:set_animation({x=current_pitch,y=current_pitch}, 15, 0, true)	
+				self.head_rotation = vector.new(180,    current_yaw,    current_pitch)
+			--nothing to look at
 			else
-				new_yaw = 0
-				pitch = 90
+				self.return_head_to_origin(self)
 			end
 			--                                                                      roll        newyaw      pitch
-			self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180,    180+(-new_yaw),    180))
-			self.child:set_animation({x=pitch,y=pitch}, 15, 0, true)	
-			self.head_rotation = vector.new(180,    180+(-new_yaw),    180)
+			
 		--if nothing to look at
 		else
 			--print("not looking")
-			self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180,    180,    180))
-			self.child:set_animation({x=90,y=90}, 15, 0, true)
+			self.return_head_to_origin(self)
 		end
 	end
+end
+--this sets the mob to move it's head back to pointing forwards
+mob.return_head_to_origin = function(self)
+	--print("setting back to origin")
+	local rotation = self.head_rotation
+	
+	--make the head yaw move back twice as fast 
+	if rotation.y > 180 then
+		if rotation.y > 360 then
+			rotation.y = rotation.y - 360
+		end
+		rotation.y = rotation.y - 2
+	elseif rotation.y < 180 then
+		if rotation.y < 0 then
+			rotation.y = rotation.y + 360
+		end
+		rotation.y = rotation.y + 2
+	end
+	--finish rotation
+	if math.abs(rotation.y)+1 == 180 then
+		rotation.y = 180
+	end
+	--move up down (pitch) back to center
+	if rotation.z > 90 then
+		rotation.z = rotation.z - 1
+	elseif rotation.z < 90 then
+		rotation.z = rotation.z + 1
+	end
+	
+	
+	rotation.z = math.floor(rotation.z + 0.5)
+	rotation.y = math.floor(rotation.y + 0.5)
+	--print(rotation.y)
+	self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180,    rotation.y,    180))
+	self.child:set_animation({x=rotation.z,y=rotation.z}, 15, 0, true)
+	self.head_rotation = rotation
 end
 
 mob.look_around = function(self)
