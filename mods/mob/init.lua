@@ -134,7 +134,7 @@ mob.move = function(self,dtime)
 	self.timer = self.timer - dtime
 	if self.timer <= 0 then
 		self.timer = math.random(1,3)
-		self.direction = vector.new(0,0,-1)--vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1))
+		self.direction = vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1))
 		--local yaw = self.object:get_yaw() + dtime
 		
 		--self.object:set_yaw(yaw)
