@@ -37,6 +37,6 @@ mob.on_activate = function(self, staticdata, dtime_s)
 		self.head_rotation = vector.new(180,180,90)
 		self.child:set_animation({x=90,y=90}, 15, 0, true)
 	end
-	
+	self.is_mob = true
 	--self.object:set_yaw(math.pi*math.random(-1,1)*math.random())
 end

@@ -34,6 +34,7 @@ mob.initial_properties = {
 	automatic_face_movement_dir = 0.0,
 	automatic_face_movement_max_rotation_per_sec = 300,
 }
+
 mob.hp = 5
 mob.speed = 5
 
@@ -238,7 +239,7 @@ mob.debug_nametag = function(self,dtime)
 	--animation on the mob's body
 	if self.child then
 		--we add in items we want to see in this list
-		local debug_items = {"hunger","timer","punch_timer"}
+		local debug_items = {"hunger","timer","punch_timer","yaw"}
 		local text = ""
 		for _,item in pairs(debug_items) do
 			if self[item] then
