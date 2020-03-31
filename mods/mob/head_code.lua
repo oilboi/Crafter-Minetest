@@ -173,9 +173,12 @@ mob.move_head = function(self,pos2)
 				self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180,    current_yaw,    180))
 				self.child:set_animation({x=current_pitch,y=current_pitch}, 15, 0, true)	
 				self.head_rotation = vector.new(180,    current_yaw,    current_pitch)
+				
+				return(true)
 			--nothing to look at
 			else
 				self.return_head_to_origin(self)
+				return(false)
 			end
 			--                                                                      roll        newyaw      pitch
 			
@@ -183,6 +186,7 @@ mob.move_head = function(self,pos2)
 		else
 			--print("not looking")
 			self.return_head_to_origin(self)
+			return(false)
 		end
 	end
 end

@@ -193,16 +193,19 @@ mob.look_around = function(self)
 			--look at player's camera
 			local pos2 = object:get_pos()
 			pos2.y = pos2.y + 1.625
-			self.move_head(self,pos2)
 			
-			self.direction = vector.direction(pos,pos2)
-			local distance = vector.distance(pos,pos2)-2
-			if distance < 0 then
-				distance = 0
+			local found_player = self.move_head(self,pos2)
+			
+			if found_player == true then
+				self.direction = vector.direction(pos,pos2)
+				local distance = vector.distance(pos,pos2)-2
+				if distance < 0 then
+					distance = 0
+				end
+				self.speed = distance
+				self.following = true
+				break
 			end
-			self.speed = distance
-			self.following = true
-			break
 		end
 	end
 	
