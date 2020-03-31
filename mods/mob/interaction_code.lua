@@ -7,7 +7,7 @@ mob.manage_punch_timer = function(self,dtime)
 	end
 	--this controls how fast you can punch the mob (punched timer reset)
 	if self.punched_timer > 0 then
-		print(self.punched_timer)
+		--print(self.punched_timer)
 		self.punched_timer = self.punched_timer - dtime
 	end
 end
@@ -47,7 +47,7 @@ end
 --this is what happens when a mob diese
 mob.on_death = function(self, killer)
 	local pos = self.object:getpos()
-	pos.y = pos.y + 0.4
+	--pos.y = pos.y + 0.4
 	minetest.sound_play("mob_die", {pos = pos, gain = 1.0})
 	minetest.add_particlespawner({
 		amount = 40,
