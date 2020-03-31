@@ -1,5 +1,6 @@
 --this is where mobs are defined
 
+--this is going to be used to set an active mob limit
 global_mob_table = {}
 
 
@@ -31,12 +32,15 @@ mob.hp = 5
 mob.mob = true
 mob.hostile = false
 mob.timer = 0
+mob.state = 0
+mob.hunger = 200
 
 
 mob.get_staticdata = function(self)
 	return minetest.serialize({
 		--range = self.range,
-		hp = self.hp,		
+		hp = self.hp,
+		hunger = self.hunger,	
 	})
 end
 
@@ -49,6 +53,7 @@ mob.on_activate = function(self, staticdata, dtime_s)
 		if data and type(data) == "table" then
 			--self.range = data.range
 			self.hp = data.hp
+			self.hunger = data.hunger
 		end
 	end
 	self.object:set_animation({x=5,y=15}, 1, 0, true)
@@ -67,6 +72,11 @@ mob.on_activate = function(self, staticdata, dtime_s)
 	
 	--self.object:set_yaw(math.pi*math.random(-1,1)*math.random())
 end
+
+
+----------------------------------
+
+
 mob.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)		
 	local hurt = tool_capabilities.damage_groups.fleshy
 	if not hurt then
@@ -103,6 +113,7 @@ mob.on_death = function(self, killer)
 	local obj = minetest.add_item(pos,"mob:raw_porkchop")
 	self.child:get_luaentity().parent = nil
 end
+
 --repel from players
 mob.push = function(self)
 	local pos = self.object:getpos()
@@ -129,6 +140,7 @@ mob.push = function(self)
 		end
 	end
 end
+
 --This makes the mob walk at a certain speed and jump
 mob.move = function(self,dtime)
 	self.timer = self.timer - dtime
@@ -143,7 +155,7 @@ mob.move = function(self,dtime)
 	local pos1 = self.object:getpos()
 	pos1.y = pos1.y + 0.37
 	local currentvel = self.object:getvelocity()
-	local goal = vector.multiply(self.direction,1)
+	local goal = vector.multiply(self.direction,5)
 	local acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
 	acceleration = vector.multiply(acceleration, 0.05)
 	self.object:add_velocity(acceleration)
@@ -164,6 +176,7 @@ mob.move = function(self,dtime)
 		end
 	end
 end
+
 --makes the mob swim
 mob.swim = function(self)
 	local pos = self.object:getpos()
@@ -179,10 +192,11 @@ mob.swim = function(self)
 		self.object:add_velocity(acceleration)
 	end
 end
+
 --sets the mob animation and speed
 mob.set_animation = function(self)
 	local distance = vector.distance(vector.new(0,0,0), self.object:getvelocity())
-	self.object:set_animation_frame_speed(distance*5)
+	self.object:set_animation_frame_speed(distance*3)
 end
 
 --converts yaw to degrees
@@ -349,15 +363,46 @@ mob.look_around = function(self)
 		self.move_head(self,nil)
 	end
 end
+--this is the info on the mob
+mob.debug_nametag = function(self,dtime)
+	--we're doing this to the child because the nametage breaks the
+	--animation on the mob's body
+	if self.child then
+		local text= "Hunger: "..self.hunger.."\n"..
+					"Yaw "..self.object:get_yaw().."\n"
+		self.child:set_nametag_attributes({
+		color = "white",
+		text = text	
+		})
+	end
+end
+
+--this depletes the mobs hunger
+mob.do_hunger = function(self,dtime)
+	self.hunger = self.hunger - dtime
+
+end
+
+--this sets the state of the mob
+mob.set_state = function(self,dtime)
+	self.do_hunger(self,dtime)
+end
 
 mob.on_step = function(self, dtime)
+	self.set_state(self,dtime)
 	self.move(self,dtime)
 	self.set_animation(self)
 	self.look_around(self)
+	mob.debug_nametag(self,dtime)
 end
 
 minetest.register_entity("mob:pig", mob)
 
+
+
+
+
+------------------------------------------------------------------------the head
 
 local head = {}
 head.initial_properties = {
