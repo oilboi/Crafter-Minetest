@@ -45,6 +45,7 @@ mob.hunger = 200
 mob.view_distance = 20
 
 mob.punch_timer = 0
+mob.punched_timer = 0
 ----------------------------------
 
 
