@@ -11,12 +11,17 @@ dofile(path.."/items.lua")
 
 
 --these are helpers to create entities
-local mob = {}
+mob = {}
+
+dofile(path.."/head_code.lua")
+dofile(path.."/movement_code.lua")
+dofile(path.."/data_handling_code.lua")
+
 mob.initial_properties = {
 	hp_max = 1,
 	physical = true,
 	collide_with_objects = false,
-	collisionbox = {-0.37, -0.37, -0.37, 0.37, 0.865, 0.37},
+	collisionbox = {-0.37, -0.4, -0.37, 0.37, 0.5, 0.37},
 	visual = "mesh",
 	visual_size = {x = 3, y = 3},
 	mesh = "pig.x",
@@ -26,53 +31,17 @@ mob.initial_properties = {
 	is_visible = true,
 	pointable = true,
 	automatic_face_movement_dir = 0.0,
-	automatic_face_movement_max_rotation_per_sec = 600,
+	automatic_face_movement_max_rotation_per_sec = 300,
 }
 mob.hp = 5
+mob.speed = 5
+
 mob.mob = true
 mob.hostile = false
 mob.timer = 0
 mob.state = 0
 mob.hunger = 200
-
-
-mob.get_staticdata = function(self)
-	return minetest.serialize({
-		--range = self.range,
-		hp = self.hp,
-		hunger = self.hunger,	
-	})
-end
-
-mob.on_activate = function(self, staticdata, dtime_s)
-	self.object:set_armor_groups({immortal = 1})
-	--self.object:set_velocity({x = math.random(-5,5), y = 5, z = math.random(-5,5)})
-	self.object:set_acceleration({x = 0, y = -9.81, z = 0})
-	if string.sub(staticdata, 1, string.len("return")) == "return" then
-		local data = minetest.deserialize(staticdata)
-		if data and type(data) == "table" then
-			--self.range = data.range
-			self.hp = data.hp
-			self.hunger = data.hunger
-		end
-	end
-	self.object:set_animation({x=5,y=15}, 1, 0, true)
-	self.object:set_hp(self.hp)
-	self.direction = vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1))
-	
-	--set the head up
-	local head = minetest.add_entity(self.object:get_pos(), "mob:head")
-	if head then
-		self.child = head
-		self.child:get_luaentity().parent = self.object
-		self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180,0,180))
-		self.head_rotation = vector.new(180,180,90)
-		self.child:set_animation({x=90,y=90}, 15, 0, true)
-	end
-	
-	--self.object:set_yaw(math.pi*math.random(-1,1)*math.random())
-end
-
+mob.view_distance = 20
 
 ----------------------------------
 
@@ -141,41 +110,6 @@ mob.push = function(self)
 	end
 end
 
---This makes the mob walk at a certain speed and jump
-mob.move = function(self,dtime)
-	self.timer = self.timer - dtime
-	if self.timer <= 0 then
-		self.timer = math.random(1,3)
-		self.direction = vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1))
-		--local yaw = self.object:get_yaw() + dtime
-		
-		--self.object:set_yaw(yaw)
-	end
-	
-	local pos1 = self.object:getpos()
-	pos1.y = pos1.y + 0.37
-	local currentvel = self.object:getvelocity()
-	local goal = vector.multiply(self.direction,5)
-	local acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
-	acceleration = vector.multiply(acceleration, 0.05)
-	self.object:add_velocity(acceleration)
-
-	--try to jump
-	if currentvel.y <= 0 then
-		local in_front = minetest.raycast(pos1, vector.add(pos1,vector.multiply(self.direction,3)), false, false):next()
-		local below = minetest.raycast(pos1, vector.add(pos1, vector.new(0,-0.02,0)), false, false):next()
-		if in_front then
-			in_front = minetest.registered_nodes[minetest.get_node(in_front.under).name].walkable
-		end
-		if below then
-			below = minetest.registered_nodes[minetest.get_node(below.under).name].walkable
-		end
-		
-		if in_front and below then
-			self.object:add_velocity(vector.new(0,5,0))
-		end
-	end
-end
 
 --makes the mob swim
 mob.swim = function(self)
@@ -196,157 +130,60 @@ end
 --sets the mob animation and speed
 mob.set_animation = function(self)
 	local distance = vector.distance(vector.new(0,0,0), self.object:getvelocity())
-	self.object:set_animation_frame_speed(distance*3)
+	self.object:set_animation_frame_speed(distance*5)
 end
 
---converts yaw to degrees
-local degrees = function(yaw)
-	yaw = yaw + math.pi
-	return(yaw*180.0/math.pi)
-end
 
-local degree_round = function(degree)
-	return(degree + 0.5 - (degree + 0.5) % 1)
-end
 
-local radians_to_degrees = function(radians)
-	return(radians*180.0/math.pi)
-end
 
---a movement test to move the head
-mob.move_head = function(self,pos2)
-	if self.child then
-		--print(self.head_rotation.y)
-		--if passed a direction to look
-		if pos2 then
-			local pos = self.object:get_pos()
-			local body_yaw = self.object:get_yaw() - (math.pi/2)
-			local dir = vector.multiply(minetest.yaw_to_dir(body_yaw),0.72)
-			local real_dir = minetest.yaw_to_dir(body_yaw)
-			local body_yaw = degree_round(degrees(minetest.dir_to_yaw(dir)))
-			
-			--pos is where the head actually is
-			pos = vector.add(pos,dir)
-			pos.y = pos.y + 0.36
-					
-			
-			local head_yaw  = degree_round(degrees(minetest.dir_to_yaw(vector.direction(pos,pos2))))			
-			
-			local new_yaw = (body_yaw-head_yaw)
-
-			local pitch = 0	
-			local roll = 0
-			
-			--print(self.head_rotation.y)
-			if math.abs(new_yaw) <= 90 or math.abs(new_yaw) >= 270 then
-				--do other calculations on pitch and roll
-				
-				local triangle = vector.new(vector.distance(pos,pos2),0,pos2.y-pos.y)
-				
-				local tri_yaw = minetest.dir_to_yaw(triangle)+(math.pi/2)
-				
-				pitch = radians_to_degrees(tri_yaw)
-				
-				pitch = math.floor(pitch+90 + 0.5)
-				
-				
-				local goal_yaw = 180-new_yaw
-				
-				if goal_yaw < 0 then
-					goal_yaw = goal_yaw + 360
-				end
-				
-				if goal_yaw > 360 then
-					goal_yaw = goal_yaw - 360
-				end
-				
-				local current_yaw = self.head_rotation.y
-				
-				if goal_yaw > current_yaw then
-					current_yaw = current_yaw + 4
-				elseif goal_yaw < current_yaw then
-					current_yaw = current_yaw - 4
-				end
-				
-				--print(current_yaw)
-				
-				--stop jittering
-				if math.abs(math.abs(goal_yaw) - math.abs(current_yaw)) <= 4 then
-					--print("skipping:")
-					--print(math.abs(goal_yaw) - math.abs(current_yaw))
-					current_yaw = goal_yaw
-				else
-					--print(" NOT SKIPPING")
-					--print(math.abs(goal_yaw) - math.abs(current_yaw))
-				end
-				
-				
-				local goal_pitch = pitch
-				
-				local current_pitch = self.head_rotation.z
-				
-				if goal_pitch > current_pitch then
-					current_pitch = current_pitch + 1
-				elseif goal_pitch < current_pitch then
-					current_pitch = current_pitch - 1
-				end
-				
-				self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180,    current_yaw,    180))
-				self.child:set_animation({x=current_pitch,y=current_pitch}, 15, 0, true)	
-				self.head_rotation = vector.new(180,    current_yaw,    current_pitch)
-			--nothing to look at
-			else
-				self.return_head_to_origin(self)
-			end
-			--                                                                      roll        newyaw      pitch
-			
-		--if nothing to look at
-		else
-			--print("not looking")
-			self.return_head_to_origin(self)
-		end
-	end
-end
---this sets the mob to move it's head back to pointing forwards
-mob.return_head_to_origin = function(self)
-	--print("setting back to origin")
-	local rotation = self.head_rotation
-	
-	--make the head yaw move back twice as fast 
-	if rotation.y > 180 then
-		if rotation.y > 360 then
-			rotation.y = rotation.y - 360
-		end
-		rotation.y = rotation.y - 2
-	elseif rotation.y < 180 then
-		if rotation.y < 0 then
-			rotation.y = rotation.y + 360
-		end
-		rotation.y = rotation.y + 2
-	end
-	--finish rotation
-	if math.abs(rotation.y)+1 == 180 then
-		rotation.y = 180
-	end
-	--move up down (pitch) back to center
-	if rotation.z > 90 then
-		rotation.z = rotation.z - 1
-	elseif rotation.z < 90 then
-		rotation.z = rotation.z + 1
-	end
-	
-	
-	rotation.z = math.floor(rotation.z + 0.5)
-	rotation.y = math.floor(rotation.y + 0.5)
-	--print(rotation.y)
-	self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180,    rotation.y,    180))
-	self.child:set_animation({x=rotation.z,y=rotation.z}, 15, 0, true)
-	self.head_rotation = rotation
-end
 
 mob.look_around = function(self)
 	local pos = self.object:get_pos()
+	
+	--this is where the mob is actually looking
+	local eye_ray = self.raycast_look(self,dtime)
+	--this is below where the mob is pointed, checks if ledge
+	--[[ --work on this later
+	local ledge_ray = self.look_below(self)
+		
+	local is_a_drop = true
+	--check if there's a drop
+	if ledge_ray then
+		for pointed_thing in ledge_ray do
+			if pointed_thing then
+				local pos2 = pointed_thing.under
+				local distance = math.floor(vector.subtract(pos2,pos).y-self.object:get_properties().collisionbox[2]+0.5+0.5)
+				if distance >= -3 then
+					is_a_drop = false
+				end
+			end
+		end
+	end
+	--turn around
+	if is_a_drop == true then
+		self.direction = vector.multiply(self.direction, -1)
+		print("turning around")
+	end
+	]]--
+	
+	--a mob will check if it needs to jump
+	if eye_ray then
+		for pointed_thing in eye_ray do
+			local pos = self.object:get_pos()
+			local pos2 = pointed_thing.under
+			local walkable = minetest.registered_nodes[minetest.get_node(pos2).name].walkable
+			if walkable then
+				if vector.distance(pos,pos2) < 1 then
+					self.jump(self)
+					break
+				end
+			end
+		end
+	end
+	
+	
 	--STARE O_O
+	--and follow!
 	local player_found = false
 	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 6)) do
 		if object:is_player() and player_found == false then
@@ -356,23 +193,41 @@ mob.look_around = function(self)
 			local pos2 = object:get_pos()
 			pos2.y = pos2.y + 1.625
 			self.move_head(self,pos2)
+			
+			self.direction = vector.direction(pos,pos2)
+			local distance = vector.distance(pos,pos2)-2
+			if distance < 0 then
+				distance = 0
+			end
+			self.speed = distance
+			
 		end
 	end
+	
+	
+	
 	--stare straight if not found
 	if player_found == false then
 		self.move_head(self,nil)
 	end
+	
 end
 --this is the info on the mob
 mob.debug_nametag = function(self,dtime)
 	--we're doing this to the child because the nametage breaks the
 	--animation on the mob's body
 	if self.child then
-		local text= "Hunger: "..self.hunger.."\n"..
-					"Yaw "..self.object:get_yaw().."\n"
+		--we add in items we want to see in this list
+		local debug_items = {"hunger","timer","yaw"}
+		local text = ""
+		for _,item in pairs(debug_items) do
+			if self[item] then
+				text = text..item..": "..self[item].."\n"
+			end
+		end
 		self.child:set_nametag_attributes({
 		color = "white",
-		text = text	
+		text = text
 		})
 	end
 end
@@ -380,7 +235,6 @@ end
 --this depletes the mobs hunger
 mob.do_hunger = function(self,dtime)
 	self.hunger = self.hunger - dtime
-
 end
 
 --this sets the state of the mob
