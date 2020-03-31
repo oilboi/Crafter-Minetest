@@ -16,6 +16,7 @@ mob = {}
 dofile(path.."/head_code.lua")
 dofile(path.."/movement_code.lua")
 dofile(path.."/data_handling_code.lua")
+dofile(path.."/interaction_code.lua")
 
 mob.initial_properties = {
 	hp_max = 1,
@@ -43,21 +44,11 @@ mob.state = 0
 mob.hunger = 200
 mob.view_distance = 20
 
+mob.punch_timer = 0
 ----------------------------------
 
 
-mob.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)		
-	local hurt = tool_capabilities.damage_groups.fleshy
-	if not hurt then
-		hurt = 1
-	end
-	local hp = self.object:get_hp()
-	self.object:set_hp(hp-hurt)
-	if hp > 1 then
-		minetest.sound_play("hurt", {object=self.object, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
-	end
-	self.hp = hp-hurt
-end
+
 mob.on_death = function(self, killer)
 	local pos = self.object:getpos()
 	pos.y = pos.y + 0.4
@@ -202,7 +193,30 @@ mob.look_around = function(self)
 				if distance < 0 then
 					distance = 0
 				end
-				self.speed = distance
+				
+				--punch the player
+				if distance < 0.5 and self.punch_timer <= 0 and object:get_hp() > 0 then
+					self.punch_timer = 1
+					object:punch(self.object, 2, 
+						{
+						full_punch_interval=1.5,
+						damage_groups = {fleshy=2},
+					},vector.direction(pos,pos2))
+				elseif distance < 0.5 and object:get_hp() <= 0 then
+					--make the head spin "victory dance"
+					if self.child then
+						if not self.head_spin then
+							self.head_spin = 180
+						end
+						self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(self.head_spin,0,0))
+						self.child:set_animation({x=90,y=90}, 15, 0, true)
+						self.head_spin = self.head_spin + 5
+						if self.head_spin > 360 then
+							self.head_spin = 0
+						end
+					end
+				end
+				self.speed = distance * 2
 				self.following = true
 				break
 			end
@@ -223,7 +237,7 @@ mob.debug_nametag = function(self,dtime)
 	--animation on the mob's body
 	if self.child then
 		--we add in items we want to see in this list
-		local debug_items = {"hunger","timer","yaw"}
+		local debug_items = {"hunger","timer","punch_timer"}
 		local text = ""
 		for _,item in pairs(debug_items) do
 			if self[item] then
@@ -252,6 +266,7 @@ mob.on_step = function(self, dtime)
 	self.move(self,dtime)
 	self.set_animation(self)
 	self.look_around(self)
+	self.manage_punch_timer(self,dtime)
 	mob.debug_nametag(self,dtime)
 end
 

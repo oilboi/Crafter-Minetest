@@ -233,6 +233,13 @@ minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
 	end,pos, newnode, placer, oldnode, itemstack, pointed_thing,old)
 end)
 
+minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
+	dir = vector.multiply(dir,10)
+	dir.y = 7
+	player:add_player_velocity(dir)
+	
+end)
+
 --play sound to keep up with player's placing vs inconsistent client placing sound 
 minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
 	local node = minetest.registered_nodes[newnode.name]
