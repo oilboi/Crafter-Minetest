@@ -38,6 +38,8 @@ mob.initial_properties = {
 mob.hp = 5
 mob.speed = 5
 
+mob.death_animation_timer = 0
+
 mob.mob = true
 mob.hostile = false
 mob.timer = 0
@@ -49,32 +51,6 @@ mob.punch_timer = 0
 mob.punched_timer = 0
 ----------------------------------
 
-
-
-mob.on_death = function(self, killer)
-	local pos = self.object:getpos()
-	pos.y = pos.y + 0.4
-	minetest.sound_play("mob_die", {pos = pos, gain = 1.0})
-	minetest.add_particlespawner({
-		amount = 40,
-		time = 0.001,
-		minpos = pos,
-		maxpos = pos,
-		minvel = vector.new(-5,-5,-5),
-		maxvel = vector.new(5,5,5),
-		minacc = {x=0, y=0, z=0},
-		maxacc = {x=0, y=0, z=0},
-		minexptime = 1.1,
-		maxexptime = 1.5,
-		minsize = 1,
-		maxsize = 2,
-		collisiondetection = false,
-		vertical = false,
-		texture = "smoke.png",
-	})
-	local obj = minetest.add_item(pos,"mob:raw_porkchop")
-	self.child:get_luaentity().parent = nil
-end
 
 --repel from players
 mob.push = function(self)
@@ -264,12 +240,15 @@ mob.set_state = function(self,dtime)
 end
 
 mob.on_step = function(self, dtime)
-	self.set_state(self,dtime)
-	self.move(self,dtime)
-	self.set_animation(self)
-	self.look_around(self)
-	self.manage_punch_timer(self,dtime)
-	mob.debug_nametag(self,dtime)
+	if self.death_animation_timer == 0 then
+		self.set_state(self,dtime)
+		self.move(self,dtime)
+		self.set_animation(self)
+		self.look_around(self)
+		self.manage_punch_timer(self,dtime)
+		mob.debug_nametag(self,dtime)
+	end
+	self.manage_death_animation(self,dtime)
 end
 
 minetest.register_entity("mob:pig", mob)
