@@ -39,13 +39,13 @@
 - make grass spread
 - water buckets
 - buckets water farmland
--pickaxe required to mine stone based nodes
--Crafting bench
--Farming with hoes, grass drops seeds, bread, etc
--simplify mobs ai
--running out of a node when placing tries to replace it with another of the same item in inventory
--crafting bench
--add in default furnace
+- pickaxe required to mine stone based nodes
+- Crafting bench
+- Farming with hoes, grass drops seeds, bread, etc
+- simplify mobs ai
+- running out of a node when placing tries to replace it with another of the same item in inventory
+- crafting bench
+- add in default furnace
 - add backgrounds to all gui elements
 - make furnaces drop all items on destroy instead of not allowing you to mine them
 - added glass - smelt sand
@@ -62,11 +62,27 @@
 - Add TooManyItems
 - add function to check which nodes drop the item
 - fix hoppers not activating furnace
+- make pigs head turn smoothly
 
 
 
 
 # IDEAS:
+
+- xp (edit the node drops code to check if node has tag for xp)
+- brewing
+- enchanting/upgrading
+- magic (wands, spells, etc)
+- mechanics (compressor, autominer)
+- automation (pipes, pumps, fluid  transfer)
+- vehicles (car, powered minecarts, trains)
+- hitscan flintlocks
+- make mob look around
+- make hostile mobs
+- make mob have nametags for debug
+- make mobs pathfind
+- upgrade minecart physics even more 
+
 
 farming - 
 - add fertilizer (pig drops bone randomly) 
