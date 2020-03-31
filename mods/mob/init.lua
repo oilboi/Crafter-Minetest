@@ -184,6 +184,7 @@ mob.look_around = function(self)
 	
 	--STARE O_O
 	--and follow!
+	self.following = false
 	local player_found = false
 	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 6)) do
 		if object:is_player() and player_found == false then
@@ -200,7 +201,8 @@ mob.look_around = function(self)
 				distance = 0
 			end
 			self.speed = distance
-			
+			self.following = true
+			break
 		end
 	end
 	

@@ -3,7 +3,7 @@
 --This makes the mob walk at a certain speed and jump
 mob.move = function(self,dtime)
 	self.timer = self.timer - dtime
-	if self.timer <= 0 then
+	if self.timer <= 0 and self.following == false then
 		self.timer = math.random(1,4)
 		self.direction = vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1))
 		--local yaw = self.object:get_yaw() + dtime
