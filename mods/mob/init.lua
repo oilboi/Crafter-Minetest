@@ -140,7 +140,10 @@ mob.look_around = function(self)
 		for pointed_thing in eye_ray do
 			local pos = self.object:get_pos()
 			local pos2 = pointed_thing.under
-			local walkable = minetest.registered_nodes[minetest.get_node(pos2).name].walkable
+			local walkable
+			if minetest.registered_nodes[minetest.get_node(pos2).name] then
+				walkable = minetest.registered_nodes[minetest.get_node(pos2).name].walkable
+			end
 			if walkable then
 				if vector.distance(pos,pos2) < 1 then
 					self.jump(self)
