@@ -68,7 +68,8 @@
 
 
 # IDEAS:
-
+- ghost mob (sync with the cave sounds) and possible cave ins during cave sounds
+- rope and tnt arrows
 - xp (edit the node drops code to check if node has tag for xp)
 - brewing
 - enchanting/upgrading
