@@ -63,7 +63,7 @@
 - add function to check which nodes drop the item
 - fix hoppers not activating furnace
 - make pigs head turn smoothly
-
+- Add in fences, walls, windows
 
 
 
