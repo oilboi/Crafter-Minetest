@@ -6,7 +6,7 @@ global_mob_table = {}
 
 local path = minetest.get_modpath(minetest.get_current_modname())
 
---dofile(path.."/spawning.lua")
+dofile(path.."/spawning.lua")
 dofile(path.."/items.lua")
 
 
