@@ -113,6 +113,7 @@ pig.set_state = function(self,dtime)
 end
 
 pig.on_step = function(self, dtime)
+	self.manage_death_animation(self,dtime)
 	if self.death_animation_timer == 0 then
 		self.set_state(self,dtime)
 		self.move(self,dtime)
@@ -120,8 +121,6 @@ pig.on_step = function(self, dtime)
 		self.look_around(self,dtime)
 		self.manage_punch_timer(self,dtime)
 		pig.debug_nametag(self,dtime)
-	else
-		self.manage_death_animation(self,dtime)
 	end
 end
 
