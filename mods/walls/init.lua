@@ -37,7 +37,7 @@ for name,def in pairs(minetest.registered_nodes) do
 			connect_back =  {-1/8, -1/2,  1/8,  1/8, 1/2 + fence_collision_extra,  1/2},
 			connect_right = { 1/8, -1/2, -1/8,  1/2, 1/2 + fence_collision_extra,  1/8}
 		}
-		def2.connects_to = {"group:fence", "group:wood", "group:tree", "group:wall", "group:stone"}
+		def2.connects_to = {"group:fence", "group:wood", "group:tree", "group:wall", "group:stone", "group:sand"}
 		def2.sunlight_propagates = true
 		minetest.register_node(newname,def2)
 		
@@ -90,7 +90,7 @@ for name,def in pairs(minetest.registered_nodes) do
 			connect_right = {-2/16,   -1/2, -2/16,  1/2,   1/2 + fence_collision_extra,  2/16},
 		}
 		def2.groups["fence"] = 1
-		def2.connects_to = {"group:fence", "group:wood", "group:tree", "group:wall", "group:stone"}
+		def2.connects_to = {"group:fence", "group:wood", "group:tree", "group:wall", "group:stone", "group:sand"}
 		def2.sunlight_propagates = true
 		minetest.register_node(newname,def2)
 		
@@ -137,7 +137,7 @@ def2.node_box = {
 	connect_right = { -1/16,   -1/2, -1/16,  1/2,   1/2,  1/16},
 }
 
-def2.connects_to = {"group:fence", "group:wood", "group:tree", "group:wall", "group:stone"}
+def2.connects_to = {"group:fence", "group:wood", "group:tree", "group:wall", "group:stone", "group:sand"}
 def2.sunlight_propagates = true
 minetest.register_node(newname,def2)
 
