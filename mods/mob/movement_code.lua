@@ -15,7 +15,7 @@ pig.move = function(self,dtime)
 	--direction state change
 	if self.timer <= 0 and not self.following == true then
 		--print("changing direction")
-		self.timer = math.random(1,1)
+		self.timer = math.random(2,7)
 		self.direction = vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1))
 		--local yaw = self.object:get_yaw() + dtime
 		self.speed = math.random(0,6)
