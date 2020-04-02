@@ -29,7 +29,7 @@ local function on_lever_destroy(pos)
 	local name = node.name
 	
 	local def = minetest.registered_nodes[name]
-	if def.drawtype == "normal" and string.match(name, "redstone:") then
+	if def.drawtype == "normal" and string.match(name, "redstone:") and def.name ~= "redstone:piston_off" then
 		name = "main:"..string.gsub(name, "redstone:", "")
 		minetest.set_node(pos, {name=name})
 		redstone.collect_info(pos)

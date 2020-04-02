@@ -9,7 +9,7 @@ local function on_button_destroy(pos)
 	local name = node.name
 	
 	local def = minetest.registered_nodes[name]
-	if def.drawtype == "normal" and string.match(name, "redstone:") then
+	if def.drawtype == "normal" and string.match(name, "redstone:") and def.name ~= "redstone:piston_off" then
 		name = "main:"..string.gsub(name, "redstone:", "")
 		minetest.set_node(pos, {name=name})
 		redstone.collect_info(pos)
@@ -36,7 +36,6 @@ minetest.register_node("redstone:button_off", {
 			},
 		},
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		minetest.sound_play("lever", {pos=pos})
 		minetest.set_node(pos, {name="redstone:button_on",param2=node.param2})
 		local dir = minetest.wallmounted_to_dir(node.param2)
 		local c_pos = table.copy(pos)
@@ -45,12 +44,16 @@ minetest.register_node("redstone:button_off", {
 		local def = minetest.registered_nodes[name]
 		
 		if def.drawtype == "normal" and string.match(name, "main:") then
+			minetest.sound_play("lever", {pos=pos})
 			name = "redstone:"..string.gsub(name, "main:", "")
 			minetest.set_node(pos,{name=name})
 			redstone.collect_info(pos)
-			local timer = minetest.get_node_timer(c_pos)
-			timer:start(1)
+		else
+			minetest.sound_play("lever", {pos=pos,pitch=0.6})
 		end
+		
+		local timer = minetest.get_node_timer(c_pos)
+		timer:start(1)
 	end,
 	on_destruct = on_button_destroy,
 })
