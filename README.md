@@ -64,6 +64,7 @@
 - fix hoppers not activating furnace
 - make pigs head turn smoothly
 - Add in fences, walls, windows
+- Overhaul doors
 
 
 
@@ -112,6 +113,11 @@ farming -
 - check if everyone is in bed before going to next night
 - also lock player in bed until they get out or daytime
 - create a function to check if a node or group is below
+
+- cars buildable in crafting table
+- require gas pumps refine oil
+- drive next to gas pump and car will fill with gas
+- maybe have pump be rightclickable and then manually fill with gass using nozel
 
 
 - minecart car train? - off rail use

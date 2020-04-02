@@ -48,7 +48,7 @@ minetest.register_globalstep(function(dtime)
 				if table.getn(spawner) > 0 then
 					local mob_pos = spawner[1]
 					mob_pos.y = mob_pos.y + 1
-					--print("Spawning at: "..minetest.pos_to_string(mob_pos))
+					print("Spawning at: "..minetest.pos_to_string(mob_pos))
 					minetest.add_entity(mob_pos,"mob:pig")
 				end
 			end
