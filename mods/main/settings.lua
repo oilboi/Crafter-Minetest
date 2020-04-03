@@ -6,6 +6,7 @@ settings:set("dedicated_server_step", 0.00001)
 settings:set("liquid_update", 0.25)
 settings:set("abm_interval", 0.01)
 settings:set("enable_minimap", "true")
+settings:set("show_entity_selectionbox", "false")
  
 
 --make stack max 1000 for everything
