@@ -10,7 +10,7 @@ for name,def in pairs(minetest.registered_nodes) do
 		def2.after_destruct = function(pos, oldnode)
 			redstone.collect_info(pos)
 		end
-		local newname = "redstone:"..string.gsub(name, "main:", "")
+		local newname = "redstone:node_activated_"..string.gsub(name, "main:", "")
 		def2.name = newname
 		def2.description = "Redstone "..def.description
 		minetest.register_node(newname,def2)
@@ -29,8 +29,8 @@ local function on_lever_destroy(pos)
 	local name = node.name
 	
 	local def = minetest.registered_nodes[name]
-	if def.drawtype == "normal" and string.match(name, "redstone:") and def.name ~= "redstone:piston_off" then
-		name = "main:"..string.gsub(name, "redstone:", "")
+	if def.drawtype == "normal" and string.match(name, "redstone:node_activated_")then
+		name = "main:"..string.gsub(name, "redstone:node_activated_", "")
 		minetest.set_node(pos, {name=name})
 		redstone.collect_info(pos)
 	end
@@ -57,7 +57,6 @@ minetest.register_node("redstone:switch_off", {
 			},
 		},
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		minetest.sound_play("lever", {pos=pos})
 		minetest.set_node(pos, {name="redstone:switch_on",param2=node.param2})
 		local dir = minetest.wallmounted_to_dir(node.param2)
 		local pos = vector.add(dir,pos)
@@ -65,9 +64,12 @@ minetest.register_node("redstone:switch_off", {
 		local def = minetest.registered_nodes[name]
 		
 		if def.drawtype == "normal" and string.match(name, "main:") then
-			name = "redstone:"..string.gsub(name, "main:", "")
+			minetest.sound_play("lever", {pos=pos})
+			name = "redstone:node_activated_"..string.gsub(name, "main:", "")
 			minetest.set_node(pos,{name=name})
 			redstone.collect_info(pos)
+		else
+			minetest.sound_play("lever", {pos=pos,pitch=0.6})
 		end
 	end,
 	on_destruct = on_lever_destroy,

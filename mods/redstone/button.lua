@@ -9,8 +9,8 @@ local function on_button_destroy(pos)
 	local name = node.name
 	
 	local def = minetest.registered_nodes[name]
-	if def.drawtype == "normal" and string.match(name, "redstone:") and def.name ~= "redstone:piston_off" then
-		name = "main:"..string.gsub(name, "redstone:", "")
+	if def.drawtype == "normal" and string.match(name, "redstone:node_activated_") then
+		name = "main:"..string.gsub(name, "redstone:node_activated_", "")
 		minetest.set_node(pos, {name=name})
 		redstone.collect_info(pos)
 	end
@@ -45,7 +45,7 @@ minetest.register_node("redstone:button_off", {
 		
 		if def.drawtype == "normal" and string.match(name, "main:") then
 			minetest.sound_play("lever", {pos=pos})
-			name = "redstone:"..string.gsub(name, "main:", "")
+			name = "redstone:node_activated_"..string.gsub(name, "main:", "")
 			minetest.set_node(pos,{name=name})
 			redstone.collect_info(pos)
 		else
