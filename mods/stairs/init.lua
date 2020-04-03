@@ -199,7 +199,7 @@ for name,def in pairs(minetest.registered_nodes) do
 		def2.mod_origin = "stairs"
 		def2.name = newname
 		def2.description = def.description.." Slab"
-		def2.drop = string.gsub(newname, "_upsidedown:", "")
+		def2.drop = string.gsub(newname, "_upsidedown", "")
 		def2.paramtype = "light"
 		def2.drawtype = "nodebox"
 		def2.node_box = {
