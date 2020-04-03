@@ -30,6 +30,7 @@ pig.initial_properties = {
 	pointable = true,
 	automatic_face_movement_dir = -90.0,
 	automatic_face_movement_max_rotation_per_sec = 300,
+	makes_footstep_sound = true,
 }
 
 pig.hp = 5
@@ -98,7 +99,9 @@ pig.set_animation = function(self)
 		self.object:set_animation({x=0,y=0}, 1, 0, true)
 	else
 		self.object:set_animation({x=5,y=15}, 1, 0, true)
-		self.object:set_animation_frame_speed(self.speed*5)
+		local speed = self.object:get_velocity()
+		speed.y = 0
+		self.object:set_animation_frame_speed(vector.distance(vector.new(0,0,0),speed)*5)
 	end
 end
 
