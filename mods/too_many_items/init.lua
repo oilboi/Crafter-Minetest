@@ -263,6 +263,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			minetest.chat_send_player(player:get_player_name(), minetest.colorize("red", "YOU DO NOT HAVE THE 'GIVE' PRIVELAGE"))
 			minetest.sound_play("lever", {to_player = player:get_player_name(),gain=0.7,pitch=0.7})
 		end
+	--play the game credits
+	elseif fields.credits then
+		minetest.close_formspec(player:get_player_name(), formname)
+		play_game_credits(player)
 	else
 		--this is the "cheating" aka giveme function
 		local privved = minetest.get_player_privs(player:get_player_name()).give
@@ -328,7 +332,8 @@ base_inv = "size[17.2,8.75]"..
     "list[current_player;craft;2.5,1;2,2;]"..
     "list[current_player;craftpreview;6.1,1.5;1,1;]"..
     "listring[current_player;main]"..
-	"listring[current_player;craft]"
+	"listring[current_player;craft]"..
+	"button[8,3.5;1,1;credits;credits]" --credits button
 --this is the 3x3 crafting table formspec
 crafting_table_inv = "size[17.2,8.75]"..
 		"background[-0.19,-0.25;9.41,9.49;crafting_inventory_workbench.png]"..
