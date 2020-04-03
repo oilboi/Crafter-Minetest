@@ -121,6 +121,8 @@ minetest.register_globalstep(function(dtime)
 				
 				meta:set_int("credits song", 0)
 				meta:set_string("pre credits pos", "")
+				
+				player:set_physics_override({speed = 1, jump = 1, sneak = true, gravity = 1})
 			end
 		end
 	end
