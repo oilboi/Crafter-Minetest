@@ -30,7 +30,7 @@ pig.initial_properties = {
 	pointable = true,
 	automatic_face_movement_dir = -90.0,
 	automatic_face_movement_max_rotation_per_sec = 300,
-	makes_footstep_sound = true,
+	--makes_footstep_sound = true,
 }
 
 pig.hp = 5
