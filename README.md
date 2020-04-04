@@ -65,9 +65,11 @@
 - make pigs head turn smoothly
 - Add in fences, walls, windows
 - Overhaul doors
-- Add in credits screen
-- Add in stairs
-- Add in slabs
+- Add credits screen
+- Add stairs
+- Add slabs
+- 2 Music tracks (day and morning)
+- Add snow
 
 
 

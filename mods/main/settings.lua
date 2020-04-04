@@ -1,6 +1,6 @@
 local settings = minetest.settings
 
-local old = settings:get("dedicated_server_step")
+--local old = settings:get("dedicated_server_step")
 
 settings:set("dedicated_server_step", 0.00001)
 settings:set("liquid_update", 0.25)
