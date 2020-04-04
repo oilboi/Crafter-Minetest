@@ -13,6 +13,7 @@ for name,def in pairs(minetest.registered_nodes) do
 		def2.drop = newname
 		def2.paramtype = "light"
 		def2.drawtype = "nodebox"
+		def2.on_dig = nil
 		def2.node_box = {
 			type = "connected",
 			fixed = {-1/8, -1/2, -1/8, 1/8, 1/2, 1/8},
@@ -65,6 +66,7 @@ for name,def in pairs(minetest.registered_nodes) do
 		def2.drop = newname
 		def2.paramtype = "light"
 		def2.drawtype = "nodebox"
+		def2.on_dig = nil
 		--def2.on_place = function(itemstack, placer, pointed_thing)
 		--	minetest.item_place(itemstack, placer, pointed_thing)
 		--	wall_placing(pointed_thing.above,newname)
@@ -117,6 +119,7 @@ def2.name = newname
 def2.drop = ""
 def2.paramtype = "light"
 def2.drawtype = "nodebox"
+def2.on_dig = nil
 --def2.on_place = function(itemstack, placer, pointed_thing)
 --	minetest.item_place(itemstack, placer, pointed_thing)
 --	wall_placing(pointed_thing.above,newname)
