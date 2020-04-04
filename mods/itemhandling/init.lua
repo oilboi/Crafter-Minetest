@@ -36,10 +36,11 @@ if not creative_mode then
 	end
 --creative
 else
+	function minetest.handle_node_drops(pos, drops, digger)
+	end
     minetest.register_on_dignode(function(pos, oldnode, digger)
 		if digger and digger:is_player() then
 			local inv = digger:get_inventory()
-			
 			if inv and not inv:contains_item("main", oldnode) and inv:room_for_item("main", oldnode) then
 				inv:add_item("main", oldnode)
 			end
