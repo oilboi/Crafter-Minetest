@@ -72,6 +72,8 @@
 - Add snow
 - Fix bed placement
 - Add snow and snowballs
+- Make snow falling node
+- Add creative mode
 
 
 # IDEAS:

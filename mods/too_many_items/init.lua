@@ -1,6 +1,8 @@
 --Too Many Items (TMI)
 --[[this is a recreation of an old minecraft mod]]--
 
+local creative_mode = minetest.settings:get_bool("creative_mode")
+
 --THIS IS EXTREMELY sloppy because it's a prototype
 minetest.register_on_mods_loaded(function()
 	for index,data in pairs(minetest.registered_items) do
@@ -252,8 +254,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		--check if the player has the give priv
 		local privved = minetest.get_player_privs(player:get_player_name()).give
 		local cheating = get_player_cheat(player)
-		if (cheating == 0 and privved == true) or cheating == 1 then
+		if creative_mode or (cheating == 0 and privved == true) or cheating == 1 then
 			local cheating = math.abs(cheating - 1)
+			if creative_mode then
+				cheating = 1
+			end
 			set_player_cheat(player,cheating)
 			local cheat_button = show_cheat_button(player)
 			local page = get_player_page(player)
@@ -270,8 +275,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	else
 		--this is the "cheating" aka giveme function
 		local privved = minetest.get_player_privs(player:get_player_name()).give
-		local cheating = get_player_cheat(player)		
-		if cheating == 1 and privved == true then
+		local cheating = get_player_cheat(player)
+			
+		if creative_mode or (cheating == 1 and privved == true) then
 			local pos = player:getpos()
 			local inv = player:get_inventory()
 			local stack = ItemStack(next(fields).." 64")
@@ -418,7 +424,11 @@ end
 
 --set new players inventory up
 minetest.register_on_joinplayer(function(player)
-	set_player_cheat(player, 0) -- this resets the cheating to false
+	local cheat_mode = 0
+	if creative_mode then
+		cheat_mode = 1
+	end
+	set_player_cheat(player, cheat_mode) -- this resets the cheating to false
 	set_player_page(player,0) -- this sets the meta "page" to remember what page they're on
 	set_inventory_page(player,base_inv) --this sets the "" (inventory button/main) inventory
 	

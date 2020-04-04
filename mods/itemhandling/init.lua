@@ -7,29 +7,48 @@ collection.collection_time = 2.5 --the time which the item will be collected
 local path = minetest.get_modpath("itemhandling")
 dofile(path.."/magnet.lua")
 
+
+local creative_mode = minetest.settings:get_bool("creative_mode")
+
 --handle node drops
-function minetest.handle_node_drops(pos, drops, digger)
-	for _,item in ipairs(drops) do
-		local count, name
-		if type(item) == "string" then
-			count = 1
-			name = item
-		else
-			count = item:get_count()
-			name = item:get_name()
-		end
-		for i=1,count do
-			local obj = minetest.add_item(pos, name)
-			if obj ~= nil then
-				local x=math.random(-2,2)*math.random()
-				local y=math.random(2,5)
-				local z=math.random(-2,2)*math.random()
-				obj:setvelocity({x=x, y=y, z=z})
+--survival
+if not creative_mode then
+	function minetest.handle_node_drops(pos, drops, digger)
+		for _,item in ipairs(drops) do
+			local count, name
+			if type(item) == "string" then
+				count = 1
+				name = item
+			else
+				count = item:get_count()
+				name = item:get_name()
+			end
+			for i=1,count do
+				local obj = minetest.add_item(pos, name)
+				if obj ~= nil then
+					local x=math.random(-2,2)*math.random()
+					local y=math.random(2,5)
+					local z=math.random(-2,2)*math.random()
+					obj:setvelocity({x=x, y=y, z=z})
+				end
 			end
 		end
 	end
+--creative
+else
+    minetest.register_on_dignode(function(pos, oldnode, digger)
+		if digger and digger:is_player() then
+			local inv = digger:get_inventory()
+			
+			if inv and not inv:contains_item("main", oldnode) and inv:room_for_item("main", oldnode) then
+				inv:add_item("main", oldnode)
+			end
+		end
+	end)
+	minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
+		return(itemstack:get_name())
+	end)
 end
-    
 
 -- Minetest: builtin/item_entity.lua
 
