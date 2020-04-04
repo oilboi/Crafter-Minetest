@@ -65,8 +65,8 @@ local spawn_weather = function(player)
 					-- If time is 0 spawner has infinite lifespan and spawns the `amount` on
 					-- a per-second basis.
 
-					minpos = vector.new(x-0.5,y,z-0.5),
-					maxpos = vector.new(x+0.5,y+20,z+0.5),
+					minpos = vector.new(x-0.5,y+1,z-0.5),
+					maxpos = vector.new(x+0.5,y+21,z+0.5),
 					minvel = {x=-0.2, y=-0.2, z=-0.2},
 					maxvel = {x=0.2, y=-0.5, z=0.2},
 					minacc = {x=0, y=0, z=0},
