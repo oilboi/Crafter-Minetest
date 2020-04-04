@@ -59,11 +59,14 @@ local spawn_weather = function(player)
 					--make it so buildable to nodes get replaced
 					local node = minetest.get_node(vector.new(x,y,z)).name
 					local buildable = minetest.registered_nodes[node].buildable_to
+					local liquid = (minetest.registered_nodes[node].liquidtype ~= "none")
 					
-					if not buildable and minetest.get_node(vector.new(x,y+1,z)).name ~= "weather:snow" then
-						minetest.set_node(vector.new(x,y+1,z),{name="weather:snow"})
-					elseif buildable == true and minetest.get_node(vector.new(x,y,z)).name ~= "weather:snow" then
-						minetest.set_node(vector.new(x,y,z),{name="weather:snow"})
+					if not liquid  then
+						if not buildable and minetest.get_node(vector.new(x,y+1,z)).name ~= "weather:snow" then
+							minetest.set_node(vector.new(x,y+1,z),{name="weather:snow"})
+						elseif buildable == true and minetest.get_node(vector.new(x,y,z)).name ~= "weather:snow" then
+							minetest.set_node(vector.new(x,y,z),{name="weather:snow"})
+						end
 					end
 				end
 				
