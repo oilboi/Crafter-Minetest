@@ -123,9 +123,22 @@ minetest.register_on_joinplayer(function(player)
 	minetest.after(2, function(player)
 		spawn_weather(player)
 	end,player)
-	player:set_sky({base_color="#808080",type="plain",clouds=false})
+	player:set_sky({
+	base_color="#808080",
+	type="plain",
+	clouds=false,
+	
+	day_sky = "#808080",
+	dawn_horizon = "#808080",
+	dawn_sky = "#808080",
+	fog_sun_tint = "#808080",
+	
+	night_sky="#000000",
+	night_horizon="#000000"
+	})
 	player:set_sun({visible=false})
 	player:set_moon({visible=false})
+	player:set_stars({visible=false})
 end)
 
 --handle weather effects during game loop

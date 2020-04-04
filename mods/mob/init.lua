@@ -123,7 +123,7 @@ pig.on_step = function(self, dtime)
 		self.set_animation(self)
 		self.look_around(self,dtime)
 		self.manage_punch_timer(self,dtime)
-		pig.debug_nametag(self,dtime)
+		--self.debug_nametag(self,dtime)
 	end
 end
 

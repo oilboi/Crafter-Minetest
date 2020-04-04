@@ -70,7 +70,7 @@
 - Add slabs
 - 2 Music tracks (day and morning)
 - Add snow
-
+- Fix bed placement
 
 
 # IDEAS:
