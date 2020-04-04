@@ -189,7 +189,7 @@ end)
 minetest.register_node("weather:snow", {
     description = "Snow",
     tiles = {"snow_block.png"},
-    groups = {soft = 1, shovel = 1, hand = 1,pathable = 1,wool=1,dirt=1},
+    groups = {soft = 1, shovel = 1, hand = 1,pathable = 1,wool=1,dirt=1,falling_node=1},
     sounds = main.woolSound(),
     paramtype = "light",
 	drawtype = "nodebox",
