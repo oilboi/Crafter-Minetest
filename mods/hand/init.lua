@@ -14,6 +14,7 @@ minetest.register_item(":", {
 			sand = {times={[4]=11.0,[3]=8.4,[2]=6.40,[1]=4.2}, uses=0, maxlevel=1},
 			wood = {times={[4]=11.5,[3]=8.5,[2]=6.70,[1]=5.5}, uses=0, maxlevel=1},
 			leaves = {times={[4]=4.5,[3]=3.2,[2]=2.20,[1]=1.2}, uses=0, maxlevel=0},
+			wool = {times={[4]=4.5,[3]=3.2,[2]=2.20,[1]=1.2}, uses=0, maxlevel=0},
 			instant = {times={[1]=0.1,},uses=0,maxlevel=1},
 			dig_immediate = {times={[2]=0,[3]=0,[1]=0,},uses=0,maxlevel=1},
 		},

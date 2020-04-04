@@ -71,6 +71,7 @@
 - 2 Music tracks (day and morning)
 - Add snow
 - Fix bed placement
+- Add snow and snowballs
 
 
 # IDEAS:

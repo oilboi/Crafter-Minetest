@@ -128,7 +128,7 @@ minetest.register_node("bed:bed_back", {
 				{0.5, -0.5, -0.5, 5/16, -5/16, -5/16},
 			},
 		},
-	drop = "bed:bed",
+	drop = "",
 	on_dig = function(pos, node, digger)
 		local param2 = minetest.get_node(pos).param2
 		local facedir = minetest.facedir_to_dir(param2)	
