@@ -6,6 +6,7 @@ minetest.register_alias("mapgen_water_source", "main:water")
 minetest.register_alias("mapgen_sand", "main:sand")
 minetest.register_alias("mapgen_tree", "main:tree")
 minetest.register_alias("mapgen_leaves", "main:leaves")
+minetest.register_alias("mapgen_apple", "main:leaves")
 
 
 print("Initializing biomes")
