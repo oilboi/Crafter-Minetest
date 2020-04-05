@@ -1,41 +1,13 @@
+<img src="https://github.com/oilboi/Crafter/blob/master/menu/header.png">
+
+> Designed for Minetest 5.2.0 DEV
+
 # ALPHA STATE CHANGELOG
-## 0.01
-- make a grass biome
-- make trees
-- make hand - mod another mod
-- make items drop
-- make tools
-- make trees drop stuff with shears
-- add treecapitator
-- itemstack max 1000
-- ores
-- vignette
-- furnace
-- add signs with vanessae's sign library
-- crafting recipes
-- beds - set respawn point - only sleep at night
-- make treecapitator cut down whole tree if using axe - make trees drop items on treecapitator
-- tnt
-- sand fall down
-- tnt throw player - and items
-- water flow faster
-- torches with particle
-- make a mob
 
-## 0.02
-- fix tools causing crash on pigs with no fleshy definition
-- ladders - only placeable on walls
-- eating animation - particles? - entity?
-- boats
-- make falling item have fall soundspec
-- rebalance sand audio
-- rewrite the item collection better
-- (not finished) redstone, make nodes drop multiple items individually
-- make item collection move with the player's speed
-- made saplings
-
+> <a href="https://github.com/oilboi/Crafter/blob/master/old_changelog.md">Old Version Changelogs</a>
 
 ## 0.03
+> It's A Real Game! Update
 - make grass spread
 - water buckets
 - buckets water farmland
@@ -76,25 +48,97 @@
 - Add creative mode
 
 
+
+
 # IDEAS:
-- ghost mob (sync with the cave sounds) and possible cave ins during cave sounds
-- rope and tnt arrows
+
+
+
+## REDSTONE:
+- breaker (mines whatever is in front of it)
+- dispenser (shoots out first item in inventory, or shoots item into pipe)
+- sticky piston (pulls node in front of it)
+- piston in general (if node is falling and piston is pointing up then FLING IT, if detects falling node entity FLING IT)
+
+
+
+
+## MOBS:
+
+> #1 idea, - make mobs pathfind
+
+### sheep
+- sheep can be punched to drop wool without damage
+- you can dye a sheep with colored dye and it will change color, then will drop the color you dyed it
+
+### pig
+- disable pig aggression
+- make porkchop look nicer
+
+### ghosts
+- make the default player model whited out
+- ghosts can pass through any nodes
+- ghosts fly around
+- will follow you groaning about "diamonds", "need food", and "join us"
+- they will fling you up in the air or punch you
+- ghosts can drag you down into nodes and suffocate you
+- spawn with cave sounds
+- drop soul
+
+### node monster
+- gets built out of nodes in the area
+- will probabaly destroy you
+- drops all nodes that it's made of when killed
+
+### Exploder
+- sneaks up on you and then explodes
+- drops gun powder
+
+
+
+
+## Game Mechanics:
 - xp (edit the node drops code to check if node has tag for xp)
 - brewing
 - enchanting/upgrading
 - magic (wands, spells, etc)
-- mechanics (compressor, autominer)
-- automation (pipes, pumps, fluid  transfer)
-- vehicles (car, powered minecarts, trains)
-- hitscan flintlocks
-- make mob look around
-- make hostile mobs
-- make mob have nametags for debug
-- make mobs pathfind
-- upgrade minecart physics even more 
+- better combat ( sweep hit enemies, falling while hitting deals more damage )
 
 
-farming - 
+## New Themes
+
+### mechanics (mechanical tools and machines)
+- compressor (compresses nodes down)
+- auto miner (digs whatever is in front of it)
+- decompressor (opposite of compressor
+
+
+### automation 
+- pipes
+- pumps
+- fluid  transfer
+- fluid storage
+- pipes should be able to move objects quickly
+
+
+### HALLOWEEN!
+- pumpkins
+- Jack O'Lanterns
+- corn and corn stalks
+- decorations
+- cobwebs
+- costumes (somehow?)
+- candy
+- make grass and leaves orange during the month of October
+- (Use a simple date check and override nodes)
+- Gravestones
+- Graveyards
+- Candles
+- candy apples
+- Soul cake, make with cake and soul
+
+
+### Farming
 - add fertilizer (pig drops bone randomly) 
 - fertilizer is made out of bone - 
 - fertilizer can make tall grass grow on regular grass
@@ -102,17 +146,35 @@ farming -
 - make sandwich with bread and cooked porkchop
 - fertilizer used on saplings randomly make tree grow (make sapling growth a function)
 
+
+### Fishing
+- have a rod that you can cast into water
+- bobber entity which goes under water when fish on line
+
+
+## New Items
+
+> These don't seem to fit into any theme so list them all here
+
+- sugar and sugar cane (grow near water on sand)
+- rope and tnt arrows
+- vehicles (car, powered minecarts, trains)
+- hitscan flintlocks
+- bows
+
+
+
+## Ideas
+
+> These ideas are all over the place but are good for future updates
+
+- upgrade minecart physics even more 
 - make torches abm that checks if player in area
 - make furnace abm that checks if player in area
-
-
-- fishing
-- bows
-- fix full inventory collection deletion bug
 - 3d character
 - make tnt hurt player
-- rewrite minecart - halfway - make go up and down hills
-- right click with tool places torch
+- rewrite minecart
+- fix tool rightclick torch placement to replace buildable to nodes
 - if placed last node put another stack into hand
 - have falling node hurt player?
 - add a function to set a velocity goal to entities and then implement it with all entities
@@ -121,13 +183,12 @@ farming -
 - check if everyone is in bed before going to next night
 - also lock player in bed until they get out or daytime
 - create a function to check if a node or group is below
-
+- ^ set meta for player so that all mods can use it without calculating it
+- ^ over and over again (saves cpu cycles)
 - cars buildable in crafting table
 - require gas pumps refine oil
 - drive next to gas pump and car will fill with gas
 - maybe have pump be rightclickable and then manually fill with gass using nozel
-
-
 - minecart car train? - off rail use
 - automatic step height for off rail use
 - make cars follow each other
@@ -135,20 +196,19 @@ farming -
 - powered minecart car (engine car)
 - chest minecart car
 - player controls engine car
-make entities push against players
+- make entities push against players
 
 
 open bugs:
 - ghost chest bug
-fix torches not deleting particles when mounted node dug <- meta glitch?
-- fixing with abm
 
 
 
-possible applications:
-causes object to magnetize towards player or other objects and stop after an inner radius
-use for better item magnet?
+## Possible Applications
 
+> causes object to magnetize towards player or other objects and stop after an inner radius
+> use for better item magnet?
+```
 if object:is_player() and object:get_player_name() ~= self.rider then
       local player_pos = object:getpos()
       pos.y = 0
@@ -174,3 +234,4 @@ if object:is_player() and object:get_player_name() ~= self.rider then
       - acceleration = vector.multiply(acceleration, -1)
       - object:add_player_velocity(acceleration)
 end
+```
