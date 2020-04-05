@@ -186,6 +186,8 @@
 
 > These ideas are all over the place but are good for future updates
 
+- make pistons able to push and pull any node that does not use meta or inv
+- make pistons able to push and pull deactivated pistons
 - upgrade minecart physics even more 
 - make torches abm that checks if player in area
 - make furnace abm that checks if player in area
