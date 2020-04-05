@@ -1,5 +1,6 @@
---exlude certain mods from being pushed to conserve metadata
+--exclude certain mods and nodes from being pushed and pulled to stop glitches
 local excluded_mods = {utility=true,craftingtable=true,buildtest=true,sign=true,bed=true}
+local excluded_nodes = {["redstone:piston_on"]=true,["redstone:sticky_piston_on"]=true,["redstone:actuator"]=true,["redstone:sticky_actuator"]=true}
 
 --this is how the piston pushes nodes
 local function piston_push_nodes(pos,dir)
@@ -11,8 +12,8 @@ local function piston_push_nodes(pos,dir)
 		local node = minetest.get_node(index_pos)
 		local param2 = node.param2
 		local def = minetest.registered_nodes[node.name]
-		local push = (excluded_mods[def.mod_origin] ~= true)
 		local name = node.name
+		local push = ((excluded_mods[def.mod_origin] ~= true) and (excluded_nodes[name] ~= true))
 		if push and name ~= "air" then
 			local index = {}
 			index.pos = index_pos
@@ -76,7 +77,7 @@ end
 
 
 minetest.register_node("redstone:piston_off", {
-    description = "Redstone Piston",
+    description = "Piston",
     tiles = {"redstone_piston.png","redstone_piston.png^[transformR180","redstone_piston.png^[transformR270","redstone_piston.png^[transformR90","wood.png","stone.png"},
     paramtype2 = "facedir",
     groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1,redstone_activation=1},
@@ -85,7 +86,9 @@ minetest.register_node("redstone:piston_off", {
     paramtype = "light",
     sunlight_propagates = true,
     redstone_activation = function(pos)
-		piston_push(pos)
+		if minetest.get_node(pos).name == "redstone:piston_off" then
+			piston_push(pos)
+		end
     end,
     --reverse the direction to face the player
     after_place_node = function(pos, placer, itemstack, pointed_thing)
@@ -97,7 +100,7 @@ minetest.register_node("redstone:piston_off", {
     end,
 })
 minetest.register_node("redstone:piston_on", {
-    description = "Redstone Piston",
+    description = "Piston",
     tiles = {"redstone_piston.png","redstone_piston.png^[transformR180","redstone_piston.png^[transformR270","redstone_piston.png^[transformR90","stone.png","stone.png"},
     drawtype = "nodebox",
     paramtype = "light",
@@ -132,7 +135,7 @@ minetest.register_node("redstone:piston_on", {
 })
 
 minetest.register_node("redstone:actuator", {
-    description = "Redstone Piston",
+    description = "Piston Actuator",
     tiles = {"wood.png"},
     drawtype = "nodebox",
     paramtype = "light",
@@ -168,8 +171,8 @@ local function sticky_piston_push_nodes(pos,dir)
 		local node = minetest.get_node(index_pos)
 		local param2 = node.param2
 		local def = minetest.registered_nodes[node.name]
-		local push = (excluded_mods[def.mod_origin] ~= true)
 		local name = node.name
+		local push = ((excluded_mods[def.mod_origin] ~= true) and (excluded_nodes[name] ~= true))
 		if push and name ~= "air" then
 			local index = {}
 			index.pos = index_pos
@@ -200,7 +203,7 @@ local function sticky_piston_push(pos)
 	local facedir = minetest.get_node(pos).param2
 	local dir = minetest.facedir_to_dir(facedir)
 	local piston_location = vector.add(pos,dir)
-	local worked = piston_push_nodes(pos,dir)
+	local worked = sticky_piston_push_nodes(pos,dir)
 	if worked == true then
 		--push player
 		for _,object in ipairs(minetest.get_objects_inside_radius(piston_location, 2)) do
@@ -242,8 +245,8 @@ local function sticky_piston_pull_nodes(pos,dir)
 	local node = minetest.get_node(index_pos)
 	local param2 = node.param2
 	local def = minetest.registered_nodes[node.name]
-	local pull = (excluded_mods[def.mod_origin] ~= true)
 	local name = node.name
+	local pull = ((excluded_mods[def.mod_origin] ~= true) and (excluded_nodes[name] ~= true))
 	--if it can be pulled pull it
 	if pull and name ~= "air" then
 		minetest.remove_node(index_pos)
@@ -298,7 +301,7 @@ end
 ------------------------------[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[
 
 minetest.register_node("redstone:sticky_piston_off", {
-    description = "Redstone Piston",
+    description = "Sticky Piston",
     tiles = {"redstone_piston.png","redstone_piston.png^[transformR180","redstone_piston.png^[transformR270","redstone_piston.png^[transformR90","sticky_piston.png","stone.png"},
     paramtype2 = "facedir",
     groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1,redstone_activation=1},
@@ -307,7 +310,9 @@ minetest.register_node("redstone:sticky_piston_off", {
     paramtype = "light",
     sunlight_propagates = true,
     redstone_activation = function(pos)
-		sticky_piston_push(pos)
+		if minetest.get_node(pos).name == "redstone:sticky_piston_off" then
+			sticky_piston_push(pos)
+		end
     end,
     --reverse the direction to face the player
     after_place_node = function(pos, placer, itemstack, pointed_thing)
@@ -324,7 +329,7 @@ minetest.register_node("redstone:sticky_piston_off", {
 
 
 minetest.register_node("redstone:sticky_piston_on", {
-    description = "Redstone Piston",
+    description = "Sticky Piston",
     tiles = {"redstone_piston.png","redstone_piston.png^[transformR180","redstone_piston.png^[transformR270","redstone_piston.png^[transformR90","stone.png","stone.png"},
     drawtype = "nodebox",
     paramtype = "light",
