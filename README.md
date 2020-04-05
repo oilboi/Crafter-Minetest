@@ -48,7 +48,7 @@
 - Add snow and snowballs
 - Make snow falling node
 - Add creative mode
-
+- Add trap chest and sticky piston
 
 ---
 
