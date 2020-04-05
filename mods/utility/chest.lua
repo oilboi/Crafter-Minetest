@@ -34,6 +34,7 @@ function chest.chest_lid_close(pn)
 			minetest.swap_node(pos,{name = "utility:"..swap,param2=node.param2})
 			minetest.sound_play(sound, {gain = 0.3, pos = pos, max_hear_distance = 10},true)
 		end
+		redstone.collect_info(pos)
 	end,pos,swap,node)
 end
 
@@ -132,6 +133,7 @@ function chest.register_chest(name, d)
 			 minetest.show_formspec(clicker:get_player_name(),"utility:chest", chest.get_chest_formspec(pos))
 			chest.open_chests[clicker:get_player_name()] = { pos = pos,
 					sound = def.sound_close, swap = name }
+			
 		end
 		def.on_blast = function() end
 		def.on_key_use = function(pos, player)
@@ -195,6 +197,7 @@ function chest.register_chest(name, d)
 				
 			minetest.show_formspec(clicker:get_player_name(),"utility:chest", chest.get_chest_formspec(pos))
 			chest.open_chests[clicker:get_player_name()] = { pos = pos,sound = def.sound_close, swap = name }
+			redstone.collect_info(pos)
 		end
 		def.on_blast = function(pos)
 			local drops = {}
@@ -270,4 +273,12 @@ minetest.register_craft({
 	type = "fuel",
 	recipe = "utility:chest",
 	burntime = 5,
+})
+
+
+local groups = minetest.registered_nodes["utility:chest_open"].groups
+groups["redstone_torch"]=1
+groups["redstone_power"]=9
+minetest.override_item("utility:chest_open", {
+	groups = groups	
 })

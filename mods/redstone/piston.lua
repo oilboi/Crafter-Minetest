@@ -45,26 +45,29 @@ local function piston_push(pos)
 	local dir = minetest.facedir_to_dir(facedir)
 	local piston_location = vector.add(pos,dir)
 	local worked = piston_push_nodes(pos,dir)
+	local node = minetest.get_node(vector.add(pos,dir)).name
 	if worked == true then
 		--push player
-		for _,object in ipairs(minetest.get_objects_inside_radius(piston_location, 2)) do
-			if object:is_player() and object:get_hp() > 0 then
-				local pos2 = object:get_pos()
-				local compare = vector.subtract(pos2,piston_location)
-				local real_y = compare.y
-				compare = vector.abs(compare)
-				--piston pointing up
-				if dir.y == 1 then
-					if compare.y <= 0.5 and compare.x < 0.8 and compare.z < 0.8 then
-						object:move_to(vector.add(dir,pos2))
-						object:add_player_velocity(vector.multiply(dir,20))
-					end
-				--piston sideways
-				elseif dir.x ~=0 or dir.z ~= 0 then
-					if real_y <= 0.5 and real_y >= -1.6 and compare.x < 0.8 and compare.z < 0.8 then
-						object:move_to(vector.add(dir,pos2))
-						object:add_player_velocity(vector.multiply(dir,20))
-					
+		if node == "air" then
+			for _,object in ipairs(minetest.get_objects_inside_radius(piston_location, 2)) do
+				if object:is_player() and object:get_hp() > 0 then
+					local pos2 = object:get_pos()
+					local compare = vector.subtract(pos2,piston_location)
+					local real_y = compare.y
+					compare = vector.abs(compare)
+					--piston pointing up
+					if dir.y == 1 then
+						if compare.y <= 0.5 and compare.x < 0.8 and compare.z < 0.8 then
+							object:move_to(vector.add(dir,pos2))
+							object:add_player_velocity(vector.multiply(dir,20))
+						end
+					--piston sideways
+					elseif dir.x ~=0 or dir.z ~= 0 then
+						if real_y <= 0.5 and real_y >= -1.6 and compare.x < 0.8 and compare.z < 0.8 then
+							object:move_to(vector.add(dir,pos2))
+							object:add_player_velocity(vector.multiply(dir,20))
+						
+						end
 					end
 				end
 			end
@@ -204,26 +207,29 @@ local function sticky_piston_push(pos)
 	local dir = minetest.facedir_to_dir(facedir)
 	local piston_location = vector.add(pos,dir)
 	local worked = sticky_piston_push_nodes(pos,dir)
+	local node = minetest.get_node(vector.add(pos,dir)).name
 	if worked == true then
 		--push player
-		for _,object in ipairs(minetest.get_objects_inside_radius(piston_location, 2)) do
-			if object:is_player() and object:get_hp() > 0 then
-				local pos2 = object:get_pos()
-				local compare = vector.subtract(pos2,piston_location)
-				local real_y = compare.y
-				compare = vector.abs(compare)
-				--piston pointing up
-				if dir.y == 1 then
-					if compare.y <= 0.5 and compare.x < 0.8 and compare.z < 0.8 then
-						object:move_to(vector.add(dir,pos2))
-						--object:add_player_velocity(vector.multiply(dir,20))
-					end
-				--piston sideways
-				elseif dir.x ~=0 or dir.z ~= 0 then
-					if real_y <= 0.5 and real_y >= -1.6 and compare.x < 0.8 and compare.z < 0.8 then
-						object:move_to(vector.add(dir,pos2))
-						--object:add_player_velocity(vector.multiply(dir,20))
-					
+		if node == "air" then
+			for _,object in ipairs(minetest.get_objects_inside_radius(piston_location, 2)) do
+				if object:is_player() and object:get_hp() > 0 then
+					local pos2 = object:get_pos()
+					local compare = vector.subtract(pos2,piston_location)
+					local real_y = compare.y
+					compare = vector.abs(compare)
+					--piston pointing up
+					if dir.y == 1 then
+						if compare.y <= 0.5 and compare.x < 0.8 and compare.z < 0.8 then
+							object:move_to(vector.add(dir,pos2))
+							--object:add_player_velocity(vector.multiply(dir,20))
+						end
+					--piston sideways
+					elseif dir.x ~=0 or dir.z ~= 0 then
+						if real_y <= 0.5 and real_y >= -1.6 and compare.x < 0.8 and compare.z < 0.8 then
+							object:move_to(vector.add(dir,pos2))
+							--object:add_player_velocity(vector.multiply(dir,20))
+						
+						end
 					end
 				end
 			end
@@ -265,30 +271,33 @@ local function sticky_piston_pull(pos,dir)
 	
 	local in_front_pos = vector.add(pos,dir)
 	
+	local node = minetest.get_node(in_front_pos).name
 	--pull nodes
 	sticky_piston_pull_nodes(pos,dir)
 	
 	--pull player
-	for _,object in ipairs(minetest.get_objects_inside_radius(in_front_pos, 2)) do
-		if object:is_player() and object:get_hp() > 0 then
-			local pos2 = object:get_pos()
-			local compare = vector.subtract(pos2,in_front_pos)
-			local real_y = compare.y
-			compare = vector.abs(compare)
-			--piston pointing up
-			if dir.y == 1 then
-				if compare.y <= 0.5 and compare.x < 0.8 and compare.z < 0.8 then
-					dir = vector.multiply(dir,-1)
-					object:move_to(vector.add(dir,pos2))
-					--object:add_player_velocity(vector.multiply(dir,20))
-				end
-			--piston sideways
-			elseif dir.x ~=0 or dir.z ~= 0 then
-				if real_y <= 0.5 and real_y >= -1.6 and compare.x < 0.8 and compare.z < 0.8 then
-					dir = vector.multiply(dir,-1)
-					object:move_to(vector.add(dir,pos2))
-					--object:add_player_velocity(vector.multiply(dir,20))
-				
+	if node == "air" then
+		for _,object in ipairs(minetest.get_objects_inside_radius(in_front_pos, 2)) do
+			if object:is_player() and object:get_hp() > 0 then
+				local pos2 = object:get_pos()
+				local compare = vector.subtract(pos2,in_front_pos)
+				local real_y = compare.y
+				compare = vector.abs(compare)
+				--piston pointing up
+				if dir.y == 1 then
+					if compare.y <= 0.5 and compare.x < 0.8 and compare.z < 0.8 then
+						dir = vector.multiply(dir,-1)
+						object:move_to(vector.add(dir,pos2))
+						--object:add_player_velocity(vector.multiply(dir,20))
+					end
+				--piston sideways
+				elseif dir.x ~=0 or dir.z ~= 0 then
+					if real_y <= 0.5 and real_y >= -1.6 and compare.x < 0.8 and compare.z < 0.8 then
+						dir = vector.multiply(dir,-1)
+						object:move_to(vector.add(dir,pos2))
+						--object:add_player_velocity(vector.multiply(dir,20))
+					
+					end
 				end
 			end
 		end
