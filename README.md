@@ -2,6 +2,8 @@
 
 > Designed for Minetest 5.2.0 DEV
 
+---
+
 # ALPHA STATE CHANGELOG
 
 > <a href="https://github.com/oilboi/Crafter/blob/master/old_changelog.md">Old Version Changelogs</a>
@@ -48,6 +50,7 @@
 - Add creative mode
 
 
+---
 
 
 # IDEAS:
@@ -61,19 +64,23 @@
 - piston in general (if node is falling and piston is pointing up then FLING IT, if detects falling node entity FLING IT)
 
 
+---
 
 
 ## MOBS:
 
 > #1 idea, - make mobs pathfind
 
+
 ### sheep
 - sheep can be punched to drop wool without damage
 - you can dye a sheep with colored dye and it will change color, then will drop the color you dyed it
 
+
 ### pig
 - disable pig aggression
 - make porkchop look nicer
+
 
 ### ghosts
 - make the default player model whited out
@@ -85,16 +92,19 @@
 - spawn with cave sounds
 - drop soul
 
+
 ### node monster
 - gets built out of nodes in the area
 - will probabaly destroy you
 - drops all nodes that it's made of when killed
+
 
 ### Exploder
 - sneaks up on you and then explodes
 - drops gun powder
 
 
+---
 
 
 ## Game Mechanics:
@@ -103,6 +113,9 @@
 - enchanting/upgrading
 - magic (wands, spells, etc)
 - better combat ( sweep hit enemies, falling while hitting deals more damage )
+
+
+---
 
 
 ## New Themes
@@ -152,6 +165,9 @@
 - bobber entity which goes under water when fish on line
 
 
+---
+
+
 ## New Items
 
 > These don't seem to fit into any theme so list them all here
@@ -162,6 +178,8 @@
 - hitscan flintlocks
 - bows
 
+
+---
 
 
 ## Ideas
@@ -199,9 +217,7 @@
 - make entities push against players
 
 
-open bugs:
-- ghost chest bug
-
+---
 
 
 ## Possible Applications
