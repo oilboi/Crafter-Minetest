@@ -7,7 +7,8 @@ pig.get_staticdata = function(self)
 		hp = self.hp,
 		hunger = self.hunger,
 		hostile = self.hostile,
-		hostile_timer = self.hostile_timer
+		hostile_timer = self.hostile_timer,
+		death_animation_timer = self.death_animation_timer
 	})
 end
 
@@ -24,6 +25,7 @@ pig.on_activate = function(self, staticdata, dtime_s)
 			self.hunger = data.hunger
 			self.hostile = data.hostile
 			self.hostile_timer = data.hostile_timer
+			self.death_animation_timer = data.death_animation_timer
 		end
 	end
 	
