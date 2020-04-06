@@ -121,7 +121,7 @@ function create_craft_formspec(item)
 		"listcolors[#8b8a89;#c9c3c6;#3e3d3e;#000000;#FFFFFF]"..
 		"list[current_player;main;0,4.5;9,1;]".. --hot bar
 		"list[current_player;main;0,6;9,3;9]".. --big part
-		"button[5,3.5;1,1;back;back]" --back button
+		"button[5,3.5;1,1;toomanyitems.back;back]" --back button
 	
 	local base_x = 0.75
 	local base_y = -0.5
@@ -184,11 +184,12 @@ end
 function show_cheat_button(player)
 	local cheat = get_player_cheat(player)
 	if cheat == 1 then
-		return("button[11.5,7.6;2,2;cheat;cheat:on]")
+		return("button[11.5,7.6;2,2;toomanyitems.cheat;cheat:on]")
 	else
-		return("button[11.5,7.6;2,2;cheat;cheat:off]")
+		return("button[11.5,7.6;2,2;toomanyitems.cheat;cheat:off]")
 	end
 end
+
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	--print(dump(fields))
@@ -202,12 +203,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		id = "crafting"
 	end
 	
-	
-	
-	
 	local cheating = get_player_cheat(player)
 	--"next" button
-	if fields.next then
+	if fields["toomanyitems.next"] then
 		local page = get_player_page(player)
 		
 		page = page + 1
@@ -223,7 +221,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		minetest.show_formspec(player:get_player_name(),id, form..inv["page_"..page]..cheat_button)
 		minetest.sound_play("lever", {to_player = player:get_player_name(),gain=0.7})
 	--"prev" button
-	elseif fields.prev then
+	elseif fields["toomanyitems.prev"] then
 		local page = get_player_page(player)
 		
 		page = page - 1
@@ -237,7 +235,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local cheat_button = show_cheat_button(player)	
 		minetest.show_formspec(player:get_player_name(),id, form..inv["page_"..page]..cheat_button)
 		minetest.sound_play("lever", {to_player = player:get_player_name(),gain=0.7})
-	elseif fields.back then
+	elseif fields["toomanyitems.back"] then
 		local page = get_player_page(player)
 		local cheat_button = show_cheat_button(player)
 		minetest.show_formspec(player:get_player_name(),id, form..inv["page_"..page]..cheat_button)
@@ -250,7 +248,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		inv:set_size("craft", 4)
 		--reset the player inv
 		set_inventory_page(player,base_inv)
-	elseif fields.cheat then
+	elseif fields["toomanyitems.cheat"] then
 		--check if the player has the give priv
 		local privved = minetest.get_player_privs(player:get_player_name()).give
 		local cheating = get_player_cheat(player)
@@ -269,18 +267,20 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			minetest.sound_play("lever", {to_player = player:get_player_name(),gain=0.7,pitch=0.7})
 		end
 	--play the game credits
-	elseif fields.credits then
+	elseif fields["toomanyitems.credits"] then
 		minetest.close_formspec(player:get_player_name(), formname)
 		play_game_credits(player)
-	else
-		--this is the "cheating" aka giveme function
+	--this is the "cheating" aka giveme function and craft recipe
+	elseif fields and type(fields) == "table" and string.match(next(fields),"toomanyitems.") then
+		local item = string.gsub(next(fields), "toomanyitems.", "")
 		local privved = minetest.get_player_privs(player:get_player_name()).give
 		local cheating = get_player_cheat(player)
-			
+
+
 		if creative_mode or (cheating == 1 and privved == true) then
 			local pos = player:getpos()
 			local inv = player:get_inventory()
-			local stack = ItemStack(next(fields).." 64")
+			local stack = ItemStack(item.." 64")
 			
 			--room for item
 			if inv and inv:room_for_item("main",stack) then
@@ -288,7 +288,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				minetest.sound_play("pickup", {to_player = player:get_player_name(),gain=0.7,pitch = math.random(60,100)/100})
 			--no room for item
 			else
-				local namer = string.upper(minetest.registered_items[next(fields)].description)
+				local namer = string.upper(minetest.registered_items[item].description)
 				minetest.chat_send_player(player:get_player_name(), minetest.colorize("red", "THERE IS NO ROOM FOR "..namer.." IN YOUR INVENTORY!"))
 				minetest.sound_play("lever", {to_player = player:get_player_name(),gain=0.7,pitch=0.7})
 			end
@@ -296,13 +296,14 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		--this is to get the craft recipe
 		else
 			local page = get_player_page(player)
-			local craft_inv = create_craft_formspec(next(fields))
+			local craft_inv = create_craft_formspec(item)
 			if craft_inv and craft_inv ~= "" then
 				local cheat_button = show_cheat_button(player)	
 				minetest.show_formspec(player:get_player_name(),id, craft_inv..inv["page_"..page]..cheat_button)
 				minetest.sound_play("lever", {to_player = player:get_player_name(),gain=0.7})
 			end
 		end
+
 	end
 end)
 
@@ -339,7 +340,7 @@ base_inv = "size[17.2,8.75]"..
     "list[current_player;craftpreview;6.1,1.5;1,1;]"..
     "listring[current_player;main]"..
 	"listring[current_player;craft]"..
-	"button[8,3.5;1,1;credits;credits]" --credits button
+	"button[8,3.5;1,1;toomanyitems.credits;credits]" --credits button
 --this is the 3x3 crafting table formspec
 crafting_table_inv = "size[17.2,8.75]"..
 		"background[-0.19,-0.25;9.41,9.49;crafting_inventory_workbench.png]"..
@@ -372,7 +373,7 @@ for index,data in pairs(minetest.registered_items) do
 		local recipe = minetest.get_craft_recipe(data.name)
 		--only put in craftable items
 		if recipe.method then
-			inv["page_"..page] = inv["page_"..page].."item_image_button["..9.25+x..","..y..";1,1;"..data.name..";"..data.name..";]"
+			inv["page_"..page] = inv["page_"..page].."item_image_button["..9.25+x..","..y..";1,1;"..data.name..";toomanyitems."..data.name..";]"
 			x = x + 1
 			if x > 7 then
 				x = 0
@@ -390,8 +391,8 @@ end
 --add buttons and labels
 for i = 0,page do
 	--set the last page
-	inv["page_"..i] = inv["page_"..i].."button[9.25,7.6;2,2;prev;prev]"..
-	"button[15.25,7.6;2,2;next;next]"..
+	inv["page_"..i] = inv["page_"..i].."button[9.25,7.6;2,2;toomanyitems.prev;prev]"..
+	"button[15.25,7.6;2,2;toomanyitems.next;next]"..
 	--this is +1 so it makes more sense
 	"label[13.75,8.25;page "..(i+1).."/"..(page+1).."]"
 end
@@ -405,7 +406,6 @@ minetest.override_item("craftingtable:craftingtable", {
 		minetest.show_formspec(player:get_player_name(), "crafting", crafting_table_inv..inv["page_"..page])
 	end,
 })
-
 pages = page
 end)
 
@@ -414,9 +414,9 @@ set_inventory_page = function(player,inventory)
 	local page = get_player_page(player)
 	local cheat = get_player_cheat(player)
 	if cheat == 1 then
-		inventory = inventory.."button[11.5,7.6;2,2;cheat;cheat:on]"
+		inventory = inventory.."button[11.5,7.6;2,2;toomanyitems.cheat;cheat:on]"
 	else
-		inventory = inventory.."button[11.5,7.6;2,2;cheat;cheat:off]"
+		inventory = inventory.."button[11.5,7.6;2,2;toomanyitems.cheat;cheat:off]"
 	end
 		
 	player:set_inventory_formspec(inventory..inv["page_"..page])
