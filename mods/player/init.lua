@@ -1,29 +1,15 @@
---[[
---map
-running - set fov set_fov(fov, is_multiplier) set_breath(value)
-sneaking --set eye offset
-
-]]--
 crafter_version = 0.03
 
 minetest.register_on_joinplayer(function(player)
-	--add in info
-	player:hud_set_flags({minimap=true})
+	--add in version info
 	player:hud_add({
-		hud_elem_type = "text",
-		position = {x=0,y=0},
-		text = "Crafter Alpha "..crafter_version,
-		number = 000000,
-		alignment = {x=1,y=1},
-		offset = {x=2, y=2},
-	})
-	player:hud_add({
-		hud_elem_type = "text",
-		position = {x=0,y=0},
-		text = "Crafter Alpha "..crafter_version,
-		number = 0xffffff,
-		alignment = {x=1,y=1},
-		offset = {x=0, y=0},
+		hud_elem_type = "image",
+		position = {x=1,y=0},
+		scale = {x=0.75,y=0.75},
+		text = "version.png",
+		--number = 000000,
+		--alignment = {x=-1,y=0},
+		offset = {x=-180, y=19},
 	})
 end)
 
