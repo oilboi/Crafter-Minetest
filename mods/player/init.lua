@@ -45,15 +45,17 @@ minetest.register_on_dieplayer(function(player, reason)
 		local count = stack:get_count()
 		if name ~= "" then
 			local obj = minetest.add_item(pos, name.." "..count)
-			obj:setvelocity(vector.new(math.random(-3,3),math.random(4,8),math.random(-3,3)))
+			if obj then
+				obj:setvelocity(vector.new(math.random(-3,3),math.random(4,8),math.random(-3,3)))
+			end
+			inv:set_stack("main", i, ItemStack(""))
+		else
 			inv:set_stack("main", i, ItemStack(""))
 		end
 	end
-	for i = 1,inv:get_size("craft") do
+	--for i = 1,inv:get_size("craft") do
 	
-	end 
-	
-
+	--end 
 end)
 
 minetest.register_globalstep(function(dtime)
