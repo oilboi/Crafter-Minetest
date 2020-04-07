@@ -2,6 +2,7 @@
 
 > Designed for Minetest 5.2.0
 
+>Built using textures from <a href="https://forum.minetest.net/viewtopic.php?t=16407">Mineclone 2</a> 
 ---
 
 # ALPHA STATE CHANGELOG

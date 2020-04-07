@@ -11,6 +11,10 @@ minetest.register_on_joinplayer(function(player)
 		--alignment = {x=-1,y=0},
 		offset = {x=-180, y=19},
 	})
+	minetest.chat_send_player(player:get_player_name(), minetest.colorize("red", "PLEASE STAY SAFE DURING THE CORONAVIRUS OUTBREAK"))
+	minetest.chat_send_player(player:get_player_name(), minetest.colorize("blue", "PLEASE STAY SAFE DURING THE CORONAVIRUS OUTBREAK"))
+	minetest.chat_send_player(player:get_player_name(), minetest.colorize("yellow", "PLEASE STAY SAFE DURING THE CORONAVIRUS OUTBREAK"))
+	minetest.chat_send_player(player:get_player_name(), minetest.colorize("white", "PLEASE STAY SAFE DURING THE CORONAVIRUS OUTBREAK"))
 end)
 
 --hurt sound
