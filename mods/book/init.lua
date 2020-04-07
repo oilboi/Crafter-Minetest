@@ -33,9 +33,9 @@ local open_book_inked_gui = function(itemstack, user)
 	
 	book_writing_formspec = "size[9,8.75]"..
 		"background[-0.19,-0.25;9.41,9.49;gui_hb_bg.png]"..
-		"style[book.book_text,book.book_title;textcolor=black;border=false;noclip=false]"..
-		"textarea[0.3,0;9,0.5;book.book_title;;"..book_title.."]"..
-		"textarea[0.3,0.3;9,9;book.book_text;;"..book_text.."]"..
+		"style_type[textarea;textcolor=black;border=false;noclip=false]"..
+		"textarea[0.3,0;9,0.5;;;"..book_title.."]"..
+		"textarea[0.3,0.3;9,9;;;"..book_text.."]"..
 		"button_exit[4,8.3;1,1;close;close]"
 		
 	minetest.show_formspec(user:get_player_name(), "book.book_gui", book_writing_formspec)
