@@ -51,7 +51,7 @@
 - Add creative mode
 - Add trap chest and sticky piston
 - Added in Et QtFunny font info
-
+- Added in footers and books
 ---
 
 
