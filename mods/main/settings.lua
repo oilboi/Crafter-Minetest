@@ -27,10 +27,11 @@ minetest.register_on_mods_loaded(function()
 	end
 	for name,_ in pairs(minetest.registered_craftitems) do
 		local stack_max = minetest.registered_items[name].stack_max
-		print(stack_max)
-		minetest.override_item(name, {
-			stack_max = 1000,
-		})
+		if stack_max == 99 then
+			minetest.override_item(name, {
+				stack_max = 1000,
+			})
+		end
 	end
 end)
 

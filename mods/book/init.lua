@@ -68,35 +68,35 @@ end)
 
 
 minetest.register_craftitem("book:book",{
-		description = "Book",
-		groups = {book = 1, written = 0},
+	description = "Book",
+	groups = {book = 1, written = 0},
+	stack_max = 1,
+	inventory_image = "book.png",
+	
+	on_place = function(itemstack, user, pointed_thing)
+		print("make books placable on the ground")
+		open_book_gui(itemstack, user)
+	end,
 
-		inventory_image = "book.png",
-		
-		on_place = function(itemstack, user, pointed_thing)
-			print("make books placable on the ground")
-			open_book_gui(itemstack, user)
-		end,
-
-		on_secondary_use = function(itemstack, user, pointed_thing)
-			open_book_gui(itemstack, user)
-		end,
+	on_secondary_use = function(itemstack, user, pointed_thing)
+		open_book_gui(itemstack, user)
+	end,
 })
 
 minetest.register_craftitem("book:book_written",{
-		description = "Book",
-		groups = {book = 1, written = 1},
+	description = "Book",
+	groups = {book = 1, written = 1},
+	stack_max = 1,
+	inventory_image = "book_written.png",
+	
+	on_place = function(itemstack, user, pointed_thing)
+		print("make books placable on the ground")
+		open_book_inked_gui(itemstack, user)
+	end,
 
-		inventory_image = "book_written.png",
-		
-		on_place = function(itemstack, user, pointed_thing)
-			print("make books placable on the ground")
-			open_book_inked_gui(itemstack, user)
-		end,
-
-		on_secondary_use = function(itemstack, user, pointed_thing)
-			open_book_inked_gui(itemstack, user)
-		end,
+	on_secondary_use = function(itemstack, user, pointed_thing)
+		open_book_inked_gui(itemstack, user)
+	end,
 })
 
 minetest.register_craft({
