@@ -1,9 +1,4 @@
---book is item
---craftable
---save metadata of text
---reload text
---write to make permenant
-
+--this is the gui for un-inked books
 local open_book_gui = function(itemstack, user)
 	local meta = itemstack:get_meta()
 	local book_text = meta:get_string("book.book_text")
@@ -25,6 +20,8 @@ local open_book_gui = function(itemstack, user)
 	minetest.show_formspec(user:get_player_name(), "book.book_gui", book_writing_formspec)
 end
 
+
+--this is the gui for permenantly written books
 local open_book_inked_gui = function(itemstack, user)
 	local meta = itemstack:get_meta()
 	local book_text = meta:get_string("book.book_text")
@@ -41,6 +38,8 @@ local open_book_inked_gui = function(itemstack, user)
 	minetest.show_formspec(user:get_player_name(), "book.book_gui", book_writing_formspec)
 end
 
+
+--handle the book gui
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if not formname == "book.book_gui" then return end
 	
@@ -66,7 +65,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 end)
 
 
-
+--this is the book item
 minetest.register_craftitem("book:book",{
 	description = "Book",
 	groups = {book = 1, written = 0},
@@ -83,6 +82,7 @@ minetest.register_craftitem("book:book",{
 	end,
 })
 
+--permenantly written books
 minetest.register_craftitem("book:book_written",{
 	description = "Book",
 	groups = {book = 1, written = 1},
@@ -99,6 +99,7 @@ minetest.register_craftitem("book:book_written",{
 	end,
 })
 
+--change this to paper
 minetest.register_craft({
 	output = "book:book",
 	recipe = {

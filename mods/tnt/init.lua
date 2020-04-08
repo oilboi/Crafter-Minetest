@@ -1,4 +1,51 @@
 --here is where tnt is defined
+local function extreme_tnt(pos,range)
+	local pos = vector.floor(vector.add(pos,0.5))
+	
+	--kill
+	--[[
+	for _,object in ipairs(minetest.get_objects_inside_radius(pos, range)) do
+		if  object:is_player() then 
+			object:set_hp(-50)
+		elseif object:get_luaentity() and object:get_luaentity().name == "__builtin:item" then
+			object:remove()
+		end
+	end
+	]]--
+	
+	local delay = 0
+	for x=-1,0 do
+	for y=-1,0 do
+	for z=-1,0 do
+		minetest.after(delay, function(pos,range,x,y,z)
+			local min = vector.add(pos,vector.multiply(vector.new(x,y,z),range))
+			local max = vector.add(pos,vector.multiply(vector.new(x+1,y+1,z+1),range))
+			local vm = minetest.get_voxel_manip()	
+			local emin, emax = vm:read_from_map(min,max)
+			local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
+			local data = vm:get_data()
+			local air = minetest.get_content_id("air")
+			
+			for x=min.x, max.x do
+			for y=min.y, max.y do
+			for z=min.z, max.z do
+				--if vector.distance(pos, vector.new(x,y,z)) <= range then		
+				--minetest.remove_node(vector.new(x,y,z))
+				data[area:index(x,y,z)] = air
+				--end
+			end
+			end
+			end
+			vm:set_data(data)
+			vm:write_to_map()
+		end,pos,range,x,y,z)
+		delay = delay + 1
+	end
+	end
+	end
+	
+	minetest.sound_play("tnt_explode", {pos = pos, gain = 1.0, max_hear_distance = range*range*range})
+end
 
 local function tnt(pos,range)
 	local pos = vector.floor(vector.add(pos,0.5))
@@ -165,7 +212,11 @@ minetest.register_entity("tnt:tnt", {
 			if not self.range then
 				self.range = 7
 			end
-			tnt(pos,self.range)
+			if self.extreme == true then
+				extreme_tnt(pos,self.range)
+			else
+				tnt(pos,self.range)
+			end
 			self.object:remove()
 		end
 	end,
@@ -202,8 +253,11 @@ minetest.register_node("tnt:uranium_tnt", {
     sounds = main.stoneSound(),
     on_punch = function(pos, node, puncher, pointed_thing)
 		local obj = minetest.add_entity(pos,"tnt:tnt")
-		local range = 145
+		local range = 50
 		obj:get_luaentity().range = range
+		obj:get_luaentity().timer = -5
+		obj:get_luaentity().extreme = true
+		
 		minetest.remove_node(pos)
     end,
 })
