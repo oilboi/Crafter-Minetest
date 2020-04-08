@@ -8,7 +8,7 @@ when placed check if above
 if finding node fails and player is under direct sunlight then
 do weather effects with the y pos half way down the column of the weather particle spawner
 
-]]--
+
 
 --add all nodes to node list
 local all_nodes = {}
@@ -186,6 +186,8 @@ minetest.register_globalstep(function(dtime)
 		end
 	end
 end)
+
+]]--
 
 minetest.register_node("weather:snow", {
     description = "Snow",

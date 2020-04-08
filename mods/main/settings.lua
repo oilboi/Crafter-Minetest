@@ -24,7 +24,3 @@ minetest.register_on_mods_loaded(function()
 		end
 	end
 end)
-
---minetest.register_globalstep(function(dtime)
---	print(settings:get("dedicated_server_step"))
---end)

@@ -1,0 +1,4 @@
+textures ={
+https://github.com/Gerold55/MineClone-2-Textures
+https://forum.minetest.net/viewtopic.php?t=16407
+}
