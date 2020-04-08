@@ -3,6 +3,11 @@
 > Designed for Minetest 5.2.0
 
 >Built using textures from <a href="https://forum.minetest.net/viewtopic.php?t=16407">Mineclone 2</a> 
+
+---
+
+## Be sure to install the clientside mod for this game mode: <a href="https://github.com/oilboi/crafter_client">Download here</a>
+
 ---
 
 # ALPHA STATE CHANGELOG
