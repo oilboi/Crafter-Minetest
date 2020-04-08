@@ -85,13 +85,15 @@ function minetest.item_drop(itemstack, dropper, pos)
 	local p = table.copy(pos)
 	local sneak = dropper:get_player_control().sneak
 	local cnt
-	if not sneak then
-		cnt = itemstack:get_count()
-	else
-		cnt = 1
-	end
 	if dropper_is_player then
 		p.y = p.y + 1.2
+		if not sneak then
+			cnt = itemstack:get_count()
+		else
+			cnt = 1
+		end
+	else
+		cnt = itemstack:get_count()
 	end
 	local item = itemstack:take_item(cnt)
 	local obj = minetest.add_item(p, item)
