@@ -46,11 +46,11 @@ end
 function main.grassSound(table)
 	table = table or {}
 	table.dig = table.dig or
-			{name = "leaves",gain=0.3}
+			{name = "leaves",gain=0.2}
 	table.footstep = table.footstep or
 			{name = "leaves", gain = 0.2}
 	table.dug = table.dug or
-			{name = "leaves", gain = 1.0}
+			{name = "leaves", gain = 0.5}
 	table.placing = table.placing or
 			{name = "leaves", gain = 0.5}
 	--default.node_sound_defaults(table)
