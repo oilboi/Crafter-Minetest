@@ -255,7 +255,7 @@ minetest.register_node("tnt:uranium_tnt", {
 		local obj = minetest.add_entity(pos,"tnt:tnt")
 		local range = 50
 		obj:get_luaentity().range = range
-		obj:get_luaentity().timer = -5
+		obj:get_luaentity().timer = 7
 		obj:get_luaentity().extreme = true
 		
 		minetest.remove_node(pos)
