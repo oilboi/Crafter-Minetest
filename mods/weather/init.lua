@@ -1,193 +1,157 @@
---[[
-when updating check if the modified node is below the current entity position
-
-or when dug check if below
-
-when placed check if above
-
-if finding node fails and player is under direct sunlight then
-do weather effects with the y pos half way down the column of the weather particle spawner
+local weather_max = 1
+local weather_type = math.random(0,weather_max)
+local weather_timer = 0
 
 
-
---add all nodes to node list
-local all_nodes = {}
-minetest.register_on_mods_loaded(function()
-	for name in pairs(minetest.registered_nodes) do
-		if name ~= "air" and name ~= "ignore" then
-			table.insert(all_nodes,name)
-		end
-	end
-end)
-
-local spawn_weather = function(player)
-	local pos = player:get_pos()
-	local radius = 10
-	local meta = player:get_meta()
-	local particle_table = {}
-	
-	local min = vector.subtract(pos, 10)
-	local max = vector.add(pos, 10)
-	
-	
-	local area_index = minetest.find_nodes_in_area_under_air(min, max, all_nodes)
-	
-	
-	
-	
-	local spawn_table = {}
-	--find the highest y value
-	for _,index in pairs(area_index) do
-		if not spawn_table[index.x] then spawn_table[index.x] = {} end
-		if not spawn_table[index.x][index.z] then
-			spawn_table[index.x][index.z] = index.y
-		elseif spawn_table[index.x][index.z] < index.y then
-			spawn_table[index.x][index.z] = index.y
-		end
-	end
-	
-	for x,x_index in pairs(spawn_table) do
-		for z,y in pairs(x_index) do
-			local lightlevel = minetest.get_node_light(vector.new(x,y+1,z), 0.5)
-			--print(lightlevel)
-			if lightlevel >= 14 then
-				--minetest.add_item(vector.new(x,y+1,z),ItemStack("main:glass"))
-				--local node_list = minetest.find_nodes_in_area_under_air(vector.new(pos.x+x,pos.y-10,pos.z+z), vector.new(pos.x+x,pos.y+10,pos.z+z), all_nodes)
-				--print(dump(minetest.registered_nodes))
-				
-				if math.random() > 0.995 then
-					--make it so buildable to nodes get replaced
-					local node = minetest.get_node(vector.new(x,y,z)).name
-					local buildable = minetest.registered_nodes[node].buildable_to
-					local walkable = minetest.registered_nodes[node].walkable
-					local liquid = (minetest.registered_nodes[node].liquidtype ~= "none")
-					
-					if not liquid then
-						if not buildable and minetest.get_node(vector.new(x,y+1,z)).name ~= "weather:snow" and walkable == true then
-							minetest.set_node(vector.new(x,y+1,z),{name="weather:snow"})
-						elseif buildable == true and minetest.get_node(vector.new(x,y,z)).name ~= "weather:snow" then
-							minetest.set_node(vector.new(x,y,z),{name="weather:snow"})
-						end
-					end
-				end
-				
-				local id = minetest.add_particlespawner({
-					amount = 2,
-					-- Number of particles spawned over the time period `time`.
-
-					time = 0,
-					-- Lifespan of spawner in seconds.
-					-- If time is 0 spawner has infinite lifespan and spawns the `amount` on
-					-- a per-second basis.
-
-					minpos = vector.new(x-0.5,y,z-0.5),
-					maxpos = vector.new(x+0.5,y+20,z+0.5),
-					minvel = {x=-0.2, y=-0.2, z=-0.2},
-					maxvel = {x=0.2, y=-0.5, z=0.2},
-					minacc = {x=0, y=0, z=0},
-					maxacc = {x=0, y=0, z=0},
-					minexptime = 1,
-					maxexptime = 1,
-					minsize = 1,
-					maxsize = 1,
-					-- The particles' properties are random values between the min and max
-					-- values.
-					-- pos, velocity, acceleration, expirationtime, size
-
-					collisiondetection = true,
-					-- If true collide with `walkable` nodes and, depending on the
-					-- `object_collision` field, objects too.
-
-					collision_removal = true,
-					-- If true particles are removed when they collide.
-					-- Requires collisiondetection = true to have any effect.
-
-					object_collision = false,
-					-- If true particles collide with objects that are defined as
-					-- `physical = true,` and `collide_with_objects = true,`.
-					-- Requires collisiondetection = true to have any effect.
-
-					--attached = ObjectRef,
-					-- If defined, particle positions, velocities and accelerations are
-					-- relative to this object's position and yaw
-
-					--vertical = false,
-					-- If true face player using y axis only
-
-					texture = "snowflake_"..math.random(1,2)..".png",
-
-					playername = player:get_player_name(),
-					-- Optional, if specified spawns particles only on the player's client
-
-					--animation = {Tile Animation definition},
-					-- Optional, specifies how to animate the particles' texture
-
-					--glow = 0
-					-- Optional, specify particle self-luminescence in darkness.
-					-- Values 0-14.
-				})
-				table.insert(particle_table,id)
-			end
-		end
-	end
-	meta:set_string("id table",minetest.serialize(particle_table))
+--this tells the client mod to update the weather type
+local function_send_weather_type = function()
+	local channel = minetest.mod_channel_join("weather_type")
+	channel:send_all(tostring(weather_type))
+	channel:leave()
 end
 
---handle weather effects on players when joining
+local all_nodes = {}
+for name in pairs(minetest.registered_nodes) do
+	if name ~= "air" and name ~= "ignore" then
+		table.insert(all_nodes,name)
+	end
+end	
+
+--this sends the client all nodes that weather can be on top of
+--(everything)
 minetest.register_on_joinplayer(function(player)
-	minetest.after(2, function(player)
-		spawn_weather(player)
-	end,player)
-	player:set_sky({
-	base_color="#808080",
-	type="plain",
-	clouds=false,
+	minetest.after(2, function()
+		
+		local text = minetest.serialize(all_nodes)	
 	
-	day_sky = "#808080",
-	dawn_horizon = "#808080",
-	dawn_sky = "#808080",
-	fog_sun_tint = "#808080",
-	
-	night_sky="#000000",
-	night_horizon="#000000"
-	})
-	player:set_sun({visible=false})
-	player:set_moon({visible=false})
-	player:set_stars({visible=false})
+		local channel = minetest.mod_channel_join("weather_nodes")
+		channel:send_all(text)
+		channel:leave()
+	end)
 end)
 
---handle weather effects during game loop
-local weather_update_timer = 0
-minetest.register_globalstep(function(dtime)
-	weather_update_timer = weather_update_timer + dtime
-	if weather_update_timer > 1 then
-		weather_update_timer = 0
-		for _,player in ipairs(minetest.get_connected_players()) do
-			local meta = player:get_meta()
-			local pos = vector.round(player:get_pos())
+--this updates players skys since it cannot be done clientside
+local update_player_sky = function()
+	for _,player in ipairs(minetest.get_connected_players()) do
+		if weather_type ~= 0 then
+			player:set_sky({
+				base_color="#808080",
+				type="plain",
+				clouds=false,
+				
+				day_sky = "#808080",
+				dawn_horizon = "#808080",
+				dawn_sky = "#808080",
+				fog_sun_tint = "#808080",
+				
+				night_sky="#808080",
+				night_horizon="#808080"
+			})
+			player:set_sun({visible=false,sunrise_visible=false})
+			player:set_moon({visible=false})
+			player:set_stars({visible=false})
+		else
+			player:set_sky({
+				base_color="#8cbafa",
+				type="regular",
+				clouds=true,
+				
+				day_sky = "#8cbafa",
+				
+				dawn_horizon = "#bac1f0",
+				dawn_sky = "#b4bafa",
+				
+				night_sky="#006aff",
+				night_horizon="#4090ff"
 			
-			if meta:contains("weather old pos") then
-				local old_pos = minetest.string_to_pos(meta:get_string("weather old pos"))
-				if not vector.equals(pos,old_pos) then
-					if meta:contains("id table") then
-						local particle_table = minetest.deserialize(meta:get_string("id table"))
-						
-						for id in pairs(particle_table) do
-							minetest.delete_particlespawner(id, player:get_player_name())
-						end
-						meta:set_string("id table", nil)
-					end
-					--print("spawning weather")
-					spawn_weather(player)
+			
+			})
+			
+			player:set_sun({visible=true,sunrise_visible=true})
+			player:set_moon({visible=true})
+			player:set_stars({visible=true})
+		end
+	end
+end
+
+--spawn snow nodes
+local snow_timer = 0
+local do_snow = function(dtime)
+	snow_timer = snow_timer + dtime
+	if snow_timer > 2 then
+		snow_timer = 0
+		for _,player in ipairs(minetest.get_connected_players()) do
+			local pos = player:get_pos()
+			
+			local meta = player:get_meta()
+			local particle_table = {}
+			
+			local area = vector.new(80,60,80)
+			
+			local min = vector.subtract(pos, area)
+			local max = vector.add(pos, area)
+				
+			local area_index = minetest.find_nodes_in_area_under_air(min, max, all_nodes)
+
+			local spawn_table = {}
+			--find the highest y value
+			for _,index in pairs(area_index) do
+				if not spawn_table[index.x] then spawn_table[index.x] = {} end
+				if not spawn_table[index.x][index.z] then
+					spawn_table[index.x][index.z] = index.y
+				elseif spawn_table[index.x][index.z] < index.y then
+					spawn_table[index.x][index.z] = index.y
 				end
 			end
 			
-			meta:set_string("weather old pos", minetest.pos_to_string(pos))
+			for x,x_index in pairs(spawn_table) do
+				for z,y in pairs(x_index) do
+					local lightlevel = minetest.get_node_light(vector.new(x,y+1,z), 0.5)
+					if lightlevel >= 14 then
+						if math.random() > 0.995 then
+							--make it so buildable to nodes get replaced
+							local node = minetest.get_node(vector.new(x,y,z)).name
+							local buildable = minetest.registered_nodes[node].buildable_to
+							local walkable = minetest.registered_nodes[node].walkable
+							local liquid = (minetest.registered_nodes[node].liquidtype ~= "none")
+							
+							if not liquid then
+								if not buildable and minetest.get_node(vector.new(x,y+1,z)).name ~= "weather:snow" and walkable == true then
+									minetest.set_node(vector.new(x,y+1,z),{name="weather:snow"})
+								elseif buildable == true and minetest.get_node(vector.new(x,y,z)).name ~= "weather:snow" then
+									minetest.set_node(vector.new(x,y,z),{name="weather:snow"})
+								end
+							end
+						end
+						
+					end
+				end
+			end
 		end
+	end
+end
+
+
+
+--this sets random weather
+local weather_goal = math.random()
+local snow_timer = 0
+minetest.register_globalstep(function(dtime)
+	weather_timer = weather_timer + dtime
+	if weather_timer >= 1 then
+		weather_timer = 0
+		weather_type = 1--math.random(0,weather_max)
+		function_send_weather_type()
+		update_player_sky()
+	end
+	--spawn snow nodes
+	if weather_type == 1 then
+		do_snow(dtime)
 	end
 end)
 
-]]--
+
+
 
 minetest.register_node("weather:snow", {
     description = "Snow",
