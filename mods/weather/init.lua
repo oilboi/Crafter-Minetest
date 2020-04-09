@@ -188,6 +188,7 @@ minetest.register_node("weather:snow", {
     sounds = main.woolSound(),
     paramtype = "light",
 	drawtype = "nodebox",
+	walkable = false,
     drop = {
 			max_items = 5,
 			items= {

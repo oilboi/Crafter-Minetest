@@ -34,7 +34,7 @@ minetest.register_globalstep(function(dtime)
 				player:set_fov(1.2, true)
 			end
 			if bunny_hopping == true then
-				player:set_physics_override({speed=2.5})
+				player:set_physics_override({speed=1.75})
 			else
 				player:set_physics_override({speed=1.5})
 			end
