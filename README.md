@@ -55,8 +55,12 @@
 - Make snow falling node
 - Add creative mode
 - Add trap chest and sticky piston
-- Added in Et QtFunny font info
-- Added in footers and books
+- Added Et QtFunny font info
+- Added footers and books
+- Added rain 
+- Added Book sounds
+- Changed TNT sound
+- Overhauled eating
 ---
 
 
