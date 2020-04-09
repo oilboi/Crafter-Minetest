@@ -84,7 +84,7 @@ minetest.register_globalstep(function(dtime)
 				if fov < 1.2 then
 					player:set_fov(fov + dtime, true)
 				elseif fov > 1.2 then
-							player:set_fov(1.2, true)
+					player:set_fov(1.2, true)
 				end
 				
 				player:set_physics_override({speed=1.5})
@@ -94,7 +94,7 @@ minetest.register_globalstep(function(dtime)
 				if fov > 1 then
 					player:set_fov(fov - dtime, true)
 				elseif fov < 1 then
-							player:set_fov(1, true)
+					player:set_fov(1, true)
 				end
 				
 				player:set_physics_override({speed=1})
@@ -123,8 +123,8 @@ minetest.register_globalstep(function(dtime)
 					local ps = minetest.add_particlespawner({
 						amount = 100,
 						time = 0,
-						minpos = {x=0, y=-1.5, z=0.5},
-						maxpos = {x=0, y=1.7, z=0.5},
+						minpos = {x=-0.2, y=-1.5, z=0.5},
+						maxpos = {x=0.2, y=1.7, z=0.5},
 						minvel = vector.new(-0.5,0,-0.5),
 						maxvel = vector.new(0.5,0,0.5),
 						minacc = {x=0, y=-9.81, z=1},

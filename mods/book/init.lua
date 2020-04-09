@@ -1,5 +1,6 @@
 --this is the gui for un-inked books
 local open_book_gui = function(itemstack, user)
+	minetest.sound_play("book_open", {to_player=user:get_player_name()})
 	local meta = itemstack:get_meta()
 	local book_text = meta:get_string("book.book_text")
 	if book_text == "" then
@@ -23,6 +24,7 @@ end
 
 --this is the gui for permenantly written books
 local open_book_inked_gui = function(itemstack, user)
+	minetest.sound_play("book_open", {to_player=user:get_player_name()})
 	local meta = itemstack:get_meta()
 	local book_text = meta:get_string("book.book_text")
 	
@@ -33,8 +35,7 @@ local open_book_inked_gui = function(itemstack, user)
 		"style_type[textarea;textcolor=black;border=false;noclip=false]"..
 		"textarea[0.3,0;9,0.5;;;"..book_title.."]"..
 		"textarea[0.3,0.3;9,9;;;"..book_text.."]"..
-		"button_exit[4,8.3;1,1;close;close]"
-		
+		"button_exit[4,8.3;1,1;book.book_close;close]"
 	minetest.show_formspec(user:get_player_name(), "book.book_gui", book_writing_formspec)
 end
 
@@ -52,15 +53,18 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		
 		player:set_wielded_item(itemstack)
 		minetest.close_formspec(player:get_player_name(), "book.book_gui")
+		minetest.sound_play("book_write", {to_player=player:get_player_name()})
 	elseif fields["book.book_ink"] and fields["book.book_text"] and fields["book.book_text"] then
 		local itemstack = ItemStack("book:book_written")
 		local meta = itemstack:get_meta()
 		meta:set_string("book.book_text", fields["book.book_text"])
 		meta:set_string("book.book_title", fields["book.book_title"])	
 		meta:set_string("description", fields["book.book_title"])
-		
 		player:set_wielded_item(itemstack)
 		minetest.close_formspec(player:get_player_name(), "book.book_gui")
+		minetest.sound_play("book_close", {to_player=player:get_player_name()})
+	elseif fields["book.book_close"] then
+		minetest.sound_play("book_close", {to_player=player:get_player_name()})
 	end
 end)
 
