@@ -1,34 +1,8 @@
-local weather_max = 1
+local weather_max = 2
 local weather_type = math.random(0,weather_max)
 local weather_timer = 0
 
 
---this tells the client mod to update the weather type
-local function_send_weather_type = function()
-	local channel = minetest.mod_channel_join("weather_type")
-	channel:send_all(tostring(weather_type))
-	channel:leave()
-end
-
-local all_nodes = {}
-for name in pairs(minetest.registered_nodes) do
-	if name ~= "air" and name ~= "ignore" then
-		table.insert(all_nodes,name)
-	end
-end	
-
---this sends the client all nodes that weather can be on top of
---(everything)
-minetest.register_on_joinplayer(function(player)
-	minetest.after(2, function()
-		
-		local text = minetest.serialize(all_nodes)	
-	
-		local channel = minetest.mod_channel_join("weather_nodes")
-		channel:send_all(text)
-		channel:leave()
-	end)
-end)
 
 --this updates players skys since it cannot be done clientside
 local update_player_sky = function()
@@ -63,8 +37,6 @@ local update_player_sky = function()
 				
 				night_sky="#006aff",
 				night_horizon="#4090ff"
-			
-			
 			})
 			
 			player:set_sun({visible=true,sunrise_visible=true})
@@ -74,27 +46,62 @@ local update_player_sky = function()
 	end
 end
 
+--this tells the client mod to update the weather type
+local function_send_weather_type = function()
+	local channel = minetest.mod_channel_join("weather_type")
+	channel:send_all(tostring(weather_type))
+	channel:leave()
+end
+
+--index all mods
+local all_nodes = {}
+minetest.register_on_mods_loaded(function()
+	for name in pairs(minetest.registered_nodes) do
+		if name ~= "air" and name ~= "ignore" then
+			table.insert(all_nodes,name)
+		end
+	end	
+end)
+
+--this sends the client all nodes that weather can be on top of
+--(everything)
+minetest.register_on_joinplayer(function(player)
+	minetest.after(5, function()
+		
+		local text = minetest.serialize(all_nodes)
+		local channel = minetest.mod_channel_join("weather_nodes")
+		channel:send_all(text)
+		channel:leave()
+		
+		function_send_weather_type()
+		update_player_sky()
+	end)
+end)
+
+
 --spawn snow nodes
 local snow_timer = 0
 local do_snow = function(dtime)
 	snow_timer = snow_timer + dtime
-	if snow_timer > 2 then
+	if snow_timer > 3 then
 		snow_timer = 0
 		for _,player in ipairs(minetest.get_connected_players()) do
+			--print("running")
 			local pos = player:get_pos()
 			
 			local meta = player:get_meta()
 			local particle_table = {}
 			
-			local area = vector.new(80,60,80)
+			local area = vector.new(40,40,40)
 			
 			local min = vector.subtract(pos, area)
 			local max = vector.add(pos, area)
-				
+			
+			
 			local area_index = minetest.find_nodes_in_area_under_air(min, max, all_nodes)
+			
 
 			local spawn_table = {}
-			--find the highest y value
 			for _,index in pairs(area_index) do
 				if not spawn_table[index.x] then spawn_table[index.x] = {} end
 				if not spawn_table[index.x][index.z] then
@@ -103,29 +110,35 @@ local do_snow = function(dtime)
 					spawn_table[index.x][index.z] = index.y
 				end
 			end
+		
 			
+			--find the highest y value
+			local bulk_list = {}
 			for x,x_index in pairs(spawn_table) do
 				for z,y in pairs(x_index) do
-					local lightlevel = minetest.get_node_light(vector.new(x,y+1,z), 0.5)
-					if lightlevel >= 14 then
-						if math.random() > 0.995 then
+					if math.random() > 0.995 then
+						local lightlevel = minetest.get_node_light(vector.new(x,y+1,z), 0.5)
+						if lightlevel >= 14 then
 							--make it so buildable to nodes get replaced
 							local node = minetest.get_node(vector.new(x,y,z)).name
-							local buildable = minetest.registered_nodes[node].buildable_to
-							local walkable = minetest.registered_nodes[node].walkable
-							local liquid = (minetest.registered_nodes[node].liquidtype ~= "none")
+							local def = minetest.registered_nodes[node]
+							local buildable = def.buildable_to
+							local walkable = def.walkable
+							local liquid = (def.liquidtype ~= "none")
 							
 							if not liquid then
 								if not buildable and minetest.get_node(vector.new(x,y+1,z)).name ~= "weather:snow" and walkable == true then
-									minetest.set_node(vector.new(x,y+1,z),{name="weather:snow"})
-								elseif buildable == true and minetest.get_node(vector.new(x,y,z)).name ~= "weather:snow" then
-									minetest.set_node(vector.new(x,y,z),{name="weather:snow"})
+									table.insert(bulk_list, vector.new(x,y+1,z))
+								elseif buildable == true and node ~= "weather:snow" then
+									table.insert(bulk_list, vector.new(x,y,z))
 								end
 							end
 						end
-						
 					end
 				end
+			end
+			if bulk_list then
+				minetest.bulk_set_node(bulk_list, {name="weather:snow"})
 			end
 		end
 	end
@@ -134,13 +147,13 @@ end
 
 
 --this sets random weather
-local weather_goal = math.random()
-local snow_timer = 0
+local weather_timer_goal = (math.random(5,7)+math.random())*60
 minetest.register_globalstep(function(dtime)
 	weather_timer = weather_timer + dtime
-	if weather_timer >= 1 then
+	if weather_timer >= weather_timer_goal then
+		weather_timer_goal = (math.random(5,7)+math.random())*60
 		weather_timer = 0
-		weather_type = 1--math.random(0,weather_max)
+		weather_type = math.random(0,weather_max)
 		function_send_weather_type()
 		update_player_sky()
 	end
@@ -150,8 +163,21 @@ minetest.register_globalstep(function(dtime)
 	end
 end)
 
-
-
+local snowball_throw = function(player)
+	local pos = player:get_pos()
+	pos.y = pos.y + 1.625
+	--let other players hear the noise too
+	minetest.sound_play("woosh",{to_player=player:get_player_name(), pitch = math.random(80,100)/100})
+	minetest.sound_play("woosh",{pos=pos, exclude_player = player:get_player_name(), pitch = math.random(80,100)/100})
+	local snowball = minetest.add_entity(pos,"weather:snowball")
+	if snowball then
+		local vel = player:get_player_velocity()
+		snowball:set_velocity(vector.add(vel,vector.multiply(player:get_look_dir(),20)))
+		snowball:get_luaentity().thrower = player:get_player_name()
+		return(true)
+	end
+	return(false)
+end
 
 minetest.register_node("weather:snow", {
     description = "Snow",
@@ -189,22 +215,6 @@ minetest.register_node("weather:snow", {
 		}
 	},
 })
-
-local snowball_throw = function(player)
-	local pos = player:get_pos()
-	pos.y = pos.y + 1.625
-	--let other players hear the noise too
-	minetest.sound_play("woosh",{to_player=player:get_player_name(), pitch = math.random(80,100)/100})
-	minetest.sound_play("woosh",{pos=pos, exclude_player = player:get_player_name(), pitch = math.random(80,100)/100})
-	local snowball = minetest.add_entity(pos,"weather:snowball")
-	if snowball then
-		local vel = player:get_player_velocity()
-		snowball:set_velocity(vector.add(vel,vector.multiply(player:get_look_dir(),20)))
-		snowball:get_luaentity().thrower = player:get_player_name()
-		return(true)
-	end
-	return(false)
-end
 
 minetest.register_craftitem("weather:snowball", {
 	description = "Snowball",
