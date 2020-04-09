@@ -65,6 +65,8 @@ end)
 
 --this sends the client all nodes that weather can be on top of
 --(everything)
+
+--have the client send the server the ready signal
 minetest.register_on_joinplayer(function(player)
 	minetest.after(5, function()
 		

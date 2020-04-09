@@ -1,13 +1,4 @@
---[[
-might have to calculate this in a local memory table then set the nodes using a voxelmanip
-]]--
-
-
-
 ---set a torch source
-
-
-
 local path = minetest.get_modpath("redstone")
 dofile(path.."/functions.lua")
 dofile(path.."/wire.lua")
