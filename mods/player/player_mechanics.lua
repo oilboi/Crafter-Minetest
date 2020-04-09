@@ -1,12 +1,10 @@
-local running_send = minetest.mod_channel_join("running_send")
-local running_receive = minetest.mod_channel_join("running_receive")
+local player_state_channel = minetest.mod_channel_join("player.player_movement_state")
 
 minetest.register_on_modchannel_message(function(channel_name, sender, message)
-	if channel_name == "running_send" then
+	if channel_name == "player.player_movement_state" then
 		local player = minetest.get_player_by_name(sender)
 		local meta = player:get_meta()
-		print(message)
-		meta:set_string("player.player_running", message)
+		meta:set_string("player.player_movement_state", message)
 	end
 end)
 
@@ -14,29 +12,38 @@ minetest.register_globalstep(function(dtime)
 	for _,player in ipairs(minetest.get_connected_players()) do
 		local meta = player:get_meta()
 		
-		local run = (meta:get_string("player.player_running") == "true")
+		local running = (meta:get_string("player.player_movement_state") == "1")
+		local bunny_hopping = (meta:get_string("player.player_movement_state") == "2")
+		local sneaking = (meta:get_string("player.player_movement_state") == "3")
+		
+		--print(running, bunny_hopping)
+		
 		
 		--running FOV modifier
-		if run then
-			--remember to implement hunger
+		if running or bunny_hopping then
 			local fov = player:get_fov()
 			if fov == 0 then
 				fov = 1
 			end
-			
-			if fov < 1.2 then
+
+			if fov+dtime < 1.2 then
 				player:set_fov(fov + dtime, true)
-			elseif fov > 1.2 then
+			elseif fov-dtime > 1.2 then
+				player:set_fov(fov - dtime, true)
+			elseif fov+dtime > 1.2 then
 				player:set_fov(1.2, true)
 			end
-			
-			player:set_physics_override({speed=1.5})
+			if bunny_hopping == true then
+				player:set_physics_override({speed=2.5})
+			else
+				player:set_physics_override({speed=1.5})
+			end
 		else
 			local meta = player:get_meta()
 			local fov = player:get_fov()
-			if fov > 1 then
+			if fov-dtime > 1 then
 				player:set_fov(fov - dtime, true)
-			elseif fov < 1 then
+			elseif fov-dtime < 1 then
 				player:set_fov(1, true)
 			end
 			
@@ -45,11 +52,13 @@ minetest.register_globalstep(function(dtime)
 		end
 		
 		--sneaking
-		if sneak then
+		if sneaking then
 			player:set_eye_offset({x=0,y=-1,z=0},{x=0,y=-1,z=0})
 		else
 			player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
 		end
+		
+		--remember to implement hunger
 		
 		--eating
 		if player:get_player_control().RMB then
