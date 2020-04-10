@@ -154,8 +154,9 @@ minetest.register_node("main:tree", {
 		if not meta:contains("placed") then
 			--remove tree
 			for y = -6,6 do
+				local name = minetest.get_node(vector.new(pos.x,pos.y+y,pos.z)).name
 				--print(y)
-				if minetest.get_node(vector.new(pos.x,pos.y+y,pos.z)).name == "main:tree" then
+				if name == "main:tree" or name == "redstone:node_activated_tree" then
 					minetest.node_dig(vector.new(pos.x,pos.y+y,pos.z), node, digger)
 				end
 			end

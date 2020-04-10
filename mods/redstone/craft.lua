@@ -13,7 +13,7 @@ minetest.register_craft({
 	}
 })
 minetest.register_craft({
-	output = "redstone:switch_off",
+	output = "redstone:lever_off",
 	recipe = {
 		{"main:stick"},
 		{"main:stone"},

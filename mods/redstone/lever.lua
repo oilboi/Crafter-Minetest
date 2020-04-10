@@ -18,7 +18,7 @@ for name,def in pairs(minetest.registered_nodes) do
 end
 
 
---this removes power from node that the switch is powering
+--this removes power from node that the lever is powering
 local function on_lever_destroy(pos)
 	local param2 = minetest.get_node(pos).param2
 	local self = minetest.get_node(pos)
@@ -31,23 +31,23 @@ local function on_lever_destroy(pos)
 	local def = minetest.registered_nodes[name]
 	if def.drawtype == "normal" and string.match(name, "redstone:node_activated_")then
 		name = "main:"..string.gsub(name, "redstone:node_activated_", "")
-		minetest.set_node(pos, {name=name})
+		minetest.swap_node(pos, {name=name})
 		redstone.collect_info(pos)
 	end
 end
 
 
-minetest.register_node("redstone:switch_off", {
-    description = "Switch",
+minetest.register_node("redstone:lever_off", {
+    description = "Lever",
     tiles = {"stone.png"},
-    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1},
+    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1,dig_immediate=1},
     sounds = main.stoneSound(),
     paramtype = "light",
 	paramtype2 = "wallmounted",
 	sunlight_propagates = true,
 	walkable = false,
 	drawtype= "nodebox",
-	drop="redstone:switch_off",
+	drop="redstone:lever_off",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -57,7 +57,7 @@ minetest.register_node("redstone:switch_off", {
 			},
 		},
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		minetest.set_node(pos, {name="redstone:switch_on",param2=node.param2})
+		minetest.set_node(pos, {name="redstone:lever_on",param2=node.param2})
 		local dir = minetest.wallmounted_to_dir(node.param2)
 		local pos = vector.add(dir,pos)
 		local name = minetest.get_node(pos).name
@@ -66,7 +66,7 @@ minetest.register_node("redstone:switch_off", {
 		if def.drawtype == "normal" and string.match(name, "main:") then
 			minetest.sound_play("lever", {pos=pos})
 			name = "redstone:node_activated_"..string.gsub(name, "main:", "")
-			minetest.set_node(pos,{name=name})
+			minetest.swap_node(pos,{name=name})
 			redstone.collect_info(pos)
 		else
 			minetest.sound_play("lever", {pos=pos,pitch=0.6})
@@ -74,17 +74,17 @@ minetest.register_node("redstone:switch_off", {
 	end,
 	on_destruct = on_lever_destroy,
 })
-minetest.register_node("redstone:switch_on", {
-    description = "Crafting Table",
+minetest.register_node("redstone:lever_on", {
+    description = "Lever On",
     tiles = {"stone.png"},
-    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1},
+    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1,dig_immediate=1},
     sounds = main.stoneSound(),
     paramtype = "light",
 	paramtype2 = "wallmounted",
 	sunlight_propagates = true,
 	walkable = false,
 	drawtype= "nodebox",
-	drop="redstone:switch_off",
+	drop="redstone:lever_off",
 	node_box = {
 		type = "fixed",
 		fixed = {
@@ -95,7 +95,7 @@ minetest.register_node("redstone:switch_on", {
 		},
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		minetest.sound_play("lever", {pos=pos,pitch=0.8})
-		minetest.set_node(pos, {name="redstone:switch_off",param2=node.param2})
+		minetest.set_node(pos, {name="redstone:lever_off",param2=node.param2})
 		on_lever_destroy(pos)
 	end,
 	on_destruct = on_lever_destroy,

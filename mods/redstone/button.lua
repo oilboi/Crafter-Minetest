@@ -1,14 +1,12 @@
---this removes power from node that the switch is powering
+--this removes power from node that the button is powering
 local function on_button_destroy(pos)
 	local param2 = minetest.get_node(pos).param2
-	local self = minetest.get_node(pos)
-	local dir = minetest.wallmounted_to_dir(self.param2)
-	
+	local dir = minetest.wallmounted_to_dir(param2)
 	local pos = vector.add(dir,pos)
 	local node = minetest.get_node(pos)
 	local name = node.name
-	
 	local def = minetest.registered_nodes[name]
+	
 	if def.drawtype == "normal" and string.match(name, "redstone:node_activated_") then
 		name = "main:"..string.gsub(name, "redstone:node_activated_", "")
 		minetest.set_node(pos, {name=name})
@@ -20,7 +18,7 @@ end
 minetest.register_node("redstone:button_off", {
     description = "Crafting Table",
     tiles = {"stone.png"},
-    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1},
+    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1,dig_immediate=1},
     sounds = main.stoneSound(),
     paramtype = "light",
 	paramtype2 = "wallmounted",
@@ -60,7 +58,7 @@ minetest.register_node("redstone:button_off", {
 minetest.register_node("redstone:button_on", {
     description = "Crafting Table",
     tiles = {"stone.png"},
-    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1},
+    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1,dig_immediate=1},
     sounds = main.stoneSound(),
     paramtype = "light",
 	paramtype2 = "wallmounted",

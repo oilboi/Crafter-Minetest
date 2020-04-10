@@ -4,7 +4,7 @@ local items = {
 "redstone:repeater_off_0 50", 
 "redstone:comparator_0 50", 
 "redstone:torch 50", 
-"redstone:switch_off 50", 
+"redstone:lever_off 50", 
 "redstone:button_off 50", 
 "redstone:piston_off 50",
 "redstone:light_off 50",

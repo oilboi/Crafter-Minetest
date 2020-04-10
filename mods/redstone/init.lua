@@ -1,9 +1,12 @@
----set a torch source
+--define the class
+redstone = {}
+local r_index = {}
+
 local path = minetest.get_modpath("redstone")
 dofile(path.."/functions.lua")
 dofile(path.."/wire.lua")
 dofile(path.."/torch.lua")
-dofile(path.."/switches.lua")
+dofile(path.."/lever.lua")
 dofile(path.."/button.lua")
 dofile(path.."/repeater.lua")
 dofile(path.."/light.lua")
@@ -16,9 +19,6 @@ dofile(path.."/player_detector.lua")
 dofile(path.."/space_maker.lua")
 dofile(path.."/pressure_plate.lua")
 
-redstone = {}
-
-local r_index = {}
 
 get_old_power = function(pos)
 	local meta = minetest.get_meta(pos)
