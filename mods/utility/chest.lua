@@ -8,7 +8,7 @@ function chest.get_chest_formspec(pos)
 		"background[-0.19,-0.25;9.41,9.49;gui_hb_bg.png]"..
 		"list[nodemeta:" .. spos .. ";main;0,0.3;9,4;]" ..
 		"list[current_player;main;0,4.5;9,1;]" ..
-		"list[current_player;main;0,6.08;9,3;8]" ..
+		"list[current_player;main;0,6.08;9,3;9]" ..
 		"listring[nodemeta:" .. spos .. ";main]" ..
 		"listring[current_player;main]" --..
 		--default.get_hotbar_bg(0,4.85)
