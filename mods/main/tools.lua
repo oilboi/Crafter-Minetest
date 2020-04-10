@@ -32,7 +32,7 @@ for level,material in pairs(material) do
 			sound = {breaks = {name="tool_break",gain=0.4}}, -- change this
 			groups = {flammable = 2, tool=1 },
 			--torch rightclick - hacked in since api doesn't call on_place correctly
-			on_place = function(itemstack, placer, pointed_thing)
+			on_place = on_rightclick or function(itemstack, placer, pointed_thing)
 				local inv = placer:get_inventory()
 				local torch = inv:contains_item("main", "torch:torch")
 				local is_air = minetest.get_node(pointed_thing.above).name == "air"
@@ -42,10 +42,6 @@ for level,material in pairs(material) do
 				local walkable = noddef.walkable
 				local sneak = placer:get_player_control().sneak
 				
-				if not sneak and noddef.on_rightclick then
-					minetest.item_place(itemstack, placer, pointed_thing)
-					return
-				end
 				
 				if torch and is_air and walkable then
 					if diff == 0 then
