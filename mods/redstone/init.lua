@@ -417,20 +417,34 @@ minetest.register_craftitem("redstone:dust", {
 	on_place = function(itemstack, placer, pointed_thing)
 		if not pointed_thing.type == "node" then
 			return
+		end		
+		local sneak = placer:get_player_control().sneak
+		local noddef = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
+		if not sneak and noddef.on_rightclick then
+			minetest.item_place(itemstack, placer, pointed_thing)
+			return
 		end
-		local pos = pointed_thing.above
-		if minetest.registered_nodes[minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name].walkable and minetest.get_node(pointed_thing.above).name == "air" then
-			minetest.add_node(pointed_thing.above, {name="redstone:dust_0"})
-			itemstack:take_item(1)
-			--print(minetest.get_node(pointed_thing.above).param1)
-			--minetest.after(0,function(pointed_thing)
-			--	redstone.add(pos)
-			--end,pointed_thing)
+		
+		local _,worked = minetest.item_place(ItemStack("redstone:dust_0"), placer, pointed_thing)
+		if worked then
+			itemstack:take_item()
 			return(itemstack)
 		end
+
+
+			--minetest.add_node(pointed_thing.above, {name="redstone:dust_0"})
+			--itemstack:take_item(1)
+			--minetest.sound_play("stone", {pos=pointed_thing.above})
+			--return(itemstack)
+		--end
 	end,
 })
 
+minetest.register_craft({
+	type = "shapeless",
+	output = "redstone:dust",
+	recipe = {"redstone:dust"},
+})
 
 --8 power levels 8 being the highest
 local color = 0
@@ -454,7 +468,8 @@ for i = 0,8 do
 			type = "fixed",
 			fixed = {-1/2, -1/2, -1/2, 1/2, -1/2+1/16, 1/2},
 		},
-		groups={dig_immediate=1,attached=1,redstone_dust=1,redstone=1,redstone_power=i},
+		sounds = main.stoneSound(),
+		groups={dig_immediate=1,attached_node=1,redstone_dust=1,redstone=1,redstone_power=i},
 		drop="redstone:dust",
 		on_construct = function(pos)
 			redstone.collect_info(pos)

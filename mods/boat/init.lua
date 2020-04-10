@@ -204,6 +204,13 @@ minetest.register_craftitem("boat:boat", {
 			return
 		end
 		
+		local sneak = placer:get_player_control().sneak
+		local noddef = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
+		if not sneak and noddef.on_rightclick then
+			minetest.item_place(itemstack, placer, pointed_thing)
+			return
+		end
+		
 		if minetest.get_item_group(minetest.get_node(pointed_thing.under).name, "water")>0 then
 			minetest.add_entity(pointed_thing.under, "boat:boat")
 		else

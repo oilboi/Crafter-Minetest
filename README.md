@@ -61,6 +61,12 @@
 - Added Book sounds
 - Changed TNT sound
 - Overhauled eating
+- Add in client weather handling
+- Add in client movement handling
+- Made sapling fuel
+- Fix bed bed, boat, book, sapling, wood, minecart, rail, redstone, and boat placement
+- Add sounds to redstone dust
+- make redstone dust an attached node
 ---
 
 

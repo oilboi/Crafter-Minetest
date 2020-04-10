@@ -101,7 +101,7 @@ minetest.register_node("main:glass", {
 minetest.register_node("main:dirt", {
     description = "Dirt",
     tiles = {"dirt.png"},
-    groups = {dirt = 1, soft = 1, shovel = 1, hand = 1, soil=1,pathable = 1},
+    groups = {dirt = 1, soft = 1, shovel = 1, hand = 1, soil=1,pathable = 1, farm_tillable=1},
     sounds = main.dirtSound(),
     paramtype = "light",
 })
@@ -109,7 +109,7 @@ minetest.register_node("main:dirt", {
 minetest.register_node("main:grass", {
     description = "Grass",
     tiles = {"grass.png"},
-    groups = {dirt = 1, soft = 1, shovel = 1, hand = 1, soil=1,pathable = 1},
+    groups = {dirt = 1, soft = 1, shovel = 1, hand = 1, soil=1,pathable = 1, farm_tillable=1},
     sounds = main.dirtSound(),
     drop="main:dirt",
 })
@@ -128,6 +128,17 @@ minetest.register_node("main:tree", {
     sounds = main.woodSound(),
     --set metadata so treecapitator doesn't destroy houses
     on_place = function(itemstack, placer, pointed_thing)
+		if not pointed_thing.type == "node" then
+			return
+		end
+		
+		local sneak = placer:get_player_control().sneak
+		local noddef = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
+		if not sneak and noddef.on_rightclick then
+			minetest.item_place(itemstack, placer, pointed_thing)
+			return
+		end
+		
 		local pos = pointed_thing.above
 		minetest.item_place_node(itemstack, placer, pointed_thing)
 		local meta = minetest.get_meta(pos)

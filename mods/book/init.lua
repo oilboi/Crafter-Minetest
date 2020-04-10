@@ -77,6 +77,15 @@ minetest.register_craftitem("book:book",{
 	inventory_image = "book.png",
 	
 	on_place = function(itemstack, user, pointed_thing)
+		if not pointed_thing.type == "node" then
+			return
+		end
+		local sneak = user:get_player_control().sneak
+		local noddef = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
+		if not sneak and noddef.on_rightclick then
+			minetest.item_place(itemstack, user, pointed_thing)
+			return
+		end
 		print("make books placable on the ground")
 		open_book_gui(itemstack, user)
 	end,
@@ -94,6 +103,15 @@ minetest.register_craftitem("book:book_written",{
 	inventory_image = "book_written.png",
 	
 	on_place = function(itemstack, user, pointed_thing)
+		if not pointed_thing.type == "node" then
+			return
+		end
+		local sneak = user:get_player_control().sneak
+		local noddef = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
+		if not sneak and noddef.on_rightclick then
+			minetest.item_place(itemstack, user, pointed_thing)
+			return
+		end
 		print("make books placable on the ground")
 		open_book_inked_gui(itemstack, user)
 	end,

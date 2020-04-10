@@ -52,7 +52,21 @@ minetest.register_node("bed:bed", {
     sounds = main.woodSound({placing=""}),
     drawtype = "nodebox",
 	node_placement_prediction = "",
-	on_place = function(itemstack, placer, pointed_thing)	
+	on_place = function(itemstack, placer, pointed_thing)
+		
+		if not pointed_thing.type == "node" then
+			return
+		end
+		
+		local sneak = placer:get_player_control().sneak
+		local noddef = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
+		if not sneak and noddef.on_rightclick then
+			minetest.item_place(itemstack, placer, pointed_thing)
+			return
+		end
+		
+		
+		
 		local _,pos = minetest.item_place_node(ItemStack("bed:bed_front"), placer, pointed_thing)
 		
 		if pos then

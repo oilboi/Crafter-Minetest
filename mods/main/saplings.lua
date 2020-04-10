@@ -20,6 +20,15 @@ minetest.register_node("main:sapling", {
 		if not pointed_thing.type == "node" then
 			return
 		end
+		
+		local sneak = placer:get_player_control().sneak
+		local noddef = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
+		
+		if not sneak and noddef.on_rightclick then
+			minetest.item_place(itemstack, placer, pointed_thing)
+			return
+		end
+		
 		local buildable = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name].buildable_to
 		--replace buildable
 		if buildable and minetest.get_node_group(minetest.get_node(vector.new(pointed_thing.under.x,pointed_thing.under.y-1,pointed_thing.under.z)).name, "soil") > 0 then

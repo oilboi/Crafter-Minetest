@@ -1,10 +1,8 @@
 --Quick definition of hoes
 local material = {"wood","stone","iron","gold","diamond"}
 
-
-
 local function till_soil(pos)
-	local is_dirt = minetest.get_node_group(minetest.get_node(pos).name, "dirt") > 0
+	local is_dirt = minetest.get_node_group(minetest.get_node(pos).name, "farm_tillable") > 0
 	local is_farmland = minetest.get_node_group(minetest.get_node(pos).name, "farmland") > 0
 	if is_dirt and not is_farmland then
 		minetest.sound_play("dirt",{pos=pos})
@@ -32,12 +30,25 @@ for level,material in pairs(material) do
 		groups = {flammable = 2, tool=1 },
 		
 		on_place = function(itemstack, placer, pointed_thing)
+			local noddef = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
+			local sneak = placer:get_player_control().sneak
+			
+			if not sneak and noddef.on_rightclick then
+				minetest.item_place(itemstack, placer, pointed_thing)
+				return
+			end
+		
 			local tilled = till_soil(pointed_thing.under)
-			if tilled == true then itemstack:add_wear(wear) end
+			if tilled == true then 
+				if minetest.registered_nodes[minetest.get_node(vector.new(pointed_thing.under.x,pointed_thing.under.y+1,pointed_thing.under.z)).name].buildable_to then
+					minetest.dig_node(vector.new(pointed_thing.under.x,pointed_thing.under.y+1,pointed_thing.under.z))
+				end
+				itemstack:add_wear(wear)
+			end
 			
 			local damage = itemstack:get_wear()
-			
-			if damage <= 0 then
+			print(damage)
+			if damage <= 0 and tilled == true  then
 				minetest.sound_play("tool_break",{object=placer})
 			end
 			return(itemstack)
