@@ -1,11 +1,13 @@
 local weather_max = 2
-local weather_type = math.random(0,weather_max)
+weather_type = math.random(0,weather_max)
 local weather_timer = 0
 
+local path = minetest.get_modpath(minetest.get_current_modname())
+dofile(path.."/commands.lua")
 
 
 --this updates players skys since it cannot be done clientside
-local update_player_sky = function()
+update_player_sky = function()
 	for _,player in ipairs(minetest.get_connected_players()) do
 		if weather_type ~= 0 then
 			player:set_sky({
@@ -47,7 +49,7 @@ local update_player_sky = function()
 end
 
 --this tells the client mod to update the weather type
-local function_send_weather_type = function()
+function_send_weather_type = function()
 	local channel = minetest.mod_channel_join("weather_type")
 	channel:send_all(tostring(weather_type))
 	channel:leave()

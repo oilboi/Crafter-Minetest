@@ -45,6 +45,7 @@ pig.jump = function(self)
 						if walkable then
 							local distance = vector.subtract(collision_point,pos).y-self.object:get_properties().collisionbox[2]+0.4
 							if distance >= -0.11 then
+								print("Jumping")
 								local vel = self.object:get_velocity()
 								self.jump_timer = 0.5
 								self.object:add_velocity(vector.new(vel.x,5,vel.z))

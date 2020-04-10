@@ -67,6 +67,8 @@
 - Fix bed bed, boat, book, sapling, wood, minecart, rail, redstone, and boat placement
 - Add sounds to redstone dust
 - make redstone dust an attached node
+- Fixed treecaptitator not cutting down part of tree when lever is powering one of it's nodes
+- Added command for users with "server" privelage to control weather
 ---
 
 
