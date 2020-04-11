@@ -37,6 +37,7 @@ pig.speed = 5
 pig.jump_timer = 0
 
 pig.death_animation_timer = 0
+pig.dead = false
 
 pig.mob = true
 pig.hostile = false

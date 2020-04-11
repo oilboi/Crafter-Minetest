@@ -13,8 +13,6 @@ pig.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, 
 	
 	local hp = hp-hurt
 	
-	
-	
 	if (self.punched_timer <= 0 and hp > 1) or puncher == self.object then
 		self.hostile = true
 		self.hostile_timer = 20
@@ -35,6 +33,7 @@ pig.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, 
 		self.object:add_velocity(dir)
 	elseif self.punched_timer <= 0 and self.death_animation_timer == 0 then
 		self.death_animation_timer = 1
+		self.dead = true
 		minetest.sound_play("pig_die", {object=self.object, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
 		--self.object:set_texture_mod("^[colorize:red:90")
 		--self.child:set_texture_mod("^[colorize:red:90")
@@ -70,7 +69,7 @@ end
 
 --this makes the mob rotate and then die
 pig.manage_death_animation = function(self,dtime)
-	if self.death_animation_timer > 0 then
+	if self.death_animation_timer >= 0 and self.dead == true then
 		self.death_animation_timer = self.death_animation_timer - dtime
 		
 		local self_rotation = self.object:get_rotation()
@@ -89,8 +88,7 @@ pig.manage_death_animation = function(self,dtime)
 		self.object:set_animation({x=0,y=0}, 15, 0, true)
 		self.return_head_to_origin(self,dtime)
 		
-		if self.death_animation_timer < 0 then
-			print("dead")
+		if self.death_animation_timer <= 0 then
 			self.on_death(self)
 		end
 	end
