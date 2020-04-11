@@ -149,3 +149,13 @@ minetest.register_craft({
 		{"main:stick", "", "main:stick"}
 	}
 })
+
+minetest.register_craft({
+	output = "main:shears",
+	recipe = {
+		{"","main:iron"},
+		{"main:iron",""},
+	}
+})
+
+

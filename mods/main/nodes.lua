@@ -12,11 +12,12 @@ for id,ore in pairs(ores) do
 	local drops = {"main:"..ore.."ore"}
 	if ore == "diamond" then drops = {"main:diamond"} elseif ore == "coal" then drops = {"main:coal"} end
 	
+	print(ore,id)
 	
 	minetest.register_node("main:"..ore.."ore", {
 		description = ore:gsub("^%l", string.upper).." Ore",
 		tiles = {"stone.png^"..ore.."ore.png"},
-		groups = {stone = id, hard = id, pickaxe = 1, hand = 4,pathable = 1},
+		groups = {stone = id, pathable = 1},
 		sounds = main.stoneSound(),
 		--light_source = 14,--debugging ore spawn
 		drop = {
@@ -35,7 +36,7 @@ end
 minetest.register_node("main:stone", {
     description = "Stone",
     tiles = {"stone.png"},
-    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1},
+    groups = {stone = 1, hand = 1,pathable = 1},
     sounds = main.stoneSound(),
     --[[
     redstone_activation = function(pos)
@@ -60,7 +61,7 @@ minetest.register_node("main:stone", {
 minetest.register_node("main:cobble", {
     description = "Cobblestone",
     tiles = {"cobble.png"},
-    groups = {stone = 2, hard = 1, pickaxe = 2, hand = 4,pathable = 1},
+    groups = {stone = 1, pathable = 1},
     sounds = main.stoneSound(),
     --[[
     redstone_activation = function(pos)
@@ -87,10 +88,9 @@ minetest.register_node("main:glass", {
     tiles = {"glass.png"},
     drawtype = "glasslike",
 	paramtype = "light",
-	--paramtype2 = "glasslikeliquidlevel",
 	sunlight_propagates = true,
 	is_ground_content = false,
-    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1},
+    groups = {glass = 1, pathable = 1},
     sounds = main.stoneSound({
 		footstep = {name = "glass_footstep", gain = 0.4},
         dug =  {name = "break_glass", gain = 0.4},
@@ -101,7 +101,7 @@ minetest.register_node("main:glass", {
 minetest.register_node("main:dirt", {
     description = "Dirt",
     tiles = {"dirt.png"},
-    groups = {dirt = 1, soft = 1, shovel = 1, hand = 1, soil=1,pathable = 1, farm_tillable=1},
+    groups = {dirt = 1, soil=1,pathable = 1, farm_tillable=1},
     sounds = main.dirtSound(),
     paramtype = "light",
 })
@@ -109,7 +109,7 @@ minetest.register_node("main:dirt", {
 minetest.register_node("main:grass", {
     description = "Grass",
     tiles = {"grass.png"},
-    groups = {dirt = 1, soft = 1, shovel = 1, hand = 1, soil=1,pathable = 1, farm_tillable=1},
+    groups = {grass = 1, soil=1,pathable = 1, farm_tillable=1},
     sounds = main.dirtSound(),
     drop="main:dirt",
 })
@@ -117,14 +117,14 @@ minetest.register_node("main:grass", {
 minetest.register_node("main:sand", {
     description = "Sand",
     tiles = {"sand.png"},
-    groups = {sand = 1, soft = 1, shovel = 1, hand = 1, falling_node = 1,pathable = 1},
+    groups = {sand = 1, falling_node = 1,pathable = 1},
     sounds = main.sandSound(),
 })
 
 minetest.register_node("main:tree", {
     description = "Tree",
     tiles = {"treeCore.png","treeCore.png","treeOut.png","treeOut.png","treeOut.png","treeOut.png"},
-    groups = {wood = 2, tree = 1, hard = 1, axe = 1, hand = 3,pathable = 1},
+    groups = {wood = 1, tree = 1, pathable = 1},
     sounds = main.woodSound(),
     --set metadata so treecapitator doesn't destroy houses
     on_place = function(itemstack, placer, pointed_thing)
@@ -169,7 +169,7 @@ minetest.register_node("main:tree", {
 minetest.register_node("main:wood", {
     description = "Wood",
     tiles = {"wood.png"},
-    groups = {wood = 1, hard = 1, axe = 1, hand = 3,pathable = 1},
+    groups = {wood = 1, pathable = 1},
     sounds = main.woodSound(),
 })
 
@@ -182,7 +182,7 @@ minetest.register_node("main:leaves", {
 	paramtype = "light",
 	is_ground_content = false,	
     tiles = {"leaves.png"},
-    groups = {leaves = 1, plant = 1, axe = 1, hand = 0, leafdecay = 1},
+    groups = {leaves = 1, leafdecay = 1},
     sounds = main.grassSound(),
     drop = {
 		max_items = 1,
@@ -438,7 +438,7 @@ minetest.register_node("main:ladder", {
 		--wall_bottom = = <default>
 		--wall_side = = <default>
 	},
-	groups = {wood = 2, flammable = 2, attached_node=1},
+	groups = {wood = 1, flammable = 1, attached_node=1},
 	sounds = main.woodSound(),
 	on_place = function(itemstack, placer, pointed_thing)
 		--copy from torch

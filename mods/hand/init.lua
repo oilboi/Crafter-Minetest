@@ -8,17 +8,21 @@ minetest.register_item(":", {
 	tool_capabilities = {
 		full_punch_interval = 0.9,
 		max_drop_level = 0,
-		groupcaps = {
-			stone = {times={[4]=11.5,[3]=8.5,[2]=6.70,[1]=5.5}, uses=0, maxlevel=1},
-			dirt = {times={[4]=11.0,[3]=8.4,[2]=6.40,[1]=4.2}, uses=0, maxlevel=1},
-			sand = {times={[4]=11.0,[3]=8.4,[2]=6.40,[1]=4.2}, uses=0, maxlevel=1},
-			wood = {times={[4]=11.5,[3]=8.5,[2]=6.70,[1]=5.5}, uses=0, maxlevel=1},
-			leaves = {times={[4]=4.5,[3]=3.2,[2]=2.20,[1]=1.2}, uses=0, maxlevel=0},
-			wool = {times={[4]=4.5,[3]=3.2,[2]=2.20,[1]=1.2}, uses=0, maxlevel=0},
-			instant = {times={[1]=0.1,},uses=0,maxlevel=1},
+		groupcaps = {		
+			stone = {times={[1]=7.5,[2]=16,[3]=32,[4]=64,[5]=128},  uses=0, maxlevel=1}, --
+			dirt =  {times={[1]=0.75,[2]=1.5,[3]=3,[4]=6,[5]=12},   uses=0, maxlevel=1}, --
+			snow =  {times={[1]=0.75,[2]=1.5,[3]=3,[4]=6,[5]=12},   uses=0, maxlevel=1}, --
+			grass = {times={[1]=0.9,[2]=1.5,[3]=3,[4]=6,[5]=12},    uses=0, maxlevel=1}, --
+			sand =  {times={[1]=0.75,[2]=1.5,[3]=3,[4]=6,[5]=12},   uses=0, maxlevel=1}, --
+			wood =  {times={[1]=3,[2]=6,[3]=9,[4]=12,[5]=15},       uses=0, maxlevel=1}, --
+			leaves ={times={[1]=0.75,[2]=1.5,[3]=3,[4]=6,[5]=12},   uses=0, maxlevel=1}, --
+			wool =  {times={[1]=0.75,[2]=1.5,[3]=3,[4]=6,[5]=12},   uses=0, maxlevel=1}, --
+			glass = {times={[1]=0.75,[2]=1.5,[3]=3,[4]=6,[5]=12},   uses=0, maxlevel=1}, --
+			
+			--instant = {times={[1]=0.1,},uses=0,maxlevel=1},
 			dig_immediate = {times={[2]=0,[3]=0,[1]=0,},uses=0,maxlevel=1},
 		},
-		damage_groups = {fleshy=1},
+		damage_groups = {damage=1},
 	}
 })
 

@@ -15,6 +15,7 @@ minetest.register_node("minecart:rail",{
 		type = "fixed",
 		fixed = {-1/2, -1/2, -1/2, 1/2, -1/2+1/16, 1/2},
 	},
+	sounds = main.stoneSound(),
 	on_place = function(itemstack, placer, pointed_thing)
 		if not pointed_thing.type == "node" then
 			return
@@ -41,11 +42,11 @@ minetest.register_node("minecart:rail",{
 		if minetest.registered_nodes[minetest.get_node({x=pos.x,y=pos.y-1,z=pos.z}).name].walkable and minetest.get_node(pointed_thing.above).name == "air" then
 			minetest.set_node(pointed_thing.above, {name="minecart:rail"})
 			itemstack:take_item(1)
-			--print(minetest.get_node(pointed_thing.above).param1)
+			minetest.sound_play("stone",{pos=pointed_thing.above})
 			return(itemstack)
 		end
 	end,
-	groups={instant=1,rail=1},
+	groups={stone=1,wood=1,rail=1},
 })
 
 minetest.register_craft({

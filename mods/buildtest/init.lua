@@ -1,7 +1,7 @@
 minetest.register_node("buildtest:glass_pipe", {
 	description = "Glass Pipe",
 	tiles = {"glass_pipe.png"},
-	groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4},
+	groups = {glass = 1},
 	sounds = main.stoneSound(),
 	drawtype = "nodebox",
 	paramtype = "light",

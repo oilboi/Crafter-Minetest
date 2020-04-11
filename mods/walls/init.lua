@@ -140,7 +140,7 @@ def2.node_box = {
 	connect_right = { -1/16,   -1/2, -1/16,  1/2,   1/2,  1/16},
 }
 
-def2.connects_to = {"group:fence", "group:wood", "group:tree", "group:wall", "group:stone", "group:sand"}
+def2.connects_to = {"group:fence", "group:wood", "group:wall", "group:stone", "group:sand","group:glass"}
 def2.sunlight_propagates = true
 minetest.register_node(newname,def2)
 
