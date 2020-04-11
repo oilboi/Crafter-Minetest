@@ -85,7 +85,6 @@ for level,material in pairs(material) do
 			end
 			
 			local damage = itemstack:get_wear()
-			print(damage)
 			if damage <= 0 and tilled == true  then
 				minetest.sound_play("tool_break",{object=placer})
 			end

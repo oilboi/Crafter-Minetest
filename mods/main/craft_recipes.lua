@@ -158,4 +158,11 @@ minetest.register_craft({
 	}
 })
 
+--tool repair
+minetest.register_craft({
+	type = "toolrepair",
+	additional_wear = -0.02,
+})
+
+
 
