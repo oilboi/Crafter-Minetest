@@ -16,7 +16,6 @@ pig = {}
 
 
 pig.initial_properties = {
-	hp_max = 1,
 	physical = true,
 	collide_with_objects = false,
 	collisionbox = {-0.37, -0.4, -0.37, 0.37, 0.5, 0.37},
@@ -33,7 +32,7 @@ pig.initial_properties = {
 	--makes_footstep_sound = true,
 }
 
-pig.hp = 5
+pig.hp = 10
 pig.speed = 5
 pig.jump_timer = 0
 

@@ -44,6 +44,7 @@ pig.on_activate = function(self, staticdata, dtime_s)
 		self.child:set_animation({x=90,y=90}, 15, 0, true)
 	end
 	self.is_mob = true
+	self.object:set_armor_groups({immortal = 1})
 	--self.object:set_yaw(math.pi*math.random(-1,1)*math.random())
 end
 

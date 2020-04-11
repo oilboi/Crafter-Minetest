@@ -3,23 +3,28 @@
 
 --this controls what happens when the mob gets punched
 pig.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-	local hp = self.object:get_hp()
+	local hp = self.hp
+	
+	local hurt = tool_capabilities.damage_groups.damage
+	
+	if not hurt then
+		hurt = 1
+	end
+	
+	local hp = hp-hurt
+	
+	
 	
 	if (self.punched_timer <= 0 and hp > 1) or puncher == self.object then
 		self.hostile = true
 		self.hostile_timer = 20
 		self.punched_timer = 0.8
-		local hurt = tool_capabilities.damage_groups.fleshy
-		if not hurt then
-			hurt = 1
-		end
 		
-		self.object:set_hp(hp-hurt)
 		if hp > 1 then
 			minetest.sound_play("pig", {object=self.object, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
 		end
 		
-		self.hp = hp-hurt
+		self.hp = hp
 		
 
 		self.direction = vector.multiply(dir,-1)
@@ -31,6 +36,8 @@ pig.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, 
 	elseif self.punched_timer <= 0 and self.death_animation_timer == 0 then
 		self.death_animation_timer = 1
 		minetest.sound_play("pig_die", {object=self.object, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
+		--self.object:set_texture_mod("^[colorize:red:90")
+		--self.child:set_texture_mod("^[colorize:red:90")
 	end
 end
 
@@ -58,6 +65,7 @@ pig.on_death = function(self, killer)
 	})
 	local obj = minetest.add_item(pos,"mob:raw_porkchop")
 	self.child:get_luaentity().parent = nil
+	self.object:remove()
 end
 
 --this makes the mob rotate and then die
@@ -83,11 +91,7 @@ pig.manage_death_animation = function(self,dtime)
 		
 		if self.death_animation_timer < 0 then
 			print("dead")
-			self.object:punch(self.object, 2, 
-						{
-						full_punch_interval=1.5,
-						damage_groups = {fleshy=2},
-					})
+			self.on_death(self)
 		end
 	end
 end
