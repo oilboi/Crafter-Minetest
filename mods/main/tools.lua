@@ -8,6 +8,7 @@ for _,material in pairs(material) do
 		--print(id,tool,level,material)
 		local groupcaps
 		local damage
+		local wear
 		--shovel
 		if tool == "shovel" then
 			if material == "wood" then
@@ -18,6 +19,7 @@ for _,material in pairs(material) do
 					sand =  {times={[1]=0.4,[2]=1.5,[3]=3,[4]=6,[5]=12},    uses=59, maxlevel=1},
 				}
 				damage = 2.5
+				wear = 500
 			elseif material == "stone" then
 				groupcaps2={
 					dirt =  {times={[1]=0.2,[2]=0.2,[3]=1.5,[4]=3,[5]=6},   uses=131, maxlevel=1},
@@ -26,6 +28,7 @@ for _,material in pairs(material) do
 					sand =  {times={[1]=0.2,[2]=0.2,[3]=1.5,[4]=3,[5]=6},   uses=131, maxlevel=1},
 				}
 				damage = 3.5
+				wear = 400
 			elseif material == "iron" then
 				groupcaps2={
 					dirt =  {times={[1]=0.15,[2]=0.15,[3]=0.15,[4]=1.5,[5]=3}, uses=250, maxlevel=1},
@@ -34,6 +37,7 @@ for _,material in pairs(material) do
 					sand =  {times={[1]=0.15,[2]=0.15,[3]=0.15,[4]=1.5,[5]=3}, uses=250, maxlevel=1},
 				}
 				damage = 4.5
+				wear = 300
 			elseif material == "gold" then
 				groupcaps2={
 					dirt =  {times={[1]=0.1,[2]=0.1,[3]=0.1,[4]=0.1,[5]=1.5}, uses=32, maxlevel=1},
@@ -42,6 +46,7 @@ for _,material in pairs(material) do
 					sand =  {times={[1]=0.1,[2]=0.1,[3]=0.1,[4]=0.1,[5]=1.5}, uses=32, maxlevel=1},
 				}
 				damage = 2.5
+				wear = 1000
 			elseif material == "diamond" then
 				groupcaps2={
 					dirt =  {times={[1]= 0.1,[2]=0.1,[3]=0.1,[4]=0.1,[5]=1.5},     uses=1561, maxlevel=1},
@@ -50,8 +55,9 @@ for _,material in pairs(material) do
 					sand =  {times={[1]= 0.1,[2]=0.1,[3]=0.1,[4]=0.1,[5]=1.5},     uses=1561, maxlevel=1},
 				}
 				damage = 5.5
+				wear = 100
 			end
-		end
+		end		
 		--axe
 		if tool == "axe" then
 			if material == "wood" then
@@ -59,30 +65,33 @@ for _,material in pairs(material) do
 					wood = {times={[1]=1.5,[2]=3,[3]=6,[4]=9,[5]=12}, uses=59, maxlevel=1}
 				}
 				damage = 7
+				wear = 500
 			elseif material == "stone" then
 				groupcaps2={
 					wood = {times={[1]=0.75,[2]=0.75,[3]=3,[4]=6,[5]=9}, uses=131, maxlevel=1}
 				}
 				damage=9
+				wear = 400
 			elseif material == "iron" then
 				groupcaps2={
 					wood = {times={[1]=0.5,[2]=0.5,[3]=0.5,[4]=3,[5]=6}, uses=250, maxlevel=1}
 				}
 				damage = 9
+				wear = 300
 			elseif material == "gold" then
 				groupcaps2={
 					wood = {times={[1]=0.25,[2]=0.25,[3]=0.25,[4]=0.25,[5]=3}, uses=32, maxlevel=1}
 				}
 				damage = 7
+				wear = 1000
 			elseif material == "diamond" then
 				groupcaps2={
 					wood = {times={[1]= 0.4,[2]=0.4,[3]=0.4,[4]=0.4,[5]=3}, uses=1561, maxlevel=1}
 				}
 				damage = 9
+				wear = 100
 			end
-		end
-		
-		
+		end		
 		--pickaxe
 		if tool == "pick" then
 			if material == "wood" then
@@ -93,30 +102,35 @@ for _,material in pairs(material) do
 					glass = {times={[1]=1.15,[2]=16,[3]=32,[4]=64,[5]=128}, uses=59, maxlevel=1},
 				}
 				damage = 3
+				wear = 500
 			elseif material == "stone" then
 				groupcaps2={
 					stone = {times={[1]=0.6,[2]=0.6,[3]=32,[4]=64,[5]=128}, uses=131, maxlevel=1},
 					glass = {times={[1]=0.6,[2]=0.6,[3]=32,[4]=64,[5]=128}, uses=131, maxlevel=1},
 				}
 				damage=4
+				wear = 400
 			elseif material == "iron" then
 				groupcaps2={
 					stone = {times={[1]=0.4,[2]=0.4,[3]=0.4,[4]=32,[5]=64}, uses=250, maxlevel=1},
 					glass = {times={[1]=0.4,[2]=0.4,[3]=0.4,[4]=32,[5]=64}, uses=250, maxlevel=1},
 				}
 				damage = 5
+				wear = 300
 			elseif material == "gold" then
 				groupcaps2={
 					stone = {times={[1]=0.2,[2]=0.2,[3]=0.2,[4]=0.2,[5]=32}, uses=32, maxlevel=1},
 					glass = {times={[1]=0.2,[2]=0.2,[3]=0.2,[4]=0.2,[5]=32}, uses=32, maxlevel=1},
 				}
 				damage = 3
+				wear = 1000
 			elseif material == "diamond" then
 				groupcaps2={
 					stone = {times={[1]= 0.3,[2]=0.3,[3]=0.3,[4]=0.3,[5]=4}, uses=1561, maxlevel=1},
 					glass = {times={[1]= 0.3,[2]=0.3,[3]=0.3,[4]=0.3,[5]=4}, uses=1561, maxlevel=1},
 				}
 				damage = 6
+				wear = 100
 			end
 		end
 		minetest.register_tool("main:"..material..tool, {
@@ -130,6 +144,7 @@ for _,material in pairs(material) do
 			},
 			sound = {breaks = {name="tool_break",gain=0.4}}, -- change this
 			groups = {flammable = 2, tool=1 },
+			mob_hit_wear = wear,
 			--torch rightclick - hacked in since api doesn't call on_place correctly
 			on_place = function(itemstack, placer, pointed_thing)
 				local inv = placer:get_inventory()
@@ -164,18 +179,25 @@ for _,material in pairs(material) do
 	end
 	
 	
+	local wear
 	
 	if material == "wood" then
 		damage = 4
+		wear = 500
 	elseif material == "stone" then
 		damage = 5
+		wear = 400
 	elseif material == "iron" then
 		damage = 6
+		wear = 300
 	elseif material == "gold" then
 		damage = 4
+		wear = 1000
 	elseif material == "diamond" then
 		damage = 7
+		wear = 100
 	end
+
 	
 	--add swords
 	minetest.register_tool("main:"..material.."sword", {
@@ -187,6 +209,7 @@ for _,material in pairs(material) do
 			groupcaps={leaves = {times={[4]=0.7,[3]=0.7,[2]=0.7,[1]=0.7}, uses=10, maxlevel=1},},
 			damage_groups = {damage = damage},
 		},
+		mob_hit_wear = wear,
 		sound = {breaks = {name="tool_break",gain=0.4}}, -- change this
 		groups = {damage=damage }
 	})

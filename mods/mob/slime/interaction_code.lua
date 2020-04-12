@@ -1,6 +1,21 @@
 --this is the file which houses the functions that control how mobs interact with the world
 
 
+--the sword wear mechanic
+slime.add_sword_wear = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
+	if puncher:is_player() then
+		local itemstack = puncher:get_wielded_item()
+		local wear = itemstack:get_definition().mob_hit_wear
+		if wear then
+			itemstack:add_wear(wear)
+			if itemstack:get_name() == "" then
+				minetest.sound_play("tool_break",{to_player = puncher:get_player_name(),gain=0.4})
+			end
+			puncher:set_wielded_item(itemstack)
+		end
+	end
+end
+
 --this controls what happens when the mob gets punched
 slime.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 	local hp = self.hp
@@ -32,12 +47,14 @@ slime.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities
 			dir.y = 0
 		end
 		self.object:add_velocity(dir)
+		self.add_sword_wear(self, puncher, time_from_last_punch, tool_capabilities, dir)
 	elseif self.punched_timer <= 0 and self.death_animation_timer == 0 then
 		self.death_animation_timer = 1
 		self.dead = true
 		minetest.sound_play("slime_die", {object=self.object, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
 		--self.object:set_texture_mod("^[colorize:red:90")
 		--self.child:set_texture_mod("^[colorize:red:90")
+		self.add_sword_wear(self, puncher, time_from_last_punch, tool_capabilities, dir)
 	end
 end
 
