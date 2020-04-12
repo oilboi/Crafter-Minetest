@@ -4,7 +4,7 @@
 --this controls what happens when the mob gets punched
 pig.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 	local hp = self.hp
-	
+	local vel = self.object:get_velocity()
 	local hurt = tool_capabilities.damage_groups.damage
 	
 	if not hurt then
@@ -24,12 +24,13 @@ pig.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, 
 		
 		self.hp = hp
 		
-
 		self.direction = vector.multiply(dir,-1)
-		self.speed = 5
-
 		dir = vector.multiply(dir,10)
-		dir.y = 4
+		if vel.y <= 0 then
+			dir.y = 4
+		else
+			dir.y = 0
+		end
 		self.object:add_velocity(dir)
 	elseif self.punched_timer <= 0 and self.death_animation_timer == 0 then
 		self.death_animation_timer = 1
