@@ -20,11 +20,35 @@ pig.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, 
 	local hp = self.hp
 	local vel = self.object:get_velocity()
 	local hurt = tool_capabilities.damage_groups.damage
-	
 	if not hurt then
 		hurt = 1
 	end
 	
+	--criticals
+	local pos = self.object:get_pos()
+	if puncher:is_player() then
+		local puncher_vel = puncher:get_player_velocity().y
+		if puncher_vel < 0 then
+			hurt = hurt * 1.5
+			minetest.add_particlespawner({
+				amount = 40,
+				time = 0.001,
+				minpos = pos,
+				maxpos = pos,
+				minvel = vector.new(-5,-5,-5),
+				maxvel = vector.new(5,5,5),
+				minacc = {x=0, y=0, z=0},
+				maxacc = {x=0, y=0, z=0},
+				minexptime = 1.1,
+				maxexptime = 1.5,
+				minsize = 1,
+				maxsize = 2,
+				collisiondetection = false,
+				vertical = false,
+				texture = "critical.png",
+			})
+		end
+	end
 	local hp = hp-hurt
 	
 	if (self.punched_timer <= 0 and hp > 1) or puncher == self.object then
