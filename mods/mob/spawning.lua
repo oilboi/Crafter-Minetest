@@ -11,6 +11,8 @@ local outer = 128
 --for debug testing to isolate mobs
 local spawn = true
 
+local spawn_table = {"pig","slime"}
+
 minetest.register_globalstep(function(dtime)
 	if spawn then
 	timer = timer + dtime
@@ -48,8 +50,9 @@ minetest.register_globalstep(function(dtime)
 				if table.getn(spawner) > 0 then
 					local mob_pos = spawner[1]
 					mob_pos.y = mob_pos.y + 1
-					print("Spawning at: "..minetest.pos_to_string(mob_pos))
-					minetest.add_entity(mob_pos,"mob:pig")
+					local mob_spawning = spawn_table[math.random(1,2)]
+					print("Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
+					minetest.add_entity(mob_pos,"mob:"..mob_spawning)
 				end
 			end
 		end
