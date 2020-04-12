@@ -23,10 +23,10 @@ slime.do_critical_particles = function(pos)
 		time = 0.001,
 		minpos = pos,
 		maxpos = pos,
-		minvel = vector.new(-5,-5,-5),
-		maxvel = vector.new(5,5,5),
-		minacc = {x=0, y=0, z=0},
-		maxacc = {x=0, y=0, z=0},
+		minvel = vector.new(-2,-2,-2),
+		maxvel = vector.new(2,8,2),
+		minacc = {x=0, y=4, z=0},
+		maxacc = {x=0, y=12, z=0},
 		minexptime = 1.1,
 		maxexptime = 1.5,
 		minsize = 1,
@@ -66,9 +66,12 @@ slime.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities
 		self.hostile_timer = 20
 		self.punched_timer = 0.8
 		
-		if hp > 1 then
-			minetest.sound_play("slime_splat", {object=self.object, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
+		--critical effect
+		if critical == true then
+			self.do_critical_particles(pos)
+			minetest.sound_play("critical", {object=self.object, gain = 0.1, max_hear_distance = 32,pitch = math.random(80,100)/100})
 		end
+		minetest.sound_play("slime_die", {object=self.object, gain = 1.0, max_hear_distance = 32,pitch = math.random(100,140)/100})
 		
 		self.hp = hp
 		
@@ -80,23 +83,21 @@ slime.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities
 			dir.y = 0
 		end
 		
-		--critical effect
-		if critical == true then
-			self.do_critical_particles(pos)
-		end
 		
 		self.object:add_velocity(dir)
 		self.add_sword_wear(self, puncher, time_from_last_punch, tool_capabilities, dir)
 	elseif self.punched_timer <= 0 and self.death_animation_timer == 0 then
+		self.death_animation_timer = 1
+		self.dead = true
+		
 		--critical effect
 		if critical == true then
 			self.do_critical_particles(pos)
+			minetest.sound_play("critical", {object=self.object, gain = 0.1, max_hear_distance = 32,pitch = math.random(80,100)/100})
 		end
-		self.death_animation_timer = 1
-		self.dead = true
-		minetest.sound_play("slime_die", {object=self.object, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
+		minetest.sound_play("slime_die", {object=self.object, gain = 1.0, max_hear_distance = 32,pitch = math.random(80,100)/100})
+		
 		self.object:set_texture_mod("^[colorize:red:130")
-		--self.child:set_texture_mod("^[colorize:red:90")
 		self.add_sword_wear(self, puncher, time_from_last_punch, tool_capabilities, dir)
 	end
 end
