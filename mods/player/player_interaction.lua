@@ -101,6 +101,10 @@ end)
 --this throws the player when they're punched
 minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
 	dir = vector.multiply(dir,10)
-	dir.y = 7
+	local vel = player:get_player_velocity()
+	dir.y = 0
+	if vel.y <= 0 then
+		dir.y = 7
+	end
 	player:add_player_velocity(dir)
 end)
