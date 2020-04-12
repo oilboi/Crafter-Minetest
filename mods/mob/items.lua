@@ -10,6 +10,10 @@ minetest.register_craftitem("mob:cooked_porkchop", {
 	health = 4,
 })
 
+minetest.register_craftitem("mob:slimeball", {
+	description = "Slimeball",
+	inventory_image = "slimeball.png",
+})
 --cooking
 minetest.register_craft({
 	type = "cooking",

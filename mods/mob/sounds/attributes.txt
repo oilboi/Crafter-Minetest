@@ -1,2 +1,6 @@
 pig https://freesound.org/people/JarredGibb/sounds/233158/
 pig die https://freesound.org/people/JarredGibb/sounds/233173/
+slimesplat1 https://freesound.org/people/TomchikRec/sounds/410913/
+slimesplat2 https://freesound.org/people/Benboncan/sounds/147541/
+slimedie1 https://freesound.org/people/ipaghost/sounds/335796/
+slimedie2 https://freesound.org/people/Breviceps/sounds/445118/
