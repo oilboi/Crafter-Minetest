@@ -277,7 +277,7 @@ snowball.on_step = function(self, dtime)
 			object:punch(self.object, 2, 
 				{
 				full_punch_interval=1.5,
-				damage_groups = {fleshy=0},
+				damage_groups = {damage=0},
 			})
 			hit = true
 			break
