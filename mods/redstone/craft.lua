@@ -65,6 +65,12 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output = "redstone:sticky_piston_off",
+	type = "shapeless",
+	recipe = {"mob:slimeball","redstone:piston_off"},
+})
+
+minetest.register_craft({
 	output = "redstone:pressure_plate_0",
 	recipe = {
 		{"main:stone","main:stone"},
