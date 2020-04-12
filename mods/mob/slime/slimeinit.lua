@@ -99,6 +99,10 @@ slime.on_step = function(self, dtime)
 		self.manage_punch_timer(self,dtime)
 		--self.debug_nametag(self,dtime)
 	end
+	--fix zombie state again
+	if self.dead == true and self.death_animation_timer <= 0 then
+		self.on_death(self)
+	end
 end
 
 minetest.register_entity("mob:slime", slime)

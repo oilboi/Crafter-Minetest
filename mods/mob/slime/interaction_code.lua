@@ -16,6 +16,27 @@ slime.add_sword_wear = function(self, puncher, time_from_last_punch, tool_capabi
 	end
 end
 
+--critical effect particles
+slime.do_critical_particles = function(pos)
+	minetest.add_particlespawner({
+		amount = 40,
+		time = 0.001,
+		minpos = pos,
+		maxpos = pos,
+		minvel = vector.new(-5,-5,-5),
+		maxvel = vector.new(5,5,5),
+		minacc = {x=0, y=0, z=0},
+		maxacc = {x=0, y=0, z=0},
+		minexptime = 1.1,
+		maxexptime = 1.5,
+		minsize = 1,
+		maxsize = 2,
+		collisiondetection = false,
+		vertical = false,
+		texture = "critical.png",
+	})
+end
+
 --this controls what happens when the mob gets punched
 slime.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 	local hp = self.hp
@@ -26,29 +47,15 @@ slime.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities
 		hurt = 1
 	end
 	
+	local critical = false
+	
 	--criticals
 	local pos = self.object:get_pos()
 	if puncher:is_player() then
 		local puncher_vel = puncher:get_player_velocity().y
 		if puncher_vel < 0 then
 			hurt = hurt * 1.5
-			minetest.add_particlespawner({
-				amount = 40,
-				time = 0.001,
-				minpos = pos,
-				maxpos = pos,
-				minvel = vector.new(-5,-5,-5),
-				maxvel = vector.new(5,5,5),
-				minacc = {x=0, y=0, z=0},
-				maxacc = {x=0, y=0, z=0},
-				minexptime = 1.1,
-				maxexptime = 1.5,
-				minsize = 1,
-				maxsize = 2,
-				collisiondetection = false,
-				vertical = false,
-				texture = "critical.png",
-			})
+			critical = true
 		end
 	end
 	
@@ -72,13 +79,23 @@ slime.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities
 		else
 			dir.y = 0
 		end
+		
+		--critical effect
+		if critical == true then
+			self.do_critical_particles(pos)
+		end
+		
 		self.object:add_velocity(dir)
 		self.add_sword_wear(self, puncher, time_from_last_punch, tool_capabilities, dir)
 	elseif self.punched_timer <= 0 and self.death_animation_timer == 0 then
+		--critical effect
+		if critical == true then
+			self.do_critical_particles(pos)
+		end
 		self.death_animation_timer = 1
 		self.dead = true
 		minetest.sound_play("slime_die", {object=self.object, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
-		--self.object:set_texture_mod("^[colorize:red:90")
+		self.object:set_texture_mod("^[colorize:red:130")
 		--self.child:set_texture_mod("^[colorize:red:90")
 		self.add_sword_wear(self, puncher, time_from_last_punch, tool_capabilities, dir)
 	end
