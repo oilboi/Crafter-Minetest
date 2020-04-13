@@ -70,6 +70,11 @@
 - Fixed treecaptitator not cutting down part of tree when lever is powering one of it's nodes
 - Added command for users with "server" privelage to control weather
 - Added craft recipe to shears
+- Moved to Minetest Engine Version 5.3.0 - DEV
+- Added slimes
+- Added mob criticals and client effects
+- Added stream and river sound effect to client
+- Moved underground cave noises to client
 ---
 
 
