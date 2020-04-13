@@ -8,6 +8,10 @@ minetest.register_on_modchannel_message(function(channel_name, sender, message)
 	end
 end)
 
+minetest.register_on_joinplayer(function(player)
+	player:set_physics_override({jump=1.25,gravity=1.25})
+end)
+
 minetest.register_globalstep(function(dtime)
 	for _,player in ipairs(minetest.get_connected_players()) do
 		local meta = player:get_meta()
