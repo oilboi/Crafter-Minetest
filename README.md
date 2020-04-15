@@ -1,6 +1,6 @@
 <img src="https://github.com/oilboi/Crafter/blob/master/menu/header.png">
 
-> Designed for Minetest 5.3.0 - DEV
+> Designed for Minetest 5.2.0
 
 >Built using textures from <a href="https://forum.minetest.net/viewtopic.php?t=16407">Mineclone 2</a> 
 
