@@ -153,9 +153,6 @@ pig.manage_death_animation = function(self,dtime)
 		self.object:set_animation({x=0,y=0}, 15, 0, true)
 		self.return_head_to_origin(self,dtime)
 		
-		if self.death_animation_timer <= 0 then
-			self.on_death(self)
-		end
 	end
 end
 

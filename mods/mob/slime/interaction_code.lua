@@ -102,7 +102,7 @@ slime.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities
 	end
 end
 
---this is what happens when a mob diese
+--this is what happens when a mob dies
 slime.on_death = function(self, killer)
 	local pos = self.object:getpos()
 	--pos.y = pos.y + 0.4
@@ -147,10 +147,6 @@ slime.manage_death_animation = function(self,dtime)
 		acceleration = vector.multiply(acceleration, 0.05)
 		self.object:add_velocity(acceleration)
 		self.object:set_animation({x=0,y=0}, 15, 0, true)
-		
-		if self.death_animation_timer <= 0 then
-			self.on_death(self)
-		end
 	end
 end
 
