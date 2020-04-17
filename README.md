@@ -75,6 +75,7 @@
 - Added mob criticals and client effects
 - Added stream and river sound effect to client
 - Moved underground cave noises to client
+- Add line_of_sight so mobs can't hit you through walls
 ---
 
 

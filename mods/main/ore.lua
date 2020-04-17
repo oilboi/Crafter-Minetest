@@ -48,7 +48,6 @@ minetest.register_ore({
 -- Scatter ores
 
 -- Coal
-for i = 1,3 do
 minetest.register_ore({
 	ore_type	 = "scatter",
 	ore		= "main:coalore",
@@ -125,7 +124,7 @@ minetest.register_ore({
 	clust_num_ores = 29,
 	clust_size     = 5,
 	y_max	    = -128,
-	y_min	    = -31000,
+	y_min	    = -9999,
 })
 
 -- Gold
@@ -160,7 +159,7 @@ minetest.register_ore({
 	clust_num_ores = 5,
 	clust_size     = 3,
 	y_max	    = -128,
-	y_min	    = -31000,
+	y_min	    = -9999,
 })
 
 -- Mese crystal
@@ -195,7 +194,7 @@ minetest.register_ore({
 	clust_num_ores = 5,
 	clust_size     = 3,
 	y_max	    = -128,
-	y_min	    = -31000,
+	y_min	    = -9999,
 })
 
 -- Diamond
@@ -230,6 +229,6 @@ minetest.register_ore({
 	clust_num_ores = 4,
 	clust_size     = 3,
 	y_max	    = -256,
-	y_min	    = -31000,
+	y_min	    = -9999,
 })
-end
+

@@ -18,6 +18,7 @@ minetest.register_item(":", {
 			leaves ={times={[1]=0.75,[2]=1.5,[3]=3,[4]=6,[5]=12},   uses=0, maxlevel=1}, --
 			wool =  {times={[1]=0.75,[2]=1.5,[3]=3,[4]=6,[5]=12},   uses=0, maxlevel=1}, --
 			glass = {times={[1]=0.75,[2]=1.5,[3]=3,[4]=6,[5]=12},   uses=0, maxlevel=1}, --
+			unbreakable = {times={[1]=63072000000000},   uses=0, maxlevel=1}, -- 2 million years
 			
 			--instant = {times={[1]=0.1,},uses=0,maxlevel=1},
 			dig_immediate = {times={[2]=0,[3]=0,[1]=0,},uses=0,maxlevel=1},
