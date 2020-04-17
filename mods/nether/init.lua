@@ -3,9 +3,9 @@ minetest.register_biome({
 	--node_top = "air",
 	--depth_top = 1,
 	--node_filler = "air",
-	--depth_filler = 10,
+	--depth_filler = 1,
 	--node_riverbed = "air",
-	--depth_riverbed = 10,
+	--depth_riverbed = 2,
 	node_stone = "nether:netherrack",
 	--node_water = "air",
 	--node_dungeon = "default:cobble",
@@ -14,9 +14,22 @@ minetest.register_biome({
 	vertical_blend = 0,
 	y_max = -10035,
 	y_min = -20000,
-	heat_point = 70,
-	humidity_point = 110,
+	heat_point = 50,
+	humidity_point = 50,
 })
+
+
+minetest.register_ore({
+	ore_type	 = "scatter",
+	ore		= "air",
+	wherein	  = "nether:netherrack",
+	clust_scarcity = 7 * 7 * 7,
+	clust_num_ores = 256,
+	clust_size     = 5,
+	y_max	    = -10035,
+	y_min	    = -20000,
+})
+
 
 minetest.register_biome({
 	name = "Boundary of Hell",
@@ -57,6 +70,7 @@ minetest.register_node("nether:netherrack", {
     is_ground_content = false,
     light_source = 7,
 })
+
 
 minetest.register_node("nether:obsidian", {
     description = "Obsidian",
