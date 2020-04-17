@@ -1,21 +1,21 @@
 minetest.register_biome({
 	name = "Hell",
-	node_top = "air",
-	depth_top = 1,
-	node_filler = "air",
-	depth_filler = 10,
-	node_riverbed = "air",
-	depth_riverbed = 10,
+	--node_top = "air",
+	--depth_top = 1,
+	--node_filler = "air",
+	--depth_filler = 10,
+	--node_riverbed = "air",
+	--depth_riverbed = 10,
 	node_stone = "nether:netherrack",
-	node_water = "air",
+	--node_water = "air",
 	--node_dungeon = "default:cobble",
 	--node_dungeon_alt = "default:mossycobble",
 	--node_dungeon_stair = "stairs:stair_cobble",
 	vertical_blend = 0,
 	y_max = -10035,
 	y_min = -20000,
-	heat_point = 0,
-	humidity_point = 0,
+	heat_point = 70,
+	humidity_point = 110,
 })
 
 minetest.register_biome({
@@ -56,4 +56,13 @@ minetest.register_node("nether:netherrack", {
     sounds = main.stoneSound(),
     is_ground_content = false,
     light_source = 7,
+})
+
+minetest.register_node("nether:obsidian", {
+    description = "Obsidian",
+    tiles = {"obsidian.png"},
+    groups = {stone = 5, pathable = 1},
+    sounds = main.stoneSound(),
+    is_ground_content = false,
+    --light_source = 7,
 })

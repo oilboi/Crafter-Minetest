@@ -8,7 +8,7 @@ minetest.register_globalstep(function(dtime)
 			local pos = player:getpos()
 			local inv = player:get_inventory()
 			--radial detection
-			for _,object in ipairs(minetest.get_objects_inside_radius({x=pos.x,y=pos.y+collection.collection_height,z=pos.z}, collection.magnet_radius)) do
+			for _,object in ipairs(minetest.get_objects_inside_radius({x=pos.x,y=pos.y+0.5,z=pos.z}, 2)) do
 				if not object:is_player() and object:get_luaentity() and object:get_luaentity().name == "__builtin:item" then
 					local pos2 = object:getpos()
 					local diff = vector.subtract(pos2,pos).y
