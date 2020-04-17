@@ -1,3 +1,8 @@
+local weather_channel = minetest.mod_channel_join("weather_type")
+local weather_intake = minetest.mod_channel_join("weather_intake")
+local weather_nodes_channel = minetest.mod_channel_join("weather_nodes")
+
+
 local weather_max = 2
 weather_type = math.random(0,weather_max)
 local weather_timer = 0
@@ -50,9 +55,7 @@ end
 
 --this tells the client mod to update the weather type
 function_send_weather_type = function()
-	local channel = minetest.mod_channel_join("weather_type")
-	channel:send_all(tostring(weather_type))
-	channel:leave()
+	weather_channel:send_all(tostring(weather_type))
 end
 
 --index all mods
@@ -69,17 +72,14 @@ end)
 --(everything)
 
 --have the client send the server the ready signal
-minetest.register_on_joinplayer(function(player)
-	minetest.after(5, function()
-		
-		local text = minetest.serialize(all_nodes)
-		local channel = minetest.mod_channel_join("weather_nodes")
-		channel:send_all(text)
-		channel:leave()
-		
+minetest.register_on_modchannel_message(function(channel_name, sender, message)
+	if channel_name == "weather_intake" then
+		--for some reason this variable assignment does not work outside the scope of this function
+		local all_nodes_serialized = minetest.serialize(all_nodes)
+		weather_nodes_channel:send_all(all_nodes_serialized)
 		function_send_weather_type()
 		update_player_sky()
-	end)
+	end
 end)
 
 
