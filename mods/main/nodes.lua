@@ -240,23 +240,23 @@ minetest.register_node("main:water", {
 	waving = 3,
 	tiles = {
 		{
-			name = "waterSource.png",
+			name = "water_source.png",
 			backface_culling = false,
 			animation = {
 				type = "vertical_frames",
 				aspect_w = 16,
 				aspect_h = 16,
-				length = 2.0,
+				length = 1,
 			},
 		},
 		{
-			name = "waterSource.png",
+			name = "water_source.png",
 			backface_culling = true,
 			animation = {
 				type = "vertical_frames",
 				aspect_w = 16,
 				aspect_h = 16,
-				length = 2.0,
+				length = 1,
 			},
 		},
 	},
@@ -282,26 +282,26 @@ minetest.register_node("main:waterflow", {
 	description = "Water Flow",
 	drawtype = "flowingliquid",
 	waving = 3,
-	tiles = {"water.png"},
+	tiles = {"water_static.png"},
 	special_tiles = {
 		{
-			name = "waterFlow.png",
+			name = "water_flow.png",
 			backface_culling = false,
 			animation = {
 				type = "vertical_frames",
 				aspect_w = 16,
 				aspect_h = 16,
-				length = 0.8,
+				length = 0.5,
 			},
 		},
 		{
-			name = "waterFlow.png",
+			name = "water_flow.png",
 			backface_culling = true,
 			animation = {
 				type = "vertical_frames",
 				aspect_w = 16,
 				aspect_h = 16,
-				length = 0.8,
+				length = 0.5,
 			},
 		},
 	},

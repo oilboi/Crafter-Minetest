@@ -1,4 +1,5 @@
 textures ={
 https://github.com/Gerold55/MineClone-2-Textures
 https://forum.minetest.net/viewtopic.php?t=16407
+https://github.com/minetest/minetest_game/tree/master/mods/default/textures
 }
