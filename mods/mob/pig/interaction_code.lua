@@ -186,12 +186,15 @@ pig.look_around = function(self,dtime)
 				
 				--punch the player
 				if distance < 1 and self.punch_timer <= 0 and object:get_hp() > 0 then
-					self.punch_timer = 1
-					object:punch(self.object, 2, 
-						{
-						full_punch_interval=1.5,
-						damage_groups = {fleshy=2},
-					},vector.direction(pos,pos2))
+					local line_of_sight = minetest.line_of_sight(pos, pos2)
+					if line_of_sight == true then
+						self.punch_timer = 1
+						object:punch(self.object, 2, 
+							{
+							full_punch_interval=1.5,
+							damage_groups = {fleshy=2},
+						},vector.direction(pos,pos2))
+					end
 				end
 				self.speed = distance * 3
 				self.following = true
