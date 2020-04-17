@@ -79,6 +79,7 @@
 - Add nether prototype
 - Fix water animation and add default Minetest water texture
 - Tweak mob direct chase AI
+- Add rain sound effect
 ---
 
 
