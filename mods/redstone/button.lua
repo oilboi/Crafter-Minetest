@@ -16,7 +16,7 @@ end
 
 
 minetest.register_node("redstone:button_off", {
-    description = "Crafting Table",
+    description = "Button",
     tiles = {"stone.png"},
     groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1,dig_immediate=1},
     sounds = main.stoneSound(),
@@ -56,7 +56,7 @@ minetest.register_node("redstone:button_off", {
 	on_destruct = on_button_destroy,
 })
 minetest.register_node("redstone:button_on", {
-    description = "Crafting Table",
+    description = "Button",
     tiles = {"stone.png"},
     groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1,dig_immediate=1},
     sounds = main.stoneSound(),
