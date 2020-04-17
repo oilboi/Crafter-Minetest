@@ -160,7 +160,7 @@ slime.look_around = function(self,dtime)
 
 	self.following = false
 	local player_found = false
-	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 6)) do
+	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 12)) do
 		if object:is_player() and player_found == false and object:get_hp() > 0 then
 			--look at player's camera
 			local pos2 = object:get_pos()
@@ -178,7 +178,7 @@ slime.look_around = function(self,dtime)
 				
 				local vel = self.object:get_velocity()
 				--punch the player
-				if vel.y ~= 0 and distance < 1 and self.punch_timer <= 0 and object:get_hp() > 0 then
+				if vel.y ~= 0 and distance <= 0 and self.punch_timer <= 0 and object:get_hp() > 0 then
 					local line_of_sight = minetest.line_of_sight(pos, pos2)
 					if line_of_sight == true then
 						self.punch_timer = 1
@@ -189,7 +189,10 @@ slime.look_around = function(self,dtime)
 						},vector.direction(pos,pos2))
 					end
 				end
-				self.speed = distance * 3
+				self.speed = distance * 4
+				if self.speed > 6 then
+					self.speed = 6
+				end
 				self.following = true
 			end
 			--only look at one player

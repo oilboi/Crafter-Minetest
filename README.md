@@ -77,6 +77,8 @@
 - Moved underground cave noises to client
 - Add line_of_sight so mobs can't hit you through walls
 - Add nether prototype
+- Fix water animation and add default Minetest water texture
+- Tweak mob direct chase AI
 ---
 
 

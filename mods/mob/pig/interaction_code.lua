@@ -196,7 +196,10 @@ pig.look_around = function(self,dtime)
 						},vector.direction(pos,pos2))
 					end
 				end
-				self.speed = distance * 3
+				self.speed = distance * 4
+				if self.speed > 6 then
+					self.speed = 6
+				end
 				self.following = true
 			end
 			--only look at one player
