@@ -47,7 +47,7 @@ local function extreme_tnt(pos,range)
 	minetest.sound_play("tnt_explode", {pos = pos, gain = 1.0, max_hear_distance = range*range*range})
 end
 
-local function tnt(pos,range)
+function tnt(pos,range)
 	local pos = vector.floor(vector.add(pos,0.5))
 	
 	--throw players and items
