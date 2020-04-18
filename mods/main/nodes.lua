@@ -276,6 +276,13 @@ minetest.register_node("main:water", {
 	post_effect_color = {a = 103, r = 30, g = 60, b = 90},
 	groups = {water = 1, liquid = 1, cools_lava = 1, bucket = 1, source = 1,pathable = 1},
 	--sounds = default.node_sound_water_defaults(),
+	
+	--water explodes in the nether
+	on_construct = function(pos)
+		if pos.y <= -10033 then
+			tnt(pos,10)
+		end
+	end,
 })
 
 minetest.register_node("main:waterflow", {

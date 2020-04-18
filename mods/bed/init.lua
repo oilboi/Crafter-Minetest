@@ -58,6 +58,12 @@ minetest.register_node("bed:bed", {
 			return
 		end
 		
+		--bed explodes in the nether
+		if pointed_thing.above.y <= -10033 then
+			tnt(pointed_thing.under,10)
+			return
+		end
+		
 		local sneak = placer:get_player_control().sneak
 		local noddef = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
 		if not sneak and noddef.on_rightclick then
