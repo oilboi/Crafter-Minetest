@@ -4,7 +4,6 @@ depth = initial level found
 
 	
 -- Dirt
---[[
 minetest.register_ore({
 	ore_type	  = "blob",
 	ore		 = "main:dirt",
@@ -25,7 +24,6 @@ minetest.register_ore({
 })
 
 -- Gravel
-
 minetest.register_ore({
 	ore_type	  = "blob",
 	ore		 = "main:gravel",
@@ -44,7 +42,6 @@ minetest.register_ore({
 		persist = 0.0
 	},
 })
-]]--
 -- Scatter ores
 
 -- Coal
