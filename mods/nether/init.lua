@@ -42,7 +42,7 @@ minetest.register_node("nether:obsidian", {
     description = "Obsidian",
     tiles = {"obsidian.png"},
     groups = {stone = 5, pathable = 1},
-    --groups = {stone = 1, pathable = 1},
+    --groups = {stone = 1, pathable = 1}, --leave this here for debug
     sounds = main.stoneSound(),
     is_ground_content = false,
     after_destruct = function(pos, oldnode)
@@ -392,92 +392,42 @@ function destroy_nether_portal(pos,origin,axis)
 	--create the origin node for stored memory
 	if not origin then
 		origin = pos
-		destroy_portal_failure = false
-	end
-	if not axis then
-		axis = "x"
-	end
-		
-	--2d virtual memory map creation (x axis)
-	if axis == "x" then
-		for x = -1,1 do
-		for y = -1,1 do
-			--index only direct neighbors
-			if destroy_x_failed == false and (math.abs(x)+math.abs(y) == 1) then
-				local i = vector.add(pos,vector.new(x,y,0))
-				
-				local execute_collection = true
-				
-				if destroy_n_index[i.x] and destroy_n_index[i.x][i.y] then
-					if destroy_n_index[i.x][i.y][i.z] then
-						execute_collection = false
-					end
-				end	
-				
-				if execute_collection == true then
-					--print(minetest.get_node(i).name)
-					--index air
-					if minetest.get_node(i).name == "nether:portal" then
-						if vector.distance(i,origin) < 50 then
-							--add data to both maps
-							if not destroy_n_index[i.x] then destroy_n_index[i.x] = {} end
-							if not destroy_n_index[i.x][i.y] then destroy_n_index[i.x][i.y] = {} end
-							destroy_n_index[i.x][i.y][i.z] = {nether_portal=1} --get_group(i,"redstone_power")}				
-							--the data to the 3d array must be written to memory before this is executed
-							--or a stack overflow occurs!!!
-							--pass down info for activators
-							destroy_nether_portal(i,origin,"x")
-						else
-							print("try z")
-							destroy_x_failed = true
-							destroy_n_index = {}
-							destroy_nether_portal(origin,origin,"z")
-						end
+	end		
+	--3d virtual memory map creation (x axis)
+	for x = -1,1 do
+	for z = -1,1 do
+	for y = -1,1 do
+		--index only direct neighbors
+		if (math.abs(x)+math.abs(z)+math.abs(y) == 1) then
+			local i = vector.add(pos,vector.new(x,y,z))
+			
+			local execute_collection = true
+			
+			if destroy_n_index[i.x] and destroy_n_index[i.x][i.y] then
+				if destroy_n_index[i.x][i.y][i.z] then
+					execute_collection = false
+				end
+			end	
+			
+			if execute_collection == true then
+				--print(minetest.get_node(i).name)
+				--index air
+				if minetest.get_node(i).name == "nether:portal" then
+					if vector.distance(i,origin) < 50 then
+						--add data to both maps
+						if not destroy_n_index[i.x] then destroy_n_index[i.x] = {} end
+						if not destroy_n_index[i.x][i.y] then destroy_n_index[i.x][i.y] = {} end
+						destroy_n_index[i.x][i.y][i.z] = {nether_portal=1} --get_group(i,"redstone_power")}				
+						--the data to the 3d array must be written to memory before this is executed
+						--or a stack overflow occurs!!!
+						--pass down info for activators
+						destroy_nether_portal(i,origin,"z")
 					end
 				end
 			end
 		end
-		end
-	--2d virtual memory map creation (z axis)
-	elseif axis == "z" then
-		for z = -1,1 do
-		for y = -1,1 do
-			--index only direct neighbors
-			if destroy_x_failed == true and destroy_portal_failure == false and (math.abs(z)+math.abs(y) == 1) then
-				local i = vector.add(pos,vector.new(0,y,z))
-				
-				local execute_collection = true
-				
-				if destroy_n_index[i.x] and destroy_n_index[i.x][i.y] then
-					if destroy_n_index[i.x][i.y][i.z] then
-						execute_collection = false
-					end
-				end	
-				
-				if execute_collection == true then
-					--print(minetest.get_node(i).name)
-					--index air
-					if minetest.get_node(i).name == "nether:portal" then
-						if vector.distance(i,origin) < 50 then
-							--add data to both maps
-							if not destroy_n_index[i.x] then destroy_n_index[i.x] = {} end
-							if not destroy_n_index[i.x][i.y] then destroy_n_index[i.x][i.y] = {} end
-							destroy_n_index[i.x][i.y][i.z] = {nether_portal=1} --get_group(i,"redstone_power")}				
-							--the data to the 3d array must be written to memory before this is executed
-							--or a stack overflow occurs!!!
-							--pass down info for activators
-							destroy_nether_portal(i,origin,"z")
-						else
-							--print("portal failed")
-							destroy_portal_failure = true
-							destroy_n_index = {}
-							--print("try z")
-						end
-					end
-				end
-			end
-		end
-		end
+	end
+	end
 	end
 end
 
@@ -517,13 +467,6 @@ minetest.register_globalstep(function(dtime)
 		--create the old version to help with deactivation calculation
 		local destroy_n_copy = table.copy(destroy_n_index)
 		destroy_portal_modify_map(destroy_n_copy)
-		destroy_portal_failure = false
-	end
-	if destroy_x_failed == true then
-		destroy_x_failed = false
-	end
-	if destroy_portal_failure == true then
-		destroy_portal_failure = false
 	end
 	--clear the index to avoid cpu looping wasting processing power
 	destroy_n_index = {}
