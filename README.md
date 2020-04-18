@@ -80,6 +80,9 @@
 - Fix water animation and add default Minetest water texture
 - Tweak mob direct chase AI
 - Add rain sound effect
+- Updated nether prototype
+- Added lava
+- Added ithor weather
 ---
 
 
