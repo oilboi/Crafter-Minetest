@@ -12,8 +12,6 @@ for id,ore in pairs(ores) do
 	local drops = {"main:"..ore.."ore"}
 	if ore == "diamond" then drops = {"main:diamond"} elseif ore == "coal" then drops = {"main:coal"} end
 	
-	print(ore,id)
-	
 	minetest.register_node("main:"..ore.."ore", {
 		description = ore:gsub("^%l", string.upper).." Ore",
 		tiles = {"stone.png^"..ore.."ore.png"},

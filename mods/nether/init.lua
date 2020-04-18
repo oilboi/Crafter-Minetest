@@ -18,28 +18,6 @@ minetest.register_biome({
 	humidity_point = -100,
 })
 
---[[
-minetest.register_biome({
-	name = "Boundary of Nether",
-	node_top = "nether:bedrock",
-	depth_top = 1,
-	node_filler = "nether:bedrock",
-	depth_filler = 1,
-	node_riverbed = "nether:bedrock",
-	depth_riverbed = 1,
-	node_stone = "nether:bedrock",
-	node_water = "nether:bedrock",
-	node_cave_liquid  = "nether:bedrock",
-	node_dungeon = "nether:bedrock",
-	node_dungeon_alt = "nether:bedrock",
-	node_dungeon_stair = "nether:bedrock",
-	vertical_blend = 1,
-	y_max = -10033,
-	y_min = -10034,
-	heat_point = -100,
-	humidity_point = -100,
-})
-]]--
 minetest.register_node("nether:bedrock", {
     description = "Bedrock",
     tiles = {"bedrock.png"},
@@ -68,14 +46,6 @@ minetest.register_node("nether:obsidian", {
     is_ground_content = false,
     --light_source = 7,
 })
-
-
-
-
-
-
-
-
 
 --this is from https://github.com/paramat/lvm_example/blob/master/init.lua
 --hi paramat :D
@@ -233,4 +203,56 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	--local chugent = math.ceil((os.clock() - t0) * 1000)
 	--print ("[lvm_example] Mapchunk generation time " .. chugent .. " ms")
 end)
+
+
+minetest.register_node("nether:portal", {
+	description = "Nether Portal",
+
+	tiles = {
+		{
+			name = "nether_portal.png",
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 0.5,
+			},
+		},
+		{
+			name = "nether_portal.png",
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 0.5,
+			},
+		},
+	},
+	drawtype = "nodebox",
+	paramtype = "light",
+	--paramtype2 = "facedir",
+	sunlight_propagates = true,
+	use_texture_alpha = false,
+	walkable = false,
+	diggable = false,
+	pointable = false,
+	buildable_to = false,
+	is_ground_content = false,
+	drop = "",
+	light_source = 7,
+	--post_effect_color = {a = 180, r = 51, g = 7, b = 89},
+	--alpha = 192,
+	node_box = {
+	type = "connected",
+		-- connect_top =
+		-- connect_bottom =
+		connect_front = {-1/16,  -1/2, -1/2,   1/16,  1/2, 0 },
+		connect_left =  {-1/2,   -1/2, -1/16, 0,   1/2,  1/16},
+		connect_back =  {-1/16,  -1/2,  0,   1/16,  1/2,  1/2 },
+		connect_right = { 0,   -1/2, -1/16,  1/2,   1/2,  1/16},
+	},
+	connects_to = {"nether:portal","nether:obsidian"},
+	groups = {unbreakable=1},
+	--on_destruct = destroy_portal,
+})
 
