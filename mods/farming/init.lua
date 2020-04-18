@@ -182,7 +182,7 @@ minetest.register_node("farming:grass", {
     tiles = {"tallgrass.png"},
     paramtype2 = "degrotate",
     buildable_to = true,
-    groups = {leaves = 1, plant = 1, axe = 1, hand = 0,dig_immediate=1,attached_node=1},
+    groups = {dig_immediate=1,attached_node=1,flammable=1},
     sounds = main.grassSound(),
     selection_box = {
 		type = "fixed",

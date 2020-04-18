@@ -122,7 +122,7 @@ minetest.register_node("main:sand", {
 minetest.register_node("main:tree", {
     description = "Tree",
     tiles = {"treeCore.png","treeCore.png","treeOut.png","treeOut.png","treeOut.png","treeOut.png"},
-    groups = {wood = 1, tree = 1, pathable = 1},
+    groups = {wood = 1, tree = 1, pathable = 1, flammable=1},
     sounds = main.woodSound(),
     --set metadata so treecapitator doesn't destroy houses
     on_place = function(itemstack, placer, pointed_thing)
@@ -167,7 +167,7 @@ minetest.register_node("main:tree", {
 minetest.register_node("main:wood", {
     description = "Wood",
     tiles = {"wood.png"},
-    groups = {wood = 1, pathable = 1},
+    groups = {wood = 1, pathable = 1,flammable=1},
     sounds = main.woodSound(),
 })
 
@@ -180,7 +180,7 @@ minetest.register_node("main:leaves", {
 	paramtype = "light",
 	is_ground_content = false,	
     tiles = {"leaves.png"},
-    groups = {leaves = 1, leafdecay = 1},
+    groups = {leaves = 1, leafdecay = 1,flammable=1},
     sounds = main.grassSound(),
     drop = {
 		max_items = 1,
