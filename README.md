@@ -165,6 +165,7 @@
 
 
 ### HALLOWEEN!
+- lava acts like water in the nether but lava in the other worlds
 - pumpkins
 - Jack O'Lanterns
 - corn and corn stalks

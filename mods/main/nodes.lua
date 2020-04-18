@@ -324,35 +324,33 @@ minetest.register_node("main:waterflow", {
 	--sounds = default.node_sound_water_defaults(),
 })
 
---[[
-
-minetest.register_node("default:lava_source", {
-	description = S("Lava Source"),
+minetest.register_node("main:lava", {
+	description = "Lava",
 	drawtype = "liquid",
 	tiles = {
 		{
-			name = "default_lava_source_animated.png",
+			name = "lava_source.png",
 			backface_culling = false,
 			animation = {
 				type = "vertical_frames",
 				aspect_w = 16,
 				aspect_h = 16,
-				length = 3.0,
+				length = 2.0,
 			},
 		},
 		{
-			name = "default_lava_source_animated.png",
+			name = "lava_source.png",
 			backface_culling = true,
 			animation = {
 				type = "vertical_frames",
 				aspect_w = 16,
 				aspect_h = 16,
-				length = 3.0,
+				length = 2.0,
 			},
 		},
 	},
 	paramtype = "light",
-	light_source = default.LIGHT_MAX - 1,
+	light_source = 13,
 	walkable = false,
 	pointable = false,
 	diggable = false,
@@ -361,8 +359,8 @@ minetest.register_node("default:lava_source", {
 	drop = "",
 	drowning = 1,
 	liquidtype = "source",
-	liquid_alternative_flowing = "default:lava_flowing",
-	liquid_alternative_source = "default:lava_source",
+	liquid_alternative_flowing = "main:lavaflow",
+	liquid_alternative_source = "main:lava",
 	liquid_viscosity = 7,
 	liquid_renewable = false,
 	damage_per_second = 4 * 2,
@@ -370,13 +368,13 @@ minetest.register_node("default:lava_source", {
 	groups = {lava = 3, liquid = 2, igniter = 1},
 })
 
-minetest.register_node("default:lava_flowing", {
-	description = S("Flowing Lava"),
+minetest.register_node("main:lavaflow", {
+	description = "Flowing Lava",
 	drawtype = "flowingliquid",
-	tiles = {"default_lava.png"},
+	tiles = {"lava_flow.png"},
 	special_tiles = {
 		{
-			name = "default_lava_flowing_animated.png",
+			name = "lava_flow.png",
 			backface_culling = false,
 			animation = {
 				type = "vertical_frames",
@@ -386,7 +384,7 @@ minetest.register_node("default:lava_flowing", {
 			},
 		},
 		{
-			name = "default_lava_flowing_animated.png",
+			name = "lava_flow.png",
 			backface_culling = true,
 			animation = {
 				type = "vertical_frames",
@@ -398,7 +396,7 @@ minetest.register_node("default:lava_flowing", {
 	},
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
-	light_source = default.LIGHT_MAX - 1,
+	light_source = 13,
 	walkable = false,
 	pointable = false,
 	diggable = false,
@@ -407,17 +405,14 @@ minetest.register_node("default:lava_flowing", {
 	drop = "",
 	drowning = 1,
 	liquidtype = "flowing",
-	liquid_alternative_flowing = "default:lava_flowing",
-	liquid_alternative_source = "default:lava_source",
+	liquid_alternative_flowing = "main:lavaflow",
+	liquid_alternative_source = "main:lava",
 	liquid_viscosity = 7,
 	liquid_renewable = false,
-	damage_per_second = 4 * 2,
+	damage_per_second = 2,
 	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
-	groups = {lava = 3, liquid = 2, igniter = 1,
-		not_in_creative_inventory = 1},
+	groups = {lava = 3, liquid = 2, igniter = 1},
 })
-
-]]--
 
 minetest.register_node("main:ladder", {
 	description = "Ladder",
