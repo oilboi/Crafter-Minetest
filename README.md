@@ -84,7 +84,7 @@
 - Added lava
 - Added ithor weather
 - Added nether portal node and fire
-- Added in flint and steel, flint, and gravel
+- Added in flint and steel, flint, and gravel and enabled dirt and gravel spawning
 ---
 
 

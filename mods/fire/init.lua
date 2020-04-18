@@ -20,8 +20,15 @@ minetest.register_node("fire:fire", {
     is_ground_content = false,
     light_source = 11, --debugging
     on_construct = function(pos)
+		
 		local timer = minetest.get_node_timer(pos)
 		timer:start(math.random(5,10))
+		
+		
+		if minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name == "nether:obsidian" then
+			minetest.remove_node(pos)
+			create_nether_portal(pos)
+		end
     end,
     on_timer = function(pos, elapsed)
 		minetest.remove_node(pos)
@@ -53,6 +60,7 @@ minetest.register_tool("fire:flint_and_steel", {
 			minetest.sound_play("flint_failed", {pos=pointed_thing.above})
 			return
 		end
+		
 		minetest.add_node(pointed_thing.above,{name="fire:fire"})
 		minetest.sound_play("flint_and_steel", {pos=pointed_thing.above})
 		itemstack:add_wear(100)

@@ -41,9 +41,13 @@ minetest.register_node("nether:netherrack", {
 minetest.register_node("nether:obsidian", {
     description = "Obsidian",
     tiles = {"obsidian.png"},
-    groups = {stone = 5, pathable = 1},
+    --groups = {stone = 5, pathable = 1},
+    groups = {stone = 1, pathable = 1},
     sounds = main.stoneSound(),
     is_ground_content = false,
+    after_destruct = function(pos, oldnode)
+		destroy_nether_portal(pos)
+    end,
     --light_source = 7,
 })
 
@@ -256,3 +260,271 @@ minetest.register_node("nether:portal", {
 	--on_destruct = destroy_portal,
 })
 
+--branch out from center
+local n_index = {}
+local portal_failure = false
+local x_failed = false
+
+--this can be used globally to create nether portals from obsidian
+function create_nether_portal(pos,origin,axis)
+	--create the origin node for stored memory
+	if not origin then
+		origin = pos
+		portal_failure = false
+	end
+	if not axis then
+		axis = "x"
+	end
+		
+	--2d virtual memory map creation (x axis)
+	if axis == "x" then
+		for x = -1,1 do
+		for y = -1,1 do
+			--index only direct neighbors
+			if x_failed == false and (math.abs(x)+math.abs(y) == 1) then
+				local i = vector.add(pos,vector.new(x,y,0))
+				
+				local execute_collection = true
+				
+				if n_index[i.x] and n_index[i.x][i.y] then
+					if n_index[i.x][i.y][i.z] then
+						execute_collection = false
+					end
+				end	
+				
+				if execute_collection == true then
+					--print(minetest.get_node(i).name)
+					--index air
+					if minetest.get_node(i).name == "air" then
+						
+						if vector.distance(i,origin) < 50 then
+							--add data to both maps
+							if not n_index[i.x] then n_index[i.x] = {} end
+							if not n_index[i.x][i.y] then n_index[i.x][i.y] = {} end
+							n_index[i.x][i.y][i.z] = {nether_portal=1} --get_group(i,"redstone_power")}				
+							--the data to the 3d array must be written to memory before this is executed
+							--or a stack overflow occurs!!!
+							--pass down info for activators
+							create_nether_portal(i,origin,"x")
+						else
+							--print("try z")
+							x_failed = true
+							n_index = {}
+							create_nether_portal(origin,origin,"z")
+						end
+					elseif minetest.get_node(i).name ~= "nether:obsidian" then
+						x_failed = true
+						n_index = {}
+						create_nether_portal(origin,origin,"z")
+					end
+				end
+			end
+		end
+		end
+	--2d virtual memory map creation (z axis)
+	elseif axis == "z" then
+		for z = -1,1 do
+		for y = -1,1 do
+			--index only direct neighbors
+			if x_failed == true and portal_failure == false and (math.abs(z)+math.abs(y) == 1) then
+				local i = vector.add(pos,vector.new(0,y,z))
+				
+				local execute_collection = true
+				
+				if n_index[i.x] and n_index[i.x][i.y] then
+					if n_index[i.x][i.y][i.z] then
+						execute_collection = false
+					end
+				end	
+				
+				if execute_collection == true then
+					--print(minetest.get_node(i).name)
+					--index air
+					if minetest.get_node(i).name == "air" then
+						if vector.distance(i,origin) < 50 then
+							--add data to both maps
+							if not n_index[i.x] then n_index[i.x] = {} end
+							if not n_index[i.x][i.y] then n_index[i.x][i.y] = {} end
+							n_index[i.x][i.y][i.z] = {nether_portal=1} --get_group(i,"redstone_power")}				
+							--the data to the 3d array must be written to memory before this is executed
+							--or a stack overflow occurs!!!
+							--pass down info for activators
+							create_nether_portal(i,origin,"z")
+						else
+							--print("portal failed")
+							portal_failure = true
+							n_index = {}
+							--print("try z")
+						end
+					elseif minetest.get_node(i).name ~= "nether:obsidian" then
+						--print("portal failed")
+						portal_failure = true
+						n_index = {}
+					end
+				end
+			end
+		end
+		end
+	end
+end
+
+--modify the map with the collected data
+local function portal_modify_map(n_copy)
+	local sorted_table = {}
+	for x,datax in pairs(n_copy) do
+		for y,datay in pairs(datax) do
+			for z,index in pairs(datay) do
+				table.insert(sorted_table, vector.new(x,y,z))
+			end
+		end
+	end
+	minetest.bulk_set_node(sorted_table, {name="nether:portal"})
+end
+
+-------------------------------------------------------------------------------
+
+local destroy_n_index = {}
+local destroy_portal_failure = false
+local destroy_x_failed = false
+
+--this can be used globally to create nether portals from obsidian
+function destroy_nether_portal(pos,origin,axis)
+	--create the origin node for stored memory
+	if not origin then
+		origin = pos
+		destroy_portal_failure = false
+	end
+	if not axis then
+		axis = "x"
+	end
+		
+	--2d virtual memory map creation (x axis)
+	if axis == "x" then
+		for x = -1,1 do
+		for y = -1,1 do
+			--index only direct neighbors
+			if destroy_x_failed == false and (math.abs(x)+math.abs(y) == 1) then
+				local i = vector.add(pos,vector.new(x,y,0))
+				
+				local execute_collection = true
+				
+				if destroy_n_index[i.x] and destroy_n_index[i.x][i.y] then
+					if destroy_n_index[i.x][i.y][i.z] then
+						execute_collection = false
+					end
+				end	
+				
+				if execute_collection == true then
+					--print(minetest.get_node(i).name)
+					--index air
+					if minetest.get_node(i).name == "nether:portal" then
+						if vector.distance(i,origin) < 50 then
+							--add data to both maps
+							if not destroy_n_index[i.x] then destroy_n_index[i.x] = {} end
+							if not destroy_n_index[i.x][i.y] then destroy_n_index[i.x][i.y] = {} end
+							destroy_n_index[i.x][i.y][i.z] = {nether_portal=1} --get_group(i,"redstone_power")}				
+							--the data to the 3d array must be written to memory before this is executed
+							--or a stack overflow occurs!!!
+							--pass down info for activators
+							destroy_nether_portal(i,origin,"x")
+						else
+							print("try z")
+							destroy_x_failed = true
+							destroy_n_index = {}
+							destroy_nether_portal(origin,origin,"z")
+						end
+					end
+				end
+			end
+		end
+		end
+	--2d virtual memory map creation (z axis)
+	elseif axis == "z" then
+		for z = -1,1 do
+		for y = -1,1 do
+			--index only direct neighbors
+			if destroy_x_failed == true and destroy_portal_failure == false and (math.abs(z)+math.abs(y) == 1) then
+				local i = vector.add(pos,vector.new(0,y,z))
+				
+				local execute_collection = true
+				
+				if destroy_n_index[i.x] and destroy_n_index[i.x][i.y] then
+					if destroy_n_index[i.x][i.y][i.z] then
+						execute_collection = false
+					end
+				end	
+				
+				if execute_collection == true then
+					--print(minetest.get_node(i).name)
+					--index air
+					if minetest.get_node(i).name == "nether:portal" then
+						if vector.distance(i,origin) < 50 then
+							--add data to both maps
+							if not destroy_n_index[i.x] then destroy_n_index[i.x] = {} end
+							if not destroy_n_index[i.x][i.y] then destroy_n_index[i.x][i.y] = {} end
+							destroy_n_index[i.x][i.y][i.z] = {nether_portal=1} --get_group(i,"redstone_power")}				
+							--the data to the 3d array must be written to memory before this is executed
+							--or a stack overflow occurs!!!
+							--pass down info for activators
+							destroy_nether_portal(i,origin,"z")
+						else
+							--print("portal failed")
+							destroy_portal_failure = true
+							destroy_n_index = {}
+							--print("try z")
+						end
+					end
+				end
+			end
+		end
+		end
+	end
+end
+
+--modify the map with the collected data
+local function destroy_portal_modify_map(destroy_n_copy)
+	local destroy_sorted_table = {}
+	for x,datax in pairs(destroy_n_copy) do
+		for y,datay in pairs(datax) do
+			for z,index in pairs(datay) do
+				table.insert(destroy_sorted_table, vector.new(x,y,z))
+			end
+		end
+	end
+	minetest.bulk_set_node(destroy_sorted_table, {name="air"})
+end
+
+minetest.register_globalstep(function(dtime)
+	--if indexes exist then calculate redstone
+	if n_index and next(n_index) and portal_failure == false then
+		--create the old version to help with deactivation calculation
+		local n_copy = table.copy(n_index)
+		portal_modify_map(n_copy)
+		portal_failure = false
+	end
+	if x_failed == true then
+		x_failed = false
+	end
+	if portal_failure == true then
+		portal_failure = false
+	end
+	--clear the index to avoid cpu looping wasting processing power
+	n_index = {}
+	
+	
+	--if indexes exist then calculate redstone
+	if destroy_n_index and next(destroy_n_index) and destroy_portal_failure == false then
+		--create the old version to help with deactivation calculation
+		local destroy_n_copy = table.copy(destroy_n_index)
+		destroy_portal_modify_map(destroy_n_copy)
+		destroy_portal_failure = false
+	end
+	if destroy_x_failed == true then
+		destroy_x_failed = false
+	end
+	if destroy_portal_failure == true then
+		destroy_portal_failure = false
+	end
+	--clear the index to avoid cpu looping wasting processing power
+	destroy_n_index = {}
+end)
