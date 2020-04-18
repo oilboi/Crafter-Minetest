@@ -41,8 +41,8 @@ minetest.register_node("nether:netherrack", {
 minetest.register_node("nether:obsidian", {
     description = "Obsidian",
     tiles = {"obsidian.png"},
-    --groups = {stone = 5, pathable = 1},
-    groups = {stone = 1, pathable = 1},
+    groups = {stone = 5, pathable = 1},
+    --groups = {stone = 1, pathable = 1},
     sounds = main.stoneSound(),
     is_ground_content = false,
     after_destruct = function(pos, oldnode)
