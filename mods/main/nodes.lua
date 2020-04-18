@@ -119,6 +119,38 @@ minetest.register_node("main:sand", {
     sounds = main.sandSound(),
 })
 
+minetest.register_node("main:gravel", {
+    description = "Gravel",
+    tiles = {"gravel.png"},
+    groups = {sand = 1, falling_node = 1,pathable = 1},
+    sounds = main.dirtSound(),
+    drop = {
+		max_items = 1,
+		items= {
+		 {
+			-- Only drop if using a tool whose name is identical to one
+			-- of these.
+			rarity = 10,
+			items = {"main:flint"},
+			-- Whether all items in the dropped item list inherit the
+			-- hardware coloring palette color from the dug node.
+			-- Default is 'false'.
+			--inherit_color = true,
+		},
+		{
+			-- Only drop if using a tool whose name is identical to one
+			-- of these.
+			--tools = {"main:shears"},
+			rarity = 0,
+			items = {"main:gravel"},
+			-- Whether all items in the dropped item list inherit the
+			-- hardware coloring palette color from the dug node.
+			-- Default is 'false'.
+			--inherit_color = true,
+		},
+	}},
+})
+
 minetest.register_node("main:tree", {
     description = "Tree",
     tiles = {"treeCore.png","treeCore.png","treeOut.png","treeOut.png","treeOut.png","treeOut.png"},

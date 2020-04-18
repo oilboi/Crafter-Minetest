@@ -46,10 +46,23 @@ minetest.register_tool("fire:flint_and_steel", {
 	description = "Flint and Steel",
 	inventory_image = "flint_and_steel.png",
 	on_place = function(itemstack, placer, pointed_thing)
+		if pointed_thing.type ~= "node" then
+			return
+		end
+		if minetest.get_node(pointed_thing.above).name ~= "air" then
+			minetest.sound_play("flint_failed", {pos=pointed_thing.above})
+			return
+		end
 		minetest.add_node(pointed_thing.above,{name="fire:fire"})
 		minetest.sound_play("flint_and_steel", {pos=pointed_thing.above})
 		itemstack:add_wear(100)
 		return(itemstack)
 	end,
 	sound = {breaks = {name="tool_break",gain=0.4}},
+})
+
+minetest.register_craft({
+	type = "shapeless",
+	output = "fire:flint_and_steel",
+	recipe = {"main:flint","main:iron"},
 })

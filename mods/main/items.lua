@@ -35,3 +35,7 @@ minetest.register_craftitem("main:diamond", {
 	description = "Diamond",
 	inventory_image = "diamond.png",
 })
+minetest.register_craftitem("main:flint", {
+	description = "Flint",
+	inventory_image = "flint.png",
+})
