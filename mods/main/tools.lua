@@ -215,6 +215,7 @@ for _,material in pairs(material) do
 	})
 end
 
+--shears
 minetest.register_tool("main:shears", {
 	description = "Shears",
 	inventory_image = "shears.png",

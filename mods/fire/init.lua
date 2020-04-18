@@ -40,3 +40,16 @@ minetest.register_abm({
 		minetest.set_node(pos,{name="fire:fire"})
 	end,
 })
+
+--flint and steel
+minetest.register_tool("fire:flint_and_steel", {
+	description = "Flint and Steel",
+	inventory_image = "flint_and_steel.png",
+	on_place = function(itemstack, placer, pointed_thing)
+		minetest.add_node(pointed_thing.above,{name="fire:fire"})
+		minetest.sound_play("flint_and_steel", {pos=pointed_thing.above})
+		itemstack:add_wear(100)
+		return(itemstack)
+	end,
+	sound = {breaks = {name="tool_break",gain=0.4}},
+})
