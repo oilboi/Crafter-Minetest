@@ -1,3 +1,6 @@
+local path = minetest.get_modpath("nether")
+dofile(path.."/schem.lua")
+
 minetest.register_biome({
 	name = "Nether",
 	node_top = "air",
@@ -41,8 +44,8 @@ minetest.register_node("nether:netherrack", {
 minetest.register_node("nether:obsidian", {
     description = "Obsidian",
     tiles = {"obsidian.png"},
-    groups = {stone = 5, pathable = 1},
-    --groups = {stone = 1, pathable = 1}, --leave this here for debug
+    --groups = {stone = 5, pathable = 1},
+    groups = {stone = 1, pathable = 1}, --leave this here for debug
     sounds = main.stoneSound(),
     is_ground_content = false,
     after_destruct = function(pos, oldnode)
@@ -301,7 +304,7 @@ function create_nether_portal(pos,origin,axis)
 							--add data to both maps
 							if not n_index[i.x] then n_index[i.x] = {} end
 							if not n_index[i.x][i.y] then n_index[i.x][i.y] = {} end
-							n_index[i.x][i.y][i.z] = {nether_portal=1} --get_group(i,"redstone_power")}				
+							n_index[i.x][i.y][i.z] = {nether_portal=1} --get_group(i,"redstone_power")}		
 							--the data to the 3d array must be written to memory before this is executed
 							--or a stack overflow occurs!!!
 							--pass down info for activators
@@ -368,12 +371,96 @@ function create_nether_portal(pos,origin,axis)
 	end
 end
 
+--creates a nether portal in the nether
+--this essentially makes it so you have to move 30 away from one portal to another otherwise it will travel to an existing portal
+local nether_origin_pos = nil
+local function spawn_portal_into_nether_callback(blockpos, action, calls_remaining, param)
+	if calls_remaining == 0 then
+		local portal_exists = minetest.find_node_near(nether_origin_pos, 30, {"nether:portal"})
+				
+		if not portal_exists then
+			local min = vector.subtract(nether_origin_pos,30)
+			local max = vector.add(nether_origin_pos,30)
+			local platform = minetest.find_nodes_in_area_under_air(min, max, {"nether:netherrack","main:lava"})
+			
+			if platform and next(platform) then
+				--print("setting the platform")
+				local platform_location = platform[math.random(1,table.getn(platform))]
+				
+				minetest.place_schematic(platform_location, portalSchematic,"0",nil,true,"place_center_x, place_center_z")
+			else
+				--print("generate a portal within netherrack")
+				minetest.place_schematic(nether_origin_pos, portalSchematic,"0",nil,true,"place_center_x, place_center_z")
+			end
+		else
+			--print("portal exists, utilizing")
+		end
+		nether_origin_pos = nil
+	end
+end
+
+local function spawn_portal_into_overworld_callback(blockpos, action, calls_remaining, param)
+	if calls_remaining == 0 then
+		local portal_exists = minetest.find_node_near(nether_origin_pos, 30, {"nether:portal"})
+				
+		if not portal_exists then
+			local min = vector.subtract(nether_origin_pos,30)
+			local max = vector.add(nether_origin_pos,30)
+			local platform = minetest.find_nodes_in_area_under_air(min, max, {"main:stone","main:water","main:grass","main:sand","main:dirt"})
+			
+			if platform and next(platform) then
+				--print("setting the platform")
+				local platform_location = platform[math.random(1,table.getn(platform))]
+				
+				minetest.place_schematic(platform_location, portalSchematic,"0",nil,true,"place_center_x, place_center_z")
+			else
+				--print("generate a portal within overworld stone")
+				minetest.place_schematic(nether_origin_pos, portalSchematic,"0",nil,true,"place_center_x, place_center_z")
+			end
+		else
+			--print("portal exists, utilizing")
+		end
+		nether_origin_pos = nil
+	end
+end
+
+local function generate_nether_portal_in_nether(pos)
+	if pos.y > -10033 then
+		--center the location to the lava height
+		pos.y = -15000--+math.random(-30,30)	
+		nether_origin_pos = pos
+		
+		local min = vector.subtract(nether_origin_pos,30)
+		local max = vector.add(nether_origin_pos,30)
+		
+		--force load the area
+		minetest.emerge_area(min, max, spawn_portal_into_nether_callback)
+	else
+		--center the location to the water height
+		pos.y = 0--+math.random(-30,30)	
+		nether_origin_pos = pos
+		
+		local min = vector.subtract(nether_origin_pos,30)
+		local max = vector.add(nether_origin_pos,30)
+		
+		--force load the area
+		minetest.emerge_area(min, max, spawn_portal_into_overworld_callback)
+	end
+end
+
+
 --modify the map with the collected data
 local function portal_modify_map(n_copy)
 	local sorted_table = {}
+	local created_portal = false
 	for x,datax in pairs(n_copy) do
 		for y,datay in pairs(datax) do
 			for z,index in pairs(datay) do
+				--try to create a return side nether portal
+				if created_portal == false then
+					created_portal = true
+					generate_nether_portal_in_nether(vector.new(x,y,z))
+				end
 				table.insert(sorted_table, vector.new(x,y,z))
 			end
 		end
