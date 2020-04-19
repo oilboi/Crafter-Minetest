@@ -1,3 +1,5 @@
+local nether_channel = minetest.mod_channel_join("nether_teleporters")
+
 local path = minetest.get_modpath("nether")
 dofile(path.."/schem.lua")
 
@@ -398,7 +400,7 @@ local function spawn_portal_into_nether_callback(blockpos, action, calls_remaini
 		nether_origin_pos = nil
 	end
 end
-
+--creates nether portals in the overworld
 local function spawn_portal_into_overworld_callback(blockpos, action, calls_remaining, param)
 	if calls_remaining == 0 then
 		local portal_exists = minetest.find_node_near(nether_origin_pos, 30, {"nether:portal"})
@@ -424,6 +426,7 @@ local function spawn_portal_into_overworld_callback(blockpos, action, calls_rema
 	end
 end
 
+
 local function generate_nether_portal_in_nether(pos)
 	if pos.y > -10033 then
 		--center the location to the lava height
@@ -439,9 +442,9 @@ local function generate_nether_portal_in_nether(pos)
 		--center the location to the water height
 		pos.y = 0--+math.random(-30,30)	
 		nether_origin_pos = pos
-		
-		local min = vector.subtract(nether_origin_pos,30)
-		local max = vector.add(nether_origin_pos,30)
+		--prefer height for mountains
+		local min = vector.subtract(nether_origin_pos,vector.new(30,30,30))
+		local max = vector.add(nether_origin_pos,vector.new(30,120,30))
 		
 		--force load the area
 		minetest.emerge_area(min, max, spawn_portal_into_overworld_callback)
@@ -467,6 +470,67 @@ local function portal_modify_map(n_copy)
 	end
 	minetest.bulk_set_node(sorted_table, {name="nether:portal"})
 end
+
+-------------------------------------------------------------------------------------------
+--the teleporter parts - stored here for now so I can read from other functions
+local teleporting_player = nil
+local function teleport_to_overworld(blockpos, action, calls_remaining, param)
+	if calls_remaining == 0 then
+		local portal_exists = minetest.find_node_near(nether_origin_pos, 30, {"nether:portal"})
+		if portal_exists then
+			print(teleporting_player)
+			if teleporting_player then
+				teleporting_player:set_pos(portal_exists)
+			end
+		end
+		teleporting_player = nil
+	end
+end
+local function teleport_to_nether(blockpos, action, calls_remaining, param)
+	if calls_remaining == 0 then
+		local portal_exists = minetest.find_node_near(nether_origin_pos, 30, {"nether:portal"})
+		if portal_exists then
+			print(teleporting_player)
+			if teleporting_player then
+				teleporting_player:set_pos(portal_exists)
+			end
+		end
+		teleporting_player = nil
+	end
+end
+
+--this initializes all teleporter commands from the client
+minetest.register_on_modchannel_message(function(channel_name, sender, message)
+	if channel_name == "nether_teleporters" then
+		local player = minetest.get_player_by_name(sender)
+		local pos = player:get_pos()
+		
+		if pos.y > -10033 then
+			--center the location to the lava height
+			pos.y = -15000--+math.random(-30,30)	
+			nether_origin_pos = pos
+			
+			local min = vector.subtract(nether_origin_pos,30)
+			local max = vector.add(nether_origin_pos,30)
+			
+			--force load the area
+			teleporting_player = player
+			minetest.emerge_area(min, max, teleport_to_nether)
+		else
+			--center the location to the water height
+			pos.y = 0--+math.random(-30,30)	
+			nether_origin_pos = pos
+			--prefer height for mountains
+			local min = vector.subtract(nether_origin_pos,vector.new(30,30,30))
+			local max = vector.add(nether_origin_pos,vector.new(30,120,30))
+			
+			--force load the area
+			teleporting_player = player
+			minetest.emerge_area(min, max, teleport_to_overworld)
+		end
+	end
+end)
+-------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
 
