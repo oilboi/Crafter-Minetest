@@ -82,9 +82,12 @@
 - Add rain sound effect
 - Updated nether prototype
 - Added lava
-- Added ithor weather
+- Added ichor weather
 - Added nether portal node and fire
 - Added in flint and steel, flint, and gravel and enabled dirt and gravel spawning
+- Made nether portal function
+- Beds and water explode in the nether
+- Added better nether portal effect
 ---
 
 
