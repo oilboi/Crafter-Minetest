@@ -88,7 +88,6 @@
 - Made nether portal function
 - Beds and water explode in the nether
 - Added better nether portal effect
-- Make error 23 much less frequent
 - Make mobs less noisy
 - Add buckets in
 - Make buckets use special raycast function
@@ -97,6 +96,7 @@
 - Made lava spawn in blobs underground
 - Added nether ores
 - Added glowstone and glowstone dust
+- Rubenwardy fixed error 23
 ---
 
 
