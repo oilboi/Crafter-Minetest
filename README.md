@@ -88,6 +88,8 @@
 - Made nether portal function
 - Beds and water explode in the nether
 - Added better nether portal effect
+- Fix clientside error 23
+- Make mobs less noisy
 ---
 
 

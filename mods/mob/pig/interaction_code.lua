@@ -69,9 +69,9 @@ pig.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, 
 		--critical effect
 		if critical == true then
 			self.do_critical_particles(pos)
-			minetest.sound_play("critical", {object=self.object, gain = 0.1, max_hear_distance = 32,pitch = math.random(80,100)/100})
+			minetest.sound_play("critical", {object=self.object, gain = 0.1, max_hear_distance = 10,pitch = math.random(80,100)/100})
 		end
-		minetest.sound_play("pig", {object=self.object, gain = 1.0, max_hear_distance = 32,pitch = math.random(80,100)/100})
+		minetest.sound_play("pig", {object=self.object, gain = 1.0, max_hear_distance = 10,pitch = math.random(80,100)/100})
 		
 		self.hp = hp
 		
@@ -93,9 +93,9 @@ pig.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, 
 		--critical effect
 		if critical == true then
 			self.do_critical_particles(pos)
-			minetest.sound_play("critical", {object=self.object, gain = 0.1, max_hear_distance = 32,pitch = math.random(80,100)/100})
+			minetest.sound_play("critical", {object=self.object, gain = 0.1, max_hear_distance = 10,pitch = math.random(80,100)/100})
 		end
-		minetest.sound_play("pig_die", {object=self.object, gain = 1.0, max_hear_distance = 32,pitch = math.random(80,100)/100})
+		minetest.sound_play("pig_die", {object=self.object, gain = 1.0, max_hear_distance = 10,pitch = math.random(80,100)/100})
 		
 		self.object:set_texture_mod("^[colorize:red:130")
 		if self.child then

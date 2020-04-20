@@ -37,7 +37,7 @@ slime.jump = function(self)
 	local vel = self.object:get_velocity()
 	if self.jump_timer <= 0 then
 		if vel.y == 0 and self.oldvely and self.oldvely <= 0 then --use <= on self.oldvely to make slime make landing sound
-			minetest.sound_play("slime_splat", {object=self.object, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
+			minetest.sound_play("slime_splat", {object=self.object, gain = 1.0, max_hear_distance = 10,pitch = math.random(80,100)/100})
 			local vel = self.object:get_velocity()
 			self.jump_timer = 1+math.random()
 			if self.hostile == true then
