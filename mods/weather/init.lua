@@ -74,6 +74,7 @@ end)
 --have the client send the server the ready signal
 minetest.register_on_modchannel_message(function(channel_name, sender, message)
 	if channel_name == "weather_intake" then
+		print("sending player weather")
 		--for some reason this variable assignment does not work outside the scope of this function
 		local all_nodes_serialized = minetest.serialize(all_nodes)
 		weather_nodes_channel:send_all(all_nodes_serialized)

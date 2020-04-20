@@ -18,4 +18,5 @@ dofile(path.."/craft_recipes.lua")
 dofile(path.."/falling.lua")
 dofile(path.."/bucket.lua")
 dofile(path.."/lava_cooling.lua")
+dofile(path.."/clientside_initializer.lua")
 
