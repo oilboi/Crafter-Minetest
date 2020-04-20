@@ -20,7 +20,7 @@ for i = 0,1 do
 	end
 	minetest.register_node("redstone:ore_"..i, {
 		description = "Redstone Ore",
-		tiles = {"redstone_ore.png"},
+		tiles = {"stone.png^redstone_ore.png"},
 		groups = groups,
 		sounds = main.stoneSound(),
 		light_source = light_level,
