@@ -95,8 +95,13 @@
 - Made snow and grass floodable
 - Made lava spawn in blobs underground
 - Added nether ores
+- Make nether ores randomly explode when mined
 - Added glowstone and glowstone dust
 - Rubenwardy fixed error 23
+- Added in raycast TNT
+- Merge Treer's group changes
+- Make TNT cannons possible
+- Add in Aether prototype dimension (21000-31000 on Y axis)
 ---
 
 
