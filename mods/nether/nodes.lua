@@ -151,7 +151,18 @@ for id,ore in pairs(ores) do
 		table.insert(tool_required, tool[i])
 	end
 
-	local drops
+	
+
+	local drops = {
+			max_items = 1,
+			items= {
+				{
+					rarity = 0,
+					tools = tool_required,
+					items = {"nether:"..ore.."ore"},
+				},
+				},
+			}
 	if ore == "diamond" then 
 		drops = {
 			max_items = 1,
@@ -177,6 +188,7 @@ for id,ore in pairs(ores) do
 	elseif ore == "redstone_" then
 		drops = {
 			max_items = 5,
+			tools = tool_required,
 			items= {
 				{
 					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
