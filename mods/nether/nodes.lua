@@ -27,7 +27,44 @@ minetest.register_node("nether:netherrack", {
 				},
 			},
 })
-
+minetest.register_node("nether:glowstone", {
+    description = "Glowstone",
+    tiles = {"glowstone.png"},
+    groups = {glass = 1, pathable = 1},
+    sounds = main.stoneSound({
+		footstep = {name = "glass_footstep", gain = 0.4},
+        dug =  {name = "break_glass", gain = 0.4},
+	}),
+    is_ground_content = false,
+    light_source = 12,
+    drop = {
+			max_items = 5,
+			tools = tool_required,
+			items= {
+				{
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"nether:glowstone_dust"},
+				},
+				{
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"nether:glowstone_dust"},
+				},
+				{
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"nether:glowstone_dust"},
+				},
+				{
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"nether:glowstone_dust"},
+				},
+				{
+					rarity = 5,
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"nether:glowstone_dust"},
+				},
+			},
+		}
+})
 
 minetest.register_node("nether:obsidian", {
     description = "Obsidian",

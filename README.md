@@ -95,6 +95,8 @@
 - Fix clientside global counters to after statements
 - Made snow and grass floodable
 - Made lava spawn in blobs underground
+- Added nether ores
+- Added glowstone and glowstone dust
 ---
 
 

@@ -10,3 +10,8 @@ minetest.register_craft({
 	recipe = "nether:ironore",
 	cooktime = 3,
 })
+minetest.register_craft({
+	type = "shapeless",
+	output = "nether:glowstone",
+	recipe = {"nether:glowstone_dust","nether:glowstone_dust","nether:glowstone_dust","nether:glowstone_dust"},
+})

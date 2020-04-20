@@ -1,1 +1,2 @@
 netherrack, obsidian, portal, bedrock https://forum.minetest.net/viewtopic.php?t=16407
+glowstone - mineclone2

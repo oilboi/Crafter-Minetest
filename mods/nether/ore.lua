@@ -11,6 +11,17 @@ minetest.register_ore({
 
 minetest.register_ore({
 	ore_type	 = "scatter",
+	ore		= "nether:glowstone",
+	wherein	  = "air",
+	clust_scarcity = 64 * 64 * 64,
+	clust_num_ores = 30,
+	clust_size     = 5,
+	y_max	    = -10033,
+	y_min	    = -20000,
+})
+
+minetest.register_ore({
+	ore_type	 = "scatter",
 	ore		= "nether:coalore",
 	wherein	  = "nether:netherrack",
 	clust_scarcity = 12 * 12 * 12,

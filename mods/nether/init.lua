@@ -6,6 +6,7 @@ dofile(path.."/nodes.lua")
 dofile(path.."/biomes.lua")
 dofile(path.."/craft_recipes.lua")
 dofile(path.."/ore.lua")
+dofile(path.."/items.lua")
 
 
 minetest.register_node("nether:portal", {
