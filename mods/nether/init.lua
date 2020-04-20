@@ -220,6 +220,7 @@ minetest.register_node("nether:portal", {
 	tiles = {
 		{
 			name = "nether_portal.png",
+			backface_culling = true,
 			animation = {
 				type = "vertical_frames",
 				aspect_w = 16,
@@ -229,6 +230,7 @@ minetest.register_node("nether:portal", {
 		},
 		{
 			name = "nether_portal.png",
+			backface_culling = true,
 			animation = {
 				type = "vertical_frames",
 				aspect_w = 16,
@@ -250,15 +252,15 @@ minetest.register_node("nether:portal", {
 	drop = "",
 	light_source = 7,
 	--post_effect_color = {a = 180, r = 51, g = 7, b = 89},
-	--alpha = 192,
+	alpha = 140,
 	node_box = {
 	type = "connected",
 		-- connect_top =
 		-- connect_bottom =
-		connect_front = {-1/16,  -1/2, -1/2,   1/16,  1/2, 0 },
-		connect_left =  {-1/2,   -1/2, -1/16, 0,   1/2,  1/16},
-		connect_back =  {-1/16,  -1/2,  0,   1/16,  1/2,  1/2 },
-		connect_right = { 0,   -1/2, -1/16,  1/2,   1/2,  1/16},
+		connect_front = {0,  -1/2, -1/2,   0,  1/2, 0 },
+		connect_left =  {-1/2,   -1/2, 0, 0,   1/2,  0},
+		connect_back =  {0,  -1/2,  0,   0,  1/2,  1/2 },
+		connect_right = { 0,   -1/2, 0,  1/2,   1/2,  0},
 	},
 	connects_to = {"nether:portal","nether:obsidian"},
 	groups = {unbreakable=1},
