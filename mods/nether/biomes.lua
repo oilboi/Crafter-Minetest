@@ -12,8 +12,8 @@ minetest.register_biome({
 	node_dungeon_alt = "air",
 	node_dungeon_stair = "air",
 	vertical_blend = 0,
-	y_max = -10000,
-	y_min = -20000,
+	y_max = -10033,
+	y_min = -20113,
 	heat_point = -100,
 	humidity_point = -100,
 })
@@ -75,7 +75,7 @@ local data = {}
 -- define the 3D volume.
 minetest.register_on_generated(function(minp, maxp, seed)
 	--nether starts at -10033 y
-	if maxp.y > -10033 then
+	if maxp.y > -10033 or maxp.y < -20033 then
 		return
 	end
 	-- Start time of mapchunk generation.
@@ -136,10 +136,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			--print(density_noise, density_gradient)
 			-- Place solid nodes when 'density' > 0.
 			--if density_noise + density_gradient > 0 then
-			if density_noise > 0  and y ~= -10033 then
+			if density_noise > 0  and y ~= -10033 and y ~= -20112 then
 				data[vi] = c_sandstone
-			-- Otherwise if at or below water level place water.
-			elseif y == -10033 then
+			-- create bedrock layer
+			elseif y == -10033 or y == -20112 then
 				data[vi] = c_bedrock
 			--elseif y <= 1 then
 			--	data[vi] = c_water

@@ -92,7 +92,7 @@
 - Add buckets in
 - Make buckets use special raycast function
 - Fix clientside global counters to after statements
-- Made snow and grass floodable
+- Made snow, grass, and torches floodable
 - Made lava spawn in blobs underground
 - Added nether ores
 - Make nether ores randomly explode when mined
