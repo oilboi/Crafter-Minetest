@@ -10,6 +10,8 @@ end)
 
 minetest.register_on_joinplayer(function(player)
 	player:set_physics_override({jump=1.25,gravity=1.25})
+	local meta = player:get_meta()
+	meta:set_string("player.player_movement_state", "0")
 end)
 
 minetest.register_globalstep(function(dtime)
