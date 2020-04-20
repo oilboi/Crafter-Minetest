@@ -135,6 +135,10 @@ minetest.register_node("torch:floor", {
 	sunlight_propagates = true,
 	drop = "torch:torch",
 	walkable = false,
+	floodable = true,
+	on_flood = function(pos, oldnode, newnode)
+		minetest.throw_item(pos, "torch:torch")
+	end,
 	light_source = 13,
 	groups = {choppy=2, dig_immediate=3, flammable=1, not_in_creative_inventory=1, attached_node=1, torch=1},
 	legacy_wallmounted = true,
@@ -154,6 +158,10 @@ minetest.register_node("torch:wall", {
 	tiles = {"torches_torch.png"},
 	paramtype = "light",
 	paramtype2 = "wallmounted",
+	floodable = true,
+	on_flood = function(pos, oldnode, newnode)
+		minetest.throw_item(pos, "torch:torch")
+	end,
 	sunlight_propagates = true,
 	walkable = false,
 	light_source = 13,
