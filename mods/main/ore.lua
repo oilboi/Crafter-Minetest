@@ -42,6 +42,27 @@ minetest.register_ore({
 		persist = 0.0
 	},
 })
+
+
+minetest.register_ore({
+	ore_type	  = "blob",
+	ore		 = "main:lava",
+	wherein	   = {"main:stone"},
+	clust_scarcity  = 48 * 48 * 48,
+	clust_size	= 15,
+	y_max	     = -128,
+	y_min	     = -10032,
+	noise_threshold = 0.0,
+	noise_params    = {
+		offset = 0.5,
+		scale = 0.2,
+		spread = {x = 5, y = 5, z = 5},
+		seed = 766,
+		octaves = 1,
+		persist = 0.0
+	},
+})
+
 -- Scatter ores
 
 -- Coal
@@ -75,7 +96,7 @@ minetest.register_ore({
 	clust_num_ores = 30,
 	clust_size     = 5,
 	y_max	    = -128,
-	y_min	    = -31000,
+	y_min	    = -10032,
 })
 
 -- Iron
@@ -121,7 +142,7 @@ minetest.register_ore({
 	clust_num_ores = 29,
 	clust_size     = 5,
 	y_max	    = -128,
-	y_min	    = -9999,
+	y_min	    = -10032,
 })
 
 -- Gold
@@ -156,7 +177,7 @@ minetest.register_ore({
 	clust_num_ores = 5,
 	clust_size     = 3,
 	y_max	    = -128,
-	y_min	    = -9999,
+	y_min	    = -10032,
 })
 
 -- Mese crystal
@@ -191,7 +212,7 @@ minetest.register_ore({
 	clust_num_ores = 5,
 	clust_size     = 3,
 	y_max	    = -128,
-	y_min	    = -9999,
+	y_min	    = -10032,
 })
 
 -- Diamond
@@ -226,6 +247,6 @@ minetest.register_ore({
 	clust_num_ores = 4,
 	clust_size     = 3,
 	y_max	    = -256,
-	y_min	    = -9999,
+	y_min	    = -10032,
 })
 
