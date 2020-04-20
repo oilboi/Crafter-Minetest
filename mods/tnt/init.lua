@@ -82,6 +82,7 @@ local positional_data
 local pos2 = vector.new(0,0,0)
 function tnt(pos,range)
 	local pos = vector.floor(vector.add(pos,0.5))
+	local in_water = (minetest.get_node(pos).name == "main:water" or minetest.get_node(pos).name == "main:waterflow")
 	local min = vector.add(pos,range)
 	local max = vector.subtract(pos,range)
 	local vm = minetest.get_voxel_manip()	
@@ -97,8 +98,9 @@ function tnt(pos,range)
 	vm:get_light_data()
 	
 	--throw players and items
+	
 	for _,object in ipairs(minetest.get_objects_inside_radius(pos, range)) do
-		if object:is_player() or (object:get_luaentity() and object:get_luaentity().name == "__builtin:item") then
+		if object:is_player() or (object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt")) then
 			local ppos = object:getpos()
 			if object:is_player() then
 				ppos.y = ppos.y + 1
@@ -124,65 +126,69 @@ function tnt(pos,range)
 						object:set_hp(hp - math.floor(power*2))
 					end
 					object:add_player_velocity(force)
-				elseif object:get_luaentity() and object:get_luaentity().name == "__builtin:item" then
+				elseif object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt") then
 					object:setvelocity(force)
+					if object:get_luaentity().name == "tnt:tnt" then
+						object:get_luaentity().shot = true
+					end
 				end
 			end
 		end
 	end
 	
-	--raycast explosion
-	for x=-range, range do
-	for y=-range, range do
-	for z=-range, range do
-		local distance = vector.distance(pos2, vector.new(x,y,z))
-		if distance <= range and distance >= range-1 then
-			
-			p_pos = area:index(pos.x+x,pos.y+y,pos.z+z)
-			n = content_id(data[p_pos])
-			
-			ray = minetest.raycast(pos, vector.new(pos.x+x,pos.y+y,pos.z+z), false, false)
-			
-			for pointed_thing in ray do
-				n_pos = area:index(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
-				node2 = content_id(data[n_pos])
+	if not in_water then
+		--raycast explosion
+		for x=-range, range do
+		for y=-range, range do
+		for z=-range, range do
+			local distance = vector.distance(pos2, vector.new(x,y,z))
+			if distance <= range and distance >= range-1 then
 				
-				if node2 == "nether:obsidian" or node2 == "nether:bedrock" then
-					break
-				elseif node2 == "tnt:tnt" then
-					data[n_pos] = air
-					local obj = minetest.add_entity(vector.new(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z), "tnt:tnt")
-					if obj then
-						obj:get_luaentity().timer = math.random()
-					end
-				else
-					data[n_pos] = air
-					minetest.after(0, function(pointed_thing)
-						minetest.check_for_falling(vector.new(pointed_thing.under.x,pointed_thing.under.y+1,pointed_thing.under.z))
-					end,pointed_thing)
-					if math.random()>0.99 then
-						local item = minetest.get_node_drops(n, "main:diamondpick")[1]
-						local ppos = vector.new(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
-						local obj = minetest.add_item(ppos, item)
+				p_pos = area:index(pos.x+x,pos.y+y,pos.z+z)
+				n = content_id(data[p_pos])
+				
+				ray = minetest.raycast(pos, vector.new(pos.x+x,pos.y+y,pos.z+z), false, false)
+				
+				for pointed_thing in ray do
+					n_pos = area:index(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
+					node2 = content_id(data[n_pos])
+					
+					if node2 == "nether:obsidian" or node2 == "nether:bedrock" then
+						break
+					elseif node2 == "tnt:tnt" then
+						data[n_pos] = air
+						local obj = minetest.add_entity(vector.new(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z), "tnt:tnt")
 						if obj then
-							local power = (range - vector.distance(pos,ppos))*2
-							local dir = vector.subtract(ppos,pos)
-							local force = vector.multiply(dir,power)
-							obj:setvelocity(force)
+							obj:get_luaentity().timer = math.random()
 						end
-						
+					else
+						data[n_pos] = air
+						minetest.after(0, function(pointed_thing)
+							minetest.check_for_falling(vector.new(pointed_thing.under.x,pointed_thing.under.y+1,pointed_thing.under.z))
+						end,pointed_thing)
+						if math.random()>0.99 then
+							local item = minetest.get_node_drops(n, "main:diamondpick")[1]
+							local ppos = vector.new(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
+							local obj = minetest.add_item(ppos, item)
+							if obj then
+								local power = (range - vector.distance(pos,ppos))*2
+								local dir = vector.subtract(ppos,pos)
+								local force = vector.multiply(dir,power)
+								obj:setvelocity(force)
+							end
+							
+						end
 					end
 				end
 			end
 		end
+		end
+		end
+		vm:set_data(data)
+		vm:calc_lighting()
+		vm:update_liquids()
+		vm:write_to_map()
 	end
-	end
-	end
-	vm:set_data(data)
-	vm:calc_lighting()
-	vm:update_liquids()
-	vm:write_to_map()
-	
 	
 	
 	minetest.sound_play("tnt_explode", {pos = pos, gain = 1.0, max_hear_distance = range*range}) --hear twice as far away
@@ -233,7 +239,6 @@ minetest.register_entity("tnt:tnt", {
 
 	timer = 5,
 	range = 7,
-	
 	get_staticdata = function(self)
 		return minetest.serialize({
 			range = self.range,
@@ -282,10 +287,11 @@ minetest.register_entity("tnt:tnt", {
 	sound_played = false,
 	on_step = function(self, dtime)
 		self.timer = self.timer - dtime
-		local vel = self.object:getvelocity()
-		vel = vector.multiply(vel,-0.05)
-		self.object:add_velocity(vector.new(vel.x,0,vel.z))
-		
+		if not self.shot then
+			local vel = self.object:getvelocity()
+			vel = vector.multiply(vel,-0.05)
+			self.object:add_velocity(vector.new(vel.x,0,vel.z))
+		end
 		if self.timer <= 0 then
 			local pos = self.object:getpos()
 			if not self.range then
