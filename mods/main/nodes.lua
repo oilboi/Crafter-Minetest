@@ -342,6 +342,12 @@ minetest.register_node("main:waterflow", {
 			},
 		},
 	},
+	selection_box = {
+            type = "fixed",
+            fixed = {
+                {0, 0, 0, 0, 0, 0},
+            },
+        },
 	alpha = 191,
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
@@ -431,6 +437,12 @@ minetest.register_node("main:lavaflow", {
 			},
 		},
 	},
+	selection_box = {
+            type = "fixed",
+            fixed = {
+                {0, 0, 0, 0, 0, 0},
+            },
+        },
 	paramtype = "light",
 	paramtype2 = "flowingliquid",
 	light_source = 13,

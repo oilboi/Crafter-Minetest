@@ -88,8 +88,12 @@
 - Made nether portal function
 - Beds and water explode in the nether
 - Added better nether portal effect
-- Fix clientside error 23
+- Make error 23 much less frequent
 - Make mobs less noisy
+- Add buckets in
+- Make buckets use special raycast function
+- Fix clientside global counters to after statements
+- Made snow and grass floodable
 ---
 
 

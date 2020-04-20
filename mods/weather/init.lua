@@ -192,6 +192,7 @@ minetest.register_node("weather:snow", {
     paramtype = "light",
 	drawtype = "nodebox",
 	walkable = false,
+	floodable = true,
     drop = {
 			max_items = 5,
 			items= {

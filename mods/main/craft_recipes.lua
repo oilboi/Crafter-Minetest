@@ -158,6 +158,14 @@ minetest.register_craft({
 	}
 })
 
+minetest.register_craft({
+	output = "main:bucket",
+	recipe = {
+		{"main:iron","","main:iron"},
+		{"","main:iron",""},
+	}
+})
+
 --tool repair
 minetest.register_craft({
 	type = "toolrepair",

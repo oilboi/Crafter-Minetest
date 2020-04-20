@@ -184,6 +184,7 @@ minetest.register_node("farming:grass", {
     buildable_to = true,
     groups = {dig_immediate=1,attached_node=1,flammable=1},
     sounds = main.grassSound(),
+    floodable = true,
     selection_box = {
 		type = "fixed",
 		fixed = {-4 / 16, -0.5, -4 / 16, 4 / 16, 4 / 16, 4 / 16}
