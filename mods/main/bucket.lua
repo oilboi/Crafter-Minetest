@@ -52,7 +52,7 @@ minetest.register_craftitem("main:bucket", {
 			itemstack:replace(ItemStack("main:bucket_water"))
 			minetest.remove_node(pos_under)
 			return(itemstack)
-		elseif node == "main:lava" then
+		elseif node == "main:lava" or node == "nether:lava" then
 			itemstack:replace(ItemStack("main:bucket_lava"))
 			minetest.remove_node(pos_under)
 			return(itemstack)
@@ -71,7 +71,7 @@ minetest.register_craftitem("main:bucket", {
 			itemstack:replace(ItemStack("main:bucket_water"))
 			minetest.remove_node(pos_under)
 			return(itemstack)
-		elseif node == "main:lava" then
+		elseif node == "main:lava" or node == "nether:lava" then
 			itemstack:replace(ItemStack("main:bucket_lava"))
 			minetest.remove_node(pos_under)
 			return(itemstack)
@@ -135,11 +135,11 @@ minetest.register_craftitem("main:bucket_water", {
 		
 		--set it to water
 		if buildable_under == true then
-			minetest.set_node(pos_under,{name="main:water"})
+			minetest.add_node(pos_under,{name="main:water"})
 			itemstack:replace(ItemStack("main:bucket"))
 			return(itemstack)
 		elseif buildable_above then
-			minetest.set_node(pos_above,{name="main:water"})
+			minetest.add_node(pos_above,{name="main:water"})
 			itemstack:replace(ItemStack("main:bucket"))
 			return(itemstack)
 		end
@@ -177,11 +177,19 @@ minetest.register_craftitem("main:bucket_lava", {
 		
 		--set it to lava
 		if buildable_under == true then
-			minetest.set_node(pos_under,{name="main:lava"})
+			if pos_under.y > -10033 then
+				minetest.add_node(pos_under,{name="main:lava"})
+			else
+				minetest.add_node(pos_under,{name="nether:lava"})
+			end
 			itemstack:replace(ItemStack("main:bucket"))
 			return(itemstack)
 		elseif buildable_above then
-			minetest.set_node(pos_above,{name="main:lava"})
+			if pos_above.y > -10033 then
+				minetest.add_node(pos_above,{name="main:lava"})
+			else
+				minetest.add_node(pos_above,{name="nether:lava"})
+			end
 			itemstack:replace(ItemStack("main:bucket"))
 			return(itemstack)
 		end
