@@ -94,6 +94,7 @@
 - Make buckets use special raycast function
 - Fix clientside global counters to after statements
 - Made snow and grass floodable
+- Made lava spawn in blobs underground
 ---
 
 
