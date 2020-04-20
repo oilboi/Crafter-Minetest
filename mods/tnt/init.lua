@@ -100,6 +100,9 @@ function tnt(pos,range)
 	for _,object in ipairs(minetest.get_objects_inside_radius(pos, range)) do
 		if object:is_player() or (object:get_luaentity() and object:get_luaentity().name == "__builtin:item") then
 			local ppos = object:getpos()
+			if object:is_player() then
+				ppos.y = ppos.y + 1
+			end
 			ray = minetest.raycast(pos, ppos, false, false)
 			local clear = true
 			for pointed_thing in ray do
