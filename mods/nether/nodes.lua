@@ -138,3 +138,85 @@ minetest.register_node("nether:lavaflow", {
 	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
 	groups = {lava = 3, liquid = 2, igniter = 1},
 })
+
+local ores = {"redstone_","coal","iron","gold","diamond"}
+local tool = {"main:woodpick","main:stonepick","main:ironpick","main:goldpick","main:diamondpick"}
+for id,ore in pairs(ores) do
+
+	if id > 1 then
+		id = id - 1
+	end
+	local tool_required = {}
+	for i = id,5 do
+		table.insert(tool_required, tool[i])
+	end
+
+	local drops
+	if ore == "diamond" then 
+		drops = {
+			max_items = 1,
+			items= {
+				{
+					rarity = 0,
+					tools = tool_required,
+					items = {"main:diamond"},
+				},
+				},
+			}
+	elseif ore == "coal" then 
+		drops = {
+			max_items = 1,
+			items= {
+				{
+					rarity = 0,
+					tools = tool_required,
+					items = {"main:coal"},
+				},
+				},
+			}
+	elseif ore == "redstone_" then
+		drops = {
+			max_items = 5,
+			items= {
+				{
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"redstone:dust"},
+				},
+				{
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"redstone:dust"},
+				},
+				{
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"redstone:dust"},
+				},
+				{
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"redstone:dust"},
+				},
+				{
+					rarity = 5,
+					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"redstone:dust"},
+				},
+			},
+		}
+	end
+	
+	minetest.register_node("nether:"..ore.."ore", {
+		description = ore:gsub("^%l", string.upper).." Ore",
+		tiles = {"netherrack.png^"..ore.."ore.png"},
+		groups = {netherrack = id, pathable = 1},
+		sounds = main.stoneSound(),
+		light_source = 7,
+		drop = drops,
+		after_destruct = function(pos, oldnode)
+			if math.random() > 0.95 then
+				minetest.sound_play("tnt_ignite")
+				minetest.after(3, function(pos)
+					tnt(pos,9)
+				end,pos)
+			end
+		end,
+	})
+end

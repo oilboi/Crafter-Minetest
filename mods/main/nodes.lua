@@ -1,5 +1,3 @@
-print("Initializing nodes")
-
 --ore def with required tool
 local ores = {"coal","iron","gold","diamond"}
 local tool = {"main:woodpick","main:stonepick","main:ironpick","main:goldpick","main:diamondpick"}

@@ -164,6 +164,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	-- Calculate lighting for what has been created.
 	--vm:calc_lighting()
 	
+	minetest.generate_ores(vm)
+	
 	vm:set_lighting({day=7,night=7}, minp, maxp)
 	
 	-- Write what has been created to the world.

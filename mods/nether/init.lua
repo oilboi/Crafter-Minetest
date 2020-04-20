@@ -4,6 +4,8 @@ local path = minetest.get_modpath("nether")
 dofile(path.."/schem.lua")
 dofile(path.."/nodes.lua")
 dofile(path.."/biomes.lua")
+dofile(path.."/craft_recipes.lua")
+dofile(path.."/ore.lua")
 
 
 minetest.register_node("nether:portal", {

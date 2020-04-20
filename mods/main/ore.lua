@@ -180,7 +180,7 @@ minetest.register_ore({
 	y_min	    = -10032,
 })
 
--- Mese crystal
+-- Diamond
 
 minetest.register_ore({
 	ore_type	 = "scatter",
