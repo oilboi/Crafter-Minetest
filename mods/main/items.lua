@@ -9,16 +9,19 @@ minetest.register_craftitem("main:apple", {
 minetest.register_craftitem("main:stick", {
 	description = "Stick",
 	inventory_image = "stick.png",
+	groups = {stick = 1}
 })
 
 minetest.register_craftitem("main:coal", {
 	description = "Coal",
 	inventory_image = "coal.png",
+	groups = {coal = 1}
 })
 
 minetest.register_craftitem("main:charcoal", {
 	description = "Charcoal",
 	inventory_image = "charcoal.png",
+	groups = {coal = 1}
 })
 
 minetest.register_craftitem("main:iron", {

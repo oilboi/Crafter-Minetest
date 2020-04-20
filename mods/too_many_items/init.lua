@@ -97,14 +97,26 @@ local recipe_converter = function (items, width)
 
     return(usable_recipe)
 end
+
+local map_group_to_item = {
+	["coal"]  = "main:coal",
+	["glass"] = "main:glass",
+	["sand"]  = "main:sand",
+	["stick"] = "main:stick",
+	["stone"] = "main:cobble",
+	["tree"]  = "main:tree",
+	["wood"]  = "main:wood"
+}
+
 get_if_group = function(item)
-	 if item == "group:stone" then
-		return("main:cobble")
-	elseif item == "group:wood" then
-		return("main:wood")
-	else
-		return(item)
+	if item ~= nil and item:sub(1,6) == "group:" then
+		local group_name = item:sub(7, item:len())
+		local mapped_item = map_group_to_item[group_name]
+		if mapped_item ~= nil then
+			return(mapped_item)
+		end
 	end
+	return(item)
 end
 	
 

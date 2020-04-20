@@ -179,14 +179,7 @@ minetest.register_node("torch:wall", {
 minetest.register_craft({
 	output = "torch:torch 4",
 	recipe = {
-		{"main:coal"},
-		{"main:stick"}
-	}
-})
-minetest.register_craft({
-	output = "torch:torch 4",
-	recipe = {
-		{"main:charcoal"},
-		{"main:stick"}
+		{"group:coal"},
+		{"group:stick"}
 	}
 })
