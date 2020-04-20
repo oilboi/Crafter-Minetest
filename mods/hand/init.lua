@@ -17,7 +17,9 @@ minetest.register_item(":", {
 			wood =  {times={[1]=3,[2]=6,[3]=9,[4]=12,[5]=15},       uses=0, maxlevel=1}, --
 			leaves ={times={[1]=0.75,[2]=1.5,[3]=3,[4]=6,[5]=12},   uses=0, maxlevel=1}, --
 			wool =  {times={[1]=0.75,[2]=1.5,[3]=3,[4]=6,[5]=12},   uses=0, maxlevel=1}, --
-			glass = {times={[1]=0.75,[2]=1.5,[3]=3,[4]=6,[5]=12},   uses=0, maxlevel=1}, --
+			glass = {times={[1]=0.5,[2]=1.5,[3]=3,[4]=6,[5]=12},   uses=0, maxlevel=1}, --
+			netherrack = {times={[1]=0.4,[2]=1.5,[3]=3,[4]=6,[5]=12},   uses=0, maxlevel=1}, --
+			
 			unbreakable = {times={[1]=63072000000000},   uses=0, maxlevel=1}, -- 2 million years
 			
 			--instant = {times={[1]=0.1,},uses=0,maxlevel=1},

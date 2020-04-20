@@ -36,10 +36,20 @@ minetest.register_node("nether:bedrock", {
 minetest.register_node("nether:netherrack", {
     description = "Netherrack",
     tiles = {"netherrack.png"},
-    groups = {stone = 1, pathable = 1},
+    groups = {netherrack = 1, pathable = 1},
     sounds = main.stoneSound(),
     is_ground_content = false,
     light_source = 7,
+    drop = {
+			max_items = 1,
+			items= {
+				{
+					rarity = 0,
+					tools = {"main:woodpick","main:stonepick","main:ironpick","main:goldpick","main:diamondpick"},
+					items = {"nether:netherrack"},
+				},
+				},
+			},
 })
 
 

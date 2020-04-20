@@ -99,35 +99,40 @@ for _,material in pairs(material) do
 					--ore hardness
 					--1 stone, 1 coal, 2 iron, 3 gold, 4 diamond, 5 obsidian
 					stone = {times={[1]=1.15,[2]=16,[3]=32,[4]=64,[5]=128}, uses=59, maxlevel=1},
-					glass = {times={[1]=1.15,[2]=16,[3]=32,[4]=64,[5]=128}, uses=59, maxlevel=1},
+					glass = {times={[1]=0.575,[2]=16,[3]=32,[4]=64,[5]=128}, uses=59, maxlevel=1},
+					netherrack = {times={[1]=0.2875,[2]=16,[3]=32,[4]=64,[5]=128}, uses=59, maxlevel=1},
 				}
 				damage = 3
 				wear = 500
 			elseif material == "stone" then
 				groupcaps2={
 					stone = {times={[1]=0.6,[2]=0.6,[3]=32,[4]=64,[5]=128}, uses=131, maxlevel=1},
-					glass = {times={[1]=0.6,[2]=0.6,[3]=32,[4]=64,[5]=128}, uses=131, maxlevel=1},
+					glass = {times={[1]=0.3,[2]=0.3,[3]=32,[4]=64,[5]=128}, uses=131, maxlevel=1},
+					netherrack = {times={[1]=0.15,[2]=0.15,[3]=32,[4]=64,[5]=128}, uses=131, maxlevel=1},
 				}
 				damage=4
 				wear = 400
 			elseif material == "iron" then
 				groupcaps2={
 					stone = {times={[1]=0.4,[2]=0.4,[3]=0.4,[4]=32,[5]=64}, uses=250, maxlevel=1},
-					glass = {times={[1]=0.4,[2]=0.4,[3]=0.4,[4]=32,[5]=64}, uses=250, maxlevel=1},
+					glass = {times={[1]=0.2,[2]=0.2,[3]=0.2,[4]=32,[5]=64}, uses=250, maxlevel=1},
+					netherrack = {times={[1]=0.1,[2]=0.1,[3]=0.1,[4]=32,[5]=64}, uses=250, maxlevel=1},
 				}
 				damage = 5
 				wear = 300
 			elseif material == "gold" then
 				groupcaps2={
 					stone = {times={[1]=0.2,[2]=0.2,[3]=0.2,[4]=0.2,[5]=32}, uses=32, maxlevel=1},
-					glass = {times={[1]=0.2,[2]=0.2,[3]=0.2,[4]=0.2,[5]=32}, uses=32, maxlevel=1},
+					glass = {times={[1]=0.1,[2]=0.1,[3]=0.1,[4]=0.1,[5]=32}, uses=32, maxlevel=1},
+					netherrack = {times={[1]=0.05,[2]=0.05,[3]=0.05,[4]=0.05,[5]=32}, uses=32, maxlevel=1},
 				}
 				damage = 3
 				wear = 1000
 			elseif material == "diamond" then
 				groupcaps2={
 					stone = {times={[1]= 0.3,[2]=0.3,[3]=0.3,[4]=0.3,[5]=4}, uses=1561, maxlevel=1},
-					glass = {times={[1]= 0.3,[2]=0.3,[3]=0.3,[4]=0.3,[5]=4}, uses=1561, maxlevel=1},
+					glass = {times={[1]= 0.15,[2]=0.15,[3]=0.15,[4]=0.15,[5]=4}, uses=1561, maxlevel=1},
+					netherrack = {times={[1]= 0.075,[2]=0.075,[3]=0.075,[4]=0.075,[5]=4}, uses=1561, maxlevel=1},
 				}
 				damage = 6
 				wear = 100
