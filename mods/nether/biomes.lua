@@ -6,6 +6,7 @@ minetest.register_biome({
 	depth_filler = 0,
 	node_riverbed = "air",
 	depth_riverbed= 0,
+	node_cave_liquid = "air",
 	node_stone = "air",
 	node_water = nil,
 	node_dungeon = "air",

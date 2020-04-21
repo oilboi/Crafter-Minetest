@@ -9,6 +9,7 @@ minetest.register_biome({
 	depth_filler = 0,
 	node_riverbed = "air",
 	depth_riverbed= 0,
+	node_cave_liquid = "air",
 	node_stone = "air",
 	node_water = nil,
 	node_dungeon = "air",
@@ -83,7 +84,7 @@ local content_id = minetest.get_name_from_content_id
 -- define the 3D volume.
 minetest.register_on_generated(function(minp, maxp, seed)
 	--nether starts at -10033 y
-	print(maxp.y)
+	--print(maxp.y)
 	if maxp.y > -20113 then
 		return
 	end

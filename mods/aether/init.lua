@@ -15,6 +15,7 @@ minetest.register_biome({
 	node_dungeon = "air",
 	node_dungeon_alt = "air",
 	node_dungeon_stair = "air",
+	node_cave_liquid = "air",
 	vertical_blend = 0,
 	y_max = 31000,
 	y_min = 21000,
