@@ -1,5 +1,8 @@
 local tool = {"main:woodpick","main:stonepick","main:ironpick","main:goldpick","main:diamondpick"}
 
+local path = minetest.get_modpath("nether")
+dofile(path.."/schem.lua")
+
 minetest.register_node("aether:stone", {
     description = "Aether Stone",
     tiles = {"stone.png^[colorize:aqua:40"},
