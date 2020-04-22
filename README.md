@@ -109,6 +109,9 @@
 - Added sugarcane, sugar, and paper
 - Books are now made out of paper and wood
 - Made sugarcane grow near water
+- Organized TooManyItems
+- Added in 3D player model
+- Added sneak animation to player model
 ---
 
 
