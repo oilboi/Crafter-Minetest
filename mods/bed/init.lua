@@ -58,11 +58,6 @@ minetest.register_node("bed:bed", {
 			return
 		end
 		
-		--bed explodes in the nether
-		if pointed_thing.above.y <= -10033 then
-			tnt(pointed_thing.under,10)
-			return
-		end
 		
 		local sneak = placer:get_player_control().sneak
 		local noddef = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
@@ -127,6 +122,10 @@ minetest.register_node("bed:bed_front", {
 		minetest.punch_node(vector.new(pos.x,pos.y+1,pos.z))
 	end,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+		if pos.y <= -10033 then
+			tnt(pos,10)
+			return
+		end
 		create_spawnpoint(pos,clicker)
 	end,
 })
@@ -160,6 +159,10 @@ minetest.register_node("bed:bed_back", {
 		minetest.punch_node(vector.new(pos.x,pos.y+1,pos.z))
 	end,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+		if pos.y <= -10033 then
+			tnt(pos,10)
+			return
+		end
 		local param2 = minetest.get_node(pos).param2
 		local facedir = minetest.facedir_to_dir(param2)	
 		create_spawnpoint(vector.add(pos,facedir),clicker)
