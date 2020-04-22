@@ -97,44 +97,7 @@ function tnt(pos,range)
 	
 	vm:get_light_data()
 	
-	--throw players and items
 	
-	for _,object in ipairs(minetest.get_objects_inside_radius(pos, range)) do
-		if object:is_player() or (object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt")) then
-			local ppos = object:getpos()
-			if object:is_player() then
-				ppos.y = ppos.y + 1
-			end
-			ray = minetest.raycast(pos, ppos, false, false)
-			local clear = true
-			for pointed_thing in ray do
-				n_pos = area:index(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
-				node2 = content_id(data[n_pos])
-				if node2 == "nether:obsidian" or node2 == "nether:bedrock" then
-					clear = false
-				end
-			end
-			
-			if clear == true then
-				local power = (range - vector.distance(pos,ppos))*2
-				local dir = vector.subtract(ppos,pos)
-				local force = vector.multiply(dir,power)
-				if object:is_player() then
-					--damage the player
-					local hp = object:get_hp()
-					if hp then
-						object:set_hp(hp - math.floor(power*2))
-					end
-					object:add_player_velocity(force)
-				elseif object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt") then
-					object:setvelocity(force)
-					if object:get_luaentity().name == "tnt:tnt" then
-						object:get_luaentity().shot = true
-					end
-				end
-			end
-		end
-	end
 	
 	if not in_water then
 		--raycast explosion
@@ -157,26 +120,24 @@ function tnt(pos,range)
 						break
 					elseif node2 == "tnt:tnt" then
 						data[n_pos] = air
-						local obj = minetest.add_entity(vector.new(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z), "tnt:tnt")
-						if obj then
-							obj:get_luaentity().timer = math.random()
-						end
+						local obj = minetest.add_entity(vector.new(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z), "tnt:tnt",minetest.serialize({do_ignition_particles=true,timer = math.random()}))
 					else
 						data[n_pos] = air
 						minetest.after(0, function(pointed_thing)
 							minetest.check_for_falling(vector.new(pointed_thing.under.x,pointed_thing.under.y+1,pointed_thing.under.z))
 						end,pointed_thing)
-						if math.random()>0.99 then
-							local item = minetest.get_node_drops(n, "main:diamondpick")[1]
-							local ppos = vector.new(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
-							local obj = minetest.add_item(ppos, item)
-							if obj then
-								local power = (range - vector.distance(pos,ppos))*2
-								local dir = vector.subtract(ppos,pos)
-								local force = vector.multiply(dir,power)
-								obj:setvelocity(force)
+						if math.random()>0.999 then
+							if n ~= "nether:obsidian" and n ~= "nether:bedrock" then
+								local item = minetest.get_node_drops(n, "main:diamondpick")[1]
+								local ppos = vector.new(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
+								local obj = minetest.add_item(ppos, item)
+								if obj then
+									local power = (range - vector.distance(pos,ppos))*2
+									local dir = vector.subtract(ppos,pos)
+									local force = vector.multiply(dir,power)
+									obj:setvelocity(force)
+								end
 							end
-							
 						end
 					end
 				end
@@ -185,13 +146,50 @@ function tnt(pos,range)
 		end
 		end
 		vm:set_data(data)
-		vm:calc_lighting()
 		vm:update_liquids()
 		vm:write_to_map()
 	end
 	
-	
 	minetest.sound_play("tnt_explode", {pos = pos, gain = 1.0, max_hear_distance = range*range}) --hear twice as far away
+	
+	--throw players and items
+	for _,object in ipairs(minetest.get_objects_inside_radius(pos, range)) do
+		if object:is_player() or (object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt")) then
+			local ppos = object:getpos()
+			if object:is_player() then
+				ppos.y = ppos.y + 1
+			end
+			ray = minetest.raycast(pos, ppos, false, false)
+			local clear = true
+			for pointed_thing in ray do
+				n_pos = area:index(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
+				node2 = content_id(data[n_pos])
+				if node2 == "nether:obsidian" or node2 == "nether:bedrock" then
+					clear = false
+				end
+			end
+			
+			if clear == true then
+				local power = (range - vector.distance(pos,ppos))*10
+				
+				local dir = vector.direction(pos,ppos)
+				local force = vector.multiply(dir,power)
+				if object:is_player() then
+					--damage the player
+					local hp = object:get_hp()
+					if hp then
+						object:set_hp(hp - math.floor(power*2))
+					end
+					object:add_player_velocity(force)
+				elseif object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt") then
+					object:setvelocity(force)
+					if object:get_luaentity().name == "tnt:tnt" then
+						object:get_luaentity().shot = true
+					end
+				end
+			end
+		end
+	end
 	
 	--stop client from lagging
 	local particle = range
@@ -201,7 +199,7 @@ function tnt(pos,range)
 	
 
 	minetest.add_particlespawner({
-		amount = particle*particle*particle,
+		amount = particle*particle,
 		time = 0.001,
 		minpos = pos,
 		maxpos = pos,
@@ -218,7 +216,6 @@ function tnt(pos,range)
 		vertical = false,
 		texture = "smoke.png",
 	})
-		
 end
 
 
@@ -238,11 +235,13 @@ minetest.register_entity("tnt:tnt", {
 	},
 
 	timer = 5,
+	timer_max = 5, --this has to be equal to timer
 	range = 7,
 	get_staticdata = function(self)
 		return minetest.serialize({
 			range = self.range,
-			timer = self.timer,			
+			timer = self.timer,
+			exploded = self.exploded,	
 		})
 	end,
 	
@@ -255,28 +254,30 @@ minetest.register_entity("tnt:tnt", {
 			if data and type(data) == "table" then
 				self.range = data.range
 				self.timer = data.timer
+				self.exploded = data.exploded
 			end
 		end
-		
-		minetest.add_particlespawner({
-			amount = 50,
-			time = 0,
-			minpos = pos,
-			maxpos = pos,
-			minvel = vector.new(-0.5,1,-0.5),
-			maxvel = vector.new(0.5,5,0.5),
-			minacc = {x=0, y=0, z=0},
-			maxacc = {x=0, y=0, z=0},
-			minexptime = 1.1,
-			maxexptime = 1.5,
-			minsize = 1,
-			maxsize = 2,
-			collisiondetection = false,
-			vertical = false,
-			texture = "smoke.png",
-			attached = self.object,
-		})
-		minetest.sound_play("tnt_ignite", {object = self.object, gain = 1.0, max_hear_distance = self.range*self.range*self.range})
+		if self.timer == self.timer_max then
+			minetest.add_particlespawner({
+				amount = 10,
+				time = 0,
+				minpos = vector.new(0,0.5,0),
+				minpos = vector.new(0,0.5,0),
+				minvel = vector.new(-0.5,1,-0.5),
+				maxvel = vector.new(0.5,5,0.5),
+				minacc = {x=0, y=0, z=0},
+				maxacc = {x=0, y=0, z=0},
+				minexptime = 0.5,
+				maxexptime = 1.0,
+				minsize = 1,
+				maxsize = 2,
+				collisiondetection = false,
+				vertical = false,
+				texture = "smoke.png",
+				attached = self.object,
+			})
+			minetest.sound_play("tnt_ignite", {object = self.object, gain = 1.0, max_hear_distance = self.range*self.range*self.range})
+		end
 	end,
 		
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
@@ -285,7 +286,7 @@ minetest.register_entity("tnt:tnt", {
 	end,
 
 	sound_played = false,
-	on_step = function(self, dtime)
+	on_step = function(self, dtime)	
 		self.timer = self.timer - dtime
 		if not self.shot then
 			local vel = self.object:getvelocity()
@@ -354,8 +355,8 @@ minetest.register_node("tnt:uh_oh", {
 			"tnt_side.png", "tnt_side.png"},
     groups = {stone = 2, hard = 1, pickaxe = 2, hand = 4},
     sounds = main.stoneSound(),
-    on_punch = function(pos, node, puncher, pointed_thing)
-		local range = 10
+    on_construct = function(pos)
+		local range = 5
 		for x=-range, range do
 		for y=-range, range do
 		for z=-range, range do 
