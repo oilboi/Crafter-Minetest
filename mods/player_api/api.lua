@@ -83,6 +83,15 @@ function player_api.set_animation(player, anim_name, speed)
 	local anim = model.animations[anim_name]
 	player_anim[name] = anim_name
 	player:set_animation(anim, speed or model.animation_speed, 0)
+	--update player's frame speed
+	local local_player_animation = player:get_local_animation()
+	player:set_local_animation(
+		{x = 0,   y = 79},
+		{x = 168, y = 187},
+		{x = 189, y = 198},
+		{x = 200, y = 219},
+		speed
+	)
 end
 
 minetest.register_on_leaveplayer(function(player)
@@ -112,6 +121,10 @@ minetest.register_globalstep(function()
 		local model_name = player_model[name]
 		local model = model_name and models[model_name]
 		if model and not player_attached[name] then
+			local meta = player:get_meta()
+			local movement_state = meta:get_string("player.player_movement_state")
+			
+			
 			local controls = player:get_player_control()
 			local animation_speed_mod = model.animation_speed or 30
 
@@ -124,15 +137,26 @@ minetest.register_globalstep(function()
 			if player:get_hp() == 0 then
 				player_set_animation(player, "lay")
 			-- Determine if the player is walking
-			elseif controls.up or controls.down or controls.left or controls.right then
-				if player_sneak[name] ~= controls.sneak then
-					player_anim[name] = nil
-					player_sneak[name] = controls.sneak
-				end
+			elseif movement_state == "0" and (controls.up or controls.down or controls.left or controls.right) then
+				--print("walking")
 				if controls.LMB or controls.RMB then
 					player_set_animation(player, "walk_mine", animation_speed_mod)
 				else
 					player_set_animation(player, "walk", animation_speed_mod)
+				end
+			elseif movement_state == "1" and (controls.up or controls.down or controls.left or controls.right) then
+				--print("running")
+				if controls.LMB or controls.RMB then
+					player_set_animation(player, "run_mine", animation_speed_mod*1.5)
+				else
+					player_set_animation(player, "run", animation_speed_mod*1.5)
+				end
+			elseif movement_state == "2" and (controls.up or controls.down or controls.left or controls.right) then
+				--print("running")
+				if controls.LMB or controls.RMB then
+					player_set_animation(player, "run_mine", animation_speed_mod*1.75)
+				else
+					player_set_animation(player, "run", animation_speed_mod*1.75)
 				end
 			elseif controls.LMB or controls.RMB then
 				player_set_animation(player, "mine", animation_speed_mod)

@@ -4,14 +4,16 @@ dofile(minetest.get_modpath("player_api") .. "/api.lua")
 
 -- Default player appearance
 player_api.register_model("player.b3d", {
-	animation_speed = 30,
+	animation_speed = 24,
 	textures = {"player.png", },
 	animations = {
 		-- Standard animations.
-		stand     = {x = 0,   y = 79},
-		lay       = {x = 162, y = 166},
+		stand     = {x = 0,   y = 0},
+		die       = {x = 1,   y = 10},
+		lay       = {x = 162, y = 162},
 		walk      = {x = 168, y = 187},
 		mine      = {x = 189, y = 198},
+		run       = {x = 189, y = 198},
 		walk_mine = {x = 200, y = 219},
 		sit       = {x = 81,  y = 160},
 	},
@@ -29,6 +31,6 @@ minetest.register_on_joinplayer(function(player)
 		{x = 168, y = 187},
 		{x = 189, y = 198},
 		{x = 200, y = 219},
-		30
+		24
 	)
 end)
