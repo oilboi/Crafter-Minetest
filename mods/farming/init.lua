@@ -175,6 +175,7 @@ minetest.register_node("farming:grass", {
     description = "Tall Grass",
     drawtype = "plantlike",
 	waving = 1,
+	inventory_image = "tallgrass.png",
 	walkable = false,
 	climbable = false,
 	paramtype = "light",
@@ -206,6 +207,23 @@ minetest.register_node("farming:grass", {
 	},
 })
 
+--register sugarcane in here since it's part of farming
+minetest.register_abm({
+	label = "Sugarcane Grow",
+	nodenames = {"main:sugarcane"},
+	neighbors = {"air"},
+	interval = 3,
+	chance = 150,
+	action = function(pos)
+		local found = minetest.find_node_near(pos, 4, {"main:water","main:waterflow"})
+		if found then
+			pos.y = pos.y + 1
+			if minetest.get_node(pos).name == "air" then
+				minetest.set_node(pos,{name="main:sugarcane"})
+			end
+		end
+	end,
+})
 
 --wheat definitions
 local wheat_max = 7

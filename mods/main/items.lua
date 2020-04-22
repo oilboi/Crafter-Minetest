@@ -6,10 +6,21 @@ minetest.register_craftitem("main:apple", {
 	health = 1,
 })
 
+minetest.register_craftitem("main:sugar", {
+	description = "Sugar",
+	inventory_image = "sugar.png",
+	health = 1,
+})
+
 minetest.register_craftitem("main:stick", {
 	description = "Stick",
 	inventory_image = "stick.png",
 	groups = {stick = 1}
+})
+minetest.register_craftitem("main:paper", {
+	description = "Paper",
+	inventory_image = "paper.png",
+	groups = {paper = 1}
 })
 
 minetest.register_craftitem("main:coal", {

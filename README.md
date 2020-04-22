@@ -105,6 +105,9 @@
 - Added in the early prototype of the VOID (made of bedrock for now)
 - Make it so you can place down beds in the nether and void, but they explode when you try to sleep in them
 - Made TNT even more efficient, stopped dropping of bedrock and obsidian
+- Added sugarcane, sugar, and paper
+- Books are now made out of paper and wood
+- Made sugarcane grow near water
 ---
 
 

@@ -86,7 +86,7 @@ minetest.register_craftitem("book:book",{
 			minetest.item_place(itemstack, user, pointed_thing)
 			return
 		end
-		print("make books placable on the ground")
+		--print("make books placable on the ground")
 		open_book_gui(itemstack, user)
 	end,
 
@@ -112,7 +112,7 @@ minetest.register_craftitem("book:book_written",{
 			minetest.item_place(itemstack, user, pointed_thing)
 			return
 		end
-		print("make books placable on the ground")
+		--print("make books placable on the ground")
 		open_book_inked_gui(itemstack, user)
 	end,
 
@@ -125,9 +125,9 @@ minetest.register_craftitem("book:book_written",{
 minetest.register_craft({
 	output = "book:book",
 	recipe = {
-		{"main:wood","weather:snowball","main:wood"},
-		{"main:wood","weather:snowball","main:wood"},
-		{"main:wood","weather:snowball","main:wood"},
+		{"main:wood","main:wood","main:wood"},
+		{"main:paper","main:paper","main:paper"},
+		{"main:wood","main:wood","main:wood"},
 	}
 })
 --book book book

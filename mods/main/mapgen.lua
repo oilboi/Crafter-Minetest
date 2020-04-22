@@ -102,3 +102,25 @@ minetest.register_decoration({
 	flags = "place_center_x, place_center_z",
 	rotation = "random",
 })
+
+minetest.register_decoration({
+	name = "main:sugarcane",
+	deco_type = "simple",
+	place_on = {"main:dirt","main:grass","main:sand"},
+	sidelen = 16,
+	noise_params = {
+		offset = -0.3,
+		scale = 0.7,
+		spread = {x = 100, y = 100, z = 100},
+		seed = 354,
+		octaves = 3,
+		persist = 0.7
+	},
+	y_max = 1,
+	y_min = 1,
+	decoration = "main:sugarcane",
+	height = 2,
+	height_max = 5,
+	spawn_by = "main:water",
+	num_spawn_by = 1,
+})

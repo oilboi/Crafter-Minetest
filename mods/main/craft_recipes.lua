@@ -59,6 +59,11 @@ minetest.register_craft({
 })
 minetest.register_craft({
 	type = "fuel",
+	recipe = "main:paper",
+	burntime = 1,
+})
+minetest.register_craft({
+	type = "fuel",
 	recipe = "main:tree",
 	burntime = 24,
 })
@@ -83,12 +88,24 @@ minetest.register_craft({
 	output = "main:wood 4",
 	recipe = {"main:tree"},
 })
+minetest.register_craft({
+	type = "shapeless",
+	output = "main:sugar 3",
+	recipe = {"main:sugarcane"},
+})
 
 minetest.register_craft({
 	output = "main:stick 4",
 	recipe = {
 		{"main:wood"},
 		{"main:wood"}
+	}
+})
+
+minetest.register_craft({
+	output = "main:paper",
+	recipe = {
+		{"main:sugarcane","main:sugarcane","main:sugarcane"},
 	}
 })
 

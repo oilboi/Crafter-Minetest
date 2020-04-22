@@ -97,8 +97,45 @@ minetest.register_node("main:grass", {
 minetest.register_node("main:sand", {
     description = "Sand",
     tiles = {"sand.png"},
-    groups = {sand = 1, falling_node = 1,pathable = 1},
+    groups = {sand = 1, falling_node = 1,pathable = 1,soil=1},
     sounds = main.sandSound(),
+})
+
+minetest.register_node("main:sugarcane", {
+    description = "Sugarcane",
+    drawtype = "plantlike",
+    inventory_image = "sugarcane.png",
+	waving = 1,
+	walkable = false,
+	paramtype = "light",
+	is_ground_content = false,	
+    tiles = {"sugarcane.png"},
+    buildable_to = false,
+    node_placement_prediction = "",
+    groups = {dig_immediate=1,flammable=1},
+    sounds = main.grassSound(),
+    floodable = true,
+    on_place = function(itemstack, placer, pointed_thing)
+		local n =  minetest.get_node_group(minetest.get_node(pointed_thing.under).name,"soil") > 0
+		if n then
+			return(minetest.item_place(itemstack, placer, pointed_thing))
+		end
+    end,
+    after_dig_node = function(pos, node, metadata, digger)
+		if digger == nil then return end
+		local np = {x = pos.x, y = pos.y + 1, z = pos.z}
+		local nn = minetest.get_node(np)
+		if nn.name == node.name then
+			minetest.node_dig(np, nn, digger)
+		end
+	end,
+    on_flood = function(pos, oldnode, newnode)
+		minetest.throw_item(pos, "main:sugarcane")
+	end,
+    selection_box = {
+		type = "fixed",
+		fixed = {-7 / 16, -0.5, -7 / 16, 7 / 16, 0.5, 7 / 16}
+	},
 })
 
 minetest.register_node("main:gravel", {

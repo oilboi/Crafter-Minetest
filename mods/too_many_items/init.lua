@@ -11,16 +11,18 @@ minetest.register_on_mods_loaded(function()
 				--single drop parents
 				if type(data.drop) == "string" then
 					--add parent to dropped items
-					local droppers = minetest.registered_items[data.drop].parent_dropper
-					if not droppers then
-						--print(data.name)
-						droppers = {}
+					if minetest.registered_items[data.drop] then
+						local droppers = minetest.registered_items[data.drop].parent_dropper
+						if not droppers then
+							--print(data.name)
+							droppers = {}
+						end
+						
+						table.insert(droppers, data.name)
+						minetest.override_item(data.drop, {
+							parent_dropper = droppers
+						})
 					end
-					
-					table.insert(droppers, data.name)
-					minetest.override_item(data.drop, {
-						parent_dropper = droppers
-					})
 				--multiple drop parents
 				elseif type(data.drop) == "table" then
 					if data.drop.items then
