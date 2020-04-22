@@ -116,7 +116,7 @@ end
 -- If item_entity_ttl is not set, enity will have default life time
 -- Setting it to -1 disables the feature
 
-local time_to_live = tonumber(minetest.settings:get("item_entity_ttl")) or 900
+local time_to_live = tonumber(minetest.settings:get("item_entity_ttl")) or 300
 local gravity = tonumber(minetest.settings:get("movement_gravity")) or 9.81
 
 
@@ -153,6 +153,7 @@ minetest.register_entity(":__builtin:item", {
 	collected = false,
 	delete_timer = 0,
 	radius = collection.magnet_radius,
+	time_to_live = time_to_live,
 
 	set_item = function(self, item)
 		local stack = ItemStack(item or self.itemstring)
@@ -309,7 +310,7 @@ minetest.register_entity(":__builtin:item", {
 		end
 				
 		self.age = self.age + dtime
-		if time_to_live > 0 and self.age > time_to_live then
+		if self.time_to_live > 0 and self.age > self.time_to_live then
 			self.itemstring = ""
 			self.object:remove()
 			return
