@@ -292,6 +292,7 @@ minetest.register_node("main:water", {
 	--water explodes in the nether
 	on_construct = function(pos)
 		if pos.y <= -10033 then
+			minetest.remove_node(pos)
 			tnt(pos,10)
 		end
 	end,
