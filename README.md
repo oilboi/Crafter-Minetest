@@ -103,6 +103,7 @@
 - Make TNT cannons possible
 - Add in Aether prototype dimension (21000-31000 on Y axis)
 - Added in the early prototype of the VOID (made of bedrock for now)
+- Treer fixed water spawning in other dimensions
 - Make it so you can place down beds in the nether and void, but they explode when you try to sleep in them
 - Made TNT even more efficient, stopped dropping of bedrock and obsidian
 - Added sugarcane, sugar, and paper
