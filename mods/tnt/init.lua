@@ -81,11 +81,8 @@ local found
 local positional_data
 local pos2 = vector.new(0,0,0)
 function tnt(pos,range)
-	local in_water = minetest.get_node(pos).name == "main:water"
-	if in_water == false then
-		in_water = minetest.get_node(pos).name == "main:waterflow"
-	end
-	
+	local in_node = minetest.get_node(pos).name
+	local in_water =  ( in_node == "main:water" or minetest.get_node(pos).name == "main:waterflow")
 	local min = vector.add(pos,range)
 	local max = vector.subtract(pos,range)
 	local vm = minetest.get_voxel_manip()	
@@ -102,7 +99,7 @@ function tnt(pos,range)
 	
 	
 	
-	if not in_water then
+	if in_water == false then
 		--raycast explosion
 		for x=-range, range do
 		for y=-range, range do
@@ -158,36 +155,45 @@ function tnt(pos,range)
 	--throw players and items
 	for _,object in ipairs(minetest.get_objects_inside_radius(pos, range)) do
 		if object:is_player() or (object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt")) then
-			local ppos = object:getpos()
-			if object:is_player() then
-				ppos.y = ppos.y + 1
-			end
-			ray = minetest.raycast(pos, ppos, false, false)
-			local clear = true
-			for pointed_thing in ray do
-				n_pos = area:index(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
-				node2 = content_id(data[n_pos])
-				if node2 == "nether:obsidian" or node2 == "nether:bedrock" then
-					clear = false
+			local do_it = true
+			if not object:is_player() and object:get_luaentity().name == "tnt:tnt" then
+				local in_node = minetest.get_node(object:get_pos()).name
+				if ( in_node == "main:water" or in_node == "main:waterflow") then
+					do_it = false
 				end
 			end
-			
-			if clear == true then
-				local power = (range - vector.distance(pos,ppos))*10
-				
-				local dir = vector.direction(pos,ppos)
-				local force = vector.multiply(dir,power)
+			if do_it == true then
+				local ppos = object:getpos()
 				if object:is_player() then
-					--damage the player
-					local hp = object:get_hp()
-					if hp then
-						object:set_hp(hp - math.floor(power*2))
+					ppos.y = ppos.y + 1
+				end
+				ray = minetest.raycast(pos, ppos, false, false)
+				local clear = true
+				for pointed_thing in ray do
+					n_pos = area:index(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
+					node2 = content_id(data[n_pos])
+					if node2 == "nether:obsidian" or node2 == "nether:bedrock" then
+						clear = false
 					end
-					object:add_player_velocity(force)
-				elseif object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt") then
-					object:setvelocity(force)
-					if object:get_luaentity().name == "tnt:tnt" then
-						object:get_luaentity().shot = true
+				end
+				
+				if clear == true then
+					local power = (range - vector.distance(pos,ppos))*10
+					
+					local dir = vector.direction(pos,ppos)
+					local force = vector.multiply(dir,power)
+					if object:is_player() then
+						--damage the player
+						local hp = object:get_hp()
+						if hp then
+							object:set_hp(hp - math.floor(power*2))
+						end
+						object:add_player_velocity(force)
+					elseif object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt") then
+						object:setvelocity(force)
+						if object:get_luaentity().name == "tnt:tnt" then
+							object:get_luaentity().shot = true
+						end
 					end
 				end
 			end
@@ -291,21 +297,16 @@ minetest.register_entity("tnt:tnt", {
 	sound_played = false,
 	on_step = function(self, dtime)	
 		self.timer = self.timer - dtime
-		if not self.shot then
+		if not self.shot or not self.redstone_activated then
 			local vel = self.object:getvelocity()
 			vel = vector.multiply(vel,-0.05)
 			self.object:add_velocity(vector.new(vel.x,0,vel.z))
 		end
 		if self.timer <= 0 then
-			local pos = self.object:getpos()
 			if not self.range then
 				self.range = 7
 			end
-			if self.extreme == true then
-				extreme_tnt(pos,self.range)
-			else
-				tnt(pos,self.range)
-			end
+			tnt(self.object:get_pos(),self.range)
 			self.object:remove()
 		end
 	end,
@@ -323,6 +324,7 @@ minetest.register_node("tnt:tnt", {
 		local obj = minetest.add_entity(pos,"tnt:tnt")
 		local range = 7
 		obj:get_luaentity().range = range
+		obj:get_luaentity().redstone_activated = true
 		minetest.remove_node(pos)
     end,
     on_punch = function(pos, node, puncher, pointed_thing)
