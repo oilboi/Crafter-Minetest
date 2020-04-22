@@ -506,8 +506,7 @@ minetest.register_on_joinplayer(function(player)
 	if creative_mode then
 		cheat_mode = 1
 	end
-	set_player_cheat(player, cheat_mode) -- this resets the cheating to false
-	set_player_page(player,0) -- this sets the meta "page" to remember what page they're on
+	
 	set_inventory_page(player,base_inv) --this sets the "" (inventory button/main) inventory
 	
 	local inv = player:get_inventory()
