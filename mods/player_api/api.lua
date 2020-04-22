@@ -36,30 +36,19 @@ end
 function player_api.set_model(player, model_name)
 	local name = player:get_player_name()
 	local model = models[model_name]
-	if model then
-		if player_model[name] == model_name then
-			return
-		end
-		player:set_properties({
-			mesh = model_name,
-			textures = player_textures[name] or model.textures,
-			visual = "mesh",
-			visual_size = model.visual_size or {x = 1, y = 1},
-			collisionbox = model.collisionbox or {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
-			stepheight = model.stepheight or 0.6,
-			eye_height = model.eye_height or 1.47,
-		})
-		player_api.set_animation(player, "stand")
-	else
-		player:set_properties({
-			textures = {"player.png", "player_back.png"},
-			visual = "upright_sprite",
-			visual_size = {x = 1, y = 2},
-			collisionbox = {-0.3, 0.0, -0.3, 0.3, 1.75, 0.3},
-			stepheight = 0.6,
-			eye_height = 1.625,
-		})
+	if player_model[name] == model_name then
+		return
 	end
+	player:set_properties({
+		mesh = model_name,
+		textures = player_textures[name] or model.textures,
+		visual = "mesh",
+		visual_size = model.visual_size or {x = 1, y = 1},
+		collisionbox = model.collisionbox or {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
+		stepheight = model.stepheight or 0.6,
+		eye_height = model.eye_height or 1.47,
+	})
+	player_api.set_animation(player, "stand")
 	player_model[name] = model_name
 end
 
@@ -81,17 +70,52 @@ function player_api.set_animation(player, anim_name, speed)
 		return
 	end
 	local anim = model.animations[anim_name]
-	player_anim[name] = anim_name
-	player:set_animation(anim, speed or model.animation_speed, 0)
 	--update player's frame speed
+	
 	local local_player_animation = player:get_local_animation()
+	local idle_animation = {x = 0,   y = 79}
+	local walk_animation = {x = 168, y = 187}
+	local dig_animation =  {x = 189, y = 198}
+	local walk_and_dig =   {x = 200, y = 219}
+	local sneak_speed = nil
+	if anim_name == "sneak" or anim_name == "sneak_mine_stand" or anim_name == "sneak_walk" or anim_name == "sneak_mine_walk" then
+		idle_animation = model.animations.sneak
+		walk_animation = model.animations.sneak_walk
+		dig_animation =  model.animations.sneak_mine_stand
+		walk_and_dig =   model.animations.sneak_mine_walk
+		sneak_speed = 15
+	end
 	player:set_local_animation(
-		{x = 0,   y = 79},
-		{x = 168, y = 187},
-		{x = 189, y = 198},
-		{x = 200, y = 219},
+		idle_animation,--idle
+		walk_animation,--walk
+		dig_animation,--dig
+		walk_and_dig,--walk and dig
 		speed
 	)
+	
+	player_api.set_model(player, "character.b3d")
+	player_anim[name] = anim_name
+	player:set_animation(anim, speed or model.animation_speed, animation_blend)
+	
+	--brute force sneaking local animation
+	for i = 1,7 do
+		minetest.after(i/10, function(player,idle_animation,walk_animation,dig_animation,walk_and_dig,speed,anim_name,anim,sneak_speed)
+			local sneaker_speed = speed
+			if sneak_speed then
+				sneaker_speed = sneak_speed
+			end
+			player:set_local_animation(
+				idle_animation,--idle
+				walk_animation,--walk
+				dig_animation,--dig
+				walk_and_dig,--walk and dig
+				speed
+			)
+			player_api.set_model(player, "character.b3d")
+			player_anim[name] = anim_name
+			player:set_animation(anim, sneaker_speed , 0)
+		end,player,idle_animation,walk_animation,dig_animation,walk_and_dig,speed,anim_name,anim,sneak_speed)
+	end
 end
 
 minetest.register_on_leaveplayer(function(player)
@@ -121,47 +145,85 @@ minetest.register_globalstep(function()
 		local model_name = player_model[name]
 		local model = model_name and models[model_name]
 		if model and not player_attached[name] then
-			local meta = player:get_meta()
-			local movement_state = meta:get_string("player.player_movement_state")
-			
-			
 			local controls = player:get_player_control()
 			local animation_speed_mod = model.animation_speed or 30
 
 			-- Determine if the player is sneaking, and reduce animation speed if so
 			if controls.sneak then
-				animation_speed_mod = animation_speed_mod / 2
+				animation_speed_mod = 0
 			end
+			
+			local meta = player:get_meta()
+			local movement_state = meta:get_string("player.player_movement_state")
 
 			-- Apply animations based on what the player is doing
 			if player:get_hp() == 0 then
 				player_set_animation(player, "lay")
-			-- Determine if the player is walking
-			elseif movement_state == "0" and (controls.up or controls.down or controls.left or controls.right) then
-				--print("walking")
-				if controls.LMB or controls.RMB then
-					player_set_animation(player, "walk_mine", animation_speed_mod)
+			elseif movement_state == "0" then
+				--walking normal
+				if controls.up or controls.down or controls.left or controls.right then
+					if controls.LMB or controls.RMB then
+						player_set_animation(player, "walk_mine", animation_speed_mod)
+					else
+						player_set_animation(player, "walk", animation_speed_mod)
+					end
 				else
-					player_set_animation(player, "walk", animation_speed_mod)
+					if controls.LMB or controls.RMB then
+						player_set_animation(player, "mine", animation_speed_mod)
+					else
+						player_set_animation(player, "stand", animation_speed_mod)
+					end
 				end
-			elseif movement_state == "1" and (controls.up or controls.down or controls.left or controls.right) then
-				--print("running")
-				if controls.LMB or controls.RMB then
-					player_set_animation(player, "run_mine", animation_speed_mod*1.5)
+			elseif movement_state == "1" then
+				--running
+				if controls.up or controls.down or controls.left or controls.right then
+					if controls.LMB or controls.RMB then
+						player_set_animation(player, "walk_mine", animation_speed_mod*1.5)
+					else
+						player_set_animation(player, "walk", animation_speed_mod*1.5)
+					end
 				else
-					player_set_animation(player, "run", animation_speed_mod*1.5)
+					if controls.LMB or controls.RMB then
+						player_set_animation(player, "mine", animation_speed_mod*1.5)
+					else
+						player_set_animation(player, "stand", animation_speed_mod*1.5)
+					end
 				end
-			elseif movement_state == "2" and (controls.up or controls.down or controls.left or controls.right) then
-				--print("running")
-				if controls.LMB or controls.RMB then
-					player_set_animation(player, "run_mine", animation_speed_mod*1.75)
+			elseif movement_state == "2" then
+				--bunnyhopping
+				if controls.up or controls.down or controls.left or controls.right then
+					if controls.LMB or controls.RMB then
+						player_set_animation(player, "walk_mine", animation_speed_mod*1.75)
+					else
+						player_set_animation(player, "walk", animation_speed_mod*1.75)
+					end
 				else
-					player_set_animation(player, "run", animation_speed_mod*1.75)
+					if controls.LMB or controls.RMB then
+						player_set_animation(player, "mine", animation_speed_mod*1.75)
+					else
+						player_set_animation(player, "stand", animation_speed_mod*1.75)
+					end
 				end
+			elseif movement_state == "3" then
+				--sneaking
+				if controls.up or controls.down or controls.left or controls.right then
+					if controls.LMB or controls.RMB then
+						player_set_animation(player, "sneak_mine_walk", 30)
+					else
+						player_set_animation(player, "sneak_walk", 30)
+					end
+				else
+					if controls.LMB or controls.RMB then
+						player_set_animation(player, "sneak_mine_stand", 30)
+					else
+						player_set_animation(player, "sneak", 30)
+					end
+				end
+			--safety catches
 			elseif controls.LMB or controls.RMB then
 				player_set_animation(player, "mine", animation_speed_mod)
 			else
-				player_set_animation(player, "stand", animation_speed_mod)
+				player_set_animation(player, "sneak", animation_speed_mod)
 			end
 		end
 	end

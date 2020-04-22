@@ -3,19 +3,24 @@
 dofile(minetest.get_modpath("player_api") .. "/api.lua")
 
 -- Default player appearance
-player_api.register_model("player.b3d", {
+player_api.register_model("character.b3d", {
 	animation_speed = 24,
 	textures = {"player.png", },
 	animations = {
 		-- Standard animations.
 		stand     = {x = 0,   y = 0},
-		die       = {x = 1,   y = 10},
+		die       = {x = 0,   y = 0},
 		lay       = {x = 162, y = 162},
 		walk      = {x = 168, y = 187},
 		mine      = {x = 189, y = 198},
 		run       = {x = 189, y = 198},
 		walk_mine = {x = 200, y = 219},
+		run_mine  = {x = 200, y = 219},
 		sit       = {x = 81,  y = 160},
+		sneak     = {x = 60,  y = 60},
+		sneak_mine_stand = {x=20,y=30},
+		sneak_walk= {x = 60,   y = 80},
+		sneak_mine_walk= {x = 40,   y = 59},
 	},
 	collisionbox = {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
 	stepheight = 0.6,
@@ -25,7 +30,7 @@ player_api.register_model("player.b3d", {
 -- Update appearance when the player joins
 minetest.register_on_joinplayer(function(player)
 	player_api.player_attached[player:get_player_name()] = false
-	player_api.set_model(player, "player.b3d")
+	player_api.set_model(player, "character.b3d")
 	player:set_local_animation(
 		{x = 0,   y = 79},
 		{x = 168, y = 187},
@@ -34,3 +39,5 @@ minetest.register_on_joinplayer(function(player)
 		24
 	)
 end)
+
+
