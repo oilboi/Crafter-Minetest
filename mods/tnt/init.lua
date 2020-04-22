@@ -81,7 +81,6 @@ local found
 local positional_data
 local pos2 = vector.new(0,0,0)
 function tnt(pos,range)
-	local pos = vector.floor(vector.add(pos,0.5))
 	local in_water = minetest.get_node(pos).name == "main:water"
 	if in_water == false then
 		in_water = minetest.get_node(pos).name == "main:waterflow"
