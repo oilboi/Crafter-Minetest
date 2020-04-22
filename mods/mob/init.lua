@@ -13,5 +13,6 @@ dofile(path.."/chatcommands.lua")
 --not get confused with each other
 dofile(path.."/pig/piginit.lua")
 dofile(path.."/slime/slimeinit.lua")
+dofile(path.."/flying_pig/flying_piginit.lua")
 
 

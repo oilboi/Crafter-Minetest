@@ -12,7 +12,7 @@ local outer = 128
 local spawn = true
 
 local spawn_table = {"pig","slime"}
-
+local aether_spawn_table = {"flying_pig"}
 minetest.register_globalstep(function(dtime)
 	if spawn then
 	timer = timer + dtime
@@ -43,16 +43,29 @@ minetest.register_globalstep(function(dtime)
 					x = pos.x + math.random(-outer,outer)
 				end
 				
+				local spawner
+				if pos.y >= 21000 then
+					spawner = minetest.find_nodes_in_area_under_air(vector.new(x,pos.y-32,z), vector.new(x,pos.y+32,z), {"aether:grass"})
+				else
+					spawner = minetest.find_nodes_in_area_under_air(vector.new(x,pos.y-32,z), vector.new(x,pos.y+32,z), {"main:grass","main:sand","main:water"})
+				end
 				
-				local spawner = minetest.find_nodes_in_area_under_air(vector.new(x,pos.y-32,z), vector.new(x,pos.y+32,z), {"main:grass","main:sand","main:water"})
-							
 				--print(dump(spawner))
 				if table.getn(spawner) > 0 then
 					local mob_pos = spawner[1]
-					mob_pos.y = mob_pos.y + 1
-					local mob_spawning = spawn_table[math.random(1,2)]
-					print("Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
-					minetest.add_entity(mob_pos,"mob:"..mob_spawning)
+					--aether spawning
+					if mob_pos.y >= 21000 then
+						mob_pos.y = mob_pos.y + 1
+						local mob_spawning = aether_spawn_table[1]
+						print("Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
+						minetest.add_entity(mob_pos,"mob:"..mob_spawning)
+
+					else
+						mob_pos.y = mob_pos.y + 1
+						local mob_spawning = spawn_table[math.random(1,2)]
+						print("Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
+						minetest.add_entity(mob_pos,"mob:"..mob_spawning)
+					end
 				end
 			end
 		end
