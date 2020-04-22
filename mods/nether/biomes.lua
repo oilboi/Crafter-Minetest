@@ -74,6 +74,18 @@ local data = {}
 
 -- 'minp' and 'maxp' are the minimum and maximum positions of the mapchunk that
 -- define the 3D volume.
+
+
+
+local sidelen
+local permapdims3d
+local vm
+local emin
+local emax
+local area
+local vi
+local density_noise
+local density_gradient
 minetest.register_on_generated(function(minp, maxp, seed)
 	--nether starts at -10033 y
 	if maxp.y > -10033 or maxp.y < -20033 then
@@ -85,9 +97,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	-- Noise stuff.
 
 	-- Side length of mapchunk.
-	local sidelen = maxp.x - minp.x + 1
+	sidelen = maxp.x - minp.x + 1
 	-- Required dimensions of the 3D noise perlin map.
-	local permapdims3d = {x = sidelen, y = sidelen, z = sidelen}
+	permapdims3d = {x = sidelen, y = sidelen, z = sidelen}
 	-- Create the perlin map noise object once only, during the generation of
 	-- the first mapchunk when 'nobj_terrain' is 'nil'.
 	nobj_terrain = minetest.get_perlin_map(np_terrain, permapdims3d) --nobj_terrain or 
@@ -100,9 +112,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	-- Load the voxelmanip with the result of engine mapgen. Since 'singlenode'
 	-- mapgen is used this will be a mapchunk of air nodes.
-	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
+	vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
 	-- 'area' is used later to get the voxelmanip indexes for positions.
-	local area = VoxelArea:new{MinEdge = emin, MaxEdge = emax}
+	area = VoxelArea:new{MinEdge = emin, MaxEdge = emax}
 	-- Get the content ID data from the voxelmanip in the form of a flat array.
 	-- Set the buffer parameter to use and reuse 'data' for this.
 	vm:get_data(data)
@@ -110,29 +122,31 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	-- Generation loop.
 
 	-- Noise index for the flat array of noise values.
-	local ni = 1
+	
 	-- Process the content IDs in 'data'.
 	-- The most useful order is a ZYX loop because:
 	-- 1. This matches the order of the 3D noise flat array.
 	-- 2. This allows a simple +1 incrementing of the voxelmanip index along x
 	-- rows.
 	-- rows.
+	
+	local ni = 1
 	for z = minp.z, maxp.z do
 	for y = minp.y, maxp.y do
 		-- Voxelmanip index for the flat array of content IDs.
 		-- Initialise to first node in this x row.
-		local vi = area:index(minp.x, y, z)
+		vi = area:index(minp.x, y, z)
 		for x = minp.x, maxp.x do
 			-- Consider a 'solidness' value for each node,
 			-- let's call it 'density', where
 			-- density = density noise + density gradient.
-			local density_noise = nvals_terrain[ni]
+			density_noise = nvals_terrain[ni]
 			-- Density gradient is a value that is 0 at water level (y = 1)
 			-- and falls in value with increasing y. This is necessary to
 			-- create a 'world surface' with only solid nodes deep underground
 			-- and only air high above water level.
 			-- Here '128' determines the typical maximum height of the terrain.
-			local density_gradient = (1 - y) / 128
+			density_gradient = (1 - y) / 128
 			
 			--print(density_noise, density_gradient)
 			-- Place solid nodes when 'density' > 0.
