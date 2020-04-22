@@ -440,7 +440,7 @@ all_items_table = nil
 --dump all the items in
 local mods_max = table.getn(final_table)
 for index,data in pairs(final_table) do
-	inv["page_"..page] = "label[9.3,0;Mod: "..data.modname.."]"
+	inv["page_"..page] = "label[9.3,0;Mod: "..data.modname:gsub("%f[%a].", string.upper).."]"
 	for _,item in pairs(data) do
 		if string.match(item, ":") then
 			inv["page_"..page] = inv["page_"..page].."item_image_button["..9.25+x..","..y..";1,1;"..item..";toomanyitems."..item..";]"
