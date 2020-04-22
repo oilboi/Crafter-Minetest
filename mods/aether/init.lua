@@ -72,7 +72,7 @@ local nvals_terrain = {}
 
 local data = {}
 
-local npos = {}
+local n_pos = {}
 
 local node2 = ""
 
