@@ -71,9 +71,7 @@ end)
 ]]--
 --use raycasting to create actual explosion
 local old_node_table
-local p_pos
 local n_pos
-local n
 local node2
 local ray
 local stop
@@ -105,11 +103,7 @@ function tnt(pos,range)
 		for y=-range, range do
 		for z=-range, range do
 			local distance = vector.distance(pos2, vector.new(x,y,z))
-			if distance <= range and distance >= range-1 then
-				
-				p_pos = area:index(pos.x+x,pos.y+y,pos.z+z)
-				n = content_id(data[p_pos])
-				
+			if distance <= range and distance >= range-1 then			
 				ray = minetest.raycast(pos, vector.new(pos.x+x,pos.y+y,pos.z+z), false, false)
 				
 				for pointed_thing in ray do
