@@ -374,26 +374,95 @@ local page = 0
 inv["page_"..page] = ""
 
 local x = 0
-local y = 0
+local y = 1
 
---dump all the items in
+--sort all items (There is definitely a better way to do this)
+
+--get all craftable items
+local all_items_table = {}
 for index,data in pairs(minetest.registered_items) do
 	if data.name ~= "" then
 		local recipe = minetest.get_craft_recipe(data.name)
 		--only put in craftable items
-		if recipe.method then
-			inv["page_"..page] = inv["page_"..page].."item_image_button["..9.25+x..","..y..";1,1;"..data.name..";toomanyitems."..data.name..";]"
+		if recipe.method then			
+			table.insert(all_items_table,data.name)
+		end
+	end
+end
+
+--organize them by mod
+local items_index_by_modname = {}
+for _,modname in pairs(minetest.get_modnames()) do
+	--add to list
+	items_index_by_modname[modname] = {}
+	for _,name in pairs(all_items_table) do
+		if minetest.registered_items[name].mod_origin == modname then
+			table.insert(items_index_by_modname[modname], name)
+		end
+	end
+end
+
+--sort each item table per mod alphabetically
+for key,item_table in pairs(items_index_by_modname) do
+	if table.getn(item_table) == 0 then
+		items_index_by_modname[key] = nil
+	else
+		local temp_table = {}
+		table.foreach(items_index_by_modname[key], function (key, value)
+			table.insert (temp_table, value)
+		end)
+		items_index_by_modname[key] = {}
+		table.sort(temp_table)
+		table.foreachi(temp_table,function(itemname,value)
+			table.insert(items_index_by_modname[key],value)
+		end)
+	end
+end
+
+--sort each modname alphabetically
+local final_table = {}
+local temp_table = {}
+table.foreach(items_index_by_modname, function (key, value)
+	table.insert (temp_table, key)
+end)
+
+table.sort(temp_table)
+table.foreachi(temp_table,function(key,modname)
+	table.insert(final_table, items_index_by_modname[modname])
+	final_table[key]["modname"] = modname
+end)
+
+--delete all unused data
+temp_table = nil
+items_index_by_modname = nil
+all_items_table = nil
+
+--dump all the items in
+local mods_max = table.getn(final_table)
+for index,data in pairs(final_table) do
+	inv["page_"..page] = "label[9.3,0;Mod: "..data.modname.."]"
+	for _,item in pairs(data) do
+		if string.match(item, ":") then
+			inv["page_"..page] = inv["page_"..page].."item_image_button["..9.25+x..","..y..";1,1;"..item..";toomanyitems."..item..";]"
 			x = x + 1
 			if x > 7 then
 				x = 0
 				y = y + 1
 			end
 			if y > 7 then
-				y = 0
+				y = 1
 				page = page + 1
-				inv["page_"..page] = ""
+				--automatically rename to continue showing modname
+				inv["page_"..page] = "label[12.3,0;"..data.modname.."]"
 			end
 		end
+	end
+	--reset the page to move onto the next mod
+	if index ~= mods_max then
+		x = 0
+		y = 1
+		page = page + 1
+		inv["page_"..page] = ""
 	end
 end
 
