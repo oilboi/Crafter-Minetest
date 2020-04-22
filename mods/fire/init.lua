@@ -20,14 +20,14 @@ minetest.register_node("fire:fire", {
     is_ground_content = false,
     light_source = 11, --debugging
     on_construct = function(pos)
-		
-		local timer = minetest.get_node_timer(pos)
-		timer:start(math.random(5,10))
-		
-		
-		if minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name == "nether:obsidian" then
+		local under = minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name
+		--fire lasts forever on netherrack
+		if under == "nether:obsidian" then
 			minetest.remove_node(pos)
 			create_nether_portal(pos)
+		elseif under ~= "nether:netherrack" then
+			local timer = minetest.get_node_timer(pos)
+			timer:start(math.random(5,10))
 		end
     end,
     on_timer = function(pos, elapsed)

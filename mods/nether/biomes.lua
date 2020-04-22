@@ -19,6 +19,20 @@ minetest.register_biome({
 	humidity_point = -100,
 })
 
+--[[
+minetest.register_decoration({
+	name = "Nether Eternal Fire",
+	deco_type = "simple",
+	place_on = {"nether:netherrack"},
+	sidelen = 16,
+	fill_ratio = 0.03,
+	biomes = {"Nether"},
+	y_max = -10033,
+	y_min = -15000,
+	decoration = "fire:fire",
+	height = 1,
+})
+]]--
 
 --this is from https://github.com/paramat/lvm_example/blob/master/init.lua
 --hi paramat :D
@@ -180,7 +194,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	--vm:calc_lighting()
 	
 	minetest.generate_ores(vm)
-	
+	--minetest.generate_decorations(vm)
 	vm:set_lighting({day=7,night=7}, minp, maxp)
 	
 	-- Write what has been created to the world.
