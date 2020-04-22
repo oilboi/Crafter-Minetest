@@ -82,7 +82,11 @@ local positional_data
 local pos2 = vector.new(0,0,0)
 function tnt(pos,range)
 	local pos = vector.floor(vector.add(pos,0.5))
-	local in_water = (minetest.get_node(pos).name == "main:water" or minetest.get_node(pos).name == "main:waterflow")
+	local in_water = minetest.get_node(pos).name == "main:water"
+	if in_water == false then
+		in_water = minetest.get_node(pos).name == "main:waterflow"
+	end
+	
 	local min = vector.add(pos,range)
 	local max = vector.subtract(pos,range)
 	local vm = minetest.get_voxel_manip()	
@@ -247,7 +251,7 @@ minetest.register_entity("tnt:tnt", {
 	
 	on_activate = function(self, staticdata, dtime_s)
 		self.object:set_armor_groups({immortal = 1})
-		self.object:set_velocity({x = math.random(-5,5), y = 5, z = math.random(-5,5)})
+		self.object:set_velocity({x = math.random(-3,3), y = 3, z = math.random(-3,3)})
 		self.object:set_acceleration({x = 0, y = -9.81, z = 0})
 		if string.sub(staticdata, 1, string.len("return")) == "return" then
 			local data = minetest.deserialize(staticdata)
