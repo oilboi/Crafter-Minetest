@@ -8,6 +8,17 @@
 
 ## Be sure to install the clientside mod for this game mode: <a href="https://github.com/oilboi/crafter_client">Download here</a>
 
+
+## If you want to run this on a server you must add this to your server minetest.conf:
+
+```
+enable_client_modding = true
+csm_restriction_flags = 0
+enable_mod_channels = true
+```
+
+## This game is in early alpha and uses a lot of experimental features in the engine
+
 ---
 
 # ALPHA STATE CHANGELOG
