@@ -70,6 +70,9 @@ function player_api.set_animation(player, anim_name, speed)
 		return
 	end
 	local anim = model.animations[anim_name]
+	
+	
+	--calculate local animation
 	--update player's frame speed
 	
 	local local_player_animation = player:get_local_animation()
@@ -78,13 +81,21 @@ function player_api.set_animation(player, anim_name, speed)
 	local dig_animation =  {x = 189, y = 198}
 	local walk_and_dig =   {x = 200, y = 219}
 	local sneak_speed = nil
+	
 	if anim_name == "sneak" or anim_name == "sneak_mine_stand" or anim_name == "sneak_walk" or anim_name == "sneak_mine_walk" then
 		idle_animation = model.animations.sneak
 		walk_animation = model.animations.sneak_walk
 		dig_animation =  model.animations.sneak_mine_stand
 		walk_and_dig =   model.animations.sneak_mine_walk
-		sneak_speed = 15
+		sneak_speed = 16
 	end
+	
+	--update the external animation speed that other players see
+	local sneaker_speed = speed
+	if sneak_speed then
+		sneaker_speed = sneak_speed
+	end
+	
 	player:set_local_animation(
 		idle_animation,--idle
 		walk_animation,--walk
@@ -95,27 +106,7 @@ function player_api.set_animation(player, anim_name, speed)
 	
 	player_api.set_model(player, "character.b3d")
 	player_anim[name] = anim_name
-	player:set_animation(anim, speed or model.animation_speed, animation_blend)
-	
-	--brute force sneaking local animation
-	for i = 1,7 do
-		minetest.after(i/10, function(player,idle_animation,walk_animation,dig_animation,walk_and_dig,speed,anim_name,anim,sneak_speed)
-			local sneaker_speed = speed
-			if sneak_speed then
-				sneaker_speed = sneak_speed
-			end
-			player:set_local_animation(
-				idle_animation,--idle
-				walk_animation,--walk
-				dig_animation,--dig
-				walk_and_dig,--walk and dig
-				speed
-			)
-			player_api.set_model(player, "character.b3d")
-			player_anim[name] = anim_name
-			player:set_animation(anim, sneaker_speed , 0)
-		end,player,idle_animation,walk_animation,dig_animation,walk_and_dig,speed,anim_name,anim,sneak_speed)
-	end
+	player:set_animation(anim, sneaker_speed, animation_blend)
 end
 
 minetest.register_on_leaveplayer(function(player)
@@ -149,9 +140,9 @@ minetest.register_globalstep(function()
 			local animation_speed_mod = model.animation_speed or 30
 
 			-- Determine if the player is sneaking, and reduce animation speed if so
-			if controls.sneak then
-				animation_speed_mod = 0
-			end
+			--if controls.sneak then
+			--	animation_speed_mod = 0
+			--end
 			
 			local meta = player:get_meta()
 			local movement_state = meta:get_string("player.player_movement_state")
