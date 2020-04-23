@@ -1,6 +1,1 @@
-print("remember to add music handling")
-minetest.register_on_joinplayer(function(player)
-	minetest.after(2, function(player)
-		minetest.sound_play("morning", {to_player=player:get_player_name()})
-	end,player)
-end)
+--this is a placeholder mod for the client to load data into
