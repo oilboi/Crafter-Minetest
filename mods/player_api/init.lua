@@ -38,11 +38,6 @@ minetest.register_on_joinplayer(function(player)
 		{x = 200, y = 219},
 		24
 	)
-	
-	
-	
-	
-	--Arm_Right
 end)
 
 minetest.register_entity("player_api:item", {
