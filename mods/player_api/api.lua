@@ -19,9 +19,48 @@ end
 -- Player stats and animations
 local player_model = {}
 local player_textures = {}
+local wielded_item = {}
 local player_anim = {}
 local player_sneak = {}
 player_api.player_attached = {}
+
+
+--modify the player's wielded item
+function player_api.set_wielded_item(player)
+	local name = player:get_player_name()
+	
+	
+	--local model = models[model_name]
+	if not wielded_item[name] or not wielded_item[name]:get_luaentity() then
+		wielded_item[name] = nil
+		--we give the player an item to hold
+		local itemstring = player:get_wielded_item():get_name()
+		
+		local wield_item = minetest.add_entity(player:get_pos(),"player_api:item")
+		if wield_item then
+		
+			wield_item:get_luaentity():set_item(itemstring)
+			
+			wield_item:get_luaentity().wielder = player:get_player_name()
+			
+			wield_item:set_attach(player, "Right_Hand", vector.new(0,0,0), vector.new(0,0,0))
+			
+			wielded_item[name] = wield_item
+		end
+		return
+	end
+	
+	
+	local itemstring = wielded_item[name]:get_luaentity().itemstring
+	local player_wield_item = player:get_wielded_item():get_name()
+	
+	if itemstring ~= player_wield_item then
+		wielded_item[name]:get_luaentity().itemstring = player_wield_item
+		local obj = wielded_item[name]:get_luaentity():set_item(obj, player_wield_item)
+	end
+end
+
+
 
 function player_api.get_animation(player)
 	local name = player:get_player_name()
@@ -132,6 +171,9 @@ end
 -- Check each player and apply animations
 minetest.register_globalstep(function()
 	for _, player in pairs(minetest.get_connected_players()) do
+		--update the player wielded item model
+		player_api.set_wielded_item(player)
+		
 		local name = player:get_player_name()
 		local model_name = player_model[name]
 		local model = model_name and models[model_name]
