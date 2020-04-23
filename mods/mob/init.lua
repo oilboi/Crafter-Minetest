@@ -14,5 +14,6 @@ dofile(path.."/chatcommands.lua")
 dofile(path.."/pig/piginit.lua")
 dofile(path.."/slime/slimeinit.lua")
 dofile(path.."/flying_pig/flying_piginit.lua")
+dofile(path.."/exploder/exploderinit.lua")
 
 

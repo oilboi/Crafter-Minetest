@@ -1,0 +1,90 @@
+--converts yaw to degrees
+local degrees = function(yaw)
+	yaw = yaw + math.pi
+	return(yaw*180.0/math.pi)
+end
+
+local degree_round = function(degree)
+	return(degree + 0.5 - (degree + 0.5) % 1)
+end
+
+local radians_to_degrees = function(radians)
+	return(radians*180.0/math.pi)
+end
+
+--a movement test to move the head
+mob.move_head = function(self)
+	if self.child then
+		local pos = self.object:get_pos()
+		local body_yaw = self.object:get_yaw() - (math.pi/2)
+		local dir = vector.multiply(minetest.yaw_to_dir(body_yaw),0.72)
+		local real_dir = minetest.yaw_to_dir(body_yaw)
+		local body_yaw = degree_round(degrees(minetest.dir_to_yaw(dir)))
+		
+		pos = vector.add(pos,dir)
+		pos.y = pos.y + 0.36
+		
+		--pos is where the head actually is
+		--STARE O_O
+		for _,object in ipairs(minetest.get_objects_inside_radius(pos, 6)) do
+			if object:is_player() then
+				local pos2 = object:get_pos()
+				pos2.y = pos2.y + 1.625
+				
+				local head_yaw  = degree_round(degrees(minetest.dir_to_yaw(vector.direction(pos,pos2))))			
+				
+				local new_yaw = (head_yaw-body_yaw)
+
+				local pitch = 0	
+				local roll = 0	
+				if math.abs(new_yaw) <= 90 or math.abs(new_yaw) >= 270 then
+					--do other calculations on pitch and roll
+					
+					local triangle = vector.new(vector.distance(pos,pos2),0,pos2.y-pos.y)
+					
+					local tri_yaw = minetest.dir_to_yaw(triangle)+(math.pi/2)
+					
+					pitch = radians_to_degrees(tri_yaw)
+					
+					local pitch_adjustment = 0
+					
+					if new_yaw >= 270 then
+						pitch_adjustment = new_yaw - 180
+					elseif new_yaw <= -270 then
+						pitch_adjustment = new_yaw + 180
+					else
+						pitch_adjustment = new_yaw
+					end
+					
+					local roll_adjustment = pitch_adjustment
+					
+					pitch_adjustment = 1-(math.abs(pitch_adjustment)/90)
+					pitch = pitch-- * pitch_adjustment
+					
+					
+					--------------------------------
+					
+					local roll_adjustment = 1-pitch_adjustment
+					
+					
+					local side_adjuster = 1
+					if new_yaw < 1 then
+						side_adjuster = -1
+					end
+					
+					roll = (radians_to_degrees(tri_yaw)*side_adjuster)*roll_adjustment
+					
+					print(roll)
+					
+					
+				
+				else
+					new_yaw = 0
+				end
+				--                                                                      roll        newyaw      pitch
+				self.child:set_attach(self.object, "", vector.new(2.4,1.2,0), vector.new(180+roll,    new_yaw,    180+pitch))				
+				--self.head_rotation = vector.new(180,new_yaw,180)
+			end
+		end
+	end
+end
