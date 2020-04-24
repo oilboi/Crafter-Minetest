@@ -177,21 +177,25 @@ minetest.register_craftitem("main:bucket_lava", {
 		
 		--set it to lava
 		if buildable_under == true then
-			if pos_under.y > -10033 then
-				minetest.add_node(pos_under,{name="main:lava"})
-			else
-				minetest.add_node(pos_under,{name="nether:lava"})
+			if pos_under.y < 20000 then
+				if pos_under.y > -10033 then
+					minetest.add_node(pos_under,{name="main:lava"})
+				else
+					minetest.add_node(pos_under,{name="nether:lava"})
+				end
+				itemstack:replace(ItemStack("main:bucket"))
+				return(itemstack)
 			end
-			itemstack:replace(ItemStack("main:bucket"))
-			return(itemstack)
 		elseif buildable_above then
-			if pos_above.y > -10033 then
-				minetest.add_node(pos_above,{name="main:lava"})
-			else
-				minetest.add_node(pos_above,{name="nether:lava"})
+			if pos_above.y < 20000 then
+				if pos_above.y > -10033 then
+					minetest.add_node(pos_above,{name="main:lava"})
+				else
+					minetest.add_node(pos_above,{name="nether:lava"})
+				end
+				itemstack:replace(ItemStack("main:bucket"))
+				return(itemstack)
 			end
-			itemstack:replace(ItemStack("main:bucket"))
-			return(itemstack)
 		end
 	end,
 	on_secondary_use = function(itemstack, user, pointed_thing)
@@ -212,13 +216,25 @@ minetest.register_craftitem("main:bucket_lava", {
 		
 		--set it to lava
 		if buildable_under == true then
-			minetest.set_node(pos_under,{name="main:lava"})
-			itemstack:replace(ItemStack("main:bucket"))
-			return(itemstack)
+			if pos_under.y < 20000 then
+				if pos_under.y > -10033 then
+					minetest.add_node(pos_under,{name="main:lava"})
+				else
+					minetest.add_node(pos_under,{name="nether:lava"})
+				end
+				itemstack:replace(ItemStack("main:bucket"))
+				return(itemstack)
+			end
 		elseif buildable_above then
-			minetest.set_node(pos_above,{name="main:lava"})
-			itemstack:replace(ItemStack("main:bucket"))
-			return(itemstack)
+			if pos_above.y < 20000 then
+				if pos_above.y > -10033 then
+					minetest.add_node(pos_above,{name="main:lava"})
+				else
+					minetest.add_node(pos_above,{name="nether:lava"})
+				end
+				itemstack:replace(ItemStack("main:bucket"))
+				return(itemstack)
+			end
 		end
 	end,
 })

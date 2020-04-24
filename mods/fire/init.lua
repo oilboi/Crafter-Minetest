@@ -15,16 +15,18 @@ minetest.register_node("fire:fire", {
 	inventory_image = "fire.png",
     groups = {dig_immediate = 1},
     sounds = main.stoneSound(),
+    floodable = true,
     drop = "",
     walkable = false,
     is_ground_content = false,
     light_source = 11, --debugging
     on_construct = function(pos)
 		local under = minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name
-		--fire lasts forever on netherrack
+		--makes nether portal
 		if under == "nether:obsidian" then
 			minetest.remove_node(pos)
 			create_nether_portal(pos)
+		--fire lasts forever on netherrack
 		elseif under ~= "nether:netherrack" then
 			local timer = minetest.get_node_timer(pos)
 			timer:start(math.random(5,10))
@@ -58,6 +60,12 @@ minetest.register_tool("fire:flint_and_steel", {
 		end
 		if minetest.get_node(pointed_thing.above).name ~= "air" then
 			minetest.sound_play("flint_failed", {pos=pointed_thing.above})
+			return
+		end
+		
+		--can't make fire in the aether
+		if pointed_thing.above.y >= 20000 then
+			minetest.sound_play("flint_failed", {pos=pointed_thing.above,pitch=math.random(75,95)/100})
 			return
 		end
 		
