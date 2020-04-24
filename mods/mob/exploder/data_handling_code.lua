@@ -32,7 +32,7 @@ exploder.on_activate = function(self, staticdata, dtime_s)
 	end
 	
 	--set up mob
-	self.object:set_animation({x=0,y=20}, 15, 0, true)
+	self.object:set_animation({x=0,y=5}, 30, 0, true)
 	self.object:set_hp(self.hp)
 	self.direction = vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1))
 	

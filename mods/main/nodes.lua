@@ -97,7 +97,7 @@ minetest.register_node("main:grass", {
 minetest.register_node("main:sand", {
     description = "Sand",
     tiles = {"sand.png"},
-    groups = {sand = 1, falling_node = 1,pathable = 1,soil=1},
+    groups = {sand = 1, falling_node = 1,pathable = 1,soil=1,touch_hurt=1},
     sounds = main.sandSound(),
 })
 
@@ -323,7 +323,7 @@ minetest.register_node("main:water", {
 	liquid_alternative_source = "main:water",
 	liquid_viscosity = 1,
 	post_effect_color = {a = 103, r = 30, g = 60, b = 90},
-	groups = {water = 1, liquid = 1, cools_lava = 1, bucket = 1, source = 1,pathable = 1},
+	groups = {water = 1, liquid = 1, cools_lava = 1, bucket = 1, source = 1,pathable = 1,drowning=1},
 	--sounds = default.node_sound_water_defaults(),
 	
 	--water explodes in the nether
@@ -383,7 +383,7 @@ minetest.register_node("main:waterflow", {
 	liquid_alternative_source = "main:water",
 	liquid_viscosity = 1,
 	post_effect_color = {a = 103, r = 30, g = 60, b = 90},
-	groups = {water = 1, liquid = 1, notInCreative = 1, cools_lava = 1,pathable = 1},
+	groups = {water = 1, liquid = 1, notInCreative = 1, cools_lava = 1,pathable = 1,drowning=1},
 	--sounds = default.node_sound_water_defaults(),
 })
 
