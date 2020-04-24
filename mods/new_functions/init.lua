@@ -84,6 +84,7 @@ local a_min
 local a_max
 local v_add = vector.add
 local v_sub = vector.subtract
+local get_number = table.getn
 local function index_players_surroundings()
 	for _,player in ipairs(minetest.get_connected_players()) do
 		if player:get_hp() > 0 then
@@ -109,7 +110,8 @@ local function index_players_surroundings()
 			a_min = v_sub(pos,1)
 			a_max = v_add(pos,1)
 			damage_pos = minetest.find_nodes_in_area(a_min, a_max, hurt_nodes)
-			if damage_pos then
+			
+			if get_number(damage_pos) > 0 then
 				for _,found_location in ipairs(damage_pos) do
 					collisionbox = registered_nodes[get_node(found_location).name].collision_box
 					if not collisionbox then
