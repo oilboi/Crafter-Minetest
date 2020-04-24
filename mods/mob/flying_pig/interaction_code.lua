@@ -127,7 +127,9 @@ flying_pig.on_death = function(self, killer)
 		vertical = false,
 		texture = "smoke.png",
 	})
-	local obj = minetest.add_item(pos,"mob:raw_porkchop")
+	for i = 1,math.random(2,6) do
+		minetest.throw_item(pos,"main:gold")
+	end
 	self.child:get_luaentity().parent = nil
 	self.object:remove()
 end
