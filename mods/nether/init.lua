@@ -275,7 +275,7 @@ local function teleport_to_overworld(blockpos, action, calls_remaining, param)
 	if calls_remaining == 0 then
 		local portal_exists = minetest.find_node_near(nether_origin_pos, 30, {"nether:portal"})
 		if portal_exists then
-			print(teleporting_player)
+			--print(teleporting_player)
 			if teleporting_player then
 				teleporting_player:set_pos(portal_exists)
 			end
@@ -287,7 +287,7 @@ local function teleport_to_nether(blockpos, action, calls_remaining, param)
 	if calls_remaining == 0 then
 		local portal_exists = minetest.find_node_near(nether_origin_pos, 30, {"nether:portal"})
 		if portal_exists then
-			print(teleporting_player)
+			--print(teleporting_player)
 			if teleporting_player then
 				teleporting_player:set_pos(portal_exists)
 			end

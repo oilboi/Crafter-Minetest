@@ -367,7 +367,11 @@ minetest.register_node("main:water", {
 	
 	--water explodes in the nether
 	on_construct = function(pos)
-		if pos.y <= -10033 then
+		local under = minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name
+		if under == "nether:glowstone" then
+			minetest.remove_node(pos)
+			create_aether_portal(pos)
+		elseif pos.y <= -10033 then
 			minetest.remove_node(pos)
 			tnt(pos,10)
 		end

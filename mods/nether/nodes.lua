@@ -37,6 +37,9 @@ minetest.register_node("nether:glowstone", {
 	}),
     is_ground_content = false,
     light_source = 12,
+    after_destruct = function(pos, oldnode)
+		destroy_aether_portal(pos)
+    end,
     drop = {
 			max_items = 5,
 			tools = tool_required,

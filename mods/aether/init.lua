@@ -1,202 +1,418 @@
+local aether_channel = minetest.mod_channel_join("aether_teleporters")
+
 local path = minetest.get_modpath("aether")
+dofile(path.."/schem.lua")
 dofile(path.."/nodes.lua")
+dofile(path.."/biomes.lua")
 
 
-minetest.register_biome({
-	name = "aether",
-	node_top = "air",
-	depth_top = 1,
-	node_filler = "air",
-	depth_filler = 3,
-	node_riverbed = "air",
-	depth_riverbed= 0,
-	node_stone = "air",
-	node_water = "air",
-	node_dungeon = "air",
-	node_dungeon_alt = "air",
-	node_dungeon_stair = "air",
-	node_cave_liquid = "air",
-	vertical_blend = 0,
-	y_max = 31000,
-	y_min = 21000,
-	heat_point = -100,
-	humidity_point = -100,
+minetest.register_node("aether:portal", {
+	description = "Aether Portal",
+
+	tiles = {
+		{
+			name = "aether_portal.png",
+			backface_culling = true,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 0.5,
+			},
+		},
+		{
+			name = "aether_portal.png",
+			backface_culling = true,
+			animation = {
+				type = "vertical_frames",
+				aspect_w = 16,
+				aspect_h = 16,
+				length = 0.5,
+			},
+		},
+	},
+	drawtype = "nodebox",
+	paramtype = "light",
+	--paramtype2 = "facedir",
+	sunlight_propagates = true,
+	use_texture_alpha = false,
+	walkable = false,
+	diggable = false,
+	pointable = false,
+	buildable_to = false,
+	is_ground_content = false,
+	drop = "",
+	light_source = 7,
+	--post_effect_color = {a = 180, r = 51, g = 7, b = 89},
+	alpha = 140,
+	node_box = {
+	type = "connected",
+		-- connect_top =
+		-- connect_bottom =
+		connect_front = {0,  -1/2, -1/2,   0,  1/2, 0 },
+		connect_left =  {-1/2,   -1/2, 0, 0,   1/2,  0},
+		connect_back =  {0,  -1/2,  0,   0,  1/2,  1/2 },
+		connect_right = { 0,   -1/2, 0,  1/2,   1/2,  0},
+	},
+	connects_to = {"aether:portal","nether:glowstone"},
+	groups = {unbreakable=1},
+	--on_destruct = destroy_portal,
 })
 
---this is from https://github.com/paramat/lvm_example/blob/master/init.lua
---hi paramat :D
+--branch out from center
+local a_index = {}
+local aether_portal_failure = false
+local x_failed = false
 
--- Set the 3D noise parameters for the terrain.
-local perlin= minetest.get_mapgen_params()
-local np_terrain = {
-	offset = 0,
-	scale = 1,
-	spread = {x = 200, y = 100, z = 200},
-	seed = 5900033, --perlin.seed
-	octaves = 5,
-	persist = 0.63,
-	lacunarity = 2.0,
-	--flags = ""
-}
-
-
--- Set singlenode mapgen (air nodes only).
--- Disable the engine lighting calculation since that will be done for a
--- mapchunk of air nodes and will be incorrect after we place nodes.
-
---minetest.set_mapgen_params({mgname = "singlenode", flags = "nolight"})
-
-
--- Get the content IDs for the nodes used.
-
-local c_dirt = minetest.get_content_id("aether:dirt")
-local c_stone = minetest.get_content_id("aether:stone")
-local c_air = minetest.get_content_id("air")
-local c_grass = minetest.get_content_id("aether:grass")
-
-
--- Initialize noise object to nil. It will be created once only during the
--- generation of the first mapchunk, to minimise memory use.
-
-local nobj_terrain = nil
-
-
--- Localise noise buffer table outside the loop, to be re-used for all
--- mapchunks, therefore minimising memory use.
-
-local nvals_terrain = {}
-
-
--- Localise data buffer table outside the loop, to be re-used for all
--- mapchunks, therefore minimising memory use.
-
-local data = {}
-
-local n_pos = {}
-
-local node2 = ""
-
-local vi = {}
-
-local content_id = minetest.get_name_from_content_id
-
--- On generated function.
-
--- 'minp' and 'maxp' are the minimum and maximum positions of the mapchunk that
--- define the 3D volume.
-minetest.register_on_generated(function(minp, maxp, seed)
-	--nether starts at -10033 y
-	if minp.y < 21000 then
-		return
+--this can be used globally to create aether portals from obsidian
+function create_aether_portal(pos,origin,axis)
+	--create the origin node for stored memory
+	if not origin then
+		origin = pos
+		aether_portal_failure = false
 	end
-	-- Start time of mapchunk generation.
-	--local t0 = os.clock()
-	
-	-- Noise stuff.
-
-	-- Side length of mapchunk.
-	local sidelen = maxp.x - minp.x + 1
-	-- Required dimensions of the 3D noise perlin map.
-	local permapdims3d = {x = sidelen, y = sidelen, z = sidelen}
-	-- Create the perlin map noise object once only, during the generation of
-	-- the first mapchunk when 'nobj_terrain' is 'nil'.
-	nobj_terrain = minetest.get_perlin_map(np_terrain, permapdims3d) --nobj_terrain or 
-	-- Create a flat array of noise values from the perlin map, with the
-	-- minimum point being 'minp'.
-	-- Set the buffer parameter to use and reuse 'nvals_terrain' for this.
-	nobj_terrain:get3dMap_flat(minp, nvals_terrain)
-
-	-- Voxelmanip stuff.
-
-	-- Load the voxelmanip with the result of engine mapgen. Since 'singlenode'
-	-- mapgen is used this will be a mapchunk of air nodes.
-	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
-	-- 'area' is used later to get the voxelmanip indexes for positions.
-	local area = VoxelArea:new{MinEdge = emin, MaxEdge = emax}
-	-- Get the content ID data from the voxelmanip in the form of a flat array.
-	-- Set the buffer parameter to use and reuse 'data' for this.
-	vm:get_data(data)
-
-	-- Generation loop.
-
-	-- Noise index for the flat array of noise values.
-	local ni = 1
-	-- Process the content IDs in 'data'.
-	-- The most useful order is a ZYX loop because:
-	-- 1. This matches the order of the 3D noise flat array.
-	-- 2. This allows a simple +1 incrementing of the voxelmanip index along x
-	-- rows.
-	-- rows.
-	for z = minp.z, maxp.z do
-	for y = minp.y, maxp.y do
-		-- Voxelmanip index for the flat array of content IDs.
-		-- Initialise to first node in this x row.
-		vi = area:index(minp.x, y, z)
-		for x = minp.x, maxp.x do
-			-- Consider a 'solidness' value for each node,
-			-- let's call it 'density', where
-			-- density = density noise + density gradient.
-			local density_noise = nvals_terrain[ni]
-			-- Density gradient is a value that is 0 at water level (y = 1)
-			-- and falls in value with increasing y. This is necessary to
-			-- create a 'world surface' with only solid nodes deep underground
-			-- and only air high above water level.
-			-- Here '128' determines the typical maximum height of the terrain.
-			
-			
-			--print(density_noise, density_gradient)
-			-- Place solid nodes when 'density' > 0.
-			--if density_noise + density_gradient > 0 then
-			
-			--print(density_noise + density_gradient)
-			if density_noise > 0.1 then
-				data[vi] = c_dirt
-			else
-				--force create grass
-				n_pos = area:index(x,y-1,z)
-				node2 = content_id(data[n_pos])
-				if node2 == "aether:dirt" then
-					data[n_pos] = c_grass
+	if not axis then
+		axis = "x"
+	end
+		
+	--2d virtual memory map creation (x axis)
+	if axis == "x" then
+		for x = -1,1 do
+		for y = -1,1 do
+			--index only direct neighbors
+			if x_failed == false and (math.abs(x)+math.abs(y) == 1) then
+				local i = vector.add(pos,vector.new(x,y,0))
+				
+				local execute_collection = true
+				
+				if a_index[i.x] and a_index[i.x][i.y] then
+					if a_index[i.x][i.y][i.z] then
+						execute_collection = false
+					end
+				end	
+				
+				if execute_collection == true then
+					--print(minetest.get_node(i).name)
+					--index air
+					if minetest.get_node(i).name == "air" then
+						
+						if vector.distance(i,origin) < 50 then
+							--add data to both maps
+							if not a_index[i.x] then a_index[i.x] = {} end
+							if not a_index[i.x][i.y] then a_index[i.x][i.y] = {} end
+							a_index[i.x][i.y][i.z] = {aether_portal=1} --get_group(i,"redstone_power")}		
+							--the data to the 3d array must be written to memory before this is executed
+							--or a stack overflow occurs!!!
+							--pass down info for activators
+							create_aether_portal(i,origin,"x")
+						else
+							--print("try z")
+							x_failed = true
+							a_index = {}
+							create_aether_portal(origin,origin,"z")
+						end
+					elseif minetest.get_node(i).name ~= "nether:glowstone" then
+						x_failed = true
+						a_index = {}
+						create_aether_portal(origin,origin,"z")
+					end
 				end
 			end
-			-- Otherwise if at or below water level place water.
-			--elseif y == -10033 then
-				--data[vi] = c_bedrock
-			--elseif y <= 1 then
-			--	data[vi] = c_water
-			--elseif y > -15000 then
-			--	data[vi] = c_air
-			--else
-				--data[vi] = c_lava
-			--end
+		end
+		end
+	--2d virtual memory map creation (z axis)
+	elseif axis == "z" then
+		for z = -1,1 do
+		for y = -1,1 do
+			--index only direct neighbors
+			if x_failed == true and aether_portal_failure == false and (math.abs(z)+math.abs(y) == 1) then
+				local i = vector.add(pos,vector.new(0,y,z))
+				
+				local execute_collection = true
+				
+				if a_index[i.x] and a_index[i.x][i.y] then
+					if a_index[i.x][i.y][i.z] then
+						execute_collection = false
+					end
+				end	
+				
+				if execute_collection == true then
+					--print(minetest.get_node(i).name)
+					--index air
+					if minetest.get_node(i).name == "air" then
+						if vector.distance(i,origin) < 50 then
+							--add data to both maps
+							if not a_index[i.x] then a_index[i.x] = {} end
+							if not a_index[i.x][i.y] then a_index[i.x][i.y] = {} end
+							a_index[i.x][i.y][i.z] = {aether_portal=1} --get_group(i,"redstone_power")}				
+							--the data to the 3d array must be written to memory before this is executed
+							--or a stack overflow occurs!!!
+							--pass down info for activators
+							create_aether_portal(i,origin,"z")
+						else
+							--print("portal failed")
+							aether_portal_failure = true
+							a_index = {}
+							--print("try z")
+						end
+					elseif minetest.get_node(i).name ~= "nether:glowstone" then
+						--print("portal failed")
+						aether_portal_failure = true
+						a_index = {}
+					end
+				end
+			end
+		end
+		end
+	end
+end
+
+--creates a aether portal in the aether
+--this essentially makes it so you have to move 30 away from one portal to another otherwise it will travel to an existing portal
+local aether_origin_pos = nil
+local function spawn_portal_into_aether_callback(blockpos, action, calls_remaining, param)
+	if calls_remaining == 0 then
+		local portal_exists = minetest.find_node_near(aether_origin_pos, 30, {"aether:portal"})
+				
+		if not portal_exists then
+			local min = vector.subtract(aether_origin_pos,30)
+			local max = vector.add(aether_origin_pos,30)
+			local platform = minetest.find_nodes_in_area_under_air(min, max, {"aether:dirt","aether:grass"})
 			
-			-- Increment noise index.
-			ni = ni + 1
-			-- Increment voxelmanip index along x row.
-			-- The voxelmanip index increases by 1 when
-			-- moving by 1 node in the +x direction.
-			vi = vi + 1
+			if platform and next(platform) then
+				--print("setting the platform")
+				local platform_location = platform[math.random(1,table.getn(platform))]
+				
+				minetest.place_schematic(platform_location, aetherportalSchematic,"0",nil,true,"place_center_x, place_center_z")
+			else
+				--print("generate a portal within aetherrack")
+				minetest.place_schematic(aether_origin_pos, aetherportalSchematic,"0",nil,true,"place_center_x, place_center_z")
+			end
+		else
+			--print("portal exists, utilizing")
+		end
+		aether_origin_pos = nil
+	end
+end
+--creates aether portals in the overworld
+local function spawn_portal_into_overworld_callback(blockpos, action, calls_remaining, param)
+	if calls_remaining == 0 then
+		local portal_exists = minetest.find_node_near(aether_origin_pos, 30, {"aether:portal"})
+				
+		if not portal_exists then
+			local min = vector.subtract(aether_origin_pos,30)
+			local max = vector.add(aether_origin_pos,30)
+			local platform = minetest.find_nodes_in_area_under_air(min, max, {"main:stone","main:water","main:grass","main:sand","main:dirt"})
+			
+			if platform and next(platform) then
+				--print("setting the platform")
+				local platform_location = platform[math.random(1,table.getn(platform))]
+				
+				minetest.place_schematic(platform_location, aetherportalSchematic,"0",nil,true,"place_center_x, place_center_z")
+			else
+				--print("generate a portal within overworld stone")
+				minetest.place_schematic(aether_origin_pos, aetherportalSchematic,"0",nil,true,"place_center_x, place_center_z")
+			end
+		else
+			--print("portal exists, utilizing")
+		end
+		aether_origin_pos = nil
+	end
+end
+
+
+local function generate_aether_portal_in_aether(pos)
+	if pos.y < 20000 then
+		--center the location to the lava height
+		pos.y = 25000--+math.random(-30,30)	
+		aether_origin_pos = pos
+		
+		local min = vector.subtract(aether_origin_pos,30)
+		local max = vector.add(aether_origin_pos,30)
+		
+		--force load the area
+		minetest.emerge_area(min, max, spawn_portal_into_aether_callback)
+	else
+		--center the location to the water height
+		pos.y = 0--+math.random(-30,30)	
+		aether_origin_pos = pos
+		--prefer height for mountains
+		local min = vector.subtract(aether_origin_pos,vector.new(30,30,30))
+		local max = vector.add(aether_origin_pos,vector.new(30,120,30))
+		
+		--force load the area
+		minetest.emerge_area(min, max, spawn_portal_into_overworld_callback)
+	end
+end
+
+
+--modify the map with the collected data
+local function portal_modify_map(n_copy)
+	local sorted_table = {}
+	local created_portal = false
+	for x,datax in pairs(n_copy) do
+		for y,datay in pairs(datax) do
+			for z,index in pairs(datay) do
+				--try to create a return side aether portal
+				if created_portal == false then
+					created_portal = true
+					generate_aether_portal_in_aether(vector.new(x,y,z))
+				end
+				table.insert(sorted_table, vector.new(x,y,z))
+			end
+		end
+	end
+	minetest.bulk_set_node(sorted_table, {name="aether:portal"})
+end
+
+-------------------------------------------------------------------------------------------
+--the teleporter parts - stored here for now so I can read from other functions
+local teleporting_player = nil
+local function teleport_to_overworld(blockpos, action, calls_remaining, param)
+	if calls_remaining == 0 then
+		local portal_exists = minetest.find_node_near(aether_origin_pos, 30, {"aether:portal"})
+		if portal_exists then
+			--print(teleporting_player)
+			if teleporting_player then
+				teleporting_player:set_pos(portal_exists)
+			end
+		end
+		teleporting_player = nil
+	end
+end
+local function teleport_to_aether(blockpos, action, calls_remaining, param)
+	if calls_remaining == 0 then
+		local portal_exists = minetest.find_node_near(aether_origin_pos, 30, {"aether:portal"})
+		if portal_exists then
+			--print(teleporting_player)
+			if teleporting_player then
+				teleporting_player:set_pos(portal_exists)
+			end
+		end
+		teleporting_player = nil
+	end
+end
+
+--this initializes all teleporter commands from the client
+minetest.register_on_modchannel_message(function(channel_name, sender, message)
+	if channel_name == "aether_teleporters" then
+		local player = minetest.get_player_by_name(sender)
+		local pos = player:get_pos()
+		
+		if pos.y < 20000 then
+			--center the location to the lava height
+			pos.y = 25000--+math.random(-30,30)	
+			aether_origin_pos = pos
+			
+			local min = vector.subtract(aether_origin_pos,30)
+			local max = vector.add(aether_origin_pos,30)
+			
+			--force load the area
+			teleporting_player = player
+			minetest.emerge_area(min, max, teleport_to_aether)
+		else
+			--center the location to the water height
+			pos.y = 0--+math.random(-30,30)	
+			aether_origin_pos = pos
+			--prefer height for mountains
+			local min = vector.subtract(aether_origin_pos,vector.new(30,30,30))
+			local max = vector.add(aether_origin_pos,vector.new(30,120,30))
+			
+			--force load the area
+			teleporting_player = player
+			minetest.emerge_area(min, max, teleport_to_overworld)
+		end
+	end
+end)
+-------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+
+local destroy_a_index = {}
+local destroy_aether_portal_failure = false
+local destroy_aether_portal_failed = false
+
+--this can be used globally to create aether portals from obsidian
+function destroy_aether_portal(pos,origin,axis)
+	--create the origin node for stored memory
+	if not origin then
+		origin = pos
+	end		
+	--3d virtual memory map creation (x axis)
+	for x = -1,1 do
+	for z = -1,1 do
+	for y = -1,1 do
+		--index only direct neighbors
+		if (math.abs(x)+math.abs(z)+math.abs(y) == 1) then
+			local i = vector.add(pos,vector.new(x,y,z))
+			
+			local execute_collection = true
+			
+			if destroy_a_index[i.x] and destroy_a_index[i.x][i.y] then
+				if destroy_a_index[i.x][i.y][i.z] then
+					execute_collection = false
+				end
+			end	
+			
+			if execute_collection == true then
+				--print(minetest.get_node(i).name)
+				--index air
+				if minetest.get_node(i).name == "aether:portal" then
+					if vector.distance(i,origin) < 50 then
+						--add data to both maps
+						if not destroy_a_index[i.x] then destroy_a_index[i.x] = {} end
+						if not destroy_a_index[i.x][i.y] then destroy_a_index[i.x][i.y] = {} end
+						destroy_a_index[i.x][i.y][i.z] = {aether_portal=1} --get_group(i,"redstone_power")}				
+						--the data to the 3d array must be written to memory before this is executed
+						--or a stack overflow occurs!!!
+						--pass down info for activators
+						destroy_aether_portal(i,origin,"z")
+					end
+				end
+			end
 		end
 	end
 	end
+	end
+end
 
-	-- After processing, write content ID data back to the voxelmanip.
-	
-	vm:set_data(data)
-	-- Calculate lighting for what has been created.
-	--vm:calc_lighting()
-	vm:set_lighting({day=15,night=0}, minp, maxp)
-	--minetest.generate_ores(vm)
-	
-	--minetest.generate_decorations(vm)
-	-- Write what has been created to the world.
-	vm:write_to_map()
-		
-		
-	-- Liquid nodes were placed so set them flowing.
-	--vm:update_liquids()
+--modify the map with the collected data
+local function destroy_portal_modify_map(destroy_n_copy)
+	local destroy_sorted_table = {}
+	for x,datax in pairs(destroy_n_copy) do
+		for y,datay in pairs(datax) do
+			for z,index in pairs(datay) do
+				table.insert(destroy_sorted_table, vector.new(x,y,z))
+			end
+		end
+	end
+	minetest.bulk_set_node(destroy_sorted_table, {name="air"})
+end
 
-	-- Print generation time of this mapchunk.
-	--local chugent = math.ceil((os.clock() - t0) * 1000)
-	--print ("[lvm_example] Mapchunk generation time " .. chugent .. " ms")
+minetest.register_globalstep(function(dtime)
+	--if indexes exist then calculate redstone
+	if a_index and next(a_index) and aether_portal_failure == false then
+		--create the old version to help with deactivation calculation
+		local n_copy = table.copy(a_index)
+		portal_modify_map(n_copy)
+		aether_portal_failure = false
+	end
+	if x_failed == true then
+		x_failed = false
+	end
+	if aether_portal_failure == true then
+		aether_portal_failure = false
+	end
+	--clear the index to avoid cpu looping wasting processing power
+	a_index = {}
+	
+	
+	--if indexes exist then calculate redstone
+	if destroy_a_index and next(destroy_a_index) and destroy_aether_portal_failure == false then
+		--create the old version to help with deactivation calculation
+		local destroy_n_copy = table.copy(destroy_a_index)
+		destroy_portal_modify_map(destroy_n_copy)
+	end
+	--clear the index to avoid cpu looping wasting processing power
+	destroy_a_index = {}
 end)

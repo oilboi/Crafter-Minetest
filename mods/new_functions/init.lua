@@ -74,6 +74,7 @@ local function handle_hurt(player)
 end
 
 --index specific things in area
+--declare here for ultra extreme efficiency
 local get_node = minetest.get_node
 local pos
 local node
