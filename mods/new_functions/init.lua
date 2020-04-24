@@ -144,7 +144,6 @@ local function handle_hurt()
 				z1 = floor_it(abs_it(player_pos.z-c_pos.z)*100)
 				--we will assume the player cbox is equal as x=0.8,y=0.5,z=0.8
 				if x1 <= 80 and z1 <= 80 and y1 <= 50 then
-					print(x1,y1,z1)
 					heart = player:get_hp()
 					player:set_hp(heart - 1)
 				end
