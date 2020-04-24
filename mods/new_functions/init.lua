@@ -52,26 +52,25 @@ local floor_it = math.floor
 
 local heart
 
-local function handle_hurt()
-	c_player = minetest.get_connected_players()
-	for _,player in ipairs(c_player) do
-		if player:get_hp() > 0 then
-			player_pos = player:get_pos()
-			name = player:get_player_name()
-			temp_hurt = player_surroundings_index_table[name].hurt
-			if temp_hurt then
-				c_pos = temp_hurt.pos				
-				x1 = floor_it(abs_it(player_pos.x-c_pos.x)*100)
-				y1 = floor_it(abs_it(player_pos.y-c_pos.y)*100)
-				z1 = floor_it(abs_it(player_pos.z-c_pos.z)*100)
-				--we will assume the player cbox is equal as x=0.8,y=0.5,z=0.8
-				if x1 <= 80 and z1 <= 80 and y1 <= 50 then
-					heart = player:get_hp()
-					player:set_hp(heart - 1)
-				end
+local function handle_hurt(player)
+	if player:get_hp() > 0 then
+		player_pos = player:get_pos()
+		name = player:get_player_name()
+		temp_hurt = player_surroundings_index_table[name].hurt
+		if temp_hurt then
+			c_pos = temp_hurt.pos				
+			x1 = floor_it(abs_it(player_pos.x-c_pos.x)*100)
+			y1 = floor_it(abs_it(player_pos.y-c_pos.y)*100)
+			z1 = floor_it(abs_it(player_pos.z-c_pos.z)*100)
+			--we will assume the player cbox is equal as x=0.8,y=0.5,z=0.8
+			if x1 <= 80 and z1 <= 80 and y1 <= 50 then
+				heart = player:get_hp()
+				player:set_hp(heart - 1)
+				return(true)
 			end
 		end
 	end
+	return(false)
 end
 
 --index specific things in area
@@ -81,6 +80,10 @@ local node
 local name
 local damage_pos
 local collisionbox
+local a_min
+local a_max
+local v_add = vector.add
+local v_sub = vector.subtract
 local function index_players_surroundings()
 	for _,player in ipairs(minetest.get_connected_players()) do
 		if player:get_hp() > 0 then
@@ -103,14 +106,21 @@ local function index_players_surroundings()
 			
 			--used for finding a damage node next to the player (centered at player's waist)
 			pos.y = pos.y - 0.74
-			damage_pos = minetest.find_node_near(pos, 1, hurt_nodes)
+			a_min = v_sub(pos,1)
+			a_max = v_add(pos,1)
+			damage_pos = minetest.find_nodes_in_area(a_min, a_max, hurt_nodes)
 			if damage_pos then
-				collisionbox = registered_nodes[get_node(damage_pos).name].collision_box
-				if not collisionbox then
-					collisionbox = {-0.5,-0.5,-0.5,0.5,0.5,0.5}
+				for _,found_location in ipairs(damage_pos) do
+					collisionbox = registered_nodes[get_node(found_location).name].collision_box
+					if not collisionbox then
+						collisionbox = {-0.5,-0.5,-0.5,0.5,0.5,0.5}
+					end
+					player_surroundings_index_table[name].hurt = {pos=found_location,collisionbox=collisionbox}
+					--stop doing damage on player if they got hurt
+					if handle_hurt(player) == true then
+						break
+					end
 				end
-				player_surroundings_index_table[name].hurt = {pos=damage_pos,collisionbox=collisionbox}
-				handle_hurt()
 			else
 				collisionbox = nil
 				player_surroundings_index_table[name].hurt = nil
