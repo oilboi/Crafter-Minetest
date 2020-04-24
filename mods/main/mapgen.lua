@@ -143,5 +143,5 @@ minetest.register_decoration({
 		y_min = 0,
 		decoration = "main:cactus",
 		height = 3,
-	        height_max = 4,
+		height_max = 4,
 	})
