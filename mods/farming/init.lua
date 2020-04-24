@@ -225,6 +225,21 @@ minetest.register_abm({
 	end,
 })
 
+--register cactus in here since it's part of farming
+minetest.register_abm({
+	label = "Cactus Grow",
+	nodenames = {"main:cactus"},
+	neighbors = {"air"},
+	interval = 3,
+	chance = 150,
+	action = function(pos)
+		pos.y = pos.y + 1
+		if minetest.get_node(pos).name == "air" then
+			minetest.set_node(pos,{name="main:cactus"})
+		end
+	end,
+})
+
 --wheat definitions
 local wheat_max = 7
 minetest.register_abm({

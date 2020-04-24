@@ -124,3 +124,24 @@ minetest.register_decoration({
 	spawn_by = "main:water",
 	num_spawn_by = 1,
 })
+
+
+minetest.register_decoration({
+		name = "main:cactus",
+		deco_type = "simple",
+		place_on = {"main:sand"},
+		sidelen = 16,
+		noise_params = {
+			offset = -0.012,
+			scale = 0.024,
+			spread = {x = 100, y = 100, z = 100},
+			seed = 230,
+			octaves = 3,
+			persist = 0.6
+		},
+		y_max = 30,
+		y_min = 0,
+		decoration = "main:cactus",
+		height = 3,
+	        height_max = 4,
+	})
