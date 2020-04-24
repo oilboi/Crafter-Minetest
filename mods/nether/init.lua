@@ -277,7 +277,7 @@ local function teleport_to_overworld(blockpos, action, calls_remaining, param)
 		if portal_exists then
 			--print(teleporting_player)
 			if teleporting_player then
-				teleporting_player:set_pos(portal_exists)
+				teleporting_player:set_pos(vector.new(portal_exists.x,portal_exists.y-0.5,portal_exists.z))
 			end
 		end
 		teleporting_player = nil
@@ -289,7 +289,7 @@ local function teleport_to_nether(blockpos, action, calls_remaining, param)
 		if portal_exists then
 			--print(teleporting_player)
 			if teleporting_player then
-				teleporting_player:set_pos(portal_exists)
+				teleporting_player:set_pos(vector.new(portal_exists.x,portal_exists.y-0.5,portal_exists.z))
 			end
 		end
 		teleporting_player = nil
