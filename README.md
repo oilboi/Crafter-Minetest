@@ -31,7 +31,14 @@ enable_mod_channels = true
 
 ## 0.04
 > Endless Horizons Update
-- 
+
+- Added in prototype for new mechanics built ontop of the engine
+- Added cactus
+- Make cactus hurt player when they touch it using touch_hurt group
+- Added aether portals
+- Make flying pigs drop 1-6 gold
+- Make mobs use builtin minetest.throw_item function (custom)
+- Double flying pigs sight radius
 ---
 
 
