@@ -124,7 +124,7 @@ slime.on_death = function(self, killer)
 		vertical = false,
 		texture = "smoke.png",
 	})
-	local obj = minetest.add_item(pos,"mob:slimeball")
+	minetest.throw_item(pos,"mob:slimeball")
 	self.object:remove()
 end
 

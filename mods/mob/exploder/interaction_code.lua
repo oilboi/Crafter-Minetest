@@ -127,7 +127,7 @@ exploder.on_death = function(self, killer)
 		vertical = false,
 		texture = "smoke.png",
 	})
-	local obj = minetest.add_item(pos,"mob:raw_porkchop")
+	minetest.throw_item(pos,"mob:raw_porkchop")
 	--self.child:get_luaentity().parent = nil
 	self.object:remove()
 end
