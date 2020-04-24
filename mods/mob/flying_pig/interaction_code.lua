@@ -166,7 +166,7 @@ flying_pig.look_around = function(self,dtime)
 	--and follow!
 	self.following = false
 	local player_found = false
-	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 6)) do
+	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 12)) do
 		if object:is_player() and player_found == false and object:get_hp() > 0 then
 			--look at player's camera
 			local pos2 = object:get_pos()
