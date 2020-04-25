@@ -39,6 +39,8 @@ enable_mod_channels = true
 - Make flying pigs drop 1-6 gold
 - Make mobs use builtin minetest.throw_item function (custom)
 - Double flying pigs sight radius
+- Add hurt_inside group
+- Add lava and fire to hurt_inside group
 ---
 
 

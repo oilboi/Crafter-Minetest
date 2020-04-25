@@ -74,19 +74,7 @@ local function handle_hurt(player)
 end
 
 --handle inside hurt
-local temp_hurt
-
-local xcompare
-local ycompare
-local zcompare
-
 local c_player
-
-local subval = vector.subtract
-
-local abs_it = math.abs
-local floor_it = math.floor
-
 local heart
 local legs
 local head
@@ -111,6 +99,33 @@ local function handle_hurt_inside(player)
 	end
 	return(false)
 end
+
+--handle player suffocating inside solid node
+local c_player
+local heart
+local legs
+local head
+local hurt_more
+local drawy
+
+local function handle_player_suffocation(player)
+	if player:get_hp() > 0 then
+		player_pos = player:get_pos()
+		name = player:get_player_name()
+		head = player_surroundings_index_table[name].head
+		if head then
+			drawy = registered_nodes[head].drawtype
+
+			if drawy == "normal" then
+				heart = player:get_hp()
+				player:set_hp(heart - 1)
+				return(true)
+			end
+		end
+	end
+	return(false)
+end
+
 
 --index specific things in area
 --declare here for ultra extreme efficiency
@@ -147,7 +162,7 @@ local function index_players_surroundings()
 			pos.y = pos.y + 0.940
 			player_surroundings_index_table[name].head = get_node(pos).name
 			
-
+			handle_player_suffocation(player)
 			handle_hurt_inside(player)
 
 			--used for finding a damage node next to the player (centered at player's waist)
