@@ -21,12 +21,33 @@ exploder.move = function(self,dtime)
 		self.speed = math.random(0,6)
 		--self.object:set_yaw(yaw)
 	end
+	
+	self.hurt_inside(self,dtime)
 
 	local currentvel = self.object:getvelocity()
 	local goal = vector.multiply(self.direction,self.speed)
 	local acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
 	acceleration = vector.multiply(acceleration, 0.05)
 	self.object:add_velocity(acceleration)
+end
+
+
+local get_group = minetest.get_node_group
+local get_node = minetest.get_node
+exploder.hurt_inside = function(self,dtime)
+	if self.hp > 0 and self.hurt_inside_timer <= 0 then
+		local pos = self.object:getpos()
+		local hurty = get_group(get_node(pos).name, "hurt_inside")
+		if hurty > 0 then
+			self.object:punch(self.object, 2, 
+				{
+				full_punch_interval=1.5,
+				damage_groups = {damage=hurty},
+			})
+		end
+	else
+		self.hurt_inside_timer = self.hurt_inside_timer - dtime
+	end
 end
 
 --use raycasting to jump

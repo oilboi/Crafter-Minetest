@@ -22,6 +22,7 @@ slime.hp = 10
 slime.speed = 5
 slime.jump_timer = 0
 
+slime.hurt_inside_timer = 0
 slime.death_animation_timer = 0
 slime.dead = false
 

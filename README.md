@@ -41,6 +41,7 @@ enable_mod_channels = true
 - Double flying pigs sight radius
 - Add hurt_inside group
 - Add lava and fire to hurt_inside group
+- Make mobs get damaged in fire and lava
 ---
 
 
@@ -51,7 +52,6 @@ enable_mod_channels = true
 ## REDSTONE:
 - breaker (mines whatever is in front of it)
 - dispenser (shoots out first item in inventory, or shoots item into pipe)
-- sticky piston (pulls node in front of it)
 - piston in general (if node is falling and piston is pointing up then FLING IT, if detects falling node entity FLING IT)
 
 

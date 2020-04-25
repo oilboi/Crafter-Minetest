@@ -22,6 +22,7 @@ pig.hp = 10
 pig.speed = 5
 pig.jump_timer = 0
 
+pig.hurt_inside_timer = 0
 pig.death_animation_timer = 0
 pig.dead = false
 

@@ -61,7 +61,7 @@ exploder.on_punch = function(self, puncher, time_from_last_punch, tool_capabilit
 	
 	local hp = hp-hurt
 	
-	if (self.punched_timer <= 0 and hp > 1) or puncher == self.object then
+	if (self.punched_timer <= 0 and hp > 1) then
 		self.hostile = true
 		self.hostile_timer = 20
 		self.punched_timer = 0.8

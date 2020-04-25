@@ -23,6 +23,7 @@ exploder.hp = 10
 exploder.speed = 5
 exploder.jump_timer = 0
 
+exploder.hurt_inside_timer = 0
 exploder.death_animation_timer = 0
 exploder.dead = false
 
