@@ -58,14 +58,14 @@ local function handle_hurt(player)
 		name = player:get_player_name()
 		temp_hurt = player_surroundings_index_table[name].hurt
 		if temp_hurt then
-			c_pos = temp_hurt.pos				
+			c_pos = temp_hurt.pos
 			x1 = floor_it(abs_it(player_pos.x-c_pos.x)*100)
 			y1 = floor_it(abs_it(player_pos.y-c_pos.y)*100)
 			z1 = floor_it(abs_it(player_pos.z-c_pos.z)*100)
 			--we will assume the player cbox is equal as x=0.8,y=0.5,z=0.8
 			if x1 <= 80 and z1 <= 80 and y1 <= 50 then
 				heart = player:get_hp()
-				player:set_hp(heart - 1)
+				player:set_hp(heart - player_surroundings_index_table[name].hurt.hurt_amount)
 				return(true)
 			end
 		end
@@ -86,6 +86,8 @@ local a_max
 local v_add = vector.add
 local v_sub = vector.subtract
 local get_number = table.getn
+local hurt_amount
+local gotten_node
 local function index_players_surroundings()
 	for _,player in ipairs(minetest.get_connected_players()) do
 		if player:get_hp() > 0 then
@@ -114,11 +116,14 @@ local function index_players_surroundings()
 			
 			if get_number(damage_pos) > 0 then
 				for _,found_location in ipairs(damage_pos) do
-					collisionbox = registered_nodes[get_node(found_location).name].collision_box
+					gotten_node = get_node(found_location).name
+					collisionbox = registered_nodes[gotten_node].collision_box
+					hurt_amount = get_group(gotten_node, "touch_hurt")
+					
 					if not collisionbox then
 						collisionbox = {-0.5,-0.5,-0.5,0.5,0.5,0.5}
 					end
-					player_surroundings_index_table[name].hurt = {pos=found_location,collisionbox=collisionbox}
+					player_surroundings_index_table[name].hurt = {pos=found_location,collisionbox=collisionbox,hurt_amount=hurt_amount}
 					--stop doing damage on player if they got hurt
 					if handle_hurt(player) == true then
 						break
