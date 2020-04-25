@@ -73,6 +73,45 @@ local function handle_hurt(player)
 	return(false)
 end
 
+--handle inside hurt
+local temp_hurt
+
+local xcompare
+local ycompare
+local zcompare
+
+local c_player
+
+local subval = vector.subtract
+
+local abs_it = math.abs
+local floor_it = math.floor
+
+local heart
+local legs
+local head
+local hurt_more
+
+local function handle_hurt_inside(player)
+	if player:get_hp() > 0 then
+		player_pos = player:get_pos()
+		name = player:get_player_name()
+		legs = player_surroundings_index_table[name].legs
+		head = player_surroundings_index_table[name].head
+		if legs and head then
+			hurt_more = get_group(legs, "hurt_inside")
+			if get_group(head, "hurt_inside") > hurt_more then
+				hurt_more = get_group(head, "hurt_inside")
+			end
+			
+			heart = player:get_hp()
+			player:set_hp(heart - hurt_more)
+			return(true)
+		end
+	end
+	return(false)
+end
+
 --index specific things in area
 --declare here for ultra extreme efficiency
 local get_node = minetest.get_node
@@ -108,6 +147,9 @@ local function index_players_surroundings()
 			pos.y = pos.y + 0.940
 			player_surroundings_index_table[name].head = get_node(pos).name
 			
+
+			handle_hurt_inside(player)
+
 			--used for finding a damage node next to the player (centered at player's waist)
 			pos.y = pos.y - 0.74
 			a_min = v_sub(pos,1)
