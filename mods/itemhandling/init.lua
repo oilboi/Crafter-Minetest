@@ -323,12 +323,40 @@ minetest.register_entity(":__builtin:item", {
 			z = pos.z
 		})
 		
-		-- Delete in 'ignore' nodes
+
+		-- Remove nodes in 'ignore'
 		if node and node.name == "ignore" then
 			self.itemstring = ""
 			self.object:remove()
 			return
 		end
+
+		--burn inside fire nodes
+		local node_inside = minetest.get_node_or_nil(pos)
+		if node_inside and (node_inside.name == "fire:fire" or node_inside.name == "nether:lava" or node_inside.name == "nether:lavaflow" or node_inside.name == "main:lava" or node_inside.name == "main:lavaflow") then
+			minetest.add_particlespawner({
+				amount = 6,
+				time = 0.001,
+				minpos = pos,
+				maxpos = pos,
+				minvel = vector.new(-1,0.5,-1),
+				maxvel = vector.new(1,1,1),
+				minacc = {x=0, y=1, z=0},
+				maxacc = {x=0, y=2, z=0},
+				minexptime = 1.1,
+				maxexptime = 1.5,
+				minsize = 1,
+				maxsize = 2,
+				collisiondetection = false,
+				vertical = false,
+				texture = "smoke.png",
+			})
+			minetest.sound_play("fire_extinguish", {pos=pos,gain=0.3,pitch=math.random(80,100)/100})
+			self.itemstring = ""
+			self.object:remove()
+			return
+		end
+
 
 		local is_stuck = false
 		local snode = minetest.get_node_or_nil(pos)
