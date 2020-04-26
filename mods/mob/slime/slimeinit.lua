@@ -92,13 +92,14 @@ end
 
 
 slime.on_step = function(self, dtime)
-	self.manage_death_animation(self,dtime)
-	if self.death_animation_timer == 0 then
+	if self.dead == false and self.death_animation_timer == 0 then
 		self.look_around(self,dtime)
 		self.move(self,dtime)
 		self.set_animation(self)
 		self.manage_punch_timer(self,dtime)
 		--self.debug_nametag(self,dtime)
+	else
+		self.manage_death_animation(self,dtime)
 	end
 	--fix zombie state again
 	if self.dead == true and self.death_animation_timer <= 0 then
