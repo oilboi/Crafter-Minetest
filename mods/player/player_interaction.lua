@@ -1,9 +1,15 @@
---hurt sound
+--hurt sound and disable fall damage group handling
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
+	if reason.type == "fall" then
+		if minetest.get_node_group(minetest.get_node(player:get_pos()).name, "disable_fall_damage") > 0 then
+			return(0)
+		end
+	end
 	if hp_change < 0 then
 		minetest.sound_play("hurt", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
 	end
-end)
+	return(hp_change)
+end, true)
 
 --throw all items on death
 minetest.register_on_dieplayer(function(player, reason)

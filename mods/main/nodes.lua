@@ -362,7 +362,7 @@ minetest.register_node("main:water", {
 	liquid_alternative_source = "main:water",
 	liquid_viscosity = 1,
 	post_effect_color = {a = 103, r = 30, g = 60, b = 90},
-	groups = {water = 1, liquid = 1, cools_lava = 1, bucket = 1, source = 1,pathable = 1,drowning=1},
+	groups = {water = 1, liquid = 1, cools_lava = 1, bucket = 1, source = 1,pathable = 1,drowning=1,disable_fall_damage=1},
 	--sounds = default.node_sound_water_defaults(),
 	
 	--water explodes in the nether
@@ -426,7 +426,7 @@ minetest.register_node("main:waterflow", {
 	liquid_alternative_source = "main:water",
 	liquid_viscosity = 1,
 	post_effect_color = {a = 103, r = 30, g = 60, b = 90},
-	groups = {water = 1, liquid = 1, notInCreative = 1, cools_lava = 1,pathable = 1,drowning=1},
+	groups = {water = 1, liquid = 1, notInCreative = 1, cools_lava = 1,pathable = 1,drowning=1,disable_fall_damage=1},
 	--sounds = default.node_sound_water_defaults(),
 })
 
