@@ -119,6 +119,7 @@ local do_snow = function(dtime)
 			
 			--find the highest y value
 			local bulk_list = {}
+			local ice_list = {}
 			for x,x_index in pairs(spawn_table) do
 				for z,y in pairs(x_index) do
 					if math.random() > 0.995 then
@@ -137,6 +138,8 @@ local do_snow = function(dtime)
 								elseif buildable == true and node ~= "weather:snow" then
 									table.insert(bulk_list, vector.new(x,y,z))
 								end
+							elseif minetest.get_node(vector.new(x,y,z)).name == "main:water" then
+								table.insert(ice_list, vector.new(x,y,z))
 							end
 						end
 					end
@@ -144,6 +147,9 @@ local do_snow = function(dtime)
 			end
 			if bulk_list then
 				minetest.bulk_set_node(bulk_list, {name="weather:snow"})
+			end
+			if ice_list then
+				minetest.bulk_set_node(ice_list, {name="main:ice"})
 			end
 		end
 	end
