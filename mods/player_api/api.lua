@@ -120,13 +120,14 @@ function player_api.set_animation(player, anim_name, speed)
 	local dig_animation =  {x = 189, y = 198}
 	local walk_and_dig =   {x = 200, y = 219}
 	local sneak_speed = nil
-	
+	local opacity = 255
 	if anim_name == "sneak" or anim_name == "sneak_mine_stand" or anim_name == "sneak_walk" or anim_name == "sneak_mine_walk" then
 		idle_animation = model.animations.sneak
 		walk_animation = model.animations.sneak_walk
 		dig_animation =  model.animations.sneak_mine_stand
 		walk_and_dig =   model.animations.sneak_mine_walk
 		sneak_speed = 16
+		opacity = 0
 	end
 	
 	--update the external animation speed that other players see
@@ -142,7 +143,14 @@ function player_api.set_animation(player, anim_name, speed)
 		walk_and_dig,--walk and dig
 		speed
 	)
-	
+	player:set_nametag_attributes(
+	{color = {
+                r = 255,
+                b = 255,
+                a = opacity,
+                g = 255
+        }
+	})
 	player_api.set_model(player, "character.b3d")
 	player_anim[name] = anim_name
 	player:set_animation(anim, sneaker_speed, animation_blend)
