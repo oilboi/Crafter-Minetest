@@ -12,7 +12,7 @@ minetest.register_globalstep(function(dtime)
 			if player:get_wielded_item():get_name() == "mining_lazer:mining_lazer" then
 				if player:get_player_control().RMB then
 					local pos = player:getpos()
-					pos.y = pos.y + 1.625
+					pos.y = pos.y + 1.485
 					local dir = player:get_look_dir()
 					local pos2 = vector.add(pos,vector.multiply(dir,30))
 					local ray = minetest.raycast(pos, pos2, false, false)
