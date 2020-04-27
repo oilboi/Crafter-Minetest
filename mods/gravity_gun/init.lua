@@ -63,11 +63,17 @@ minetest.register_craftitem("gravity_gun:gravity_gun", {
 minetest.register_globalstep(function(dtime)
 	for _,player in ipairs(minetest.get_connected_players()) do
 		if obj_table[player:get_player_name()] then
-			local pos = player:get_pos()
-			pos.y = pos.y + 1.485
-			local dir = player:get_look_dir()
-			local pos2 = vector.add(pos,vector.multiply(dir,3))
-			obj_table[player:get_player_name()]:set_pos(pos2)
+			if player:get_wielded_item():get_name() == "gravity_gun:gravity_gun" then
+				local pos = player:get_pos()
+				pos.y = pos.y + 1.485
+				local dir = player:get_look_dir()
+				local pos2 = vector.add(pos,vector.multiply(dir,3))
+				obj_table[player:get_player_name()]:set_pos(pos2)
+			else
+				obj_table[player:get_player_name()]:set_acceleration(vector.new(0,-9.81,0))
+				obj_table[player:get_player_name()]:get_luaentity().allow = true
+				obj_table[player:get_player_name()] = nil
+			end
 		end
 	end
 end)
