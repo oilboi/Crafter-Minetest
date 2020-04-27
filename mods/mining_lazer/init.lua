@@ -14,14 +14,14 @@ minetest.register_globalstep(function(dtime)
 					local pos = player:getpos()
 					pos.y = pos.y + 1.625
 					local dir = player:get_look_dir()
-					local pos2 = vector.add(pos,vector.multiply(dir,50))
+					local pos2 = vector.add(pos,vector.multiply(dir,30))
 					local ray = minetest.raycast(pos, pos2, false, false)
 					
 					if ray then
 						--local pointed_thing = ray:next()
 						for pointed_thing in ray do
 							if pointed_thing then
-								minetest.add_item(pointed_thing.under,minetest.get_node(pointed_thing.under).name)
+								--minetest.add_item(pointed_thing.under,minetest.get_node(pointed_thing.under).name)
 								minetest.remove_node(pointed_thing.under)
 								minetest.punch_node(pointed_thing.under)
 							end
