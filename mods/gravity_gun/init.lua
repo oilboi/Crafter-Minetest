@@ -226,8 +226,7 @@ core.register_entity(":__builtin:floating_node", {
 
 	on_step = function(self, dtime)
 		-- Set gravity
-		local vel = self.object:get_velocity()
-		if self.allow == true and vel.y == 0 then
+		if self.allow == true then
 			local acceleration = self.object:get_acceleration()
 			if not vector.equals(acceleration, {x = 0, y = -10, z = 0}) then
 				self.object:set_acceleration({x = 0, y = -10, z = 0})
