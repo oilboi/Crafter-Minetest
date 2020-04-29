@@ -151,6 +151,7 @@ pig.manage_death_animation = function(self,dtime)
 		acceleration = vector.multiply(acceleration, 0.05)
 		self.object:add_velocity(acceleration)
 		self.object:set_animation({x=0,y=0}, 15, 0, true)
+        
 		self.return_head_to_origin(self,dtime)
 		
 	end
