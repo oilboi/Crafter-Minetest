@@ -6,14 +6,15 @@ global_mob_table = {}
 
 local path = minetest.get_modpath(minetest.get_current_modname())
 
-dofile(path.."/spawning.lua")
-dofile(path.."/items.lua")
-dofile(path.."/chatcommands.lua")
+--dofile(path.."/spawning.lua")
+dofile(path.."/api.lua")
+--dofile(path.."/items.lua")
+--dofile(path.."/chatcommands.lua")
 --these are called 'mob'init.lua so when modifying their code they do
 --not get confused with each other
-dofile(path.."/pig/piginit.lua")
-dofile(path.."/slime/slimeinit.lua")
-dofile(path.."/flying_pig/flying_piginit.lua")
-dofile(path.."/exploder/exploderinit.lua")
+--dofile(path.."/pig/piginit.lua")
+--dofile(path.."/slime/slimeinit.lua")
+--dofile(path.."/flying_pig/flying_piginit.lua")
+--dofile(path.."/exploder/exploderinit.lua")
 
 
