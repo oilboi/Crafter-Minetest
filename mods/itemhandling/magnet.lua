@@ -15,7 +15,7 @@ minetest.register_globalstep(function(dtime)
 					if diff >= 0 and inv and inv:room_for_item("main", ItemStack(object:get_luaentity().itemstring)) then
 						if object:get_luaentity().collectable == true and object:get_luaentity().collected == false then
 							minetest.sound_play("pickup", {
-								to_player = player,
+								to_player = player:get_player_name(),
 								gain = 0.4,
 								pitch = math.random(60,100)/100
 							})
