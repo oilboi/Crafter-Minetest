@@ -52,10 +52,18 @@ mob_register.head_mount = def.head_mount
 mob_register.hurt_sound = def.hurt_sound
 mob_register.die_sound = def.die_sound
 
+mob_register.attack_type = def.attack_type
+mob_register.explosion_radius = def.explosion_radius
+mob_register.explosion_power = def.explosion_power
+mob_register.tnt_timer = nil
+mob_register.explosion_time = def.explosion_time
 
 mob_register.custom_function_begin = def.custom_function_begin
 mob_register.custom_function_end = def.custom_function_end
+mob_register.projectile_timer_cooldown = def.projectile_timer_cooldown
 
+mob_register.projectile_timer = 0
+mob_register.projectile_type = def.projectile_type
 
 
 mob_register.on_activate = function(self, staticdata, dtime_s)
@@ -119,6 +127,30 @@ if def.hostile == false then
             self.hostile = false
         end
     end
+end
+
+
+mob_register.manage_explode_timer = function(self,dtime)
+    self.tnt_timer = self.tnt_timer - dtime
+    if self.tnt_timer <= 0 then
+        
+        self.object:set_texture_mod("^[colorize:red:130")
+        if self.child then
+           self.child:set_texture_mod("^[colorize:red:130") 
+        end
+        
+        local pos = self.object:get_pos()
+        --direction.y = direction.y + 1
+        
+        tnt(pos,7)
+        self.death_animation_timer = 1
+        self.dead = true
+        self.tnt_timer = 100
+    end
+end
+
+mob_register.manage_projectile_timer = function(self,dtime)
+    self.projectile_timer = self.projectile_timer - dtime
 end
 
 --this stops the pig from flying into the air
@@ -298,7 +330,7 @@ mob_register.look_around = function(self,dtime)
     --and follow!
     self.following = false
     local player_found = false
-    for _,object in ipairs(minetest.get_objects_inside_radius(pos, 6)) do
+    for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.view_distance)) do
         if object:is_player() and player_found == false and object:get_hp() > 0 then
             --look at player's camera
             local pos2 = object:get_pos()
@@ -311,6 +343,7 @@ mob_register.look_around = function(self,dtime)
             end
             
             if self.hostile == true then
+                
                 self.direction = vector.direction(pos,pos2)
                 local distance = vector.distance(pos,pos2)-2
                 if distance < 0 then
@@ -318,15 +351,38 @@ mob_register.look_around = function(self,dtime)
                 end
                 
                 --punch the player
-                if distance < 1 and self.punch_timer <= 0 and object:get_hp() > 0 then
-                    local line_of_sight = minetest.line_of_sight(pos, pos2)
-                    if line_of_sight == true then
-                        self.punch_timer = 1
-                        object:punch(self.object, 2, 
-                            {
-                            full_punch_interval=1.5,
-                            damage_groups = {fleshy=2},
-                        },vector.direction(pos,pos2))
+                if self.attack_type == "punch" then
+                    if distance < 1 and self.punch_timer <= 0 and object:get_hp() > 0 then
+                        local line_of_sight = minetest.line_of_sight(pos, pos2)
+                        if line_of_sight == true then
+                            self.punch_timer = 1
+                            object:punch(self.object, 2, 
+                                {
+                                full_punch_interval=1.5,
+                                damage_groups = {fleshy=2},
+                            },vector.direction(pos,pos2))
+                        end
+                    end
+                elseif self.attack_type == "explode" then
+                    if distance <  self.explosion_radius then
+                        
+                        if not self.tnt_timer then
+                            self.tnt_timer = self.explosion_time
+                        end
+                    end
+                elseif self.attack_type == "projectile" then
+                    if not self.projectile_timer then
+                        self.projectile_timer = self.projectile_timer_cooldown
+                    end
+                    if self.projectile_timer <= 0 then
+                        self.projectile_timer = self.projectile_timer_cooldown
+                        
+                        local obj = minetest.add_entity(pos, self.projectile_type)
+                        if obj then
+                            local dir = vector.multiply(vector.direction(pos,pos2), 50)
+                            obj:set_velocity(dir)
+                            obj:get_luaentity().timer = 2
+                        end
                     end
                 end
                 self.speed = distance * 4
@@ -697,6 +753,14 @@ mob_register.on_step = function(self, dtime)
 		self.on_death(self)
 	end
     
+    if self.tnt_timer then
+        self.manage_explode_timer(self,dtime)
+    end
+    
+    if self.projectile_timer then
+        self.manage_projectile_timer(self,dtime)
+    end
+    
     if self.custom_function_end then
         self.custom_function_end(self,dtime)
     end
@@ -756,9 +820,9 @@ mobs.register_mob(
      gravity = {x = 0, y = -9.81, z = 0},
      movement_type = "walk",
      speed = 5,
-     hostile = false,
+     hostile = true,
      state = 0,
-     view_distance = 20,
+     view_distance = 50,
       
       
      standing_frame = {x=0,y=0},
@@ -778,36 +842,10 @@ mobs.register_mob(
      hurt_sound = "pig",
      die_sound = "pig_die",
      
-     custom_function_begin = function(self,dtime)
-        if self.hostile == true then
-            if not self.tnt_timer then
-                self.tnt_timer = 3
-            end
-            self.tnt_timer = self.tnt_timer - dtime
-            if self.tnt_timer <= 0 then
-                
-                --local direction = minetest.yaw_to_dir(self.object:get_yaw())
-     
-                --if self.child then
-                    
-                --end
-                local pos = self.object:get_pos()
-                --direction.y = direction.y + 1
-                
-     
-                --local obj = minetest.add_entity(pos,"tnt:tnt")
-                --if obj  then
-                    --obj:get_luaentity().range = 3
-                    --obj:get_luaentity().timer = 3
-                --end
-                
-                tnt(pos,7)
-                self.death_animation_timer = 1
-                self.dead = true
-                self.tnt_timer = 10
-            end
-        end
-     end,
+     --attack_type = "explode",
+     --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
+     --explosion_power = 7, -- how big the explosion has to be
+     --explosion_time = 3, -- how long it takes for a mob to explode
     }
 )
 
@@ -848,5 +886,59 @@ mobs.register_mob(
      
      hurt_sound = "slime_die",
      die_sound = "slime_die"
+    }
+)
+
+
+mobs.register_mob(
+    {
+     mobname = "flying_pig",
+	 physical = true,
+	 collide_with_objects = false,
+	 collisionbox = {-0.37, -0.4, -0.37, 0.37, 0.5, 0.37},
+	 visual = "mesh",
+	 visual_size = {x = 3, y = 3},
+	 mesh = "pig.x",
+	 textures = {
+		"flying_pig_body.png","flying_pig_leg.png","flying_pig_leg.png","flying_pig_leg.png","flying_pig_leg.png"
+	},
+	 is_visible = true,
+	 pointable = true,
+	 automatic_face_movement_dir = -90.0,
+	 automatic_face_movement_max_rotation_per_sec = 300,
+	 makes_footstep_sound = false,
+     hp = 10,
+     gravity = {x = 0, y = -1, z = 0},
+     movement_type = "jump",
+     speed = 5,
+     hostile = true,
+     state = 0,
+     view_distance = 50,
+      
+      
+     standing_frame = {x=0,y=0},
+     moving_frame = {x=5,y=15},
+     animation_multiplier = 5,
+     ----
+      
+     has_head = true, --remove this when mesh based head rotation is implemented
+     head_visual = "mesh",
+     head_visual_size = {x = 1.1, y = 1.1},
+     head_mesh = "pig_head.x",
+     head_textures ={"flying_pig_head.png","flying_pig_nose.png"},
+     head_mount = vector.new(0,1.2,1.9),
+     
+     death_rotation = "z",
+     
+     hurt_sound = "pig",
+     die_sound = "pig_die",
+     
+     attack_type = "projectile",
+     projectile_timer_cooldown = 4,
+     projectile_type = "tnt:tnt",
+     
+     --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
+     --explosion_power = 7, -- how big the explosion has to be
+     --explosion_time = 3, -- how long it takes for a mob to explode
     }
 )
