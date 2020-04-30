@@ -1,7 +1,7 @@
 --this is where mob spawning is defined
 
 --spawn mob in a square doughnut shaped radius
-local chance = 2
+local chance = 20
 local tick = 0.2
 local timer = 0
 --inner and outer part of square donut radius

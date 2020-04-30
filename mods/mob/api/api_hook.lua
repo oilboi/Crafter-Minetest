@@ -105,6 +105,7 @@ mob_register.on_step = function(self, dtime)
     end
     
     self.collision_detection(self)
+    self.fall_damage(self)
     
 	if self.dead == false and self.death_animation_timer == 0 then
 		self.move(self,dtime)

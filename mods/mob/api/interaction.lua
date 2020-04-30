@@ -47,6 +47,11 @@ mobs.create_interaction_functions = function(def,mob_register)
                 local dir = vector.direction(pos,pos2)
                 dir.y = 0
                 
+                --eliminate mob being stuck in corners
+                if dir.x == 0 and dir.z == 0 then
+                    dir = vector.new(math.random(-1,1)*math.random(),0,math.random(-1,1)*math.random())
+                end
+                
                 local velocity = vector.multiply(dir,1.1)
                 
                 vel1 = vector.multiply(velocity, -1)
@@ -60,6 +65,22 @@ mobs.create_interaction_functions = function(def,mob_register)
                 end
             end
         end
+    end
+    
+    mob_register.fall_damage = function(self)
+        local vel = self.object:get_velocity()
+        if vel and self.oldvel then
+           if self.oldvel.y < -7 and vel.y == 0 then
+              local damage = math.abs(self.oldvel.y + 7)
+              damage = math.floor(damage/1.5)
+              self.object:punch(self.object, 2, 
+                 {
+                  full_punch_interval=1.5,
+                  damage_groups = {damage=damage},
+                 })
+           end
+        end
+        self.oldvel = vel
     end
 
     --this controls what happens when the mob gets punched
@@ -87,7 +108,9 @@ mobs.create_interaction_functions = function(def,mob_register)
         local hp = hp-hurt
         
         if (self.punched_timer <= 0 and hp > 1) then
-            self.hostile = true
+            if puncher ~= self.object then
+                self.hostile = true
+            end
             self.hostile_timer = 20
             self.punched_timer = 0.8
             
