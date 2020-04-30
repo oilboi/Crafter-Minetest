@@ -83,6 +83,10 @@ mob_register.item_amount = def.item_amount
 mob_register.die_in_light = def.die_in_light
 mob_register.die_in_light_level = def.die_in_light_level
 
+mob_register.mob = true
+
+mob_register.collision_boundary = def.collision_boundary or 1
+
 
 mobs.create_movement_functions(def,mob_register)
 mobs.create_interaction_functions(def,mob_register)
@@ -99,6 +103,9 @@ mob_register.on_step = function(self, dtime)
     if self.custom_function_begin then
         self.custom_function_begin(self,dtime)
     end
+    
+    self.collision_detection(self)
+    
 	if self.dead == false and self.death_animation_timer == 0 then
 		self.move(self,dtime)
 		self.set_animation(self)

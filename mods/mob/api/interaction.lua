@@ -35,6 +35,32 @@ mobs.create_interaction_functions = function(def,mob_register)
             texture = "critical.png",
         })
     end
+    
+    mob_register.collision_detection = function(self)
+        local pos = self.object:get_pos()
+        --do collision detection from the base of the mob
+        pos.y = pos.y - self.object:get_properties().collisionbox[2]
+        for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.collision_boundary)) do
+            if object:is_player() or object:get_luaentity().mob == true then
+                local pos2 = object:get_pos()
+                
+                local dir = vector.direction(pos,pos2)
+                dir.y = 0
+                
+                local velocity = vector.multiply(dir,1.1)
+                
+                vel1 = vector.multiply(velocity, -1)
+                vel2 = velocity
+                self.object:add_velocity(vel1)
+                
+                if object:is_player() then
+                    object:add_player_velocity(vel2)
+                else
+                    object:add_velocity(vel2)
+                end
+            end
+        end
+    end
 
     --this controls what happens when the mob gets punched
     mob_register.on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
