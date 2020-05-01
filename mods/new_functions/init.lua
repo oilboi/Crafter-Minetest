@@ -113,7 +113,8 @@ local function handle_player_suffocation(player)
 		player_pos = player:get_pos()
 		name = player:get_player_name()
 		head = player_surroundings_index_table[name].head
-		if head then
+		if head and registered_nodes[head] then
+            
 			drawy = registered_nodes[head].drawtype
 
 			if drawy == "normal" then

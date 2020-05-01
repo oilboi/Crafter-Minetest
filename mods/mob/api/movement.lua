@@ -82,13 +82,16 @@ mobs.create_movement_functions = function(def,mob_register)
                         for pointed_thing in ray do
                             local collision_point = pointed_thing.under
                             if collision_point then
-                                local walkable = minetest.registered_nodes[minetest.get_node(collision_point).name].walkable
-                                if walkable then
-                                    local distance = vector.subtract(collision_point,pos).y-self.object:get_properties().collisionbox[2]+0.4
-                                    if distance >= -0.11 then
-                                        local vel = self.object:get_velocity()
-                                        self.jump_timer = 0.5
-                                        self.object:add_velocity(vector.new(vel.x,5,vel.z))
+                                local nodey = minetest.registered_nodes[minetest.get_node(collision_point).name]
+                                if nodey then
+                                    local walkable = nodey.walkable
+                                    if walkable then
+                                        local distance = vector.subtract(collision_point,pos).y-self.object:get_properties().collisionbox[2]+0.4
+                                        if distance >= -0.11 then
+                                            local vel = self.object:get_velocity()
+                                            self.jump_timer = 0.5
+                                            self.object:add_velocity(vector.new(vel.x,5,vel.z))
+                                        end
                                     end
                                 end
                             end
