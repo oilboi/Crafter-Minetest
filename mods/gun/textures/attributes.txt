@@ -1,1 +1,0 @@
-gun: https://github.com/kaeza/minetest-firearms/blob/master/firearms_guns/textures/firearms_pistol_45.png
