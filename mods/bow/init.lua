@@ -1,7 +1,7 @@
 local arrow = {}
 arrow.initial_properties = {
 	physical = true,
-	collide_with_objects = true,
+	collide_with_objects = false,
 	collisionbox = {-0.37, -0.4, -0.37, 0.37, 0.5, 0.37},
 	visual = "mesh",
 	visual_size = {x = 1 , y = 1},
@@ -25,6 +25,34 @@ end
 
 arrow.on_step = function(self, dtime)
 	local pos = self.object:get_pos()
+    local vel = self.object:get_velocity()
+    
+    
+    for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
+		if (object:is_player() and object:get_hp() > 0 and object:get_player_name() ~= self.thrower) or (object:get_luaentity() and object:get_luaentity().mob == true) then
+            if object:is_player() then
+                object:punch(self.object, 2, 
+                    {
+                    full_punch_interval=1.5,
+                    damage_groups = {fleshy=3},
+                })
+            else
+                object:punch(self.object, 2, 
+                    {
+                    full_punch_interval=1.5,
+                    damage_groups = {damage=3},
+                })
+            end
+			hit = true
+            self.object:remove()
+			break
+		end
+	end
+    
+    if (self.oldvel and ((vel.x == 0 and self.oldvel.x ~= 0) or (vel.y == 0 and self.oldvel.y ~= 0) or (vel.x == 0 and self.oldvel.x ~= 0))) then
+        minetest.throw_item(pos, "bow:arrow")
+        self.object:remove()
+    end
 	if self.old_pos then
 		local yaw = minetest.dir_to_yaw(vector.direction(pos,self.old_pos))+(math.pi/2)
 		
@@ -41,6 +69,8 @@ arrow.on_step = function(self, dtime)
 		self.object:set_animation({x=pitch,y=pitch}, 15, 0, true)
 	end
 	self.old_pos = pos
+    
+    self.oldvel = vel
 end
 minetest.register_entity("bow:arrow", arrow)
 
@@ -61,7 +91,10 @@ for i = 1,5 do
 	})
 end
 
-
+minetest.register_craftitem("bow:arrow", {
+	description = "Arrow",
+	inventory_image = "arrow_item.png",
+})
 
 minetest.register_globalstep(function(dtime)
 	--check if player has bow
