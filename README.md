@@ -42,6 +42,21 @@ enable_mod_channels = true
 - Add hurt_inside group
 - Add lava and fire to hurt_inside group
 - Make mobs get damaged in fire and lava
+- Add prototype mining lazer
+- Add prototype gravity gun
+- Added ice
+- Make players get suffocated inside solid nodes
+- Ice now breaks into water
+- Ice spawns when snowing, replaces water under air
+- Players sneaking hide nametag
+- Updated main menu texture to have better brightness/contrast
+- Turned mobs into API
+- Added creepig
+- Flying Pig now throws TNT at player
+- Redid fishing mechanics
+- Redid bows and arrows
+- Added collision detection to mobs
+- Add fall damage to mobs
 ---
 
 
