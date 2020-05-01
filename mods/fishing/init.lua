@@ -2,7 +2,7 @@
  
  minetest.register_craftitem("fishing:pole", {
 	description = "Fishing Pole",
-	inventory_image = "stick.png",
+	inventory_image = "fishing_rod.png",
 	stack_max = 1,
 	range = 0,
 	on_use = function(itemstack, user, pointed_thing)
