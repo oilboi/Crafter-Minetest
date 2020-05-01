@@ -95,6 +95,9 @@ minetest.register_node("main:ice", {
 	use_texture_alpha = false,
 	alpha = 100,
     drop = "",
+    after_destruct = function(pos, oldnode)
+       minetest.set_node(pos, {name="main:water"})                            
+    end                
 })
 
 minetest.register_node("main:dirt", {
