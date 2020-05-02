@@ -27,38 +27,22 @@ minetest.register_globalstep(function(dtime)
 		
 		--running FOV modifier
 		if running or bunny_hopping then
-			local fov = player:get_fov()
-			if fov == 0 then
-				fov = 1
-			end
-
-			if fov+dtime < 1.2 then
-				player:set_fov(fov + dtime, true)
-			elseif fov-dtime > 1.2 then
-				player:set_fov(fov - dtime, true)
-			elseif fov+dtime > 1.2 then
-				player:set_fov(1.2, true)
-			end
 			if bunny_hopping == true then
+                player:set_fov(1.4, true,0.1)
 				player:set_physics_override({speed=1.75})
 			else
+                player:set_fov(1.2, true,0.1)
 				player:set_physics_override({speed=1.5})
 			end
 		else
-			local meta = player:get_meta()
-			local fov = player:get_fov()
-			if fov-dtime > 1 then
-				player:set_fov(fov - dtime, true)
-			elseif fov-dtime < 1 then
-				player:set_fov(1, true)
-			end
-			
+            player:set_fov(1, true,0.1)
 			player:set_physics_override({speed=1})
 			--meta:set_float("running_timer", 0)
 		end
 		
 		--sneaking
 		if sneaking then
+            player:set_fov(0.8, true,0.1)
 			player:set_eye_offset({x=0,y=-1,z=0},{x=0,y=-1,z=0})
 		else
 			player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
