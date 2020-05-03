@@ -223,3 +223,61 @@ mobs.register_mob(
      die_in_light_level = 12,
     }
 )
+
+
+
+mobs.register_mob(
+    {
+     mobname = "exploder",
+	 physical = true,
+	 collide_with_objects = false,
+	 collisionbox = {-0.37, -0.4, -0.37, 0.37, 0.5, 0.37},
+	 visual = "mesh",
+	 visual_size = {x = 3, y = 3},
+	 mesh = "exploder.b3d",
+	 textures = {
+		"creepig_body.png","creepig_leg.png","creepig_leg.png","creepig_leg.png","creepig_leg.png"
+	},
+	 is_visible = true,
+	 pointable = true,
+	 automatic_face_movement_dir = 0,
+	 automatic_face_movement_max_rotation_per_sec = 300,
+	 makes_footstep_sound = false,
+     hp = 10,
+     gravity = {x = 0, y = -9.81, z = 0},
+     movement_type = "walk",
+     max_speed = 4,
+     hostile = false,
+     state = 0,
+     view_distance = 20,
+     item_drop = "mob:cooked_porkchop",
+      
+     standing_frame = {x=5,y=5},
+     moving_frame = {x=0,y=20},
+     animation_multiplier = 10,
+     ----
+      
+     has_head = false, --remove this when mesh based head rotation is implemented
+     --head_visual = "mesh",
+     --head_visual_size = {x = 1, y = 1},
+     --head_mesh = "pig_head.x",
+     --head_textures ={"creepig_head.png","creepig_nose.png"},
+     --head_mount = vector.new(0,1.2,1.9),
+     
+     death_rotation = "x",
+     
+     hurt_sound = "pig",
+     die_sound = "pig_die",
+     
+     attack_type = "explode",
+     --projectile_timer_cooldown = 5,
+     --projectile_type = "tnt:tnt",
+     
+     explosion_radius = 2, -- how far away the mob has to be to initialize the explosion
+     explosion_power = 7, -- how big the explosion has to be
+     explosion_time = 5, -- how long it takes for a mob to explode
+     
+     die_in_light = false,
+     --die_in_light_level = 12,
+    }
+)

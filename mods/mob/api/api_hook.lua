@@ -83,6 +83,8 @@ mob_register.item_amount = def.item_amount
 mob_register.die_in_light = def.die_in_light
 mob_register.die_in_light_level = def.die_in_light_level
 
+mob_register.current_animation = 0
+
 mob_register.mob = true
 
 mob_register.collision_boundary = def.collision_boundary or 1

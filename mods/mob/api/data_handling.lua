@@ -31,7 +31,8 @@ mobs.create_data_handling_functions = function(def,mob_register)
         end
         
         --set up mob
-        self.object:set_animation({x=0,y=0}, 1, 0, true)
+        self.object:set_animation(def.standing_frame, 0, 0, true)
+        self.current_animation = 0
         self.object:set_hp(self.hp)
         self.direction = vector.new(math.random()*math.random(-1,1),0,math.random()*math.random(-1,1))
         
