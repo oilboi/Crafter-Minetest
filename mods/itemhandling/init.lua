@@ -14,29 +14,57 @@ local creative_mode = minetest.settings:get_bool("creative_mode")
 --survival
 if not creative_mode then
 	function minetest.handle_node_drops(pos, drops, digger)
-		for _,item in ipairs(drops) do
-			local count, name
-			if type(item) == "string" then
-				count = 1
-				name = item
-			else
-				count = item:get_count()
-				name = item:get_name()
-			end
-			for i=1,count do
-				local obj = minetest.add_item(pos, name)
-				if obj ~= nil then
-					local x=math.random(-2,2)*math.random()
-					local y=math.random(2,5)
-					local z=math.random(-2,2)*math.random()
-					obj:setvelocity({x=x, y=y, z=z})
+		local meta = digger:get_wielded_item():get_meta()
+		local slippery =  meta:get_int("slippery")
+		local careful = meta:get_int("careful")
+		local fortune = meta:get_int("fortune") + 1
+		local autorepair = meta:get_int("autorepair")
+		local spiky = meta:get_int("spiky")
+		if careful > 0 then
+			drops = {minetest.get_node(pos).name}
+		end
+		for i = 1,fortune do
+			for _,item in ipairs(drops) do
+				local count, name
+				if type(item) == "string" then
+					count = 1
+					name = item
+				else
+					count = item:get_count()
+					name = item:get_name()
+				end
+				for i=1,count do
+					local obj = minetest.add_item(pos, name)
+					if obj ~= nil then
+						local x=math.random(-2,2)*math.random()
+						local y=math.random(2,5)
+						local z=math.random(-2,2)*math.random()
+						obj:setvelocity({x=x, y=y, z=z})
+					end
 				end
 			end
+	        local experience_amount = minetest.get_node_group(minetest.get_node(pos).name,"experience")
+	        if experience_amount > 0 then
+	            minetest.throw_experience(pos, experience_amount)
+	        end
 		end
-        local experience_amount = minetest.get_node_group(minetest.get_node(pos).name,"experience")
-        if experience_amount > 0 then
-            minetest.throw_experience(pos, experience_amount)
-        end
+		--make the player drop their "slippery" item
+		if slippery > 0 and math.random(0,1000) < slippery then
+			minetest.item_drop(digger:get_wielded_item(), digger, digger:get_pos())
+			digger:set_wielded_item("")
+		end
+		
+		--auto repair the item
+		if autorepair > 0 and math.random(0,1000) < autorepair then
+			local itemstack = digger:get_wielded_item()
+			itemstack:add_wear(autorepair*-100)
+			digger:set_wielded_item(itemstack)
+		end
+		
+		--hurt the player randomly
+		if spiky > 0 and math.random(0,1000) < spiky then
+			digger:set_hp(digger:get_hp()-spiky)
+		end
 	end
 --creative
 else
