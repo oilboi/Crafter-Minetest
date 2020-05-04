@@ -45,7 +45,7 @@ minetest.register_node("enchanting:table", {
 			local description = minetest.registered_tools[stack:get_name()].description--temp_names[math.random(1,table.getn(temp_names))]
 			for i = 1,enchants_available do
 				local new_enchant = enchantment_list[math.random(1,table.getn(enchantment_list))]
-				local level = math.random(1,enchants_available)
+				local level = math.random(1,6)
 				if meta:get_int(new_enchant) == 0 then
 					player_level = player_level - 5
 					meta:set_int(new_enchant, level)
