@@ -182,7 +182,7 @@ local function test_experience()
         add_experience(player,math.random(1,3)*2)
     end
        
-    minetest.after(0.3, function()
+    minetest.after(0.1, function()
         test_experience()
     end)
 end
