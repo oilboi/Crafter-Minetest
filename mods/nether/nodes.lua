@@ -256,7 +256,7 @@ for id,ore in pairs(ores) do
 	minetest.register_node("nether:"..ore.."ore", {
 		description = ore:gsub("^%l", string.upper).." Ore",
 		tiles = {"netherrack.png^"..ore.."ore.png"},
-		groups = {netherrack = id, pathable = 1},
+		groups = {netherrack = id, pathable = 1, experience = id*2},
 		sounds = main.stoneSound(),
 		light_source = 7,
 		drop = drops,

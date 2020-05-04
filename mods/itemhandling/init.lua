@@ -33,6 +33,10 @@ if not creative_mode then
 				end
 			end
 		end
+        local experience_amount = minetest.get_node_group(minetest.get_node(pos).name,"experience")
+        if experience_amount > 0 then
+            minetest.throw_experience(pos, experience_amount)
+        end
 	end
 --creative
 else
@@ -77,6 +81,21 @@ function minetest.throw_item(pos, item)
 		obj:setvelocity({x=x, y=y, z=z})
 	end
 	return obj
+end
+
+
+function minetest.throw_experience(pos, amount)
+    for i = 1,amount do
+        local obj = minetest.add_entity(pos, "experience:orb")
+        -- Don't use obj if it couldn't be added to the map.
+        if obj then
+            local x=math.random(-2,2)*math.random()
+            local y=math.random(2,5)
+            local z=math.random(-2,2)*math.random()
+            obj:setvelocity({x=x, y=y, z=z})
+        end
+    end
+	--return obj
 end
 
 --override drops

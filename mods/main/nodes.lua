@@ -13,7 +13,7 @@ for id,ore in pairs(ores) do
 	minetest.register_node("main:"..ore.."ore", {
 		description = ore:gsub("^%l", string.upper).." Ore",
 		tiles = {"stone.png^"..ore.."ore.png"},
-		groups = {stone = id, pathable = 1},
+		groups = {stone = id, pathable = 1,experience=id},
 		sounds = main.stoneSound(),
 		--light_source = 14,--debugging ore spawn
 		drop = {
