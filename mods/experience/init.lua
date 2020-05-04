@@ -12,6 +12,15 @@ local experience_bar_max = 36
 minetest.register_on_joinplayer(function(player)
     local meta = player:get_meta()
     meta:set_float("experience_collection_buffer",0)
+        player:hud_add({
+        hud_elem_type = "statbar",
+        position = {x = 0.5, y = 1},
+        text = "heart_bg.png",
+        number = core.PLAYER_MAX_HP_DEFAULT,
+        direction = 0,
+        size = {x = 24, y = 24},
+        offset = {x = (-10 * 24) - 25, y = -(48 + 24 + 38)},
+    })
     player:hud_add({
         hud_elem_type = "statbar",  -- See HUD element types
         -- Type of element, can be "image", "text", "statbar", or "inventory"
