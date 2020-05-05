@@ -3,3 +3,4 @@ https://forum.minetest.net/viewtopic.php?t=16407
 https://github.com/minetest/minetest_game/tree/master/mods/default/textures
 flint - https://github.com/MysticTempest/REFI_Textures/blob/master/textures/default_mcl_core/stone/default_flint.png
 gravel - https://github.com/minetest-texture-packs/Good-Morning-Craft/blob/master/default/default_gravel.png
+bubble - https://github.com/Gerold55
