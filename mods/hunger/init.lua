@@ -123,4 +123,9 @@ function minetest.eat_food(player,item)
 	
 	meta:set_int("hunger", player_hunger)
 	meta:set_int("satiation", player_satiation)
+	local hunger_bar = meta:get_int("hunger_bar")
+	player:hud_change(hunger_bar, "number", player_hunger)
+	local stack = player:get_wielded_item()
+	stack:take_item()
+	player:set_wielded_item(stack)
 end
