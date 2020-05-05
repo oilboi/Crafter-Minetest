@@ -1,15 +1,10 @@
 minetest.register_on_joinplayer(function(player)
 	local meta = player:get_meta()
-	--give players new hunger when they join
-	if meta:get_int("hunger") == 0 then
-		meta:set_int("hunger", 20)
-		meta:set_int("satiation", 5)
-	end
 	player:hud_add({
 		hud_elem_type = "statbar",
 		position = {x = 0.5, y = 1},
 		text = "hunger_icon_bg.png",
-		number = 20,
+		number = meta:get_int("hunger"),
 		direction = 1,
 		size = {x = 24, y = 24},
 		offset = {x = 24*10, y= -(48 + 50 + 39)},
@@ -18,12 +13,23 @@ minetest.register_on_joinplayer(function(player)
 		hud_elem_type = "statbar",
 		position = {x = 0.5, y = 1},
 		text = "hunger_icon.png",
-		number = 20,
+		number = meta:get_int("hunger"),
 		direction = 1,
 		size = {x = 24, y = 24},
 		offset = {x = 24*10, y= -(48 + 50 + 39)},
 	})
 	meta:set_int("hunger_bar", hunger_bar)
+end)
+
+
+minetest.register_on_newplayer(function(player)
+	local meta = player:get_meta()
+	--give players new hunger when they join
+	if meta:get_int("hunger") == 0 then
+		meta:set_int("hunger", 20)
+		meta:set_int("satiation", 5)
+	end
+	
 end)
 
 minetest.register_on_respawnplayer(function(player)
@@ -42,26 +48,26 @@ local function hunger_update()
 		local sneaking = (meta:get_string("player.player_movement_state") == "3")		
 		local got_hungry = math.random()
 		if satiation > 0 then
-			if running and got_hungry > 0.95 then
+			if running and got_hungry > 0.995 then
 				satiation = satiation - 1
-			elseif bunny_hopping and got_hungry > 0.90 then
+			elseif bunny_hopping and got_hungry > 0.990 then
 				satiation = satiation - 1
-			elseif sneaking and got_hungry > 0.998 then
+			elseif sneaking and got_hungry > 0.9998 then
 				satiation = satiation - 1
-			elseif got_hungry > 0.996 then
+			elseif got_hungry > 0.9996 then
 				satiation = satiation - 1
 			end
 		end
 		
 		if satiation == 0 then
 			if hunger > 0 then
-				if running and got_hungry > 0.82 then
+				if running and got_hungry > 0.982 then
 					hunger = hunger - 1
-				elseif bunny_hopping and got_hungry > 0.77 then
+				elseif bunny_hopping and got_hungry > 0.977 then
 					hunger = hunger - 1
-				elseif sneaking and got_hungry > 0.968 then
+				elseif sneaking and got_hungry > 0.9968 then
 					hunger = hunger - 1
-				elseif got_hungry > 0.954 then
+				elseif got_hungry > 0.9954 then
 					hunger = hunger - 1
 				end
 			end
@@ -82,7 +88,7 @@ local function hunger_update()
 				satiation = 0
 			end
 		end
-		
+		print(satiation)
 		meta:set_int("satiation", satiation)
 		local hunger_bar = meta:get_int("hunger_bar")
 		player:hud_change(hunger_bar, "number", hunger)
