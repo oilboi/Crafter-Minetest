@@ -9,7 +9,7 @@ minetest.register_craftitem("main:apple", {
 minetest.register_craftitem("main:sugar", {
 	description = "Sugar",
 	inventory_image = "sugar.png",
-	health = 1,
+	groups = {satiation=1,hunger=1},
 })
 
 minetest.register_craftitem("main:stick", {

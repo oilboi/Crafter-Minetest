@@ -52,8 +52,13 @@ minetest.register_globalstep(function(dtime)
 		
 		--eating
 		if player:get_player_control().RMB then
-			local health = player:get_wielded_item():get_definition().health
-			if health then
+		
+			local item = player:get_wielded_item():get_name()
+			local satiation = minetest.get_item_group(item, "satiation")
+			local hunger = minetest.get_item_group(item, "hunger")
+			
+			
+			if hunger and satiation then
 				local meta = player:get_meta()
 				local eating = meta:get_float("eating")
 				local eating_timer = meta:get_float("eating_timer")
@@ -93,8 +98,7 @@ minetest.register_globalstep(function(dtime)
 				if eating + dtime >= 1 then
 					local stack = player:get_wielded_item()
 					stack:take_item(1)
-					player:set_wielded_item(stack)
-					player:set_hp(player:get_hp() + health)
+					minetest.eat_food(player,item)
 					eating = 0
 					minetest.sound_play("eat_finish", {
 						to_player = player:get_player_name(),

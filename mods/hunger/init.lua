@@ -68,6 +68,11 @@ local function hunger_update()
 			end
 		end
 		
+		
+		if hunger >= 20 then
+			player:set_hp(player:get_hp()+1)
+		end
+		
 		meta:set_int("satiation", satiation)
 		local hunger_bar = meta:get_int("hunger_bar")
 		player:hud_change(hunger_bar, "number", hunger)
@@ -79,3 +84,39 @@ local function hunger_update()
 end
 
 hunger_update()
+
+--allow players to eat food
+function minetest.eat_food(player,item)
+	local meta = player:get_meta()
+	
+	local player_hunger = meta:get_int("hunger")
+	local player_satiation = meta:get_int("satiation")
+	
+	
+	if type(item) == "string" then
+		item = ItemStack(item)
+	elseif type(item) == "table" then
+		item = ItemStack(item.name)
+	end
+	
+	item = item:get_name()
+	
+	local satiation = minetest.get_item_group(item, "satiation")
+	local hunger = minetest.get_item_group(item, "hunger")
+	
+	if player_hunger < 20 then
+		player_hunger = player_hunger + hunger
+		if player_hunger > 20 then
+			player_hunger = 20
+		end
+	end
+	if player_satiation < 20 then
+		player_satiation = player_satiation + satiation
+		if player_satiation > 20 then
+			player_satiation = 20
+		end
+	end
+	
+	meta:set_int("hunger", player_hunger)
+	meta:set_int("satiation", player_satiation)
+end

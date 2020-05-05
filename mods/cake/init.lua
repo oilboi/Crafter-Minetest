@@ -30,7 +30,7 @@ for i = 0,13 do
 		},
 		drop = "",
 		sounds = main.woolSound(),
-		groups = {wool=1,cake=i,falling_node=1},
+		groups = {wool=1,cake=i,falling_node=1,satiation=5,hunger=3},
 		on_construct = function(pos)
 			--randomly cake eats itself
 			if math.random() > 0.995 then
@@ -38,7 +38,8 @@ for i = 0,13 do
 			end
 		end,
 		on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-			clicker:set_hp(clicker:get_hp()+5)
+			minetest.eat_food(clicker,node)
+			--clicker:set_hp(clicker:get_hp()+5)
 			if i == 13 then
 		        minetest.sound_play("eat_finish",{pos=pos,gain=0.2,pitch=math.random(90,100)/100})
 		        minetest.remove_node(pos)
