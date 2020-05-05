@@ -68,9 +68,13 @@ local function hunger_update()
 			end
 		end
 		
-		
-		if hunger >= 20 then
-			player:set_hp(player:get_hp()+1)
+		local hp = player:get_hp()
+		if hunger >= 20 and hp < 20 then
+			player:set_hp(hp+1)
+			satiation = satiation - 1
+			if satiation < 0 then
+				satiation = 0
+			end
 		end
 		
 		meta:set_int("satiation", satiation)
