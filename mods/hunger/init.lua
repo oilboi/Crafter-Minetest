@@ -48,25 +48,25 @@ local function hunger_update()
 		local sneaking = (meta:get_string("player.player_movement_state") == "3")		
 		local got_hungry = math.random()
 		if satiation > 0 then
-			if running and got_hungry > 0.989 then
+			if running and got_hungry > 0.959 then
 				satiation = satiation - 1
-			elseif bunny_hopping and got_hungry > 0.983 then
+			elseif bunny_hopping and got_hungry > 0.941 then
 				satiation = satiation - 1
 			elseif sneaking and got_hungry > 0.9930 then
 				satiation = satiation - 1
-			elseif got_hungry > 0.99 then
+			elseif got_hungry > 0.97 then
 				satiation = satiation - 1
 			end
 		end
 		if satiation == 0 then
 			if hunger > 0 then
-				if running and got_hungry > 0.962 then
+				if running and got_hungry > 0.922 then
 					hunger = hunger - 1
-				elseif bunny_hopping and got_hungry > 0.957 then
+				elseif bunny_hopping and got_hungry > 0.917 then
 					hunger = hunger - 1
-				elseif sneaking and got_hungry > 0.981 then
+				elseif sneaking and got_hungry > 0.941 then
 					hunger = hunger - 1
-				elseif got_hungry > 0.9774 then
+				elseif got_hungry > 0.937 then
 					hunger = hunger - 1
 				end
 			end
@@ -106,7 +106,7 @@ minetest.register_on_dignode(function(pos, oldnode, digger)
 	local hunger = meta:get_int("hunger")
 	local got_hungry = math.random()
 	if satiation > 0 then
-		if got_hungry > 0.975 then
+		if got_hungry > 0.955 then
 			satiation = satiation - 1
 			meta:set_int("satiation", satiation)
 		end
@@ -114,7 +114,7 @@ minetest.register_on_dignode(function(pos, oldnode, digger)
 	
 	if satiation == 0 then
 		if hunger > 0 then
-			if got_hungry > 0.955 then
+			if got_hungry > 0.925 then
 				hunger = hunger - 1
 				meta:set_int("hunger", hunger)
 				local hunger_bar = meta:get_int("hunger_bar")
