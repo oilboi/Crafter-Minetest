@@ -26,6 +26,12 @@ minetest.register_on_joinplayer(function(player)
 	meta:set_int("hunger_bar", hunger_bar)
 end)
 
+minetest.register_on_respawnplayer(function(player)
+	local meta = player:get_meta()
+	meta:set_int("hunger", 20)
+	meta:set_int("satiation", 5)
+end)
+
 local function hunger_update()
 	for _,player in ipairs(minetest.get_connected_players()) do
 		local meta = player:get_meta()
