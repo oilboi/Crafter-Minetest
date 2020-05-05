@@ -73,6 +73,19 @@ enable_mod_channels = true
 ---
 
 
+
+## BUILDTEST:
+- quarry
+- filter
+- siv
+- mining lazer
+- trains
+
+
+
+---
+
+
 ## MOBS:
 
 > #1 idea, - make mobs pathfind
