@@ -245,51 +245,39 @@ local function fix_breath_hack()
 		player:set_breath(50000)
 		name = player:get_player_name()
 		indexer = player_surroundings_index_table[name].head
+		
+		local meta = player:get_meta()
+		local ticker = meta:get_int("breath_ticker")
+		
+		ticker = ticker + 1
+		if ticker > 1 then ticker = 0 end
+		meta:set_int("breath_ticker", ticker)
+		
 		if indexer == "main:water" or indexer == "main:waterflow" then
-			local meta = player:get_meta()
 			local breath = meta:get_int("breath")
 			local breathbar = meta:get_int("breathbar")
 			breath = breath - 1
 			
-			if breath >= 0 then
+			if breath >= 0 and ticker == 1 then
 				meta:set_int("breath", breath)
 				player:hud_change(breathbar, "number", breath*2)
 			end
+			if meta:get_int("breath") <= 0 then
+				local hp =  player:get_hp()
+				if hp > 0 then
+					player:set_hp(hp-1)
+				end
+			end
 		else --reset the bar
-			local meta = player:get_meta()
 			meta:set_int("breath", 10)
 			local breathbar = meta:get_int("breathbar")
 			player:hud_change(breathbar, "number", 20)
 		end
 	end
 	
-	minetest.after(1, function()
+	minetest.after(0.5, function()
 		fix_breath_hack()
 	end)
 end
 
 fix_breath_hack()
-
-
---handle the drowning
-local function drown()
-	for _,player in ipairs(minetest.get_connected_players()) do
-		name = player:get_player_name()
-		indexer = player_surroundings_index_table[name].head
-		
-		local meta = player:get_meta()
-		local breath = meta:get_int("breath")
-		if breath == 0 and (indexer == "main:water" or indexer == "main:waterflow") then
-			local hp =  player:get_hp()
-			if hp > 0 then
-				player:set_hp(hp-1)
-			end
-		end
-	end
-
-	minetest.after(0.5, function()
-		drown()
-	end)
-end
-
-drown()
