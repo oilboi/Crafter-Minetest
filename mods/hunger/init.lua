@@ -40,9 +40,9 @@ local function hunger_update()
 				satiation = satiation - 1
 			elseif bunny_hopping and got_hungry > 0.90 then
 				satiation = satiation - 1
-			elseif sneaking and got_hungry > 0.997 then
+			elseif sneaking and got_hungry > 0.998 then
 				satiation = satiation - 1
-			elseif got_hungry > 0.998 then
+			elseif got_hungry > 0.996 then
 				satiation = satiation - 1
 			end
 		end
