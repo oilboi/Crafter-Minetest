@@ -280,7 +280,10 @@ local function drown()
 		local meta = player:get_meta()
 		local breath = meta:get_int("breath")
 		if breath == 0 and (indexer == "main:water" or indexer == "main:waterflow") then
-			player:set_hp(player:get_hp()-1)
+			local hp =  player:get_hp()
+			if hp > 0 then
+				player:set_hp(hp-1)
+			end
 		end
 	end
 
