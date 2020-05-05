@@ -206,51 +206,68 @@ end
 
 index_players_surroundings() --begin
 
---[[ this is disabled for now
---handle water drowning - temp - will be moved to a custom function in a future update
-local breath
-local function handle_drowning()
+
+--completely destroy the breath bar
+minetest.hud_replace_builtin("breath",{
+	hud_elem_type = "statbar",
+	position = {x = 0.5, y = 1},
+	text = "nothing.png",
+	number = 50000,
+	direction = 0,
+	size = {x = 24, y = 24},
+	offset = {x = 25, y= -(48 + 24 + 16)},
+})
+
+minetest.register_on_joinplayer(function(player)
+	player:hud_set_flags({breathbar=false})
+	
+	local meta = player:get_meta()
+	--give players new breath when they join
+	meta:set_int("breath", 10)
+	local bubble_id = player:hud_add({
+		hud_elem_type = "statbar",
+		position = {x = 0.5, y = 1},
+		text = "bubble.png",
+		number = 20,
+		direction = 0,
+		size = {x = 24, y = 24},
+		offset = {x = 23, y= -(48 + 24 + 39)},
+	})
+	meta:set_int("breathbar", bubble_id)
+end)
+
+--begin custom breathbar
+local name
+local indexer
+--we will handle
+local function fix_breath_hack()
 	for _,player in ipairs(minetest.get_connected_players()) do
-		if player:get_hp() > 0 then
-			name = player:get_player_name()
-			if get_group(player_surroundings_index_table[name].head, "drowning") > 0 then
-				breath = player:get_breath()
-				if breath > 0 then
-					player:set_breath(breath - 1)
-				end
+		player:set_breath(50000)
+		name = player:get_player_name()
+		indexer = player_surroundings_index_table[name].head
+		if indexer == "main:water" or indexer == "main:waterflow" then
+			local meta = player:get_meta()
+			local breath = meta:get_int("breath")
+			local breathbar = meta:get_int("breathbar")
+			breath = breath - 1
+			
+			if breath >= 0 then
+				meta:set_int("breath", breath)
+				player:hud_change(breathbar, "number", breath*2)
 			else
-				breath = player:get_breath()
-				if breath < 11 then
-					player:set_breath(breath + 1)
-				end
+				player:set_hp(player:get_hp()-1)
 			end
+		else --reset the bar
+			local meta = player:get_meta()
+			meta:set_int("breath", 10)
+			local breathbar = meta:get_int("breathbar")
+			player:hud_change(breathbar, "number", 20)
 		end
 	end
+	
 	minetest.after(0.5, function()
-		handle_drowning()
+		fix_breath_hack()
 	end)
 end
 
-handle_drowning()
-]]--
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+fix_breath_hack()
