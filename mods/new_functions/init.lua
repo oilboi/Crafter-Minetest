@@ -107,17 +107,20 @@ local legs
 local head
 local hurt_more
 local drawy
-
+local legs
 local function handle_player_suffocation(player)
 	if player:get_hp() > 0 then
 		player_pos = player:get_pos()
 		name = player:get_player_name()
 		head = player_surroundings_index_table[name].head
-		if head and registered_nodes[head] then
+		legs = player_surroundings_index_table[name].legs
+		
+		if head and registered_nodes[head] and not legs == "aether:portal" and not legs == "nether:portal" then
             
 			drawy = registered_nodes[head].drawtype
 
 			if drawy == "normal" then
+				print(dump(legs))
 				heart = player:get_hp()
 				player:set_hp(heart - 1)
 				return(true)
