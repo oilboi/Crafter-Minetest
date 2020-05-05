@@ -57,10 +57,12 @@ minetest.register_globalstep(function(dtime)
 			local satiation = minetest.get_item_group(item, "satiation")
 			local hunger = minetest.get_item_group(item, "hunger")
 			
+			local meta = player:get_meta()
+			if meta:get_int("hunger") == 20 then
+				return 
+			end
 			
-			if hunger and satiation then
-				local meta = player:get_meta()
-				if meta:get_int("hunger") == 20 and meta:get_int("satiation") == 20 then return end
+			if hunger > 0 and satiation > 0  then				
 				local eating = meta:get_float("eating")
 				local eating_timer = meta:get_float("eating_timer")
 				
