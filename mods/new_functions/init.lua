@@ -231,7 +231,7 @@ minetest.register_on_joinplayer(function(player)
 		number = 20,
 		direction = 0,
 		size = {x = 24, y = 24},
-		offset = {x = 23, y= -(48 + 24 + 39)},
+		offset = {x = 24, y= -(48 + 24 + 39)},
 	})
 	meta:set_int("breathbar", bubble_id)
 end)
