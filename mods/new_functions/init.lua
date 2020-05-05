@@ -229,18 +229,18 @@ minetest.register_on_joinplayer(function(player)
 		position = {x = 0.5, y = 1},
 		text = "bubble_bg.png",
 		number = 20,
-		direction = 0,
+		direction = 1,
 		size = {x = 24, y = 24},
-		offset = {x = 24, y= -(48 + 24 + 39)},
+		offset = {x = 24*10, y= -(48 + 24 + 39)},
 	})
 	local bubble_id = player:hud_add({
 		hud_elem_type = "statbar",
 		position = {x = 0.5, y = 1},
 		text = "bubble.png",
 		number = 20,
-		direction = 0,
+		direction = 1,
 		size = {x = 24, y = 24},
-		offset = {x = 24, y= -(48 + 24 + 39)},
+		offset = {x = 24*10, y= -(48 + 24 + 39)},
 	})
 	meta:set_int("breathbar", bubble_id)
 end)
