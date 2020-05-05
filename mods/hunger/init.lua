@@ -4,7 +4,7 @@ minetest.register_on_joinplayer(function(player)
 		hud_elem_type = "statbar",
 		position = {x = 0.5, y = 1},
 		text = "hunger_icon_bg.png",
-		number = meta:get_int("hunger"),
+		number = 20,
 		direction = 1,
 		size = {x = 24, y = 24},
 		offset = {x = 24*10, y= -(48 + 50 + 39)},
@@ -48,26 +48,25 @@ local function hunger_update()
 		local sneaking = (meta:get_string("player.player_movement_state") == "3")		
 		local got_hungry = math.random()
 		if satiation > 0 then
-			if running and got_hungry > 0.995 then
+			if running and got_hungry > 0.989 then
 				satiation = satiation - 1
-			elseif bunny_hopping and got_hungry > 0.990 then
+			elseif bunny_hopping and got_hungry > 0.983 then
 				satiation = satiation - 1
-			elseif sneaking and got_hungry > 0.9998 then
+			elseif sneaking and got_hungry > 0.9930 then
 				satiation = satiation - 1
-			elseif got_hungry > 0.9996 then
+			elseif got_hungry > 0.99 then
 				satiation = satiation - 1
 			end
 		end
-		
 		if satiation == 0 then
 			if hunger > 0 then
-				if running and got_hungry > 0.982 then
+				if running and got_hungry > 0.962 then
 					hunger = hunger - 1
-				elseif bunny_hopping and got_hungry > 0.977 then
+				elseif bunny_hopping and got_hungry > 0.957 then
 					hunger = hunger - 1
-				elseif sneaking and got_hungry > 0.9968 then
+				elseif sneaking and got_hungry > 0.981 then
 					hunger = hunger - 1
-				elseif got_hungry > 0.9954 then
+				elseif got_hungry > 0.9774 then
 					hunger = hunger - 1
 				end
 			end
@@ -88,7 +87,6 @@ local function hunger_update()
 				satiation = 0
 			end
 		end
-		print(satiation)
 		meta:set_int("satiation", satiation)
 		local hunger_bar = meta:get_int("hunger_bar")
 		player:hud_change(hunger_bar, "number", hunger)
@@ -100,6 +98,32 @@ local function hunger_update()
 end
 
 hunger_update()
+
+--take away hunger and satiation randomly while mining
+minetest.register_on_dignode(function(pos, oldnode, digger)
+	local meta = digger:get_meta()
+	local satiation = meta:get_int("satiation")
+	local hunger = meta:get_int("hunger")
+	local got_hungry = math.random()
+	if satiation > 0 then
+		if got_hungry > 0.975 then
+			satiation = satiation - 1
+			meta:set_int("satiation", satiation)
+		end
+	end
+	
+	if satiation == 0 then
+		if hunger > 0 then
+			if got_hungry > 0.955 then
+				hunger = hunger - 1
+				meta:set_int("hunger", hunger)
+				local hunger_bar = meta:get_int("hunger_bar")
+				digger:hud_change(hunger_bar, "number", hunger)
+			end
+		end
+	end
+end)
+
 
 --allow players to eat food
 function minetest.eat_food(player,item)
