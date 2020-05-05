@@ -239,7 +239,7 @@ end)
 --begin custom breathbar
 local name
 local indexer
---we will handle
+--handle the breath bar
 local function fix_breath_hack()
 	for _,player in ipairs(minetest.get_connected_players()) do
 		player:set_breath(50000)
@@ -254,8 +254,6 @@ local function fix_breath_hack()
 			if breath >= 0 then
 				meta:set_int("breath", breath)
 				player:hud_change(breathbar, "number", breath*2)
-			else
-				player:set_hp(player:get_hp()-1)
 			end
 		else --reset the bar
 			local meta = player:get_meta()
@@ -265,9 +263,30 @@ local function fix_breath_hack()
 		end
 	end
 	
-	minetest.after(0.5, function()
+	minetest.after(1, function()
 		fix_breath_hack()
 	end)
 end
 
 fix_breath_hack()
+
+
+--handle the drowning
+local function drown()
+	for _,player in ipairs(minetest.get_connected_players()) do
+		name = player:get_player_name()
+		indexer = player_surroundings_index_table[name].head
+		
+		local meta = player:get_meta()
+		local breath = meta:get_int("breath")
+		if breath == 0 and (indexer == "main:water" or indexer == "main:waterflow") then
+			player:set_hp(player:get_hp()-1)
+		end
+	end
+
+	minetest.after(0.5, function()
+		drown()
+	end)
+end
+
+drown()
