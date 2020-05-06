@@ -319,7 +319,7 @@ minetest.register_entity("experience:orb", {
 				return
 			end
 			local collector = minetest.get_player_by_name(self.collector)
-			if collector then
+			if collector and collector:get_hp() > 0 then
 				self.object:setacceleration(vector.new(0,0,0))
 				self.disable_physics(self)
 				--get the variables
