@@ -18,6 +18,8 @@ minetest.register_globalstep(function(dtime)
 	for _,player in ipairs(minetest.get_connected_players()) do
 		local meta = player:get_meta()
 		
+		local hunger = meta:get_int("hunger")
+		
 		local running = (meta:get_string("player.player_movement_state") == "1")
 		local bunny_hopping = (meta:get_string("player.player_movement_state") == "2")
 		local sneaking = (meta:get_string("player.player_movement_state") == "3")
@@ -26,7 +28,7 @@ minetest.register_globalstep(function(dtime)
 		
 		
 		--running FOV modifier
-		if running or bunny_hopping then
+		if hunger > 6 and (running or bunny_hopping) then
 			if bunny_hopping == true then
                 player:set_fov(1.4, true,0.1)
 				player:set_physics_override({speed=1.75})
