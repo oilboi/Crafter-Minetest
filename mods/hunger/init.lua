@@ -156,7 +156,7 @@ local function hunger_update()
 				meta:set_int("exhaustion_tick", exhaustion_tick)
 			end
 			
-			print("satiation:",satiation,"exhaustion_tick:",exhaustion_tick)
+			--print("satiation:",satiation,"exhaustion_tick:",exhaustion_tick)
 			local hp = player:get_hp()
 			if hunger >= 20 and hp < 20 then
 				player:set_hp(hp+1)
