@@ -92,7 +92,7 @@ local function hunger_update()
 			
 			--we count up the exhaustion of the player moving around
 			--based on their states
-			if satiation > 0 then
+			if satiation > 0 and hunger >= 20 then
 				if running then
 					exhaustion_tick = exhaustion_tick + 6
 				elseif bunny_hopping then
