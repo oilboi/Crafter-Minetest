@@ -108,7 +108,6 @@ local function hunger_update()
 				
 				
 				if exhaustion_tick >= exhaustion_peak then
-					print("should be wroking")
 					satiation = satiation - 1
 					exhaustion_tick = exhaustion_tick - exhaustion_peak
 					
@@ -156,19 +155,27 @@ local function hunger_update()
 				meta:set_int("exhaustion_tick", exhaustion_tick)
 			end
 			
-			--print("satiation:",satiation,"exhaustion_tick:",exhaustion_tick)
+			
 			local hp = player:get_hp()
-			if hunger >= 20 and hp < 20 then
-				player:set_hp(hp+1)
-				exhaustion_tick = 0
-				satiation = satiation - 1
-				if satiation < 0 then
-					satiation = 0
+			--make regeneration happen every second
+			if hunger >= 20 and hp < 20 and satiation > 0 then
+				local regeneration_interval = meta:get_int("regeneration_interval")
+				--print(regeneration_interval,"--------------------------")
+				regeneration_interval = regeneration_interval + 1
+				if regeneration_interval >= 2 then
+					player:set_hp(hp+1)
+					exhaustion_tick = exhaustion_tick + 32
+					meta:set_int("exhaustion_tick", exhaustion_tick)
+					meta:set_int("satiation", satiation)
+					regeneration_interval = 0
 				end
-				meta:set_int("exhaustion_tick", exhaustion_tick)
+				meta:set_int("regeneration_interval",regeneration_interval)
+			--reset the regen interval
+			else
+				meta:set_int("regeneration_interval",0)
 			end
 			
-			meta:set_int("satiation", satiation)
+			--print("satiation:",satiation,"exhaustion_tick:",exhaustion_tick)
 		end
 	end
 	
