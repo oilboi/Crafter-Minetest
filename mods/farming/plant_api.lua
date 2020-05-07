@@ -1,3 +1,7 @@
+ --plant growth time contants (in seconds)
+ local plant_min = 60
+ local plant_max = 240
+ 
  minetest.register_plant = function(name,def)
 	 max = 1
 	 if def.stages then
@@ -36,7 +40,7 @@
 						minetest.set_node(pos,{name="farming:"..name})
 					end
 					local timer = minetest.get_node_timer(pos)
-					timer:start(1)
+					timer:start(math.random(plant_min,plant_max))
 				end
 			end
 			
@@ -48,7 +52,7 @@
 				pos.y = pos.y + 1
 				if found then
 					local timer = minetest.get_node_timer(pos)
-					timer:start(1)
+					timer:start(math.random(plant_min,plant_max))
 				elseif noder ~= nodename then
 					minetest.dig_node(pos)
 				end
@@ -58,7 +62,7 @@
 				pos.y = pos.y - 1
 				if minetest.get_node(pos).name == nodename then
 					local timer = minetest.get_node_timer(pos)
-					timer:start(1)
+					timer:start(math.random(plant_min,plant_max))
 				end
 			end
 		--for plants that grow in place
@@ -72,7 +76,7 @@
 						pos.y = pos.y + 1
 						minetest.set_node(pos,{name="farming:"..name.."_"..(i+1)})
 						local timer = minetest.get_node_timer(pos)
-						timer:start(1)
+						timer:start(math.random(plant_min,plant_max))
 					end
 				--if not found farmland
 				else
@@ -85,7 +89,7 @@
 				pos.y = pos.y + 1
 				if found then
 					local timer = minetest.get_node_timer(pos)
-					timer:start(1)
+					timer:start(math.random(plant_min,plant_max))
 				else
 					minetest.dig_node(pos)
 				end
