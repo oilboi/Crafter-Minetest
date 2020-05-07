@@ -111,11 +111,18 @@ local ice_list
 local spawn_table
 local mass_set = minetest.bulk_set_node
 local inserter = table.insert
+local temp_pos
+local get_table_size = table.getn
+
+--this is debug
 --local average = {}
+
 local function do_snow()
 	if weather_type == 1 then
 		for _,player in ipairs(minetest.get_connected_players()) do
+			--this is debug
 			--local t0 = os.clock()
+			
 			pos = round_it(player:get_pos())
 			
 			area = n_vec(40,40,40)
@@ -125,15 +132,27 @@ local function do_snow()
 			area_index = under_air(min, max, all_nodes)
 			
 			spawn_table = {}
-			for _,index in pairs(area_index) do
-				if not spawn_table[index.x] then spawn_table[index.x] = {} end
-				if not spawn_table[index.x][index.z] then
-					spawn_table[index.x][index.z] = index.y
-				elseif spawn_table[index.x][index.z] < index.y then
-					spawn_table[index.x][index.z] = index.y
+			
+			--the highest value is always indexed last in minetest.find_nodes_in_area_under_air, 
+			--so all that is needed is to iterate through it backwards and hook into the first
+			--y value on the x and y and ignore the rest
+			for key = get_table_size(area_index),1,-1 do
+				temp_pos = area_index[key]
+				if not spawn_table[temp_pos.x] then spawn_table[temp_pos.x] = {} end
+				if not spawn_table[temp_pos.x][temp_pos.z] then
+					spawn_table[temp_pos.x][temp_pos.z] = temp_pos.y
 				end
 			end
-		
+			
+			--save old method just in case useful or turns out it's faster after all
+			--for _,index in pairs(area_index) do
+			--	if not spawn_table[index.x] then spawn_table[index.x] = {} end
+			--	if not spawn_table[index.x][index.z] then
+			--		spawn_table[index.x][index.z] = index.y
+			--	elseif spawn_table[index.x][index.z] < index.y then
+			--		spawn_table[index.x][index.z] = index.y
+			--	end
+			--end
 			
 			--find the highest y value
 			bulk_list = {}
@@ -170,6 +189,8 @@ local function do_snow()
 				mass_set(ice_list, {name="main:ice"})
 			end
 			
+			
+			--this is debug
 			--[[
 			local chugent = math.ceil((os.clock() - t0) * 1000)
 			print("---------------------------------")
@@ -178,14 +199,14 @@ local function do_snow()
 			inserter(average, chugent)
 			local a = 0
 			--don't cause memory leak
-			if table.getn(average) > 10 then
+			if get_table_size(average) > 10 then
 				table.remove(average,1)
 			end
 			for _,i in ipairs(average) do
 				a = a + i
 			end
 			print(dump(average))
-			a = a / table.getn(average)
+			a = a / get_table_size(average)
 			print("average = "..a.."ms")
 			print("---------------------------------")
 			]]--
