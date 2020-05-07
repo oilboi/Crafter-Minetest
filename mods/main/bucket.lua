@@ -29,15 +29,7 @@ minetest.register_craftitem("main:bucket", {
 	stack_max = 1,
 	--wield_image = "bucket.png",
 	--liquids_pointable = true,
-	on_place = function(itemstack, placer, pointed_thing)
-		--do the sucking water out of farmland thing first
-		if pointed_thing.under and minetest.get_node(pointed_thing.under).name == "farming:farmland_wet" then
-			minetest.set_node(pointed_thing.under,{name="farming:farmland_dry"})
-			itemstack:replace(ItemStack("main:bucket_water"))
-			return(itemstack)
-		end
-		
-		
+	on_place = function(itemstack, placer, pointed_thing)		
 		local pos = bucket_raycast(placer)
 		
 		if not pos then
@@ -86,11 +78,6 @@ minetest.register_craftitem("main:bucket_water", {
 	stack_max = 1,
 	--liquids_pointable = false,
 	on_place = function(itemstack, placer, pointed_thing)
-		if pointed_thing.under and minetest.get_node(pointed_thing.under).name == "farming:farmland_dry" then
-			minetest.set_node(pointed_thing.under,{name="farming:farmland_wet"})
-			itemstack:replace(ItemStack("main:bucket"))
-			return(itemstack)
-		end
 		local pos = bucket_raycast(placer)
 		
 		if not pos then
