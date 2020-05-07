@@ -2,7 +2,50 @@ local farmland = {"wet","dry"}
 
 for level,dryness in pairs(farmland) do
 	local coloring = 160/level
-
+	local on_construct
+	if dryness == "wet" then
+		on_construct = function(pos)
+			local found = minetest.find_node_near(pos, 3, {"main:water","main:waterflow"})
+			if not found then
+				minetest.set_node(pos,{name="farming:farmland_dry"})
+			end
+			local timer = minetest.get_node_timer(pos)
+			timer:start(1)
+		end
+		
+		on_timer = function(pos)
+			print("on_timer")
+			local found = minetest.find_node_near(pos, 3, {"main:water","main:waterflow"})
+			if not found then
+				minetest.set_node(pos,{name="farming:farmland_dry"})
+			end
+			local timer = minetest.get_node_timer(pos)
+			timer:start(1)
+		end
+	else
+		on_construct = function(pos)
+			local found = minetest.find_node_near(pos, 3, {"main:water","main:waterflow"})
+			if found then
+				minetest.set_node(pos,{name="farming:farmland_wet"})
+			else
+				minetest.set_node(pos,{name="main:dirt"})
+			end
+			local timer = minetest.get_node_timer(pos)
+			timer:start(1)
+		end
+		
+		on_timer = function(pos)
+			local found = minetest.find_node_near(pos, 3, {"main:water","main:waterflow"})
+			if found then
+				minetest.set_node(pos,{name="farming:farmland_wet"})
+				local timer = minetest.get_node_timer(pos)
+				timer:start(1)
+			else
+				minetest.set_node(pos,{name="main:dirt"})
+			end
+		end
+	end
+	
 	minetest.register_node("farming:farmland_"..dryness,{
 		description = "Farmland",
 		paramtype = "light",
@@ -25,10 +68,12 @@ for level,dryness in pairs(farmland) do
 		tiles = {"dirt.png^farmland.png^[colorize:black:"..coloring,"dirt.png^[colorize:black:"..coloring,"dirt.png^[colorize:black:"..coloring,"dirt.png^[colorize:black:"..coloring,"dirt.png^[colorize:black:"..coloring,"dirt.png^[colorize:black:"..coloring},
 		groups = {dirt = 1, soft = 1, shovel = 1, hand = 1, soil=1,farmland=1},
 		drop="main:dirt",
+		on_construct = on_construct,
+		on_timer = on_timer,
 	})
 end
 
-
+--[[
 --drying and wetting abm for farmland
 minetest.register_abm({
 	label = "Farmland Wet",
@@ -58,4 +103,4 @@ minetest.register_abm({
 		end
 	end,
 })
- 
+]]--
