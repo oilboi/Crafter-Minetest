@@ -7,6 +7,6 @@ minetest.register_on_joinplayer(function(player)
 		text = "version.png",
 		--number = 000000,
 		--alignment = {x=-1,y=0},
-		offset = {x=-180, y=19},
+		offset = {x=-182, y=19},
 	})
 end)
