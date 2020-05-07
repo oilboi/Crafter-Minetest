@@ -91,7 +91,7 @@ minetest.register_craft({
 minetest.register_craft({
 	type = "shapeless",
 	output = "main:sugar 3",
-	recipe = {"main:sugarcane"},
+	recipe = {"farming:sugarcane"},
 })
 
 minetest.register_craft({
@@ -105,7 +105,7 @@ minetest.register_craft({
 minetest.register_craft({
 	output = "main:paper",
 	recipe = {
-		{"main:sugarcane","main:sugarcane","main:sugarcane"},
+		{"farming:sugarcane","farming:sugarcane","farming:sugarcane"},
 	}
 })
 
