@@ -130,6 +130,11 @@ minetest.register_craftitem("farming:seeds", {
 		if pointed_thing.type ~= "node" then
 			return itemstack
 		end
+		local pointed_thing_diff = pointed_thing.above.y - pointed_thing.under.y
+		
+		if pointed_thing_diff < 1 then return end
+		 
+		if minetest.get_node(pointed_thing.above).name ~= "air" then return end
 		local pb = pointed_thing.above
 		if minetest.get_node_group(minetest.get_node(vector.new(pb.x,pb.y-1,pb.z)).name, "farmland") == 0 or minetest.get_node(pointed_thing.above).name ~= "air"  then
 			return itemstack

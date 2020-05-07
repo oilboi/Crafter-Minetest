@@ -20,7 +20,7 @@ for level,dryness in pairs(farmland) do
 				minetest.set_node(pos,{name="farming:farmland_dry"})
 			end
 			local timer = minetest.get_node_timer(pos)
-			timer:start(1)
+			timer:start(math.random(10,25))
 		end
 	else
 		on_construct = function(pos)
@@ -78,35 +78,3 @@ for level,dryness in pairs(farmland) do
 		on_timer = on_timer,
 	})
 end
-
---[[
---drying and wetting abm for farmland
-minetest.register_abm({
-	label = "Farmland Wet",
-	nodenames = {"farming:farmland_dry"},
-	neighbors = {"air","group:crop"},
-	interval = 3,
-	chance = 150,
-	action = function(pos)
-		local found = minetest.find_node_near(pos, 3, {"main:water","main:waterflow"})
-		if found then
-			minetest.set_node(pos,{name="farming:farmland_wet"})
-		else
-			minetest.set_node(pos,{name="main:dirt"})
-		end
-	end,
-})
-minetest.register_abm({
-	label = "Farmland dry",
-	nodenames = {"farming:farmland_wet"},
-	neighbors = {"air"},
-	interval = 5,
-	chance = 500,
-	action = function(pos)
-		local found = minetest.find_node_near(pos, 3, {"main:water","main:waterflow"})
-		if not found then
-			minetest.set_node(pos,{name="farming:farmland_dry"})
-		end
-	end,
-})
-]]--
