@@ -270,3 +270,121 @@ for id,ore in pairs(ores) do
 		end,
 	})
 end
+
+local colorize_ratio = 125
+minetest.register_node("nether:tree", {
+    description = "Nether Tree",
+    tiles = {"treeCore.png^[colorize:red:"..colorize_ratio,"treeCore.png^[colorize:red:"..colorize_ratio,"treeOut.png^[colorize:red:"..colorize_ratio,"treeOut.png^[colorize:red:"..colorize_ratio,"treeOut.png^[colorize:red:"..colorize_ratio,"treeOut.png^[colorize:red:"..colorize_ratio},
+    groups = {wood = 1, tree = 1, pathable = 1},
+    sounds = main.woodSound(),
+    --set metadata so treecapitator doesn't destroy houses
+    on_place = function(itemstack, placer, pointed_thing)
+		if not pointed_thing.type == "node" then
+			return
+		end
+		
+		local sneak = placer:get_player_control().sneak
+		local noddef = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
+		if not sneak and noddef.on_rightclick then
+			minetest.item_place(itemstack, placer, pointed_thing)
+			return
+		end
+		
+		local pos = pointed_thing.above
+		minetest.item_place_node(itemstack, placer, pointed_thing)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("placed", "true")	
+		return(itemstack)
+	end,
+	light_source = 7,
+	--treecapitator - move treecapitator into own file using override
+	on_dig = function(pos, node, digger)
+	
+		--check if wielding axe?
+		
+		local meta = minetest.get_meta(pos)
+		if not meta:contains("placed") then
+			--remove tree
+			for y = -6,6 do
+				local name = minetest.get_node(vector.new(pos.x,pos.y+y,pos.z)).name
+				--print(y)
+				if name == "nether:tree" then
+					minetest.node_dig(vector.new(pos.x,pos.y+y,pos.z), node, digger)
+				end
+			end
+		else
+			minetest.node_dig(pos, node, digger)
+		end	
+	end
+})
+
+minetest.register_node("nether:wood", {
+    description = "Nether Wood",
+    tiles = {"wood.png^[colorize:red:"..colorize_ratio},
+    groups = {wood = 1, pathable = 1},
+    sounds = main.woodSound(),
+    light_source = 7,
+})
+
+
+minetest.register_node("nether:leaves", {
+    description = "Nether Leaves",
+    drawtype = "allfaces_optional",
+	waving = 1,
+	walkable = false,
+	climbable = true,
+	paramtype = "light",
+	is_ground_content = false,	
+    tiles = {"leaves.png^[colorize:red:"..colorize_ratio},
+    groups = {leaves = 1, leafdecay = 1},
+    sounds = main.grassSound(),
+    light_source = 7,
+    drop = {
+		max_items = 1,
+		items= {
+		 {
+			-- Only drop if using a tool whose name is identical to one
+			-- of these.
+			rarity = 10,
+			items = {"main:sapling"},
+			-- Whether all items in the dropped item list inherit the
+			-- hardware coloring palette color from the dug node.
+			-- Default is 'false'.
+			--inherit_color = true,
+		},
+		{
+			-- Only drop if using a tool whose name is identical to one
+			-- of these.
+			tools = {"main:shears"},
+			rarity = 2,
+			items = {"main:leaves"},
+			-- Whether all items in the dropped item list inherit the
+			-- hardware coloring palette color from the dug node.
+			-- Default is 'false'.
+			--inherit_color = true,
+		},
+		{
+			-- Only drop if using a tool whose name is identical to one
+			-- of these.
+			tools = {"main:shears"},
+			rarity = 2,
+			items = {"main:stick"},
+			-- Whether all items in the dropped item list inherit the
+			-- hardware coloring palette color from the dug node.
+			-- Default is 'false'.
+			--inherit_color = true,
+		},
+		{
+			-- Only drop if using a tool whose name is identical to one
+			-- of these.
+			tools = {"main:shears"},
+			rarity = 6,
+			items = {"main:apple"}, --golden apples
+			-- Whether all items in the dropped item list inherit the
+			-- hardware coloring palette color from the dug node.
+			-- Default is 'false'.
+			--inherit_color = true,
+		},
+		},
+    },
+})

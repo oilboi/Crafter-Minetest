@@ -32,3 +32,37 @@ minetest.register_chatcommand("nether", {
 		minetest.place_schematic(pos, portalSchematic,"0",nil,true,"place_center_x, place_center_z")
 	end,
 })
+
+--[[
+left - > right
+bottom - > top
+front -> back
+
+]]--
+
+nethertreeSchematic = {
+	size = {x = 3, y = 6, z = 3},
+	data = {
+		-- The side of the bush, with the air on top
+		{name = "air"},	   {name = "air"},	   {name = "air"},
+		{name = "air"},	   {name = "air"},	   {name = "air"},
+		{name = "air"},	   {name = "air"},	   {name = "air"},
+		{name = "nether:leaves"}, {name = "nether:leaves"}, {name = "nether:leaves"}, -- lower layer
+		{name = "nether:leaves"}, {name = "nether:leaves"}, {name = "nether:leaves"}, -- middle layer
+		{name = "air"},	   {name = "air"},	   {name = "air"}, -- top layer
+		-- The center of the bush, with stem at the base and a pointy leave 2 nodes above
+		{name = "air"},	   {name = "nether:tree"},	{name = "air"},
+		{name = "air"},	   {name = "nether:tree"},	{name = "air"},
+		{name = "air"},	   {name = "nether:tree"},	{name = "air"},
+		{name = "nether:leaves"}, {name = "nether:tree"},	{name = "nether:leaves"}, -- lower layer
+		{name = "nether:leaves"}, {name = "nether:tree"},    {name = "nether:leaves"}, -- middle layer
+		{name = "air"},	   {name = "nether:leaves"},    {name = "air"}, -- top layer
+		-- The other side of the bush, same as first side
+		{name = "air"},	   {name = "air"},	   {name = "air"},
+		{name = "air"},	   {name = "air"},	   {name = "air"},
+		{name = "air"},	   {name = "air"},	   {name = "air"},
+		{name = "nether:leaves"}, {name = "nether:leaves"}, {name = "nether:leaves"}, -- lower layer
+		{name = "nether:leaves"}, {name = "nether:leaves"}, {name = "nether:leaves"}, -- middle layer
+		{name = "air"},	   {name = "air"},	   {name = "air"}, -- top layer
+		}
+		}

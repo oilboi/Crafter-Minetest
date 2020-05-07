@@ -50,6 +50,30 @@ local np_terrain = {
 	--flags = ""
 }
 
+minetest.register_decoration({
+	name = "nether:tree",
+	deco_type = "schematic",
+	place_on = {"nether:netherrack"},
+	sidelen = 16,
+	noise_params = {
+		offset = 0.024,
+		scale = 0.015,
+		spread = {x = 250, y = 250, z = 250},
+		seed = 2,
+		octaves = 3,
+		persist = 0.66
+	},
+	--biomes = {},
+	y_max = -10000,
+	y_min = -15000,
+	schematic = nethertreeSchematic,
+	flags = "place_center_x, place_center_z",
+	rotation = "random",
+	spawn_by = "air",
+	num_spawn_by = 1,
+})
+
+
 
 -- Set singlenode mapgen (air nodes only).
 -- Disable the engine lighting calculation since that will be done for a
@@ -172,9 +196,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 				data[vi] = c_bedrock
 			--elseif y <= 1 then
 			--	data[vi] = c_water
-			elseif y > -15000 then
-				data[vi] = c_air
-			else
+			--elseif y > -15000 then
+				--data[vi] = c_air
+			elseif y <= -15000 then
 				data[vi] = c_lava
 			end
 
@@ -187,13 +211,15 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		end
 	end
 	end
-
+	
 	-- After processing, write content ID data back to the voxelmanip.
 	vm:set_data(data)
 	-- Calculate lighting for what has been created.
 	--vm:calc_lighting()
-	
 	minetest.generate_ores(vm)
+	
+	minetest.generate_decorations(vm)
+	
 	--minetest.generate_decorations(vm)
 	vm:set_lighting({day=7,night=7}, minp, maxp)
 	
