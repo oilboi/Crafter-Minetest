@@ -114,11 +114,10 @@ local inserter = table.insert
 local function do_snow()
 	if weather_type == 1 then
 		for _,player in ipairs(minetest.get_connected_players()) do
-			local t0 = os.clock()
-			--print("running")
+			--local t0 = os.clock()
 			pos = round_it(player:get_pos())
 			
-			area = n_vec(80,40,80)
+			area = n_vec(40,40,40)
 			min = subber(pos, area)
 			max = adder(pos, area)
 			
@@ -140,7 +139,7 @@ local function do_snow()
 			ice_list = {}
 			for x,x_index in pairs(spawn_table) do
 				for z,y in pairs(x_index) do
-					if randomize_number(1,1000) >= 995 then
+					if randomize_number(1,1100) >= 1097 then
 						lightlevel = get_light(n_vec(x,y+1,z), 0.5)
 						if lightlevel >= 14 then
 							--make it so buildable to nodes get replaced
@@ -170,8 +169,8 @@ local function do_snow()
 				mass_set(ice_list, {name="main:ice"})
 			end
 			
-			local chugent = math.ceil((os.clock() - t0) * 1000)
-			print ("[lvm_example] Mapchunk generation time " .. chugent .. " ms")
+			--local chugent = math.ceil((os.clock() - t0) * 1000)
+			--print ("[lvm_example] Mapchunk generation time " .. chugent .. " ms")
 		end
 	end
 	
