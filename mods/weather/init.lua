@@ -85,11 +85,8 @@ end)
 
 
 --spawn snow nodes
-local snow_timer = 0
-local do_snow = function(dtime)
-	snow_timer = snow_timer + dtime
-	if snow_timer > 3 then
-		snow_timer = 0
+local function do_snow()
+	if weather_type == 1 then
 		for _,player in ipairs(minetest.get_connected_players()) do
 			--print("running")
 			local pos = player:get_pos()
@@ -97,7 +94,7 @@ local do_snow = function(dtime)
 			local meta = player:get_meta()
 			local particle_table = {}
 			
-			local area = vector.new(40,40,40)
+			local area = vector.new(80,40,80)
 			
 			local min = vector.subtract(pos, area)
 			local max = vector.add(pos, area)
@@ -122,25 +119,23 @@ local do_snow = function(dtime)
 			local ice_list = {}
 			for x,x_index in pairs(spawn_table) do
 				for z,y in pairs(x_index) do
-					if math.random() > 0.995 then
-						local lightlevel = minetest.get_node_light(vector.new(x,y+1,z), 0.5)
-						if lightlevel >= 14 then
-							--make it so buildable to nodes get replaced
-							local node = minetest.get_node(vector.new(x,y,z)).name
-							local def = minetest.registered_nodes[node]
-							local buildable = def.buildable_to
-							local walkable = def.walkable
-							local liquid = (def.liquidtype ~= "none")
-							
-							if not liquid then
-								if not buildable and minetest.get_node(vector.new(x,y+1,z)).name ~= "weather:snow" and walkable == true then
-									table.insert(bulk_list, vector.new(x,y+1,z))
-								elseif buildable == true and node ~= "weather:snow" then
-									table.insert(bulk_list, vector.new(x,y,z))
-								end
-							elseif minetest.get_node(vector.new(x,y,z)).name == "main:water" then
-								table.insert(ice_list, vector.new(x,y,z))
+					local lightlevel = minetest.get_node_light(vector.new(x,y+1,z), 0.5)
+					if lightlevel >= 14 then
+						--make it so buildable to nodes get replaced
+						local node = minetest.get_node(vector.new(x,y,z)).name
+						local def = minetest.registered_nodes[node]
+						local buildable = def.buildable_to
+						local walkable = def.walkable
+						local liquid = (def.liquidtype ~= "none")
+						
+						if not liquid then
+							if not buildable and minetest.get_node(vector.new(x,y+1,z)).name ~= "weather:snow" and walkable == true then
+								table.insert(bulk_list, vector.new(x,y+1,z))
+							elseif buildable == true and node ~= "weather:snow" then
+								table.insert(bulk_list, vector.new(x,y,z))
 							end
+						elseif minetest.get_node(vector.new(x,y,z)).name == "main:water" then
+							table.insert(ice_list, vector.new(x,y,z))
 						end
 					end
 				end
@@ -153,7 +148,13 @@ local do_snow = function(dtime)
 			end
 		end
 	end
+	
+	minetest.after(1.5, function()
+		do_snow()
+	end)
 end
+
+do_snow()
 
 
 
@@ -167,10 +168,6 @@ minetest.register_globalstep(function(dtime)
 		weather_type = math.random(0,weather_max)
 		function_send_weather_type()
 		update_player_sky()
-	end
-	--spawn snow nodes
-	if weather_type == 1 then
-		do_snow(dtime)
 	end
 end)
 
