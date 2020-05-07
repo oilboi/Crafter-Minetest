@@ -111,6 +111,7 @@ local ice_list
 local spawn_table
 local mass_set = minetest.bulk_set_node
 local inserter = table.insert
+--local average = {}
 local function do_snow()
 	if weather_type == 1 then
 		for _,player in ipairs(minetest.get_connected_players()) do
@@ -139,7 +140,7 @@ local function do_snow()
 			ice_list = {}
 			for x,x_index in pairs(spawn_table) do
 				for z,y in pairs(x_index) do
-					if randomize_number(1,1100) >= 1097 then
+					if randomize_number(1100) >= 1098 then
 						lightlevel = get_light(n_vec(x,y+1,z), 0.5)
 						if lightlevel >= 14 then
 							--make it so buildable to nodes get replaced
@@ -169,12 +170,29 @@ local function do_snow()
 				mass_set(ice_list, {name="main:ice"})
 			end
 			
-			--local chugent = math.ceil((os.clock() - t0) * 1000)
-			--print ("[lvm_example] Mapchunk generation time " .. chugent .. " ms")
+			--[[
+			local chugent = math.ceil((os.clock() - t0) * 1000)
+			print("---------------------------------")
+			print ("Snow generation time " .. chugent .. " ms")
+
+			inserter(average, chugent)
+			local a = 0
+			--don't cause memory leak
+			if table.getn(average) > 10 then
+				table.remove(average,1)
+			end
+			for _,i in ipairs(average) do
+				a = a + i
+			end
+			print(dump(average))
+			a = a / table.getn(average)
+			print("average = "..a.."ms")
+			print("---------------------------------")
+			]]--
 		end
 	end
 	
-	minetest.after(2, function()
+	minetest.after(3, function()
 		do_snow()
 	end)
 end
