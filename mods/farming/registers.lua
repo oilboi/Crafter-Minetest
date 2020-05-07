@@ -117,7 +117,7 @@ minetest.register_plant("wheat", {
 	    sounds = main.grassSound(),
 	    selection_box = {
 			type = "fixed",
-			fixed = {-8 / 16, -0.5, -8 / 16, 8 / 16, -6 / 16, 8 / 16}
+			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, -6 / 16, 6 / 16}
 		},
 		grows = "in_place",
 		stages = 7,
