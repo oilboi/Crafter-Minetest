@@ -85,25 +85,46 @@ end)
 
 
 --spawn snow nodes
+local pos
+local area = vector.new(80,40,80)
+local min
+local max
+local subber = vector.subtract
+local adder  = vector.add
+local area_index
+local under_air = minetest.find_nodes_in_area_under_air
+local area
+local round_it = vector.round
+local randomize_number = math.random
+local n_vec = vector.new
+local lightlevel
+local get_light = minetest.get_node_light
+local g_node = minetest.get_node
+local node
+local def
+local buildable
+local walkable
+local liquid
+local r_nodes = minetest.registered_nodes
+local bulk_list
+local ice_list
+local spawn_table
+local mass_set = minetest.bulk_set_node
+local inserter = table.insert
 local function do_snow()
 	if weather_type == 1 then
 		for _,player in ipairs(minetest.get_connected_players()) do
+			local t0 = os.clock()
 			--print("running")
-			local pos = player:get_pos()
+			pos = round_it(player:get_pos())
 			
-			local meta = player:get_meta()
-			local particle_table = {}
+			area = n_vec(80,40,80)
+			min = subber(pos, area)
+			max = adder(pos, area)
 			
-			local area = vector.new(80,40,80)
+			area_index = under_air(min, max, all_nodes)
 			
-			local min = vector.subtract(pos, area)
-			local max = vector.add(pos, area)
-			
-			
-			local area_index = minetest.find_nodes_in_area_under_air(min, max, all_nodes)
-			
-
-			local spawn_table = {}
+			spawn_table = {}
 			for _,index in pairs(area_index) do
 				if not spawn_table[index.x] then spawn_table[index.x] = {} end
 				if not spawn_table[index.x][index.z] then
@@ -115,41 +136,46 @@ local function do_snow()
 		
 			
 			--find the highest y value
-			local bulk_list = {}
-			local ice_list = {}
+			bulk_list = {}
+			ice_list = {}
 			for x,x_index in pairs(spawn_table) do
 				for z,y in pairs(x_index) do
-					local lightlevel = minetest.get_node_light(vector.new(x,y+1,z), 0.5)
-					if lightlevel >= 14 then
-						--make it so buildable to nodes get replaced
-						local node = minetest.get_node(vector.new(x,y,z)).name
-						local def = minetest.registered_nodes[node]
-						local buildable = def.buildable_to
-						local walkable = def.walkable
-						local liquid = (def.liquidtype ~= "none")
-						
-						if not liquid then
-							if not buildable and minetest.get_node(vector.new(x,y+1,z)).name ~= "weather:snow" and walkable == true then
-								table.insert(bulk_list, vector.new(x,y+1,z))
-							elseif buildable == true and node ~= "weather:snow" then
-								table.insert(bulk_list, vector.new(x,y,z))
+					if randomize_number(1,1000) >= 995 then
+						lightlevel = get_light(n_vec(x,y+1,z), 0.5)
+						if lightlevel >= 14 then
+							--make it so buildable to nodes get replaced
+							node = g_node(n_vec(x,y,z)).name
+							def = r_nodes[node]
+							buildable = def.buildable_to
+							walkable = def.walkable
+							liquid = (def.liquidtype ~= "none")
+							
+							if not liquid then
+								if not buildable and g_node(n_vec(x,y+1,z)).name ~= "weather:snow" and walkable == true then
+									inserter(bulk_list, n_vec(x,y+1,z))
+								elseif buildable == true and node ~= "weather:snow" then
+									inserter(bulk_list, n_vec(x,y,z))
+								end
+							elseif g_node(n_vec(x,y,z)).name == "main:water" then
+								inserter(ice_list, n_vec(x,y,z))
 							end
-						elseif minetest.get_node(vector.new(x,y,z)).name == "main:water" then
-							table.insert(ice_list, vector.new(x,y,z))
 						end
 					end
 				end
 			end
 			if bulk_list then
-				minetest.bulk_set_node(bulk_list, {name="weather:snow"})
+				mass_set(bulk_list, {name="weather:snow"})
 			end
 			if ice_list then
-				minetest.bulk_set_node(ice_list, {name="main:ice"})
+				mass_set(ice_list, {name="main:ice"})
 			end
+			
+			local chugent = math.ceil((os.clock() - t0) * 1000)
+			print ("[lvm_example] Mapchunk generation time " .. chugent .. " ms")
 		end
 	end
 	
-	minetest.after(1.5, function()
+	minetest.after(2, function()
 		do_snow()
 	end)
 end
@@ -160,16 +186,16 @@ do_snow()
 
 --this sets random weather
 local weather_timer_goal = (math.random(5,7)+math.random())*60
-minetest.register_globalstep(function(dtime)
-	weather_timer = weather_timer + dtime
-	if weather_timer >= weather_timer_goal then
-		weather_timer_goal = (math.random(5,7)+math.random())*60
-		weather_timer = 0
-		weather_type = math.random(0,weather_max)
-		function_send_weather_type()
-		update_player_sky()
-	end
-end)
+--minetest.register_globalstep(function(dtime)
+local function randomize_weather()
+	weather_type = math.random(0,weather_max)
+	function_send_weather_type()
+	update_player_sky()
+	minetest.after((math.random(5,7)+math.random())*60, function()
+		randomize_weather()
+	end)
+end
+randomize_weather()
 
 local snowball_throw = function(player)
 	local pos = player:get_pos()
