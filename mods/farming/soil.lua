@@ -5,7 +5,7 @@ for level,dryness in pairs(farmland) do
 	local on_construct
 	if dryness == "wet" then
 		on_construct = function(pos)
-			local found = minetest.find_node_near(pos, 3, {"main:water","main:waterflow"})
+			local found = table.getn(minetest.find_nodes_in_area(vector.new(pos.x-3,pos.y,pos.z-3), vector.new(pos.x+3,pos.y,pos.z+3), {"main:water","main:waterflow"})) > 0
 			if not found then
 				minetest.set_node(pos,{name="farming:farmland_dry"})
 			end
@@ -14,7 +14,8 @@ for level,dryness in pairs(farmland) do
 		end
 		
 		on_timer = function(pos)
-			local found = minetest.find_node_near(pos, 3, {"main:water","main:waterflow"})
+			local found = table.getn(minetest.find_nodes_in_area(vector.new(pos.x-3,pos.y,pos.z-3), vector.new(pos.x+3,pos.y,pos.z+3), {"main:water","main:waterflow"})) > 0
+			
 			if not found then
 				minetest.set_node(pos,{name="farming:farmland_dry"})
 			end
@@ -28,7 +29,7 @@ for level,dryness in pairs(farmland) do
 		end
 		
 		on_timer = function(pos)
-			local found = minetest.find_node_near(pos, 3, {"main:water","main:waterflow"})
+			local found = table.getn(minetest.find_nodes_in_area(vector.new(pos.x-3,pos.y,pos.z-3), vector.new(pos.x+3,pos.y,pos.z+3), {"main:water","main:waterflow"})) > 0
 			if found then
 				minetest.set_node(pos,{name="farming:farmland_wet"})
 				local timer = minetest.get_node_timer(pos)
