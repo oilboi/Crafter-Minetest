@@ -109,6 +109,7 @@
 			tiles = def.tiles
 		end
 		
+		def.groups.plants = 1
 		
 		minetest.register_node(nodename, {
 			description               = def.description,

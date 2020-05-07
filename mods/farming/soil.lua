@@ -29,6 +29,9 @@ for level,dryness in pairs(farmland) do
 				minetest.set_node(pos,{name="farming:farmland_wet"})
 			else
 				minetest.set_node(pos,{name="main:dirt"})
+				if minetest.get_node_group(minetest.get_node(vector.new(pos.x,pos.y+1,pos.z)).name, "plant") > 0 then
+					minetest.dig_node(vector.new(pos.x,pos.y+1,pos.z))
+				end
 			end
 			local timer = minetest.get_node_timer(pos)
 			timer:start(1)
@@ -42,6 +45,9 @@ for level,dryness in pairs(farmland) do
 				timer:start(1)
 			else
 				minetest.set_node(pos,{name="main:dirt"})
+				if minetest.get_node_group(minetest.get_node(vector.new(pos.x,pos.y+1,pos.z)).name, "plant") > 0 then
+					minetest.dig_node(vector.new(pos.x,pos.y+1,pos.z))
+				end
 			end
 		end
 	end
