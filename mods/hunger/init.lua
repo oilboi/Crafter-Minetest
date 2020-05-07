@@ -188,10 +188,12 @@ hunger_update()
 
 --take away hunger and satiation randomly while mining
 minetest.register_on_dignode(function(pos, oldnode, digger)
-	local meta = digger:get_meta()
-	local exhaustion_tick = meta:get_int("exhaustion_tick")
-	exhaustion_tick = exhaustion_tick + math.random(0,2)
-	meta:set_int("exhaustion_tick", exhaustion_tick)
+	if digger:is_player() then
+		local meta = digger:get_meta()
+		local exhaustion_tick = meta:get_int("exhaustion_tick")
+		exhaustion_tick = exhaustion_tick + math.random(0,2)
+		meta:set_int("exhaustion_tick", exhaustion_tick)
+	end
 end)
 
 --allow players to eat food
