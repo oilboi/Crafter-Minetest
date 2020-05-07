@@ -52,7 +52,7 @@ function main.grassSound(table)
 	table.dug = table.dug or
 			{name = "leaves", gain = 0.5}
 	table.placing = table.placing or
-			{name = "leaves", gain = 0.5}
+			{name = "leaves", gain = 0.2}
 	--default.node_sound_defaults(table)
 	return table
 end
