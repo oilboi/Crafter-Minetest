@@ -1,40 +1,14 @@
 local path = minetest.get_modpath("farming")
+dofile(path.."/plant_api.lua")
+dofile(path.."/registers.lua")
 dofile(path.."/tools.lua")
 dofile(path.."/soil.lua")
 
 
 
-minetest.register_node("farming:grass", {
-    description = "Tall Grass",
-    drawtype = "plantlike",
-	waving = 1,
-	inventory_image = "tallgrass.png",
-	walkable = false,
-	climbable = false,
-	paramtype = "light",
-	is_ground_content = false,	
-    tiles = {"tallgrass.png"},
-    paramtype2 = "degrotate",
-    buildable_to = true,
-    groups = {dig_immediate=1,attached_node=1,flammable=1},
-    sounds = main.grassSound(),
-    floodable = true,
-    selection_box = {
-		type = "fixed",
-		fixed = {-4 / 16, -0.5, -4 / 16, 4 / 16, 4 / 16, 4 / 16}
-	},
-	drop =  {
-		max_items = 1,
-		items= {
-		 {
-			rarity = 10,
-			items = {"farming:seeds"},
-		},
-		},
-	},
-})
 
 --register sugarcane in here since it's part of farming
+--[[
 minetest.register_abm({
 	label = "Sugarcane Grow",
 	nodenames = {"main:sugarcane"},
@@ -66,8 +40,10 @@ minetest.register_abm({
 		end
 	end,
 })
+]]--
 
 --wheat definitions
+--[[
 local wheat_max = 7
 minetest.register_abm({
 	label = "crops grow",
@@ -145,7 +121,7 @@ for i = 0,wheat_max do
 		drop = drop,
 	})
 end
-
+]]--
 
 minetest.register_craftitem("farming:seeds", {
 	description = "Seeds",
@@ -164,7 +140,7 @@ minetest.register_craftitem("farming:seeds", {
 		local fakestack = itemstack
 		local retval = false
 
-		retval = fakestack:set_name("farming:wheat_0")
+		retval = fakestack:set_name("farming:wheat_1")
 
 		if not retval then
 			return itemstack
@@ -178,17 +154,6 @@ minetest.register_craftitem("farming:seeds", {
 
 		return itemstack
 	end
-})
-
-
-minetest.register_decoration({
-	deco_type = "simple",
-	place_on = "main:grass",
-	sidelen = 16,
-	fill_ratio = 0.5,
-	--biomes = {"grassland"},
-	decoration = "farming:grass",
-	height = 1,
 })
 
 
