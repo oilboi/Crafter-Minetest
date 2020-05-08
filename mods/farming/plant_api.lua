@@ -239,6 +239,8 @@
 			    
 			    if minetest.get_node(stem_pos).name == "farming:"..name.."_complete" then
 				    minetest.set_node(stem_pos, {name = "farming:"..name.."_1"})
+				    local timer = minetest.get_node_timer(stem_pos)
+					timer:start(math.random(plant_min,plant_max))
 			    end
 		    end
 		})
