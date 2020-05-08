@@ -30,6 +30,8 @@ minetest.register_on_mods_loaded(function()
 							if dropdata.items then
 								for index3,drop_item in pairs(dropdata.items) do
 									--add parent to dropped items
+									--this intentionally crashes to tell me that something is not
+									--defined properly
 									local droppers = minetest.registered_items[drop_item].parent_dropper
 									if not droppers then
 										droppers = {}
