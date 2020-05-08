@@ -84,6 +84,7 @@ minetest.register_plant("grass", {
     tiles = {"tallgrass.png"},
     paramtype2 = "degrotate",
     buildable_to = true,
+    sunlight_propagates = true,
     groups = {dig_immediate=1,attached_node=1,flammable=1},
     sounds = main.grassSound(),
     selection_box = {
@@ -115,6 +116,7 @@ minetest.register_plant("wheat", {
 	    grow_stage = i,
 	    groups = {leaves = 1, plant = 1, axe = 1, hand = 0,dig_immediate=1,attached_node=1,crops=1},
 	    sounds = main.grassSound(),
+	    sunlight_propagates = true,
 	    selection_box = {
 			type = "fixed",
 			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, -6 / 16, 6 / 16}
@@ -154,12 +156,13 @@ minetest.register_plant("melon_stem", {
 		walkable = false,
 		climbable = false,
 		paramtype = "light",
+		sunlight_propagates = true,
 		is_ground_content = false,	
 	    tiles = {"melon_stage"}, --automatically adds _X.png
 	    paramtype2 = "degrotate",
 	    buildable_to = false,
 	    grow_stage = i,
-	    groups = {leaves = 1, plant = 1, axe = 1, hand = 0,dig_immediate=1,attached_node=1,crops=1},
+	    groups = {leaves = 1,plant=1, stem = 1, axe = 1, hand = 0,dig_immediate=1,attached_node=1,crops=1},
 	    sounds = main.grassSound(),
 	    selection_box = {
 			type = "fixed",
@@ -167,7 +170,7 @@ minetest.register_plant("melon_stem", {
 		},
 		grows = "in_place_yields",
 		grown_node="farming:melon",
-		grown_replacer = "farming:melon_stem_stage_complete",
+		stem_replacer = "farming:melon_stem_stage_complete",
 		stages = 7,
 		drop = {
 			max_items = 2,
@@ -201,14 +204,17 @@ minetest.register_node("farming:melon", {
     description = "Melon",
     tiles = {"melon_top.png","melon_top.png","melon_side.png","melon_side.png","melon_side.png","melon_side.png"},
     paramtype2 = "facedir",
-    groups = {wood = 1, pathable = 1,flammable=1},
+    groups = {pathable = 1,flammable=1,dig_immediate=1},
     sounds = main.woodSound(),
     after_destruct = function(pos,oldnode)
 	    local facedir = oldnode.param2
 	    facedir = minetest.facedir_to_dir(facedir)
 	    local dir = vector.multiply(facedir,-1)
+	    local stem_pos = vector.add(dir,pos)
 	    
-	    minetest.set_node(vector.add(dir,pos), {name = "farming:melon_stem_1"})
+	    if minetest.get_node(stem_pos).name == "farming:melon_stem_stage_complete" then--minetest.get_node_group(minetest.get_node(stem_pos).name, "stem") > 0 then
+		    minetest.set_node(stem_pos, {name = "farming:melon_stem_1"})
+	    end
     end
 })
 
@@ -216,6 +222,9 @@ minetest.register_node("farming:melon_stem_stage_complete", {
     description = "",
     tiles = {"nothing.png","nothing.png","melon_stage_complete.png^[transformFX","melon_stage_complete.png","nothing.png","nothing.png",},
     drawtype = "nodebox",
+    walkable = false,
+    sunlight_propagates = true,
+    paramtype = "light",
     node_box = {
 		type = "fixed",
 		fixed = {
@@ -223,7 +232,7 @@ minetest.register_node("farming:melon_stem_stage_complete", {
 		},
 	},
     paramtype2 = "facedir",
-    groups = {wood = 1, pathable = 1,flammable=1},
+    groups = {leaves = 1, plant=1,stem = 1, axe = 1, hand = 0,dig_immediate=1,attached_node=1,crops=1},
     sounds = main.woodSound(),
 })
 

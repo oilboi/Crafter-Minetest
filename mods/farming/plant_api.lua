@@ -130,7 +130,7 @@
 							local facedir = minetest.facedir_to_dir(param2)
 							
 							local inverted_facedir = vector.multiply(facedir,-1)
-							minetest.set_node(vector.add(inverted_facedir,add_node), {name=def.grown_replacer, param2=minetest.dir_to_facedir(facedir)})
+							minetest.set_node(vector.add(inverted_facedir,add_node), {name=def.stem_replacer, param2=minetest.dir_to_facedir(facedir)})
 						end
 						
 						
