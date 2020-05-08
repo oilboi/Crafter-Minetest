@@ -100,7 +100,6 @@ minetest.register_node("main:ice", {
     tiles = {"ice.png"},
     drawtype = "glasslike",
 	paramtype = "light",
-	paramtype = "light",
 	sunlight_propagates = true,
 	sunlight_propagates = true,
 	is_ground_content = false,
@@ -115,6 +114,21 @@ minetest.register_node("main:ice", {
     after_destruct = function(pos, oldnode)
        minetest.set_node(pos, {name="main:water"})                            
     end                
+})
+minetest.register_node("main:ice_mapgen", {
+    description = "Ice",
+    tiles = {"ice.png"},
+    drawtype = "normal",
+	sunlight_propagates = true,
+	sunlight_propagates = true,
+	is_ground_content = false,
+    groups = {glass = 1, pathable = 1,slippery=3},
+    sounds = main.stoneSound({
+		footstep = {name = "glass_footstep", gain = 0.4},
+        dug =  {name = "break_glass", gain = 0.4},
+	}),
+	use_texture_alpha = false,
+    drop = "",           
 })
 
 minetest.register_node("main:dirt", {

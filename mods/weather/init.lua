@@ -290,6 +290,34 @@ minetest.register_node("weather:snow", {
 	},
 })
 
+minetest.register_node("weather:snow_block", {
+    description = "Snow",
+    tiles = {"snow_block.png"},
+    groups = {pathable = 1,snow = 1},
+    sounds = main.woolSound(),
+    drop = {
+			max_items = 5,
+			items= {
+				{
+					items = {"weather:snowball"},
+				},
+				{
+					items = {"weather:snowball"},
+				},
+				{
+					items = {"weather:snowball"},
+				},
+				{
+					items = {"weather:snowball"},
+				},
+				{
+					rarity = 5,
+					items = {"weather:snowball"},
+				},
+			},
+		},
+})
+
 minetest.register_craftitem("weather:snowball", {
 	description = "Snowball",
 	inventory_image = "snowball.png",
