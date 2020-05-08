@@ -2,9 +2,9 @@
 local material = {"wood","stone","iron","gold","diamond"}
 
 local function till_soil(pos)
-	local is_dirt = minetest.get_node_group(minetest.get_node(pos).name, "farm_tillable") > 0
-	local is_farmland = minetest.get_node_group(minetest.get_node(pos).name, "farmland") > 0
-	if is_dirt and not is_farmland then
+	local nodey = minetest.get_node(pos).name
+	local is_dirt = (nodey == "main:dirt" or nodey == "main:grass")
+	if is_dirt then
 		minetest.sound_play("dirt",{pos=pos})
 		minetest.set_node(pos,{name="farming:farmland_dry"})
 		return(true)
