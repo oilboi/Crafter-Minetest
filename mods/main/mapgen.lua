@@ -7,8 +7,6 @@ minetest.register_alias("mapgen_tree", "main:tree")
 minetest.register_alias("mapgen_leaves", "main:leaves")
 minetest.register_alias("mapgen_apple", "main:leaves")
 
-
-print("Initializing biomes")
 --[[
 minetest.register_biome({
 		name = "greenhills",
@@ -44,7 +42,7 @@ minetest.register_biome({
 	heat_point = 50,
 	humidity_point = 35,
 })
-
+--[[
 minetest.register_biome({
 		name = "snowland",
 		node_dust = "weather:snow",
@@ -104,7 +102,7 @@ minetest.register_biome({
 		heat_point = 0,
 		humidity_point = 73,
 	})
-
+]]--
 minetest.register_biome({
 	name = "sandDunes",
 	node_top = "main:sand",
