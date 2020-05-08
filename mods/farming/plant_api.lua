@@ -104,7 +104,7 @@
 						pos.y = pos.y + 1
 						minetest.set_node(pos,{name="farming:"..name.."_"..(i+1)})
 						local timer = minetest.get_node_timer(pos)
-						timer:start(0.25)--start(math.random(plant_min,plant_max))
+						timer:start(math.random(plant_min,plant_max))
 					else
 						pos.y = pos.y + 1
 						local found = false
@@ -135,7 +135,7 @@
 						
 						
 						local timer = minetest.get_node_timer(pos)
-						timer:start(0.25)--start(math.random(plant_min,plant_max))
+						timer:start(math.random(plant_min,plant_max))
 					end
 				--if not found farmland
 				else
@@ -148,7 +148,7 @@
 				pos.y = pos.y + 1
 				if found then
 					local timer = minetest.get_node_timer(pos)
-					timer:start(0.25)--start(math.random(plant_min,plant_max))
+					timer:start(math.random(plant_min,plant_max))
 				else
 					minetest.dig_node(pos)
 				end
