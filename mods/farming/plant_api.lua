@@ -246,7 +246,7 @@
 	
 	if def.seed_name then
 		minetest.register_craftitem("farming:"..def.seed_name.."_seeds", {
-			description = def.seed_description.." Seeds",
+			description = def.seed_description,
 			inventory_image = def.seed_inventory_image,
 			on_place = function(itemstack, placer, pointed_thing)
 				if pointed_thing.type ~= "node" then

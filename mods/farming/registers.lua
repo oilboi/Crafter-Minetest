@@ -98,10 +98,14 @@ minetest.register_plant("grass", {
 			rarity = 10,
 			items = {"farming:melon_seeds"},
 		},
-		--{
-		--	rarity = 10,
-		--	items = {"farming:pumpkin_seeds"},
-		--},
+		{
+			rarity = 10,
+			items = {"farming:pumpkin_seeds"},
+		},
+		{
+			rarity = 10,
+			items = {"farming:wheat_seeds"},
+		},
 		},
 	},
 })
