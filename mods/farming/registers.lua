@@ -231,6 +231,7 @@ minetest.register_node("farming:melon_stem_stage_complete", {
 			{-0/16, -8/16, -7/16,  0/16, 8/16,  7/16}, -- Main body
 		},
 	},
+	drop = "",
     paramtype2 = "facedir",
     groups = {leaves = 1, plant=1,stem = 1, axe = 1, hand = 0,dig_immediate=1,attached_node=1,crops=1},
     sounds = main.woodSound(),
