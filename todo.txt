@@ -1,4 +1,3 @@
-0.) fix suffocation not working
 1.5) make bookshelves
 2.) make better enchanting
 --find mod that has these?
