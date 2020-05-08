@@ -1,7 +1,41 @@
 --saplings
+--
+--
+local sapling_min = 120
+local sapling_max = 720
+--make sapling grow
+local function sapling_grow(pos)
+	if minetest.get_node_light(pos, nil) < 10 then
+		local timer = minetest.get_node_timer(pos)
+		timer:start(math.random(sapling_min,sapling_max))
+		--print("failed to grow at "..dump(pos))
+		return
+	end
+	--print("growing at "..dump(pos))
+	if minetest.get_node_group(minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name, "soil") > 0 then
+		local good_to_grow = true
+		--check if room to grow (leaves or air)
+		for i = 1,4 do
+			local node_name = minetest.get_node(vector.new(pos.x,pos.y+i,pos.z)).name
+			if node_name ~= "air" and node_name ~= "main:leaves" then
+				good_to_grow = false
+			end
+		end
+		if good_to_grow == true then
+			minetest.set_node(pos,{name="main:tree"})
+			minetest.place_schematic(pos, treeSchematic,"0",nil,false,"place_center_x, place_center_z")
+			--override leaves
+			for i = 1,4 do
+				minetest.set_node(vector.new(pos.x,pos.y+i,pos.z),{name="main:tree"})
+			end
+		end
+	end
+end
+
 minetest.register_node("main:sapling", {
 	description = "Sapling",
 	drawtype = "plantlike",
+	inventory_image = "sapling.png",
 	waving = 1,
 	walkable = false,
 	climbable = false,
@@ -9,7 +43,7 @@ minetest.register_node("main:sapling", {
 	is_ground_content = false,	
 	tiles = {"sapling.png"},
 	groups = {leaves = 1, plant = 1, axe = 1, hand = 0,instant=1, sapling=1, attached_node=1},
-	sounds = main.grassSound(),
+	sounds = main.dirtSound(),
 	drop = "main:sapling",
 	node_placement_prediction = "",
 	selection_box = {
@@ -42,48 +76,16 @@ minetest.register_node("main:sapling", {
 		local pos = pointed_thing.above
 		if minetest.get_node_group(minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name, "soil") > 0 and minetest.get_node(pointed_thing.above).name == "air" then
 			minetest.set_node(pointed_thing.above, {name="main:sapling"})
-			minetest.sound_play("leaves",{pos=pointed_thing.above})
+			minetest.sound_play("dirt",{pos=pointed_thing.above})
 			itemstack:take_item(1)
 			return(itemstack)
 		end
 	end,
-})
-
---make sapling grow
-local function sapling_grow(pos)
-	if minetest.get_node_light(pos, nil) < 10 then
-		--print("failed to grow at "..dump(pos))
-		return
-	end
-	--print("growing at "..dump(pos))
-	if minetest.get_node_group(minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name, "soil") > 0 then
-		local good_to_grow = true
-		--check if room to grow (leaves or air)
-		for i = 1,4 do
-			local node_name = minetest.get_node(vector.new(pos.x,pos.y+i,pos.z)).name
-			if node_name ~= "air" and node_name ~= "main:leaves" then
-				good_to_grow = false
-			end
-		end
-		if good_to_grow == true then
-			minetest.set_node(pos,{name="main:tree"})
-			minetest.place_schematic(pos, treeSchematic,"0",nil,false,"place_center_x, place_center_z")
-			--override leaves
-			for i = 1,4 do
-				minetest.set_node(vector.new(pos.x,pos.y+i,pos.z),{name="main:tree"})
-			end
-		end
-	end
-end
-
---growing abm for sapling
-minetest.register_abm({
-	label = "Tree Grow",
-	nodenames = {"group:sapling"},
-	neighbors = {"group:soil"},
-	interval = 3,
-	chance = 2000,
-	action = function(pos)
+	on_construct = function(pos)
+		local timer = minetest.get_node_timer(pos)
+		timer:start(math.random(sapling_min,sapling_max))
+	end,
+	on_timer = function(pos)
 		sapling_grow(pos)
 	end,
 })
