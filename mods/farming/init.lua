@@ -123,43 +123,7 @@ for i = 0,wheat_max do
 end
 ]]--
 
-minetest.register_craftitem("farming:seeds", {
-	description = "Seeds",
-	inventory_image = "seeds.png",
-	on_place = function(itemstack, placer, pointed_thing)
-		if pointed_thing.type ~= "node" then
-			return itemstack
-		end
-		local pointed_thing_diff = pointed_thing.above.y - pointed_thing.under.y
-		
-		if pointed_thing_diff < 1 then return end
-		 
-		if minetest.get_node(pointed_thing.above).name ~= "air" then return end
-		local pb = pointed_thing.above
-		if minetest.get_node_group(minetest.get_node(vector.new(pb.x,pb.y-1,pb.z)).name, "farmland") == 0 or minetest.get_node(pointed_thing.above).name ~= "air"  then
-			return itemstack
-		end
 
-		local wdir = minetest.dir_to_wallmounted(vector.subtract(pointed_thing.under,pointed_thing.above))
-
-		local fakestack = itemstack
-		local retval = false
-
-		retval = fakestack:set_name("farming:wheat_1")
-
-		if not retval then
-			return itemstack
-		end
-		itemstack, retval = minetest.item_place(fakestack, placer, pointed_thing, wdir)
-		itemstack:set_name("farming:seeds")
-
-		if retval then
-			minetest.sound_play("leaves", {pos=pointed_thing.above, gain = 1.0})
-		end
-
-		return itemstack
-	end
-})
 
 
 minetest.register_craftitem("farming:wheat", {

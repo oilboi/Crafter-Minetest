@@ -94,10 +94,14 @@ minetest.register_plant("grass", {
 	drop =  {
 		max_items = 1,
 		items= {
-		 {
+		{
 			rarity = 10,
-			items = {"farming:seeds"},
+			items = {"farming:melon_seeds"},
 		},
+		--{
+		--	rarity = 10,
+		--	items = {"farming:pumpkin_seeds"},
+		--},
 		},
 	},
 })
@@ -123,6 +127,7 @@ minetest.register_plant("wheat", {
 		},
 		grows = "in_place",
 		stages = 7,
+		--[[
 		drop = {
 			max_items = 2,
 			items= {
@@ -148,7 +153,9 @@ minetest.register_plant("wheat", {
 			},
 			},
 			},
+		]]--
 	})
+
 minetest.register_plant("melon_stem", {
 	    description = "Melon Stem",
 	    drawtype = "plantlike",
@@ -159,9 +166,7 @@ minetest.register_plant("melon_stem", {
 		sunlight_propagates = true,
 		is_ground_content = false,	
 	    tiles = {"melon_stage"}, --automatically adds _X.png
-	    paramtype2 = "degrotate",
 	    buildable_to = false,
-	    grow_stage = i,
 	    groups = {leaves = 1,plant=1, stem = 1, axe = 1, hand = 0,dig_immediate=1,attached_node=1,crops=1},
 	    sounds = main.grassSound(),
 	    selection_box = {
@@ -170,71 +175,173 @@ minetest.register_plant("melon_stem", {
 		},
 		grows = "in_place_yields",
 		grown_node="farming:melon",
-		stem_replacer = "farming:melon_stem_stage_complete",
 		stages = 7,
-		drop = {
+		--stem stage complete definition (fully grown and budding)
+		stem_description = "",
+		stem_tiles = {"nothing.png","nothing.png","melon_stage_complete.png^[transformFX","melon_stage_complete.png","nothing.png","nothing.png",},
+		stem_drawtype = "nodebox",
+		stem_walkable = false,
+		stem_sunlight_propagates = true,
+		stem_paramtype = "light",
+		stem_node_box = {
+			type = "fixed",
+			fixed = {
+				{-0/16, -8/16, -7/16,  0/16, 8/16,  7/16}
+			},
+		},
+		stem_selection_box = {
+			type = "fixed",
+			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, -6 / 16, 6 / 16}
+		},
+		stem_drop = {
 			max_items = 2,
 			items= {
-			 {
-				-- Only drop if using a tool whose name is identical to one
-				-- of these.
-				--rarity = 10,
-				items = {"farming:seeds"},
-				-- Whether all items in the dropped item list inherit the
-				-- hardware coloring palette color from the dug node.
-				-- Default is 'false'.
-				--inherit_color = true,
+			{
+				items = {"farming:melon_seeds"},
 			},
 			{
-				-- Only drop if using a tool whose name is identical to one
-				-- of these.
 				rarity = 2,
-				items = {"farming:seeds"},
-				-- Whether all items in the dropped item list inherit the
-				-- hardware coloring palette color from the dug node.
-				-- Default is 'false'.
-				--inherit_color = true,
+				items = {"farming:melon_seeds"},
 			},
 			},
-			},
-	})
-
-
-minetest.register_node("farming:melon", {
-    description = "Melon",
-    tiles = {"melon_top.png","melon_top.png","melon_side.png","melon_side.png","melon_side.png","melon_side.png"},
-    paramtype2 = "facedir",
-    groups = {pathable = 1,flammable=1,dig_immediate=1},
-    sounds = main.woodSound(),
-    after_destruct = function(pos,oldnode)
-	    local facedir = oldnode.param2
-	    facedir = minetest.facedir_to_dir(facedir)
-	    local dir = vector.multiply(facedir,-1)
-	    local stem_pos = vector.add(dir,pos)
+		},
+	    stem_groups = {plant=1,dig_immediate=1,attached_node=1,crops=1},
+	    stem_sounds = main.woodSound(),
 	    
-	    if minetest.get_node(stem_pos).name == "farming:melon_stem_stage_complete" then--minetest.get_node_group(minetest.get_node(stem_pos).name, "stem") > 0 then
-		    minetest.set_node(stem_pos, {name = "farming:melon_stem_1"})
-	    end
-    end
+	    --fruit definition (what the stem creates)
+	    fruit_name        = "melon",
+	    fruit_description = "Melon",
+	    fruit_tiles = {"melon_top.png","melon_top.png","melon_side.png","melon_side.png","melon_side.png","melon_side.png"},
+	    fruit_groups = {pathable = 1,wood=1,flammable=1},
+	    fruit_sounds = main.woodSound(),
+	    fruit_drop  = {
+			max_items = 6,
+			items= {
+				{
+					items = {"farming:melon_slice"},
+				},
+				{
+					items = {"farming:melon_slice"},
+				},
+				{
+					items = {"farming:melon_slice"},
+				},
+				{
+					items = {"farming:melon_slice"},
+				},
+				{
+					rarity = 5,
+					items = {"farming:melon_slice"},
+				},
+				{
+					rarity = 15,
+					items = {"farming:melon_seeds"},
+				},
+			},
+		},
+		
+		--seed definition
+		--"farming:wheat_1"
+		seed_name = "melon",
+		seed_description = "Melon Seeds",
+		seed_inventory_image = "melon_seeds.png",
+		seed_plants = "farming:melon_stem_1",
+})
+minetest.register_craftitem("farming:melon_slice", {
+	description = "Melon Slice",
+	inventory_image = "melon_slice.png",
+	groups = {satiation=1,hunger=2},
 })
 
-minetest.register_node("farming:melon_stem_stage_complete", {
-    description = "",
-    tiles = {"nothing.png","nothing.png","melon_stage_complete.png^[transformFX","melon_stage_complete.png","nothing.png","nothing.png",},
-    drawtype = "nodebox",
-    walkable = false,
-    sunlight_propagates = true,
-    paramtype = "light",
-    node_box = {
-		type = "fixed",
-		fixed = {
-			{-0/16, -8/16, -7/16,  0/16, 8/16,  7/16}, -- Main body
+
+
+minetest.register_plant("pumpkin_stem", {
+	    description = "Pumpkin Stem",
+	    drawtype = "plantlike",
+		waving = 1,
+		walkable = false,
+		climbable = false,
+		paramtype = "light",
+		sunlight_propagates = true,
+		is_ground_content = false,	
+	    tiles = {"melon_stage"}, --automatically adds _X.png
+	    buildable_to = false,
+	    groups = {leaves = 1,plant=1, stem = 1, axe = 1, hand = 0,dig_immediate=1,attached_node=1,crops=1},
+	    sounds = main.grassSound(),
+	    selection_box = {
+			type = "fixed",
+			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, -6 / 16, 6 / 16}
 		},
-	},
-	drop = "",
-    paramtype2 = "facedir",
-    groups = {leaves = 1, plant=1,stem = 1, axe = 1, hand = 0,dig_immediate=1,attached_node=1,crops=1},
-    sounds = main.woodSound(),
+		grows = "in_place_yields",
+		grown_node="farming:pumpkin",
+		stages = 7,
+		
+		--stem stage complete definition (fully grown and budding)
+		stem_description = "",
+		stem_tiles = {"nothing.png","nothing.png","melon_stage_complete.png^[transformFX","melon_stage_complete.png","nothing.png","nothing.png",},
+		stem_drawtype = "nodebox",
+		stem_walkable = false,
+		stem_sunlight_propagates = true,
+		stem_paramtype = "light",
+		stem_node_box = {
+			type = "fixed",
+			fixed = {
+				{-0/16, -8/16, -7/16,  0/16, 8/16,  7/16}
+			},
+		},
+		stem_selection_box = {
+			type = "fixed",
+			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, -6 / 16, 6 / 16}
+		},
+		stem_drop = {
+			max_items = 2,
+			items= {
+			{
+				items = {"farming:pumpkin_seeds"},
+			},
+			{
+				rarity = 2,
+				items = {"farming:pumpkin_seeds"},
+			},
+			},
+		},
+	    stem_groups = {plant=1,dig_immediate=1,attached_node=1,crops=1},
+	    stem_sounds = main.woodSound(),
+	    
+	    --fruit definition (what the stem creates)
+	    fruit_name        = "pumpkin",
+	    fruit_description = "Pumpkin",
+	    fruit_tiles = {"pumpkin_top.png","pumpkin_top.png","pumpkin_side.png","pumpkin_side.png","pumpkin_side.png","pumpkin_side.png"},
+	    fruit_groups = {pathable = 1,wood=1,flammable=1},
+	    fruit_sounds = main.woodSound(),
+		--seed definition
+		--"farming:wheat_1"
+		seed_name = "pumpkin",
+		seed_description = "Pumpkin Seeds",
+		seed_inventory_image = "pumpkin_seeds.png",
+		seed_plants = "farming:pumpkin_stem_1",
+})
+
+minetest.register_craft({
+	type = "shapeless",
+	output = "farming:pumpkin_seeds",
+	recipe = {"farming:pumpkin"},
+})
+minetest.register_craft({
+	type = "fuel",
+	recipe = "farming:pumpkin",
+	burntime = 3,
+})
+minetest.register_craft({
+	type = "cooking",
+	output = "farming:pumpkin_pie",
+	recipe = "farming:pumpkin",
+	cooktime = 2,
+})
+minetest.register_craftitem("farming:pumpkin_pie", {
+	description = "Pumpkin Pie",
+	inventory_image = "pumpkin_pie.png",
+	groups = {satiation=4,hunger=3},
 })
 
 

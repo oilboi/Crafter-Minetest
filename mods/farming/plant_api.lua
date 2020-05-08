@@ -130,7 +130,7 @@
 							local facedir = minetest.facedir_to_dir(param2)
 							
 							local inverted_facedir = vector.multiply(facedir,-1)
-							minetest.set_node(vector.add(inverted_facedir,add_node), {name=def.stem_replacer, param2=minetest.dir_to_facedir(facedir)})
+							minetest.set_node(vector.add(inverted_facedir,add_node), {name="farming:"..name.."_complete", param2=minetest.dir_to_facedir(facedir)})
 						end
 						
 						
@@ -157,7 +157,7 @@
 		
 		--allow plants to only drop item at max stage
 		local drop
-		if i == max then
+		if i == max and def.grows ~= "in_place_yields" then
 			drop = def.drop
 		elseif max == 1 then
 			drop = def.drop
@@ -200,11 +200,87 @@
 				 minetest.dig_node(pos)
 			end,
 			
-			
 			after_dig_node = after_dig_node,
 			on_timer       = on_timer,
 			on_construct   = on_construct,
 			after_destruct = after_destruct,
+		})
+	end
+	
+	--create final stage for grow in place plant stems that create food
+	if def.grows == "in_place_yields" then
+		minetest.register_node("farming:"..name.."_complete", {
+		    description         = def.stem_description,
+		    tiles               = def.stem_tiles,
+		    drawtype            = def.stem_drawtype,
+		    walkable            = def.stem_walkable,
+		    sunlight_propagates = def.stem_sunlight_propagates,
+		    paramtype           = def.stem_paramtype,
+		    drop                = def.stem_drop,
+			groups              = def.stem_groups,
+			sounds              = def.stem_sounds,
+		    node_box            = def.stem_node_box,
+		    selection_box       = def.stem_selection_box,
+		    paramtype2          = "facedir",
+		})
+		minetest.register_node("farming:"..def.fruit_name, {
+		    description = def.fruit_description,
+		    tiles       = def.fruit_tiles,
+		    groups      = def.fruit_groups,
+		    sounds      = def.fruit_sounds,
+		    drop        = def.fruit_drop,
+		    --this is hardcoded to work no matter what
+		    paramtype2  = "facedir",
+		    after_destruct = function(pos,oldnode)
+			    local facedir = oldnode.param2
+			    facedir = minetest.facedir_to_dir(facedir)
+			    local dir = vector.multiply(facedir,-1)
+			    local stem_pos = vector.add(dir,pos)
+			    
+			    if minetest.get_node(stem_pos).name == "farming:"..name.."_complete" then
+				    minetest.set_node(stem_pos, {name = "farming:"..name.."_1"})
+			    end
+		    end
+		})
+	end
+	
+	if def.seed_name then
+		minetest.register_craftitem("farming:"..def.seed_name.."_seeds", {
+			description = def.seed_description.." Seeds",
+			inventory_image = def.seed_inventory_image,
+			on_place = function(itemstack, placer, pointed_thing)
+				if pointed_thing.type ~= "node" then
+					return itemstack
+				end
+				local pointed_thing_diff = pointed_thing.above.y - pointed_thing.under.y
+				
+				if pointed_thing_diff < 1 then return end
+				 
+				if minetest.get_node(pointed_thing.above).name ~= "air" then return end
+				local pb = pointed_thing.above
+				if minetest.get_node_group(minetest.get_node(vector.new(pb.x,pb.y-1,pb.z)).name, "farmland") == 0 or minetest.get_node(pointed_thing.above).name ~= "air"  then
+					return itemstack
+				end
+
+				local wdir = minetest.dir_to_wallmounted(vector.subtract(pointed_thing.under,pointed_thing.above))
+
+				local fakestack = itemstack
+				local retval = false
+
+				retval = fakestack:set_name(def.seed_plants)
+
+				if not retval then
+					return itemstack
+				end
+				itemstack, retval = minetest.item_place(fakestack, placer, pointed_thing, wdir)
+				itemstack:set_name("farming:"..def.seed_name.."_seeds")
+
+				if retval then
+					minetest.sound_play("leaves", {pos=pointed_thing.above, gain = 1.0})
+				end
+
+				return itemstack
+			end
 		})
 	end
 end
