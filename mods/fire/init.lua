@@ -29,25 +29,28 @@ minetest.register_node("fire:fire", {
 		--fire lasts forever on netherrack
 		elseif under ~= "nether:netherrack" then
 			local timer = minetest.get_node_timer(pos)
-			timer:start(math.random(5,10))
+			timer:start(math.random(0,2)+math.random())
 		end
     end,
     on_timer = function(pos, elapsed)
-		minetest.remove_node(pos)
+	    local find_flammable = minetest.find_nodes_in_area(vector.subtract(pos,1), vector.add(pos,1), {"group:flammable"})
+	    --print(dump(find_flammable))
+	    
+	    for _,p_pos in pairs(find_flammable) do
+		    if math.random() > 0.9 then
+				minetest.set_node(p_pos,{name="fire:fire"})
+				local timer = minetest.get_node_timer(p_pos)
+				timer:start(math.random(0,2)+math.random())
+			end
+	    end
+	    
+	    if math.random() > 0.85 then
+			minetest.remove_node(pos)
+		else
+			local timer = minetest.get_node_timer(pos)
+			timer:start(math.random(0,2)+math.random())
+		end
     end,
-})
-
-
-minetest.register_abm({
-	label = "Fire Spread",
-	nodenames = {"group:flammable"},
-	neighbors = {"fire:fire"},
-	interval = 0.25,
-	chance = 15.0,
-	catch_up = false,
-	action = function(pos)
-		minetest.set_node(pos,{name="fire:fire"})
-	end,
 })
 
 --flint and steel

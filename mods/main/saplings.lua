@@ -42,7 +42,7 @@ minetest.register_node("main:sapling", {
 	paramtype = "light",
 	is_ground_content = false,	
 	tiles = {"sapling.png"},
-	groups = {leaves = 1, plant = 1, axe = 1, hand = 0,instant=1, sapling=1, attached_node=1},
+	groups = {leaves = 1, plant = 1, axe = 1, hand = 0,instant=1, sapling=1, attached_node=1,flammable=1},
 	sounds = main.dirtSound(),
 	drop = "main:sapling",
 	node_placement_prediction = "",
