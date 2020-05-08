@@ -120,7 +120,7 @@ local function handle_player_suffocation(player)
 
 			if drawy == "normal" then
 				legs = player_surroundings_index_table[name].legs
-				if not legs == "aether:portal" and not legs == "nether:portal" then
+				if legs ~= "aether:portal" and legs ~= "nether:portal" then
 					heart = player:get_hp()
 					player:set_hp(heart - 1)
 					return(true)
