@@ -111,7 +111,7 @@ minetest.register_plant("wheat", {
 		is_ground_content = false,	
 	    tiles = {"wheat_stage"}, --automatically adds _X.png
 	    paramtype2 = "degrotate",
-	    buildable_to = true,
+	    buildable_to = false,
 	    grow_stage = i,
 	    groups = {leaves = 1, plant = 1, axe = 1, hand = 0,dig_immediate=1,attached_node=1,crops=1},
 	    sounds = main.grassSound(),
@@ -147,6 +147,86 @@ minetest.register_plant("wheat", {
 			},
 			},
 	})
+minetest.register_plant("melon_stem", {
+	    description = "Melon Stem",
+	    drawtype = "plantlike",
+		waving = 1,
+		walkable = false,
+		climbable = false,
+		paramtype = "light",
+		is_ground_content = false,	
+	    tiles = {"melon_stage"}, --automatically adds _X.png
+	    paramtype2 = "degrotate",
+	    buildable_to = false,
+	    grow_stage = i,
+	    groups = {leaves = 1, plant = 1, axe = 1, hand = 0,dig_immediate=1,attached_node=1,crops=1},
+	    sounds = main.grassSound(),
+	    selection_box = {
+			type = "fixed",
+			fixed = {-6 / 16, -0.5, -6 / 16, 6 / 16, -6 / 16, 6 / 16}
+		},
+		grows = "in_place_yields",
+		grown_node="farming:melon",
+		grown_replacer = "farming:melon_stem_stage_complete",
+		stages = 7,
+		drop = {
+			max_items = 2,
+			items= {
+			 {
+				-- Only drop if using a tool whose name is identical to one
+				-- of these.
+				--rarity = 10,
+				items = {"farming:seeds"},
+				-- Whether all items in the dropped item list inherit the
+				-- hardware coloring palette color from the dug node.
+				-- Default is 'false'.
+				--inherit_color = true,
+			},
+			{
+				-- Only drop if using a tool whose name is identical to one
+				-- of these.
+				rarity = 2,
+				items = {"farming:seeds"},
+				-- Whether all items in the dropped item list inherit the
+				-- hardware coloring palette color from the dug node.
+				-- Default is 'false'.
+				--inherit_color = true,
+			},
+			},
+			},
+	})
+
+
+minetest.register_node("farming:melon", {
+    description = "Melon",
+    tiles = {"melon_top.png","melon_top.png","melon_side.png","melon_side.png","melon_side.png","melon_side.png"},
+    paramtype2 = "facedir",
+    groups = {wood = 1, pathable = 1,flammable=1},
+    sounds = main.woodSound(),
+    after_destruct = function(pos,oldnode)
+	    local facedir = oldnode.param2
+	    facedir = minetest.facedir_to_dir(facedir)
+	    local dir = vector.multiply(facedir,-1)
+	    
+	    minetest.set_node(vector.add(dir,pos), {name = "farming:melon_stem_1"})
+    end
+})
+
+minetest.register_node("farming:melon_stem_stage_complete", {
+    description = "",
+    tiles = {"nothing.png","nothing.png","melon_stage_complete.png^[transformFX","melon_stage_complete.png","nothing.png","nothing.png",},
+    drawtype = "nodebox",
+    node_box = {
+		type = "fixed",
+		fixed = {
+			{-0/16, -8/16, -7/16,  0/16, 8/16,  7/16}, -- Main body
+		},
+	},
+    paramtype2 = "facedir",
+    groups = {wood = 1, pathable = 1,flammable=1},
+    sounds = main.woodSound(),
+})
+
 
 minetest.register_decoration({
 	name = "farming:sugarcane",

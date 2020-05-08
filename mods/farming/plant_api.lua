@@ -33,7 +33,7 @@
 			end
 			
 			on_timer = function(pos)
-				local found = minetest.find_node_near(pos, 4, {"main:water","main:waterflow"})
+				local found = minetest.find_node_near(pos, 3, {"main:water","main:waterflow"})
 				if found then
 					pos.y = pos.y + 1
 					if minetest.get_node(pos).name == "air" then
@@ -90,6 +90,65 @@
 				if found then
 					local timer = minetest.get_node_timer(pos)
 					timer:start(math.random(plant_min,plant_max))
+				else
+					minetest.dig_node(pos)
+				end
+			end
+		elseif def.grows == "in_place_yields" then
+			on_timer = function(pos)
+				pos.y = pos.y - 1
+				local found = minetest.get_node_group(minetest.get_node(pos).name, "farmland") > 0
+				--if found farmland below
+				if found then	
+					if i < max then
+						pos.y = pos.y + 1
+						minetest.set_node(pos,{name="farming:"..name.."_"..(i+1)})
+						local timer = minetest.get_node_timer(pos)
+						timer:start(0.25)--start(math.random(plant_min,plant_max))
+					else
+						pos.y = pos.y + 1
+						local found = false
+						local add_node = nil
+						for x = -1,1 do
+							if found == false then
+								for z = -1,1 do
+									if math.abs(x)+math.abs(z) == 1 then
+										local node_get = minetest.get_node(vector.new(pos.x-x,pos.y,pos.z-z)).name == "air"
+										if node_get then
+											add_node = vector.new(pos.x-x,pos.y,pos.z-z)
+											found = true
+										end
+									end
+								end
+							end
+						end
+						
+						if found == true and add_node then
+							local param2 = minetest.dir_to_facedir(vector.direction(pos,add_node))
+							minetest.add_node(add_node,{name=def.grown_node,param2=param2})
+							
+							local facedir = minetest.facedir_to_dir(param2)
+							
+							local inverted_facedir = vector.multiply(facedir,-1)
+							minetest.set_node(vector.add(inverted_facedir,add_node), {name=def.grown_replacer, param2=minetest.dir_to_facedir(facedir)})
+						end
+						
+						
+						local timer = minetest.get_node_timer(pos)
+						timer:start(0.25)--start(math.random(plant_min,plant_max))
+					end
+				--if not found farmland
+				else
+					minetest.dig_node(pos)
+				end
+			end
+			on_construct = function(pos)
+				pos.y = pos.y - 1
+				local found = minetest.get_node_group(minetest.get_node(pos).name, "farmland") > 0
+				pos.y = pos.y + 1
+				if found then
+					local timer = minetest.get_node_timer(pos)
+					timer:start(0.25)--start(math.random(plant_min,plant_max))
 				else
 					minetest.dig_node(pos)
 				end
