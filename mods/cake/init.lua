@@ -34,7 +34,7 @@ for i = 0,13 do
 		on_construct = function(pos)
 			--randomly cake eats itself
 			if math.random() > 0.995 then
-				minetest.set_node(pos, {name="cake:cursed_cake_1"})
+				minetest.set_node(pos, {name="cake:cursed_cake_0"})
 			end
 		end,
 		on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
@@ -102,7 +102,7 @@ end
 
 
 minetest.register_craft({
-	output = "cake:cake_1",
+	output = "cake:cake_0",
 	recipe = {
 		{"weather:snowball","weather:snowball","weather:snowball"},
 		{"farming:wheat","farming:wheat","farming:wheat"},
