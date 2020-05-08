@@ -127,7 +127,6 @@ minetest.register_plant("wheat", {
 		},
 		grows = "in_place",
 		stages = 7,
-		--[[
 		drop = {
 			max_items = 2,
 			items= {
@@ -145,7 +144,7 @@ minetest.register_plant("wheat", {
 				-- Only drop if using a tool whose name is identical to one
 				-- of these.
 				rarity = 2,
-				items = {"farming:seeds"},
+				items = {"farming:wheat_seeds"},
 				-- Whether all items in the dropped item list inherit the
 				-- hardware coloring palette color from the dug node.
 				-- Default is 'false'.
@@ -153,7 +152,14 @@ minetest.register_plant("wheat", {
 			},
 			},
 			},
-		]]--
+		
+		
+		--seed definition
+		--"farming:wheat_1"
+		seed_name = "wheat",
+		seed_description = "Wheat Seeds",
+		seed_inventory_image = "wheat_seeds.png",
+		seed_plants = "farming:wheat_1",
 	})
 
 minetest.register_plant("melon_stem", {
