@@ -189,12 +189,13 @@ mobs.create_interaction_functions = function(def,mob_register)
             end
         end
             
-        
-        self.object:remove()
-        
+        global_mob_amount = global_mob_amount - 1
+        print("Mobs Died. Current Mobs: "..global_mob_amount)
         if self.child then
             self.child:get_luaentity().parent = nil
         end
+        
+        self.object:remove()
     end
     
     --the pig will look for and at players

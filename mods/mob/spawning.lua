@@ -2,8 +2,6 @@
 
 --spawn mob in a square doughnut shaped radius
 local chance = 20
-local tick = 0.2
-local timer = 0
 --inner and outer part of square donut radius
 local inner = 24
 local outer = 128
@@ -15,12 +13,9 @@ local spawn_table = {"pig"}
 local dark_spawn_table = {"slime","creepig"}
 local aether_spawn_table = {"flying_pig"}
 
-minetest.register_globalstep(function(dtime)
-	if spawn then
-	timer = timer + dtime
-	if timer >= tick and math.random(1,chance) == chance then
-		--print("ticking")
-		timer = 0
+local function spawn_mobs()
+	print("---------------------------------------------")
+	if spawn and global_mob_amount < mob_limit then
 		--check through players
 		for _,player in ipairs(minetest.get_connected_players()) do
 			--don't spawn near dead players
@@ -63,24 +58,26 @@ minetest.register_globalstep(function(dtime)
 						minetest.add_entity(mob_pos,"mob:"..mob_spawning)
 
 					else
-                        local light_level = minetest.get_node_light(spawner[1])
-                        if light_level < 10 then
-                            mob_pos.y = mob_pos.y + 1
-                            local mob_spawning = dark_spawn_table[math.random(1,table.getn(dark_spawn_table))]
-                            print("Dark Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
-                            minetest.add_entity(mob_pos,"mob:"..mob_spawning)
-                        else
-                            mob_pos.y = mob_pos.y + 1
-                            local mob_spawning = spawn_table[math.random(1,table.getn(spawn_table))]
-                            print("Light Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
-                            minetest.add_entity(mob_pos,"mob:"..mob_spawning)
-                        end
+						local light_level = minetest.get_node_light(spawner[1])
+						if light_level < 10 then
+							mob_pos.y = mob_pos.y + 1
+							local mob_spawning = dark_spawn_table[math.random(1,table.getn(dark_spawn_table))]
+							print("Dark Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
+							minetest.add_entity(mob_pos,"mob:"..mob_spawning)
+						else
+							mob_pos.y = mob_pos.y + 1
+							local mob_spawning = spawn_table[math.random(1,table.getn(spawn_table))]
+							print("Light Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
+							minetest.add_entity(mob_pos,"mob:"..mob_spawning)
+						end
 					end
 				end
 			end
 		end
-	elseif timer > tick then
-		timer = 0
 	end
-	end
-end)
+	minetest.after(5, function()
+		spawn_mobs()
+	end)
+end
+
+spawn_mobs()

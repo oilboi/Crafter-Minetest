@@ -14,6 +14,8 @@ mobs.create_data_handling_functions = function(def,mob_register)
 
 
     mob_register.on_activate = function(self, staticdata, dtime_s)
+	    global_mob_amount = global_mob_amount + 1
+	    print("Mobs Spawned. Current Mobs: "..global_mob_amount)
         self.object:set_armor_groups({immortal = 1})
         --self.object:set_velocity({x = math.random(-5,5), y = 5, z = math.random(-5,5)})
         self.object:set_acceleration(def.gravity)
