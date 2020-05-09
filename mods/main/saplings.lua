@@ -21,9 +21,18 @@ local function sapling_grow(pos)
 		end
 		if good_to_grow == true then
 			minetest.set_node(pos,{name="main:tree"})
-			minetest.place_schematic(pos, treeSchematic,"0",nil,false,"place_center_x, place_center_z")
+			local schemmy = math.random(1,2)
+			if schemmy == 1 then
+				minetest.place_schematic(pos, tree_big,"0",nil,false,"place_center_x, place_center_z")
+			elseif schemmy == 2 then
+				minetest.place_schematic(pos, tree_small,"0",nil,false,"place_center_x, place_center_z")
+			end
 			--override leaves
-			for i = 1,4 do
+			local max = 3
+			if schemmy == 2 then
+				max = 1
+			end
+			for i = 1,max do
 				minetest.set_node(vector.new(pos.x,pos.y+i,pos.z),{name="main:tree"})
 			end
 		end

@@ -139,25 +139,49 @@ minetest.register_biome({
 	humidity_point = 35,
 })
 
+--[[
 minetest.register_decoration({
 	name = "main:tree",
-	deco_type = "schematic",
+	deco_type = "simple",
 	place_on = {"main:grass"},
 	sidelen = 16,
-	noise_params = {
-		offset = 0.024,
-		scale = 0.015,
-		spread = {x = 250, y = 250, z = 250},
-		seed = 2,
-		octaves = 3,
-		persist = 0.66
-	},
+	fill_ratio = 0.005,
 	biomes = {"grassland"},
 	y_max = 31000,
 	y_min = 0,
-	schematic = treeSchematic,
-	flags = "place_center_x, place_center_z, force_placement",
-	rotation = "random",
+	--schematic = treeSchematic,
+	--flags = "place_center_x, place_center_z, force_placement",
+	--rotation = "random",
+	decoration = "main:tree",
+	height = 4,
+	height_max = 6,
 })
-
-
+]]--
+minetest.register_decoration({
+	name = "main:tree_big",
+	deco_type = "schematic",
+	place_on = {"main:grass"},
+	sidelen = 16,
+	fill_ratio = 0.0025,
+	biomes = {"grassland"},
+	y_max = 31000,
+	y_min = 0,
+	schematic = tree_big,
+	flags = "place_center_x, place_center_z",
+	rotation = "random",
+	place_offset_y = 1,
+})
+minetest.register_decoration({
+	name = "main:tree_small",
+	deco_type = "schematic",
+	place_on = {"main:grass"},
+	sidelen = 16,
+	fill_ratio = 0.0025,
+	biomes = {"grassland"},
+	y_max = 31000,
+	y_min = 0,
+	schematic = tree_small,
+	flags = "place_center_x, place_center_z",
+	rotation = "random",
+	place_offset_y = 1,
+})
