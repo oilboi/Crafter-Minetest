@@ -212,7 +212,9 @@ minetest.register_node("main:tree", {
 	end,
 	--treecapitator - move treecapitator into own file using override
 	on_dig = function(pos, node, digger)
-	
+		bvav_create_vessel(pos,minetest.facedir_to_dir(minetest.dir_to_facedir(minetest.yaw_to_dir(digger:get_look_horizontal()+(math.pi/2)))))
+
+		--[[
 		--check if wielding axe?
 		--turn treecapitator into an enchantment?
 		local meta = minetest.get_meta(pos)
@@ -233,6 +235,7 @@ minetest.register_node("main:tree", {
 		else
 			minetest.node_dig(pos, node, digger)
 		end
+		]]--
 	end
 })
 
