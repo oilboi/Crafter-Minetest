@@ -17,9 +17,10 @@
 	 
 	 
 		 local after_dig_node
-		 local on_timer
+		 local on_abm
 		 local on_construct
 		 local after_destruct
+		 local after_place_node
 		 --do custom functions for each node
 		 --wether growing in place or up
 		 if def.grows == "up" then
@@ -32,42 +33,37 @@
 				end
 			end
 			
-			on_timer = function(pos)
+			on_abm = function(pos)
 				local found = minetest.find_node_near(pos, 3, {"main:water","main:waterflow"})
-				if found then
-					pos.y = pos.y + 1
+				pos.y = pos.y - 1
+				local noder = minetest.get_node(pos).name
+				local found_soil = minetest.get_node_group(noder, "soil") > 0
+				local found_self--[[this is deep]]= (noder == nodename)
+				
+				if found and (found_soil or found_self) then
+					pos.y = pos.y + 2
 					if minetest.get_node(pos).name == "air" then
 						minetest.set_node(pos,{name="farming:"..name})
 					end
-					local timer = minetest.get_node_timer(pos)
-					timer:start(math.random(plant_min,plant_max))
-				end
-			end
-			
-			on_construct = function(pos)
-				pos.y = pos.y - 1
-				local noder = minetest.get_node(pos).name
-				local found = minetest.get_node_group(noder, "soil") > 0
-				print(noder)
-				pos.y = pos.y + 1
-				if found then
-					local timer = minetest.get_node_timer(pos)
-					timer:start(math.random(plant_min,plant_max))
-				elseif noder ~= nodename then
+				elseif not found_self then
+					pos.y = pos.y + 1
 					minetest.dig_node(pos)
 				end
 			end
 			
-			after_destruct = function(pos)
+			after_place_node = function(pos, placer, itemstack, pointed_thing)
 				pos.y = pos.y - 1
-				if minetest.get_node(pos).name == nodename then
-					local timer = minetest.get_node_timer(pos)
-					timer:start(math.random(plant_min,plant_max))
+				local noder = minetest.get_node(pos).name
+				local found = minetest.get_node_group(noder, "soil") > 0
+				if not found then
+					pos.y = pos.y + 1
+					minetest.dig_node(pos)
 				end
 			end
+			
 		--for plants that grow in place
 		elseif def.grows == "in_place" then
-			on_timer = function(pos)
+			on_abm = function(pos)
 				pos.y = pos.y - 1
 				local found = minetest.get_node_group(minetest.get_node(pos).name, "farmland") > 0
 				--if found farmland below
@@ -75,27 +71,23 @@
 					if i < max then
 						pos.y = pos.y + 1
 						minetest.set_node(pos,{name="farming:"..name.."_"..(i+1)})
-						local timer = minetest.get_node_timer(pos)
-						timer:start(math.random(plant_min,plant_max))
 					end
 				--if not found farmland
 				else
 					minetest.dig_node(pos)
 				end
 			end
-			on_construct = function(pos)
+			after_place_node = function(pos, placer, itemstack, pointed_thing)
 				pos.y = pos.y - 1
-				local found = minetest.get_node_group(minetest.get_node(pos).name, "farmland") > 0
-				pos.y = pos.y + 1
-				if found then
-					local timer = minetest.get_node_timer(pos)
-					timer:start(math.random(plant_min,plant_max))
-				else
+				local noder = minetest.get_node(pos).name
+				local found = minetest.get_node_group(noder, "farmland") > 0
+				if not found then
+					pos.y = pos.y + 1
 					minetest.dig_node(pos)
 				end
 			end
 		elseif def.grows == "in_place_yields" then
-			on_timer = function(pos)
+			on_abm = function(pos)
 				pos.y = pos.y - 1
 				local found = minetest.get_node_group(minetest.get_node(pos).name, "farmland") > 0
 				--if found farmland below
@@ -103,8 +95,6 @@
 					if i < max then
 						pos.y = pos.y + 1
 						minetest.set_node(pos,{name="farming:"..name.."_"..(i+1)})
-						local timer = minetest.get_node_timer(pos)
-						timer:start(math.random(plant_min,plant_max))
 					else
 						pos.y = pos.y + 1
 						local found = false
@@ -132,24 +122,18 @@
 							local inverted_facedir = vector.multiply(facedir,-1)
 							minetest.set_node(vector.add(inverted_facedir,add_node), {name="farming:"..name.."_complete", param2=minetest.dir_to_facedir(facedir)})
 						end
-						
-						
-						local timer = minetest.get_node_timer(pos)
-						timer:start(math.random(plant_min,plant_max))
 					end
 				--if not found farmland
 				else
 					minetest.dig_node(pos)
 				end
 			end
-			on_construct = function(pos)
+			after_place_node = function(pos, placer, itemstack, pointed_thing)
 				pos.y = pos.y - 1
-				local found = minetest.get_node_group(minetest.get_node(pos).name, "farmland") > 0
-				pos.y = pos.y + 1
-				if found then
-					local timer = minetest.get_node_timer(pos)
-					timer:start(math.random(plant_min,plant_max))
-				else
+				local noder = minetest.get_node(pos).name
+				local found = minetest.get_node_group(noder, "farmland") > 0
+				if not found then
+					pos.y = pos.y + 1
 					minetest.dig_node(pos)
 				end
 			end
@@ -200,11 +184,24 @@
 				 minetest.dig_node(pos)
 			end,
 			
-			after_dig_node = after_dig_node,
-			on_timer       = on_timer,
-			on_construct   = on_construct,
-			after_destruct = after_destruct,
+			after_dig_node   = after_dig_node,
+			after_place_node = after_place_node,
+			on_construct     = on_construct,
+			after_destruct   = after_destruct,
 		})
+		if on_abm then
+			minetest.register_abm({
+				label = nodename.." Grow",
+				nodenames = {nodename},
+				neighbors = {"air"},
+				interval = 6,
+				chance = 400,
+				catch_up = true,
+				action = function(pos)
+					on_abm(pos)
+				end,
+			})
+		end
 	end
 	
 	--create final stage for grow in place plant stems that create food
@@ -239,8 +236,6 @@
 			    
 			    if minetest.get_node(stem_pos).name == "farming:"..name.."_complete" then
 				    minetest.set_node(stem_pos, {name = "farming:"..name.."_1"})
-				    local timer = minetest.get_node_timer(stem_pos)
-					timer:start(math.random(plant_min,plant_max))
 			    end
 		    end
 		})
