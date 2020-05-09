@@ -214,20 +214,25 @@ minetest.register_node("main:tree", {
 	on_dig = function(pos, node, digger)
 	
 		--check if wielding axe?
-		
+		--turn treecapitator into an enchantment?
 		local meta = minetest.get_meta(pos)
-		if not meta:contains("placed") then
-			--remove tree
-			for y = -6,6 do
-				local name = minetest.get_node(vector.new(pos.x,pos.y+y,pos.z)).name
-				--print(y)
-				if name == "main:tree" or name == "redstone:node_activated_tree" then
-					minetest.node_dig(vector.new(pos.x,pos.y+y,pos.z), node, digger)
+		local tool_meta = digger:get_wielded_item():get_meta()
+		if tool_meta:get_int("treecapitator") > 0 then
+			if not meta:contains("placed") then
+				--remove tree
+				for y = -6,6 do
+					local name = minetest.get_node(vector.new(pos.x,pos.y+y,pos.z)).name
+					--print(y)
+					if name == "main:tree" or name == "redstone:node_activated_tree" then
+						minetest.node_dig(vector.new(pos.x,pos.y+y,pos.z), node, digger)
+					end
 				end
+			else
+				minetest.node_dig(pos, node, digger)
 			end
 		else
 			minetest.node_dig(pos, node, digger)
-		end	
+		end
 	end
 })
 
@@ -252,52 +257,49 @@ minetest.register_node("main:leaves", {
     drop = {
 		max_items = 1,
 		items= {
-		 {
-			-- Only drop if using a tool whose name is identical to one
-			-- of these.
-			rarity = 10,
-			items = {"main:sapling"},
-			-- Whether all items in the dropped item list inherit the
-			-- hardware coloring palette color from the dug node.
-			-- Default is 'false'.
-			--inherit_color = true,
+		{
+			tools = {"main:shears"},
+			items = {"main:dropped_leaves"},
 		},
 		{
-			-- Only drop if using a tool whose name is identical to one
-			-- of these.
-			tools = {"main:shears"},
-			rarity = 2,
-			items = {"main:leaves"},
-			-- Whether all items in the dropped item list inherit the
-			-- hardware coloring palette color from the dug node.
-			-- Default is 'false'.
-			--inherit_color = true,
-		},
-		{
-			-- Only drop if using a tool whose name is identical to one
-			-- of these.
-			tools = {"main:shears"},
-			rarity = 2,
-			items = {"main:stick"},
-			-- Whether all items in the dropped item list inherit the
-			-- hardware coloring palette color from the dug node.
-			-- Default is 'false'.
-			--inherit_color = true,
-		},
-		{
-			-- Only drop if using a tool whose name is identical to one
-			-- of these.
-			tools = {"main:shears"},
 			rarity = 6,
 			items = {"main:apple"},
-			-- Whether all items in the dropped item list inherit the
-			-- hardware coloring palette color from the dug node.
-			-- Default is 'false'.
-			--inherit_color = true,
+		},
+		{
+			rarity = 10,
+			items = {"main:sapling"},
 		},
 		},
     },
 })
+
+
+minetest.register_node("main:dropped_leaves", {
+    description = "Leaves",
+    drawtype = "allfaces_optional",
+	waving = 0,
+	walkable = false,
+	climbable = false,
+	paramtype = "light",
+	is_ground_content = false,	
+    tiles = {"leaves.png"},
+    groups = {leaves = 1, flammable=1},
+    sounds = main.grassSound(),
+    drop = {
+		max_items = 1,
+		items= {
+		{
+			tools = {"main:shears"},
+			items = {"main:dropped_leaves"},
+		},
+    },
+    },
+})
+
+
+
+
+
 
 minetest.register_node("main:water", {
 	description = "Water Source",

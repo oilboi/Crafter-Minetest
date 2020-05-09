@@ -28,8 +28,7 @@ local function leafdecay_on_timer(pos, def)
 				is_leaf = true
 			end
 		end
-		if minetest.get_item_group(item, "leafdecay_drop") ~= 0 or
-				not is_leaf then
+		if minetest.get_item_group(item, "leafdecay_drop") ~= 0 or not is_leaf then
 			minetest.add_item({
 				x = pos.x - 0.5 + math.random(),
 				y = pos.y - 0.5 + math.random(),
@@ -59,10 +58,10 @@ local function leafdecay_on_timer(pos, def)
 		texture = "treecapitator.png"
 	})
 	minetest.sound_play("leaves", {pos=pos, gain = 0.2, max_hear_distance = 60,pitch = math.random(70,100)/100})
-	--random drops
-	if math.random() > 0.75 then
-		local obj = minetest.add_item(pos,dropper[math.random(1,3)])
-	end
+	--random drops - remove this for now
+	--if math.random() > 0.75 then
+		--local obj = minetest.add_item(pos,dropper[math.random(1,3)])
+	--end
 end
 
 function treecaptitator.register_leafdecay(def)
