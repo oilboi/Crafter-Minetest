@@ -29,11 +29,13 @@ minetest.register_globalstep(function(dtime)
 		
 		--running FOV modifier
 		if hunger > 6 and (running or bunny_hopping) then
+			player:set_fov(1.35, true,0.15)
+			
 			if bunny_hopping == true then
-                player:set_fov(1.45, true,0.15)
+                --player:set_fov(1.45, true,0.15)
 				player:set_physics_override({speed=1.75})
 			else
-                player:set_fov(1.25, true,0.15)
+                --player:set_fov(1.25, true,0.15)
 				player:set_physics_override({speed=1.5})
 			end
 		else
@@ -44,7 +46,7 @@ minetest.register_globalstep(function(dtime)
 		
 		--sneaking
 		if sneaking then
-            player:set_fov(0.8, true,0.1)
+            --player:set_fov(0.8, true,0.1)
 			player:set_eye_offset({x=0,y=-1,z=0},{x=0,y=-1,z=0})
 		else
 			player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
