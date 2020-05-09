@@ -1,8 +1,8 @@
 --saplings
 --
 --
-local sapling_min = 120
-local sapling_max = 720
+--local sapling_min = 120
+--local sapling_max = 720
 --make sapling grow
 local function sapling_grow(pos)
 	if minetest.get_node_light(pos, nil) < 10 then
@@ -87,8 +87,8 @@ minetest.register_abm({
 	label = "Tree Grow",
 	nodenames = {"group:sapling"},
 	neighbors = {"group:soil"},
-	interval = 3,
-	chance = 2000,
+	interval = 6,
+	chance = 400,
 	catch_up = true,
 	action = function(pos)
 		sapling_grow(pos)
