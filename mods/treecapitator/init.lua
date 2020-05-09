@@ -157,6 +157,7 @@ minetest.register_entity("treecapitator:tree_element", {
 					local pos = self.object:get_pos()
 					minetest.throw_item(pos,{name="main:leaves"})
 				end
+				minetest.sound_play("tree_thud",{pos=self.object:get_pos()})
 				self.object:remove()
 			end
 			
@@ -238,5 +239,5 @@ function bvav_create_vessel(pos,dir)
 		parent:get_luaentity().leaves = parent:get_luaentity().leaves + 1
 	end
 	
-	minetest.sound_play("treecapitate",{object=parent})
+	minetest.sound_play("tree_fall",{object=parent})
 end
