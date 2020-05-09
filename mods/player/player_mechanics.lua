@@ -29,7 +29,7 @@ minetest.register_globalstep(function(dtime)
 		
 		--running FOV modifier
 		if hunger > 6 and (running or bunny_hopping) then
-			player:set_fov(1.35, true,0.15)
+			player:set_fov(1.25, true,0.15)
 			
 			if bunny_hopping == true then
                 --player:set_fov(1.45, true,0.15)
