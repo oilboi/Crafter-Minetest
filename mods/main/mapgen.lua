@@ -156,7 +156,7 @@ minetest.register_decoration({
 	y_max = 31000,
 	y_min = 0,
 	schematic = treeSchematic,
-	flags = "place_center_x, place_center_z",
+	flags = "place_center_x, place_center_z, force_placement",
 	rotation = "random",
 })
 
