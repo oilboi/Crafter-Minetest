@@ -6,8 +6,6 @@ local sapling_max = 720
 --make sapling grow
 local function sapling_grow(pos)
 	if minetest.get_node_light(pos, nil) < 10 then
-		local timer = minetest.get_node_timer(pos)
-		timer:start(math.random(sapling_min,sapling_max))
 		--print("failed to grow at "..dump(pos))
 		return
 	end
@@ -81,11 +79,18 @@ minetest.register_node("main:sapling", {
 			return(itemstack)
 		end
 	end,
-	on_construct = function(pos)
-		local timer = minetest.get_node_timer(pos)
-		timer:start(math.random(sapling_min,sapling_max))
-	end,
-	on_timer = function(pos)
+})
+
+
+--growing abm for sapling
+minetest.register_abm({
+	label = "Tree Grow",
+	nodenames = {"group:sapling"},
+	neighbors = {"group:soil"},
+	interval = 3,
+	chance = 2000,
+	catch_up = true,
+	action = function(pos)
 		sapling_grow(pos)
 	end,
 })
