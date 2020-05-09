@@ -88,7 +88,7 @@ minetest.register_abm({
 	nodenames = {"group:sapling"},
 	neighbors = {"group:soil"},
 	interval = 6,
-	chance = 400,
+	chance = 250,
 	catch_up = true,
 	action = function(pos)
 		sapling_grow(pos)

@@ -30,10 +30,16 @@
 				local nn = minetest.get_node(np)
 				if nn.name == node.name then
 					minetest.node_dig(np, nn, digger)
+					minetest.sound_play("dirt",{pos=pos,gain=0.2})
 				end
 			end
 			
 			on_abm = function(pos)
+				if minetest.get_node_light(pos, nil) < 10 then
+					--print("failed to grow at "..dump(pos))
+					return
+				end
+				
 				local found = minetest.find_node_near(pos, 3, {"main:water","main:waterflow"})
 				pos.y = pos.y - 1
 				local noder = minetest.get_node(pos).name
@@ -48,6 +54,7 @@
 				elseif not found_self then
 					pos.y = pos.y + 1
 					minetest.dig_node(pos)
+					minetest.sound_play("dirt",{pos=pos,gain=0.2})
 				end
 			end
 			
@@ -64,6 +71,13 @@
 		--for plants that grow in place
 		elseif def.grows == "in_place" then
 			on_abm = function(pos)
+				if minetest.get_node_light(pos, nil) < 10 then
+					minetest.dig_node(pos)
+					minetest.sound_play("dirt",{pos=pos,gain=0.2})
+					--print("failed to grow at "..dump(pos))
+					return
+				end
+				
 				pos.y = pos.y - 1
 				local found = minetest.get_node_group(minetest.get_node(pos).name, "farmland") > 0
 				--if found farmland below
@@ -75,6 +89,7 @@
 				--if not found farmland
 				else
 					minetest.dig_node(pos)
+					minetest.sound_play("dirt",{pos=pos,gain=0.2})
 				end
 			end
 			after_place_node = function(pos, placer, itemstack, pointed_thing)
@@ -88,6 +103,12 @@
 			end
 		elseif def.grows == "in_place_yields" then
 			on_abm = function(pos)
+				if minetest.get_node_light(pos, nil) < 10 then
+					minetest.dig_node(pos)
+					minetest.sound_play("dirt",{pos=pos,gain=0.2})
+					--print("failed to grow at "..dump(pos))
+					return
+				end
 				pos.y = pos.y - 1
 				local found = minetest.get_node_group(minetest.get_node(pos).name, "farmland") > 0
 				--if found farmland below
@@ -126,6 +147,7 @@
 				--if not found farmland
 				else
 					minetest.dig_node(pos)
+					minetest.sound_play("dirt",{pos=pos,gain=0.2})
 				end
 			end
 			after_place_node = function(pos, placer, itemstack, pointed_thing)
@@ -195,7 +217,7 @@
 				nodenames = {nodename},
 				neighbors = {"air"},
 				interval = 6,
-				chance = 400,
+				chance = 250,
 				catch_up = true,
 				action = function(pos)
 					on_abm(pos)
