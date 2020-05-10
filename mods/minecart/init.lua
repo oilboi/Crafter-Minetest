@@ -52,7 +52,7 @@ end
 
 --this will turn the z into x and x into z
 minecart.flip_direction_axis = function(self)
-	self.dir = vector.new(math.abs(self.dir.z),0,math.abs(self.dir.x))
+	self.dir = vector.new(self.dir.z,0,self.dir.x)
 end
 
 --this makes the minecart move in "blocks"
@@ -60,32 +60,47 @@ end
 minecart.movement = function(self)
 	if self.dir and self.goal then
 		local pos = self.object:get_pos()
-		local movement = vector.direction(pos,self.goal)
-		self.object:set_velocity(vector.multiply(movement,self.speed))
 		local distance_from_goal = vector.distance(pos,self.goal)
+		
+		
+		--make minecart slow down, but only so much
+		
+		--speed up going downhill
+		if self.dir and (self.dir.y == -1 or self.rider) and self.speed < 10 then
+			self.speed = self.speed + 0.1
+		--slow down going uphill
+		elseif self.dir and self.dir.y == 1 then
+			self.speed = self.speed - 0.12
+		--normal flat friction slowdown
+		elseif self.speed > 0.1 then
+			self.speed = self.speed - 0.01
+		end
+		
+		--
+		--if the minecart is slowed down below 1 nph (node per hour)
+		--try to flip direction if pointing up
+		--then stop it if failed
+		if self.speed < 0.2 then
+			if self.dir.y == 1 then
+				self.dir = vector.multiply(self.dir, -1)
+				minecart.set_direction(self,self.dir)
+				self.goal = nil
+			else
+				self.speed = 0
+				self.dir = nil
+				self.goal = nil
+			end
+		end
 		
 		--this checks how far the minecart is from the "goal node"
 		--aka the node that the minecart was supposed to go to
-		if distance_from_goal < 0.2 then
+		if distance_from_goal < 0.2 or self.goal == nil then
 			self.object:set_velocity(vector.new(0,0,0))
 			self.goal = nil
 			--self.object:move_to(minecart.round_pos(self.object:get_pos()))
-			
-			--if the minecart is slowed down below 1 nph (node per hour)
-			--try to flip direction if pointing up
-			--then stop it if failed
-			if self.speed < 1 then
-				if self.dir.y == 1 then
-					self.dir = vector.multiply(self.dir, -1)
-					minecart.set_direction(self,self.dir)
-				else
-					self.speed = 0
-					self.dir = nil
-					self.goal = nil
-				end
 				
 			--otherwise try to keep going
-			else
+			if self.dir then
 				--test to see if minecart will keep moving
 				minecart.set_direction(self,self.dir)
 				
@@ -109,18 +124,11 @@ minecart.movement = function(self)
 			end
 		end
 		
-		--make minecart slow down, but only so much
-		
-		--speed up going downhill
-		if self.dir and (self.dir.y == -1 or self.rider) and self.speed < 10 then
-			self.speed = self.speed + 0.05
-		--slow down going uphill
-		elseif self.dir and self.speed > 1 and self.dir.y == 1 then
-			self.speed = self.speed - 0.05
-		--normal flat friction slowdown
-		elseif self.speed > 1 then
-			self.speed = self.speed - 0.01
+		if self.dir and self.goal then
+			local movement = vector.direction(pos,self.goal)
+			self.object:set_velocity(vector.multiply(movement,self.speed))
 		end
+		
 	--stop the minecart from flying off into the distance
 	elseif not vector.equals(self.object:get_velocity(), vector.new(0,0,0)) and (self.speed == 0 or not self.speed) then
 		self.object:set_velocity(vector.new(0,0,0))
