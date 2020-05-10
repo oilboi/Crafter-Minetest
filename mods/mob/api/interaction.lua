@@ -191,7 +191,7 @@ mobs.create_interaction_functions = function(def,mob_register)
             
         global_mob_amount = global_mob_amount - 1
         print("Mobs Died. Current Mobs: "..global_mob_amount)
-        if self.child then
+        if self.child and self.child:get_luaentity() then
             self.child:get_luaentity().parent = nil
         end
         
