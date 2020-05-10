@@ -1,4 +1,3 @@
---[[
 treecaptitator = {}
 
 local dropper = {"main:leaves","main:stick","main:apple"}
@@ -10,7 +9,7 @@ local function leafdecay_after_destruct(pos, oldnode, def)
 		local node = minetest.get_node(v)
 		local timer = minetest.get_node_timer(v)
 		if node.param2 ~= 1 and not timer:is_started() then
-			timer:start(math.random())
+			timer:start(math.random()+math.random()+math.random())
 		end
 	end
 end
@@ -91,7 +90,8 @@ treecaptitator.register_leafdecay({
 	leaves = {"main:leaves"},
 	radius = 2,
 })
-]]--
+
+--[[
 bvav_settings = {}
 bvav_settings.attach_scaling = 30
 bvav_settings.scaling = 0.667
@@ -241,3 +241,4 @@ function bvav_create_vessel(pos,dir)
 	
 	minetest.sound_play("tree_fall",{object=parent})
 end
+]]--
