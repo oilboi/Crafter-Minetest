@@ -67,6 +67,7 @@ mob_register.view_distance = def.view_distance
 
 mob_register.punch_timer = 0
 mob_register.punched_timer = 0
+mob_register.group_attack = def.group_attack
 
 mob_register.death_rotation = def.death_rotation
 

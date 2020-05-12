@@ -62,6 +62,7 @@ mobs.register_mob(
 	 die_sound = "pig_die",
 	 
 	 attack_type = "punch",
+	 group_attack = true,
 	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
 	 --explosion_power = 7, -- how big the explosion has to be
 	 --explosion_time = 3, -- how long it takes for a mob to explode

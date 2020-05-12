@@ -110,9 +110,17 @@ mobs.create_interaction_functions = function(def,mob_register)
 		if (self.punched_timer <= 0 and hp > 1) then
 			if puncher ~= self.object then
 				self.hostile = true
+				if self.group_attack == true then
+					for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.view_distance)) do
+						if not object:is_player() and object:get_luaentity() and object:get_luaentity().mobname == self.mobname then
+							object:get_luaentity().hostile = true
+							object:get_luaentity().hostile_timer = 20
+						end
+					end
+				end
+				self.hostile_timer = 20
+				self.punched_timer = 0.8
 			end
-			self.hostile_timer = 20
-			self.punched_timer = 0.8
 			
 			--critical effect
 			if critical == true then
@@ -235,15 +243,13 @@ mobs.create_interaction_functions = function(def,mob_register)
 				
 				if self.hostile == true then
 					
-					self.direction = vector.direction(pos,pos2)
-					local distance = vector.distance(pos,pos2)-2
-					if distance < 0 then
-						distance = 0
-					end
+					self.direction = vector.direction(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z))
+					local distance = vector.distance(pos,pos2)
+					
 					
 					--punch the player
 					if self.attack_type == "punch" then
-						if distance < 1 and self.punch_timer <= 0 and object:get_hp() > 0 then
+						if distance < 2.5 and self.punch_timer <= 0 and object:get_hp() > 0 then
 							local line_of_sight = minetest.line_of_sight(pos, pos2)
 							if line_of_sight == true then
 								self.punch_timer = 1
@@ -278,10 +284,10 @@ mobs.create_interaction_functions = function(def,mob_register)
 							end
 						end
 					end
-					self.speed = distance * 4
-					if self.speed > self.max_speed then
-						self.speed = self.max_speed
-					end
+					--self.speed = distance * 4
+					--if self.speed > self.max_speed then
+					self.speed = self.max_speed
+					--end
 					self.following = true
 				end
 				--only look at one player
