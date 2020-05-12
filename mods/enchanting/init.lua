@@ -103,8 +103,6 @@ minetest.register_chatcommand("xp", {
 	func = function(name)
 		local player = minetest.get_player_by_name(name)
 		local pos = player:get_pos()
-		
-		
 		minetest.throw_experience(pos, math.random(200,300))
 	end,
 })
