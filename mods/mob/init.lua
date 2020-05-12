@@ -46,7 +46,6 @@ mobs.register_mob(
 	 gravity = {x = 0, y = -9.81, z = 0},
 	 movement_type = "walk",
 	 max_speed = 5,
-	 hostile = false,
 	 state = 0,
 	 view_distance = 15,
 	 
@@ -61,6 +60,9 @@ mobs.register_mob(
 	 hurt_sound = "pig",
 	 die_sound = "pig_die",
 	 
+	 
+	 hostile = false,
+	 attacked_hostile = true,
 	 attack_type = "punch",
 	 group_attack = true,
 	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion

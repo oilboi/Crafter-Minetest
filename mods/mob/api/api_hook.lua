@@ -85,6 +85,8 @@ mob_register.explosion_time = def.explosion_time
 mob_register.custom_function_begin = def.custom_function_begin
 mob_register.custom_function_end = def.custom_function_end
 mob_register.projectile_timer_cooldown = def.projectile_timer_cooldown
+mob_register.attacked_hostile = def.attacked_hostile
+
 
 mob_register.projectile_timer = 0
 mob_register.projectile_type = def.projectile_type
@@ -131,6 +133,7 @@ mob_register.on_step = function(self, dtime)
 		--self.debug_nametag(self,dtime)
 	else
 		self.manage_death_animation(self,dtime)
+		self.move_head(self,nil,dtime)
 	end
 	--fix zombie state again
 	if self.dead == true and self.death_animation_timer <= 0 then

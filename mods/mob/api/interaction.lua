@@ -107,8 +107,8 @@ mobs.create_interaction_functions = function(def,mob_register)
 		
 		local hp = hp-hurt
 		
-		if (self.punched_timer <= 0 and hp > 1) then
-			if puncher ~= self.object then
+		if (self.punched_timer <= 0 and hp > 1) and not self.dead then
+			if puncher ~= self.object and self.attacked_hostile then
 				self.hostile = true
 				if self.group_attack == true then
 					for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.view_distance)) do
@@ -143,6 +143,16 @@ mobs.create_interaction_functions = function(def,mob_register)
 			self.object:add_velocity(dir)
 			self.add_sword_wear(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		elseif (self.punched_timer <= 0 and self.death_animation_timer == 0) then
+			if puncher ~= self.object and self.attacked_hostile then
+				if self.group_attack == true then
+					for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.view_distance)) do
+						if not object:is_player() and object:get_luaentity() and object:get_luaentity().mobname == self.mobname then
+							object:get_luaentity().hostile = true
+							object:get_luaentity().hostile_timer = 20
+						end
+					end
+				end
+			end
 			self.death_animation_timer = 1
 			self.dead = true
 			
@@ -154,9 +164,6 @@ mobs.create_interaction_functions = function(def,mob_register)
 			minetest.sound_play(self.die_sound, {object=self.object, gain = 1.0, max_hear_distance = 10,pitch = math.random(80,100)/100})
 			
 			self.object:set_texture_mod("^[colorize:red:130")
-			if self.child then
-			self.child:set_texture_mod("^[colorize:red:130") 
-			end
 			self.add_sword_wear(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		end
 	end
