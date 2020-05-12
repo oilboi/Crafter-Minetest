@@ -25,9 +25,11 @@ mobs.register_mob(
 		 --blank out the first two to create adult pig
 		"pig.png"
 	 },
-	 head_bone = "head",
+	 
 	 --these are used to anchor a point to the head position
-	 debug_head_pos = true,
+	 -----
+	 head_bone = "head",
+	 debug_head_pos = false,
 	 head_directional_offset = 0.5, --used in vector.multiply(minetest.yaw_to_dir(body_yaw),head_offset)
 	 head_height_offset = 0.8, --added to the base y position
 	 head_rotation_offset = math.pi,

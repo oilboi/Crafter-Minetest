@@ -147,9 +147,6 @@ mob_register.on_step = function(self, dtime)
 	if self.custom_function_end then
 		self.custom_function_end(self,dtime)
 	end
-	
-	
-	self.move_head(self)
 end
 
 minetest.register_entity("mob:"..def.mobname, mob_register)

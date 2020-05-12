@@ -125,16 +125,25 @@ mobs.create_head_functions = function(def,mob_register)
 		local head_position,head_rotation = self.object:get_bone_position(self.head_bone)		
 		--make the head yaw move back
 		if head_rotation.x > 0 then
-			head_rotation.x = head_rotation.x - 1
+			head_rotation.x = head_rotation.x - (dtime*100)
 		elseif head_rotation.x < 0 then
-			head_rotation.x = head_rotation.x + 1
+			head_rotation.x = head_rotation.x + (dtime*100)
 		end
+		
+		if math.abs(head_rotation.x) < (dtime*100) then
+			head_rotation.x = 0
+		end
+		
 		
 		--move up down (pitch) back to center
 		if head_rotation.z > 0 then
-			head_rotation.z = head_rotation.z - 1
+			head_rotation.z = head_rotation.z - (dtime*100)
 		elseif head_rotation.z < 0 then
-			head_rotation.z = head_rotation.z + 1
+			head_rotation.z = head_rotation.z + (dtime*100)
+		end
+		
+		if math.abs(head_rotation.z) < (dtime*100) then
+			head_rotation.z = 0
 		end
 		
 		self.object:set_bone_position(self.head_bone, head_position, head_rotation)
