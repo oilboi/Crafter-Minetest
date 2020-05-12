@@ -62,7 +62,7 @@ mobs.register_mob(
 	 
 	 
 	 hostile = false,
-	 attacked_hostile = true,
+	 attacked_hostile = false,
 	 attack_type = "punch",
 	 group_attack = true,
 	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion

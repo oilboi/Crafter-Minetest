@@ -108,18 +108,20 @@ mobs.create_interaction_functions = function(def,mob_register)
 		local hp = hp-hurt
 		
 		if (self.punched_timer <= 0 and hp > 1) and not self.dead then
-			if puncher ~= self.object and self.attacked_hostile then
-				self.hostile = true
-				if self.group_attack == true then
-					for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.view_distance)) do
-						if not object:is_player() and object:get_luaentity() and object:get_luaentity().mobname == self.mobname then
-							object:get_luaentity().hostile = true
-							object:get_luaentity().hostile_timer = 20
+			if puncher ~= self.object then
+				if self.attacked_hostile then
+					self.hostile = true
+					self.hostile_timer = 20
+					self.punched_timer = 0.8
+					if self.group_attack == true then
+						for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.view_distance)) do
+							if not object:is_player() and object:get_luaentity() and object:get_luaentity().mobname == self.mobname then
+								object:get_luaentity().hostile = true
+								object:get_luaentity().hostile_timer = 20
+							end
 						end
 					end
 				end
-				self.hostile_timer = 20
-				self.punched_timer = 0.8
 			end
 			
 			--critical effect
@@ -143,12 +145,17 @@ mobs.create_interaction_functions = function(def,mob_register)
 			self.object:add_velocity(dir)
 			self.add_sword_wear(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		elseif (self.punched_timer <= 0 and self.death_animation_timer == 0) then
-			if puncher ~= self.object and self.attacked_hostile then
-				if self.group_attack == true then
-					for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.view_distance)) do
-						if not object:is_player() and object:get_luaentity() and object:get_luaentity().mobname == self.mobname then
-							object:get_luaentity().hostile = true
-							object:get_luaentity().hostile_timer = 20
+			if puncher ~= self.object then
+				if self.attacked_hostile then
+					self.hostile = true
+					self.hostile_timer = 20
+					self.punched_timer = 0.8
+					if self.group_attack == true then
+						for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.view_distance)) do
+							if not object:is_player() and object:get_luaentity() and object:get_luaentity().mobname == self.mobname then
+								object:get_luaentity().hostile = true
+								object:get_luaentity().hostile_timer = 20
+							end
 						end
 					end
 				end
