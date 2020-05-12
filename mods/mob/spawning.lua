@@ -1,5 +1,5 @@
 --this is where mob spawning is defined
-
+--[[
 --spawn mob in a square doughnut shaped radius
 local chance = 20
 --inner and outer part of square donut radius
@@ -81,3 +81,4 @@ local function spawn_mobs()
 end
 
 spawn_mobs()
+]]--

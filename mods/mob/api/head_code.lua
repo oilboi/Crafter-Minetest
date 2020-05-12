@@ -1,163 +1,143 @@
 --
 mobs.create_head_functions = function(def,mob_register)
-    --converts the degrees to radians
-    local degrees_to_radians = function(degrees)
-        --print(d)
-        return(degrees/180.0*math.pi)
-    end
+	--converts the degrees to radians
+	local degrees_to_radians = function(degrees)
+		--print(d)
+		return(degrees/180.0*math.pi)
+	end
+	
+	--converts yaw to degrees
+	local degrees = function(yaw)
+		return(yaw*180.0/math.pi)
+	end
+	
+	--rounds it up to an integer
+	local degree_round = function(degree)
+		return(degree + 0.5 - (degree + 0.5) % 1)
+	end
+	--turns radians into degrees - not redundant
+	--doesn't add math.pi
+	local radians_to_degrees = function(radians)
+		return(radians*180.0/math.pi)
+	end
+	
+	
+	--make sure this is redefined as shown below aka
+	--don't run mob_rotation_degree_to_radians(rotation)
+	--run local radians = mob_rotation_degree_to_radians(rotation)
+	--or the mobs head rotation will become overwritten
+	local head_rotation_to_radians = function(rotation)
+		return{
+			x = 0, --roll should never be changed
+			y = degrees_to_radians(180 - rotation.y)*-1,
+			z = degrees_to_radians(90 - rotation.z)
+		}
+	end
+	
+	--a movement test to move the head
+	mob_register.move_head = function(self,pos2,dtime)
+		if self.head_bone then
+			--print(self.head_bone)
+			local head_position,head_rotation = self.object:get_bone_position(self.head_bone)
+			--[[ debug
+			if rotation then
+				--print("--------------------------------")
+				--rotation.x = rotation.x + 1
+				rotation.z = rotation.z + 1
+				rotation.y = 0
+				
+				if rotation.x > 90 then
+					 rotation.x = -90
+				end
+				if rotation.z > 90 then
+					 rotation.z = -90
+				end
+				
+				--print(rotation.x)
+				self.object:set_bone_position(self.head_bone, head_position, rotation)
+			end
+			]]--
+			
+			--print(self.head_rotation.y)
+			--if passed a direction to look
+			local pos = self.object:get_pos()
+			local body_yaw = self.object:get_yaw()
+			if not body_yaw then
+				return
+			end
+			
+			local dir = vector.multiply(minetest.yaw_to_dir(body_yaw+self.head_rotation_offset),self.head_directional_offset)
+			
+			
+			local body_yaw = minetest.dir_to_yaw(dir)
+			
+			--pos is where the head actually is
+			pos = vector.add(pos,dir)
+			pos.y = pos.y + self.head_height_offset
+			
+			--use this to literally look around
+			self.head_pos = pos
+			
+			if self.debug_head_pos == true then
+				minetest.add_particle({
+					pos = pos,
+					velocity = {x=0, y=0, z=0},
+					acceleration = {x=0, y=0, z=0},
+					expirationtime = 0.2,
+					size = 1,
+					texture = "dirt.png",
+				})
+			end
+			
+			--if the function was given a pos
+			if pos2 then
+				--compare the head yaw to the body
+				local head_yaw = minetest.dir_to_yaw(vector.direction(pos,pos2))
+				
+				local goal_yaw = body_yaw-head_yaw
+				
+				--if within range then do calculations
+				if goal_yaw <= math.pi/2 and goal_yaw >= -math.pi/2 then
+					---begin pitch calculation
+					--feed a 2D coordinate flipped into dir to yaw to calculate pitch
+					head_rotation.x = degrees(minetest.dir_to_yaw(vector.new(vector.distance(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z)),0,pos.y-pos2.y))+(math.pi/2))
+					head_rotation.z = degrees(-goal_yaw)
+					self.object:set_bone_position(self.head_bone, head_position, head_rotation)
+					return(true)
+				--nothing to look at
+				else--dofile(path.."movement.lua")
+					self.return_head_to_origin(self,dtime)
+					return(false)
+				end
+				
+			--if nothing to look at
+			else
+				self.return_head_to_origin(self,dtime)
+				return(false)
+			end
+		end
+	end
+	
+	
+	--this sets the mob to move it's head back to pointing forwards
 
-    --converts yaw to degrees
-    local degrees = function(yaw)
-        return(yaw*180.0/math.pi)
-    end
-
-    --rounds it up to an integer
-    local degree_round = function(degree)
-        return(degree + 0.5 - (degree + 0.5) % 1)
-    end
-    --turns radians into degrees - not redundant
-    --doesn't add math.pi
-    local radians_to_degrees = function(radians)
-        return(radians*180.0/math.pi)
-    end
-
-
-    --make sure this is redefined as shown below aka
-    --don't run mob_rotation_degree_to_radians(rotation)
-    --run local radians = mob_rotation_degree_to_radians(rotation)
-    --or the mobs head rotation will become overwritten
-    local head_rotation_to_radians = function(rotation)
-        return{
-            x = 0, --roll should never be changed
-            y = degrees_to_radians(180 - rotation.y)*-1,
-            z = degrees_to_radians(90 - rotation.z)
-        }
-    end
-
-    --a movement test to move the head
-    mob_register.move_head = function(self,pos2,dtime)
-        if self.child then
-            --print(self.head_rotation.y)
-            --if passed a direction to look
-            local pos = self.object:get_pos()
-            local body_yaw = self.object:get_yaw()
-            local dir = vector.multiply(minetest.yaw_to_dir(body_yaw),0.58)
-            local body_yaw = minetest.dir_to_yaw(dir)
-            --save the yaw for debug
-            
-            --pos is where the head actually is
-            pos = vector.add(pos,dir)
-            pos.y = pos.y + 0.36
-            --use this to literally look around
-            self.head_pos = pos
-                    
-            --if the function was given a pos
-            if pos2 then
-
-                local pitch = 0
-                --compare the head yaw to the body
-                local head_yaw = minetest.dir_to_yaw(vector.direction(pos,pos2))
-                local goal_yaw = body_yaw-head_yaw
-                
-                --if within range then do calculations
-                if goal_yaw <= math.pi/2 and goal_yaw >= -math.pi/2 then
-                    
-                    local current_yaw = self.head_rotation.y
-                    --smoothly move head using dtime
-                    if current_yaw > goal_yaw then
-                        current_yaw = current_yaw - (dtime*5)
-                    elseif current_yaw < goal_yaw then
-                        current_yaw = current_yaw + (dtime*5)
-                    end
-                    
-                    --stop jittering
-                    if math.abs(goal_yaw - current_yaw) <= (dtime*5) then
-                        current_yaw = goal_yaw
-                    end
-                    
-                    ---begin pitch calculation
-                    
-                    --feed a 2D coordinate flipped into dir to yaw to calculate pitch
-                    local goal_pitch = (minetest.dir_to_yaw(vector.new(vector.distance(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z)),0,pos.y-pos2.y))+(math.pi/2))*-1
-                    
-                    local current_pitch = self.head_rotation.z
-                                    
-                    --smoothly move head using dtime
-                    if goal_pitch > current_pitch then
-                        current_pitch = current_pitch + (dtime*5)
-                    elseif goal_pitch < current_pitch then
-                        current_pitch = current_pitch - (dtime*5)
-                    end
-                    
-                    --stop jittering
-                    if math.abs(goal_pitch - current_pitch) <= (dtime*5) then
-                        current_pitch = goal_pitch
-                    end
-                    
-                    --convert this into degrees for the attach code
-                    local deg_yaw = degrees(current_yaw)
-                    --this is rounded because it uses animation frames baked into the head model
-                    local deg_pitch = math.floor(degrees(current_pitch) + 0.5)+90
-
-
-                    self.child:set_attach(self.object, "", self.head_mount, vector.new(0,   deg_yaw , 0))
-                    self.child:set_animation({x=deg_pitch,y=deg_pitch}, 15, 0, true)	
-                    self.head_rotation = vector.new(0,    current_yaw,    current_pitch)
-                    
-                    return(true)
-                --nothing to look at
-                else--dofile(path.."movement.lua")
-                    self.return_head_to_origin(self,dtime)
-                    return(false)
-                end
-                
-            --if nothing to look at
-            else
-                self.return_head_to_origin(self,dtime)
-                return(false)
-            end
-        end
-    end
-
-
-    --this sets the mob to move it's head back to pointing forwards
-    mob_register.return_head_to_origin = function(self,dtime)
-        local current_yaw = self.head_rotation.y
-        local current_pitch = self.head_rotation.z
-        
-        --make the head yaw move back
-        if current_yaw > 0 then
-            current_yaw = current_yaw - (dtime*5)
-        elseif current_yaw < 0 then
-            current_yaw = current_yaw + (dtime*5)
-        end
-        
-        --finish rotation
-        if math.abs(current_yaw) <= (dtime*5) then
-            current_yaw = 0
-        end
-        
-        --move up down (pitch) back to center
-        if current_pitch > 0 then
-            current_pitch = current_pitch - (dtime*5)
-        elseif current_pitch < 0 then
-            current_pitch = current_pitch + (dtime*5)
-        end
-        
-        --finish rotation
-        if math.abs(current_pitch) <= (dtime*5) then
-            current_pitch = 0
-        end
-        
-        --convert this into degrees for the attach code
-        local deg_yaw = degrees(current_yaw)
-        --this is rounded because it uses animation frames baked into the head model
-        local deg_pitch = math.floor(degrees(current_pitch) + 0.5)+90
-        
-        self.child:set_attach(self.object, "", self.head_mount, vector.new(0,   deg_yaw , 0))
-        self.child:set_animation({x=deg_pitch,y=deg_pitch}, 15, 0, true)	
-        self.head_rotation = vector.new(0,    current_yaw,    current_pitch)
-    end
-    
-    return(mob_register)
+	mob_register.return_head_to_origin = function(self,dtime)
+		local head_position,head_rotation = self.object:get_bone_position(self.head_bone)		
+		--make the head yaw move back
+		if head_rotation.x > 0 then
+			head_rotation.x = head_rotation.x - 1
+		elseif head_rotation.x < 0 then
+			head_rotation.x = head_rotation.x + 1
+		end
+		
+		--move up down (pitch) back to center
+		if head_rotation.z > 0 then
+			head_rotation.z = head_rotation.z - 1
+		elseif head_rotation.z < 0 then
+			head_rotation.z = head_rotation.z + 1
+		end
+		
+		self.object:set_bone_position(self.head_bone, head_position, head_rotation)
+	end
+	return(mob_register)
 end

@@ -36,6 +36,19 @@ mob_register.hp = def.hp
 mob_register.max_speed = def.max_speed
 mob_register.jump_timer = 0
 
+
+if def.head_bone then
+	mob_register.head_bone = def.head_bone
+	mobs.create_head_functions(def,mob_register)
+	mob_register.debug_head_pos = def.debug_head_pos
+	mob_register.head_directional_offset = def.head_directional_offset
+	mob_register.head_height_offset = def.head_height_offset
+	mob_register.head_rotation_offset = def.head_rotation_offset
+	mob_register.head_position_correction = def.head_position_correction
+else
+	print("create some other functions to turn mob " .. def.mobname)
+end
+
 mob_register.hurt_inside_timer = 0
 mob_register.death_animation_timer = 0
 mob_register.dead = false
@@ -95,28 +108,24 @@ mobs.create_interaction_functions(def,mob_register)
 mobs.create_data_handling_functions(def,mob_register)
 mobs.create_animation_functions(def,mob_register)
 mobs.create_timer_functions(def,mob_register)
---only creat internal head animation functions if has head
-if def.has_head == true then
-    mobs.create_head_functions(def,mob_register)
-end
 
 
 mob_register.on_step = function(self, dtime)
-    if self.custom_function_begin then
-        self.custom_function_begin(self,dtime)
-    end
-    
-    self.collision_detection(self)
-    self.fall_damage(self)
-    
+	if self.custom_function_begin then
+		self.custom_function_begin(self,dtime)
+	end
+	
+	self.collision_detection(self)
+	self.fall_damage(self)
+	
 	if self.dead == false and self.death_animation_timer == 0 then
 		self.move(self,dtime)
 		self.set_animation(self)
-        
-        if self.look_around then
-            self.look_around(self,dtime)
-        end
-        
+		
+		if self.look_around then
+			self.look_around(self,dtime)
+		end
+		
 		self.manage_punch_timer(self,dtime)
 		--self.debug_nametag(self,dtime)
 	else
@@ -126,48 +135,24 @@ mob_register.on_step = function(self, dtime)
 	if self.dead == true and self.death_animation_timer <= 0 then
 		self.on_death(self)
 	end
-    
-    if self.tnt_timer then
-        self.manage_explode_timer(self,dtime)
-    end
-    
-    if self.projectile_timer then
-        self.manage_projectile_timer(self,dtime)
-    end
-    
-    if self.custom_function_end then
-        self.custom_function_end(self,dtime)
-    end
+	
+	if self.tnt_timer then
+		self.manage_explode_timer(self,dtime)
+	end
+	
+	if self.projectile_timer then
+		self.manage_projectile_timer(self,dtime)
+	end
+	
+	if self.custom_function_end then
+		self.custom_function_end(self,dtime)
+	end
+	
+	
+	self.move_head(self)
 end
 
 minetest.register_entity("mob:"..def.mobname, mob_register)
-
-
-if def.has_head == true then
-    mob_register.head = {}
-    mob_register.head.initial_properties = {
-        hp_max = 1,
-        physical = false,
-        collide_with_objects = false,
-        collisionbox = {0, 0, 0, 0, 0, 0},
-        visual =  def.head_visual,
-        visual_size = def.head_visual_size,
-        mesh = def.head_mesh,
-        textures = def.head_textures,
-        is_visible = true,
-        pointable = false,
-        --automatic_face_movement_dir = 0.0,
-        --automatic_face_movement_max_rotation_per_sec = 600,
-    }
-
-    --remove the head if no body
-    mob_register.head.on_step = function(self, dtime)
-        if self.parent == nil then
-            self.object:remove()
-        end
-    end
-    minetest.register_entity("mob:head"..def.mobname, mob_register.head) 
-end
 ------------------------------------------------
 
 end
