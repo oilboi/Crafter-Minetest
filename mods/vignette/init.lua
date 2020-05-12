@@ -3,8 +3,8 @@ function joinplayer (player)
     hud_elem_type = "image",
     position = {x = 0.5, y = 0.5},
     scale = {
-	x = -100.1,
-	y = -100.1
+	x = -100.5,
+	y = -100.5
     },
     text = "vignette.png"
   })
