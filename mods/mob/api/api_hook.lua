@@ -45,6 +45,7 @@ if def.head_bone then
 	mob_register.head_height_offset = def.head_height_offset
 	mob_register.head_rotation_offset = def.head_rotation_offset
 	mob_register.head_position_correction = def.head_position_correction
+	mob_register.head_coord = def.head_coord
 else
 	print("create some other functions to turn mob " .. def.mobname)
 end

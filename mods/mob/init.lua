@@ -34,7 +34,8 @@ mobs.register_mob(
 	 head_height_offset = 0.8, --added to the base y position
 	 head_rotation_offset = math.pi,
 	 --use this to correct the head position initially because it becomes severly offset - look at your blender model to get this perfect
-	 head_position_correction = vector.new(0,3,-0.5), 
+	 head_position_correction = vector.new(0,3,-0.5),
+	 head_coord = "horizontal",
 	 -----
 	 
 	 is_visible = true,
@@ -283,45 +284,52 @@ mobs.register_mob(
 	}
 )
 
-
+]]--
 
 mobs.register_mob(
 	{
-	 mobname = "exploder",
+	 mobname = "creeper",
 	 physical = true,
 	 collide_with_objects = false,
-	 collisionbox = {-0.37, -0.4, -0.37, 0.37, 0.5, 0.37},
+	 collisionbox = {-0.37,0, -0.37, 0.37, 0.5, 0.37},
 	 visual = "mesh",
-	 visual_size = {x = 3, y = 3},
-	 mesh = "exploder.b3d",
+	 visual_size = {x = 3.2, y = 3.2},
+	 mesh = "creeper.b3d",
 	 textures = {
-		"creepig_body.png","creepig_leg.png","creepig_leg.png","creepig_leg.png","creepig_leg.png"
+		"creeper.png"
 	},
 	 is_visible = true,
 	 pointable = true,
-	 automatic_face_movement_dir = 0,
 	 automatic_face_movement_max_rotation_per_sec = 300,
 	 makes_footstep_sound = false,
 	 hp = 10,
 	 gravity = {x = 0, y = -9.81, z = 0},
 	 movement_type = "walk",
-	 max_speed = 4,
+	 max_speed = 0.1,
 	 hostile = false,
 	 state = 0,
 	 view_distance = 20,
 	 item_drop = "mob:cooked_porkchop",
 	  
-	 standing_frame = {x=5,y=5},
-	 moving_frame = {x=0,y=20},
-	 animation_multiplier = 10,
+	 standing_frame = {x=0,y=0},
+	 moving_frame = {x=0,y=40},
+	 animation_multiplier = 20,
 	 ----
+	 
+	 
+	 --these are used to anchor a point to the head position
+	 -----
+	 automatic_face_movement_dir = -90,
+	 head_bone = "head",
+	 debug_head_pos = true,
+	 head_directional_offset = 2, --used in vector.multiply(minetest.yaw_to_dir(body_yaw),head_offset)
+	 head_height_offset = 1.45, --added to the base y position
+	 head_rotation_offset = 0,
+	 --use this to correct the head position initially because it becomes severly offset - look at your blender model to get this perfect
+	 head_position_correction = vector.new(0,2.4,0),
+	 head_coord = "vertical",
+	 -----
 	  
-	 has_head = false, --remove this when mesh based head rotation is implemented
-	 --head_visual = "mesh",
-	 --head_visual_size = {x = 1, y = 1},
-	 --head_mesh = "pig_head.x",
-	 --head_textures ={"creepig_head.png","creepig_nose.png"},
-	 --head_mount = vector.new(0,1.2,1.9),
 	 
 	 death_rotation = "x",
 	 
@@ -340,4 +348,4 @@ mobs.register_mob(
 	 --die_in_light_level = 12,
 	}
 )
-]]--
+

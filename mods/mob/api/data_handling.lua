@@ -52,20 +52,19 @@ mobs.create_data_handling_functions = function(def,mob_register)
 	mob_register.debug_nametag = function(self,dtime)
 		--we're doing this to the child because the nametage breaks the
 		--animation on the mob's body
-		if self.child then
-			--we add in items we want to see in this list
-			local debug_items = {"hostile_timer","hostile"}
-			local text = ""
-			for _,item in pairs(debug_items) do
-				if self[item] ~= nil then
-					text = text..item..": "..tostring(self[item]).."\n"
-				end
+		
+		--we add in items we want to see in this list
+		local debug_items = {"hostile_timer","hostile"}
+		local text = ""
+		for _,item in pairs(debug_items) do
+			if self[item] ~= nil then
+				text = text..item..": "..tostring(self[item]).."\n"
 			end
-			self.child:set_nametag_attributes({
-			color = "white",
-			text = text
-			})
 		end
+		self.child:set_nametag_attributes({
+		color = "white",
+		text = text
+		})
 	end
 	return(mob_register)
 end

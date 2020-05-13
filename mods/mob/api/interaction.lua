@@ -257,7 +257,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 				
 				if self.hostile == true then
 					
-					self.direction = vector.direction(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z))
+					
 					local distance = vector.distance(pos,pos2)
 					
 					
@@ -298,10 +298,8 @@ mobs.create_interaction_functions = function(def,mob_register)
 							end
 						end
 					end
-					--self.speed = distance * 4
-					--if self.speed > self.max_speed then
+					self.direction = vector.direction(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z))
 					self.speed = self.max_speed
-					--end
 					self.following = true
 				end
 				--only look at one player
