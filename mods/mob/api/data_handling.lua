@@ -9,7 +9,6 @@ mobs.create_data_handling_functions = function(def,mob_register)
 			hostile_timer = self.hostile_timer,
 			death_animation_timer = self.death_animation_timer,
 			dead = self.dead,
-
 			tnt_timer = self.tnt_timer,
 			tnt_tick_timer = self.tnt_tick_timer,
 			tnt_mod_state = self.tnt_mod_state,
@@ -35,7 +34,6 @@ mobs.create_data_handling_functions = function(def,mob_register)
 				self.hostile_timer = data.hostile_timer
 				self.death_animation_timer = data.death_animation_timer
 				self.dead = data.dead
-
 				self.tnt_timer = data.tnt_timer
 				self.tnt_tick_timer = data.tnt_tick_timer
 				self.tnt_mod_state = data.tnt_mod_state
@@ -66,14 +64,14 @@ mobs.create_data_handling_functions = function(def,mob_register)
 		--animation on the mob's body
 		
 		--we add in items we want to see in this list
-		local debug_items = {"hostile_timer","hostile"}
+		local debug_items = {"hostile"}
 		local text = ""
 		for _,item in pairs(debug_items) do
 			if self[item] ~= nil then
 				text = text..item..": "..tostring(self[item]).."\n"
 			end
 		end
-		self.child:set_nametag_attributes({
+		self.object:set_nametag_attributes({
 		color = "white",
 		text = text
 		})

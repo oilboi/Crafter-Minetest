@@ -370,6 +370,7 @@ mobs.register_mob(
 	 movement_type = "walk",
 	 max_speed = 4,
 	 hostile = true,
+	 hostile_cooldown = false,
 	 state = 0,
 	 view_distance = 20,
 	 item_drop = "mob:cooked_porkchop",
@@ -378,7 +379,7 @@ mobs.register_mob(
 	 moving_frame = {x=0,y=40},
 	 animation_multiplier = 20,
 	 ----
-	 
+	 pathfinds = true,
 	 
 	 --these are used to anchor a point to the head position
 	 -----

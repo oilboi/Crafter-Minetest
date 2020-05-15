@@ -13,12 +13,14 @@ mobs.create_timer_functions = function(def,mob_register)
 
 	--this controls the hostile state
 	if def.hostile == true or def.attacked_hostile == true then
-		mob_register.manage_hostile_timer = function(self,dtime)
-			if self.hostile_timer > 0 then
-				self.hostile_timer = self.hostile_timer - dtime
-			end
-			if self.hostile_timer <= 0 then
-				self.hostile = false
+		if def.hostile_cooldown == true then
+			mob_register.manage_hostile_timer = function(self,dtime)
+				if self.hostile_timer > 0 then
+					self.hostile_timer = self.hostile_timer - dtime
+				end
+				if self.hostile_timer <= 0 then
+					self.hostile = false
+				end
 			end
 		end
 	end

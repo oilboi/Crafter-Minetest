@@ -248,13 +248,13 @@ mobs.create_interaction_functions = function(def,mob_register)
 				local pos2 = object:get_pos()
 				pos2.y = pos2.y + 1.625
 				
-				player_found = false
+				player_found = true
 				
 				if self.head_bone then
- 					player_found = self.move_head(self,pos2,dtime)
+ 					self.move_head(self,pos2,dtime)
 				end
 				
-				
+				--print(self.hostile)
 				if self.hostile == true then
 					local distance = vector.distance(pos,pos2)
 					

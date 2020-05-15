@@ -56,6 +56,7 @@ mob_register.dead = false
 
 mob_register.mob = true
 mob_register.hostile = def.hostile
+mob_register.hostile_cooldown = def.hostile_cooldown
 
 mob_register.hostile_timer = 0
 mob_register.timer = 0
@@ -140,7 +141,7 @@ mob_register.on_step = function(self, dtime)
 		end
 		
 		self.manage_punch_timer(self,dtime)
-		--self.debug_nametag(self,dtime)
+		self.debug_nametag(self,dtime)
 	else
 		self.manage_death_animation(self,dtime)
 		self.move_head(self,nil,dtime)
