@@ -129,7 +129,7 @@ function tnt(pos,range)
 									local power = (range - vector.distance(pos,ppos))*2
 									local dir = vector.subtract(ppos,pos)
 									local force = vector.multiply(dir,power)
-									obj:setvelocity(force)
+									obj:set_velocity(force)
 								end
 							end
 						end
@@ -148,7 +148,7 @@ function tnt(pos,range)
 	
 	--throw players and items
 	for _,object in ipairs(minetest.get_objects_inside_radius(pos, range)) do
-		if object:is_player() or (object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt")) then
+		if object:is_player() or (object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt" or object:get_luaentity().is_mob == true)) then
 			local do_it = true
 			if not object:is_player() and object:get_luaentity().name == "tnt:tnt" then
 				local in_node = minetest.get_node(object:get_pos()).name
@@ -157,7 +157,7 @@ function tnt(pos,range)
 				end
 			end
 			if do_it == true then
-				local ppos = object:getpos()
+				local ppos = object:get_pos()
 				if object:is_player() then
 					ppos.y = ppos.y + 1
 				end
@@ -170,7 +170,6 @@ function tnt(pos,range)
 						clear = false
 					end
 				end
-				
 				if clear == true then
 					local power = (range - vector.distance(pos,ppos))*10
 					
@@ -183,10 +182,16 @@ function tnt(pos,range)
 							object:set_hp(hp - math.floor(power*2))
 						end
 						object:add_player_velocity(force)
-					elseif object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt") then
-						object:setvelocity(force)
+					elseif object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt" or object:get_luaentity().is_mob == true)  then
 						if object:get_luaentity().name == "tnt:tnt" then
 							object:get_luaentity().shot = true
+						elseif object:get_luaentity().is_mob == true then
+							object:punch(object, 2, 
+								{
+								full_punch_interval=1.5,
+								damage_groups = {damage=math.floor(power*2)},
+								})
+							object:set_velocity(force)
 						end
 					end
 				end
@@ -284,7 +289,7 @@ minetest.register_entity("tnt:tnt", {
 	end,
 		
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-		local obj = minetest.add_item(self.object:getpos(), "tnt:tnt")
+		local obj = minetest.add_item(self.object:get_pos(), "tnt:tnt")
 		self.object:remove()
 	end,
 
