@@ -2,7 +2,7 @@
 mobs.create_movement_functions = function(def,mob_register)
 	--makes the mob swim
 	mob_register.swim = function(self,dtime)
-		local pos = self.object:getpos()
+		local pos = self.object:get_pos()
 		pos.y = pos.y + 0.3
 		local node = minetest.get_node(pos).name
 		self.swimming = false
@@ -25,7 +25,7 @@ mobs.create_movement_functions = function(def,mob_register)
 	local get_node = minetest.get_node
 	mob_register.hurt_inside = function(self,dtime)
 		if self.hp > 0 and self.hurt_inside_timer <= 0 then
-			local pos = self.object:getpos()
+			local pos = self.object:get_pos()
 			local hurty = get_group(get_node(pos).name, "hurt_inside")
 			if hurty > 0 then
 				self.object:punch(self.object, 2, 
@@ -64,7 +64,7 @@ mobs.create_movement_functions = function(def,mob_register)
 
 			self.hurt_inside(self,dtime)
 
-			local currentvel = self.object:getvelocity()
+			local currentvel = self.object:get_velocity()
 			local goal = vector.multiply(self.direction,self.speed)
 			local acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
 			acceleration = vector.multiply(acceleration, 0.05)

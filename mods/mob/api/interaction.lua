@@ -54,8 +54,8 @@ mobs.create_interaction_functions = function(def,mob_register)
 				
 				local velocity = vector.multiply(dir,1.1)
 				
-				vel1 = vector.multiply(velocity, -1)
-				vel2 = velocity
+				local vel1 = vector.multiply(velocity, -1)
+				local vel2 = velocity
 				self.object:add_velocity(vel1)
 				
 				if object:is_player() then
