@@ -5,9 +5,9 @@ arrow.initial_properties = {
 	collisionbox = {-0.37, -0.4, -0.37, 0.37, 0.5, 0.37},
 	visual = "mesh",
 	visual_size = {x = 1 , y = 1},
-	mesh = "arrow.x",
+	mesh = "basic_bow_arrow.b3d",
 	textures = {
-		"arrow_core.png","front_alpha.png","front_alpha.png"
+		"basic_bow_arrow_uv.png"
 	},
 	pointable = false,
 	glow = -1,
@@ -22,12 +22,14 @@ end
 local radians_to_degrees = function(radians)
 	return(radians*180.0/math.pi)
 end
-
+arrow.spin = 0
 arrow.on_step = function(self, dtime)
 	local pos = self.object:get_pos()
     local vel = self.object:get_velocity()
-    
-    
+	self.spin = self.spin + (dtime*10)
+	if self.spin > math.pi then
+		self.spin = -math.pi
+	end
     for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
 		if (object:is_player() and object:get_hp() > 0 and object:get_player_name() ~= self.thrower) or (object:get_luaentity() and object:get_luaentity().mob == true) then
             if object:is_player() then
@@ -56,22 +58,16 @@ arrow.on_step = function(self, dtime)
         minetest.throw_item(pos, "bow:arrow")
         self.object:remove()
     end
-	if self.old_pos then
-		local yaw = minetest.dir_to_yaw(vector.direction(pos,self.old_pos))+(math.pi/2)
-		
-		self.object:set_yaw(yaw)
-		
-		local triangle = vector.new(vector.distance(pos,self.old_pos),0,self.old_pos.y-pos.y)
-				
-		local tri_yaw = minetest.dir_to_yaw(triangle)+(math.pi/2)
-		
-		pitch = radians_to_degrees(tri_yaw)
-		
-		pitch = 90-(math.floor(pitch + 0.5)*2)
-		
-		self.object:set_animation({x=pitch,y=pitch}, 15, 0, true)
+	
+	if pos and self.oldpos then
+		local dir = vector.normalize(vector.subtract(pos,self.oldpos))
+		local y = minetest.dir_to_yaw(dir)
+		local x = (minetest.dir_to_yaw(vector.new(vector.distance(vector.new(pos.x,0,pos.z),vector.new(self.oldpos.x,0,self.oldpos.z)),0,pos.y-self.oldpos.y))+(math.pi/2))
+		self.object:set_rotation(vector.new(x,y,self.spin))
+		--local frame = self.get_animation_frame(dir)
+		--self.object:set_animation({x=frame, y=frame}, 0)
 	end
-	self.old_pos = pos
+	self.oldpos = pos
     self.oldvel = vel
 end
 minetest.register_entity("bow:arrow", arrow)
