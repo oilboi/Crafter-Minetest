@@ -1,6 +1,6 @@
 --Quick definition of hoes
-local material = {"wood","stone","iron","gold","diamond"}
-
+local material  = {"wood","stone","iron","gold","diamond"}
+local construct = {"wood","cobble","iron","gold","diamond"}
 local function till_soil(pos)
 	local nodey = minetest.get_node(pos).name
 	local is_dirt = (nodey == "main:dirt" or nodey == "main:grass")
@@ -94,7 +94,7 @@ for level,material in pairs(material) do
 	minetest.register_craft({
 		output = "farming:"..material.."hoe",
 		recipe = {
-			{"","main:"..material, "main:"..material},
+			{"","main:"..construct[level], "main:"..construct[level]},
 			{"","main:stick", ""},
 			{"", "main:stick", ""}
 		}
@@ -102,7 +102,7 @@ for level,material in pairs(material) do
 	minetest.register_craft({
 		output = "farming:"..material.."hoe",
 		recipe = {
-			{"main:"..material,"main:"..material, ""},
+			{"main:"..construct[level],"main:"..construct[level], ""},
 			{"","main:stick", ""},
 			{"", "main:stick", ""}
 		}
