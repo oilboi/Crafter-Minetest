@@ -66,21 +66,22 @@ mobs.create_interaction_functions = function(def,mob_register)
 			end
 		end
 	end
-	
-	mob_register.fall_damage = function(self)
-		local vel = self.object:get_velocity()
-		if vel and self.oldvel then
-		   if self.oldvel.y < -7 and vel.y == 0 then
-			  local damage = math.abs(self.oldvel.y + 7)
-			  damage = math.floor(damage/1.5)
-			  self.object:punch(self.object, 2, 
-				 {
-				  full_punch_interval=1.5,
-				  damage_groups = {damage=damage},
-				 })
-		   end
+	if def.takes_fall_damage == nil or def.takes_fall_damage == true then
+		mob_register.fall_damage = function(self)
+			local vel = self.object:get_velocity()
+			if vel and self.oldvel then
+				if self.oldvel.y < -7 and vel.y == 0 then
+					local damage = math.abs(self.oldvel.y + 7)
+					damage = math.floor(damage/1.5)
+					self.object:punch(self.object, 2, 
+						{
+						full_punch_interval=1.5,
+						damage_groups = {damage=damage},
+						})
+				end
+			end
+			self.oldvel = vel
 		end
-		self.oldvel = vel
 	end
 
 	--this controls what happens when the mob gets punched

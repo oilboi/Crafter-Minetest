@@ -96,6 +96,7 @@ mob_register.attacked_hostile = def.attacked_hostile
 mob_register.projectile_timer = 0
 mob_register.projectile_type = def.projectile_type
 
+mob_register.takes_fall_damage = def.takes_fall_damage or true
 
 mob_register.item_drop = def.item_drop
 mob_register.item_minimum = def.item_minimum or 1
@@ -128,7 +129,9 @@ mob_register.on_step = function(self, dtime)
 	end
 	
 	self.collision_detection(self)
-	self.fall_damage(self)
+	if self.fall_damage then
+		self.fall_damage(self)
+	end
 	
 	if self.dead == false and self.death_animation_timer == 0 then
 		self.move(self,dtime)
