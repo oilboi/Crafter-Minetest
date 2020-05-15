@@ -132,7 +132,7 @@ mob_register.on_step = function(self, dtime)
 	
 	if self.dead == false and self.death_animation_timer == 0 then
 		self.move(self,dtime)
-		
+		--self.debug_nametag(self,dtime)
 		self.manage_hurt_color_timer(self,dtime)
 		self.set_animation(self)
 		
@@ -141,7 +141,6 @@ mob_register.on_step = function(self, dtime)
 		end
 		
 		self.manage_punch_timer(self,dtime)
-		self.debug_nametag(self,dtime)
 	else
 		self.manage_death_animation(self,dtime)
 		self.move_head(self,nil,dtime)
