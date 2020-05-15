@@ -97,6 +97,7 @@ mob_register.projectile_timer = 0
 mob_register.projectile_type = def.projectile_type
 
 mob_register.takes_fall_damage = def.takes_fall_damage or true
+mob_register.make_jump_noise = def.make_jump_noise
 
 mob_register.item_drop = def.item_drop
 mob_register.item_minimum = def.item_minimum or 1

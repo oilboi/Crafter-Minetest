@@ -108,6 +108,7 @@ mobs.register_mob(
 	 automatic_face_movement_max_rotation_per_sec = 300,
 	 makes_footstep_sound = false,
 	 takes_fall_damage = false,
+	 make_jump_noise = false,
 	 hp = 10,
 	 gravity = {x = 0, y = -1, z = 0},
 	 movement_type = "jump",
