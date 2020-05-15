@@ -102,7 +102,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	-- Create a flat array of noise values from the perlin map, with the
 	-- minimum point being 'minp'.
 	-- Set the buffer parameter to use and reuse 'nvals_terrain' for this.
-	nobj_terrain:get3dMap_flat(minp, nvals_terrain)
+	nobj_terrain:get_3d_map_flat(minp, nvals_terrain)
 
 	-- Voxelmanip stuff.
 
