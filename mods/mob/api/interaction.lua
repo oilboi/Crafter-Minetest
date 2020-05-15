@@ -241,6 +241,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 		--and follow!
 		self.following = false
 		local player_found = false
+
 		for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.view_distance)) do
 			if object:is_player() and player_found == false and object:get_hp() > 0 then
 				--look at player's camera
@@ -306,7 +307,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 		end
 		--stare straight if not found
 		if player_found == false then
-			--self.move_head(self,nil,dtime)
+			self.move_head(self,nil,dtime)
 			if self.manage_hostile_timer then
 				self.manage_hostile_timer(self,dtime)
 			end
