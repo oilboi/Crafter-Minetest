@@ -110,6 +110,9 @@ mob_register.mob = true
 
 mob_register.collision_boundary = def.collision_boundary or 1
 
+if def.pathfinds then
+	mob_register.path = {}
+end
 
 mobs.create_movement_functions(def,mob_register)
 mobs.create_interaction_functions(def,mob_register)

@@ -272,7 +272,8 @@ mobs.create_interaction_functions = function(def,mob_register)
 							end
 						end
 					elseif self.attack_type == "explode" then
-						if distance <  self.explosion_radius then
+						--mob will not explode if it cannot see you
+						if distance <  self.explosion_radius and minetest.line_of_sight(vector.new(pos.x,pos.y+self.object:get_properties().collisionbox[5],pos.z), pos2) then
 							
 							if not self.tnt_timer then
 								minetest.sound_play("tnt_ignite", {object = self.object, gain = 1.0,})

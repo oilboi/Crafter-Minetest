@@ -143,6 +143,10 @@ mobs.create_movement_functions = function(def,mob_register)
 		end
 	end
 	
+	if def.pathfinds then
+
+
+	end
 	
 	return(mob_register)
 end
