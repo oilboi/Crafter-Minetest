@@ -111,7 +111,7 @@ mobs.register_mob(
 	 make_jump_noise = false,
 	 hp = 10,
 	 gravity = {x = 0, y = -1, z = 0},
-	 movement_type = "jump",
+	 movement_type = "walk",
 	 max_speed = 5,
 	 state = 0,
 	 view_distance = 15,
