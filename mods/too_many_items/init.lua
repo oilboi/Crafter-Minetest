@@ -368,9 +368,9 @@ crafting_table_inv = "size[17.2,8.75]"..
 pages = 0
 
 --run through the items and then set the pages
+inv = {}
 minetest.register_on_mods_loaded(function()
 local item_counter = 0
-inv = {}
 
 local page = 0
 inv["page_"..page] = ""

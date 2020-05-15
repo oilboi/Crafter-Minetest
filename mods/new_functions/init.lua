@@ -1,4 +1,4 @@
-local get_group = minetest.get_node_group
+local get_group = minetest.get_item_group
 local registered_nodes
 local get_node = minetest.get_node
 --add nodes that hurt the player into the touch hurt table
@@ -79,7 +79,7 @@ local heart
 local legs
 local head
 local hurt_more
-
+local name = ""
 local function handle_hurt_inside(player)
 	if player:get_hp() > 0 then
 		player_pos = player:get_pos()
@@ -108,6 +108,7 @@ local head
 local hurt_more
 local drawy
 local legs
+local name = ""
 local function handle_player_suffocation(player)
 	if player:get_hp() > 0 then
 		player_pos = player:get_pos()
@@ -137,7 +138,7 @@ end
 local get_node = minetest.get_node
 local pos
 local node
-local name
+local name = ""
 local damage_pos
 local collisionbox
 local a_min
@@ -203,8 +204,11 @@ local function index_players_surroundings()
 		index_players_surroundings()
 	end)
 end
-
-index_players_surroundings() --begin
+minetest.register_on_mods_loaded(function()
+	minetest.after(0,function()
+		index_players_surroundings() --begin
+	end)
+end)
 
 
 --completely destroy the breath bar
@@ -288,5 +292,8 @@ local function fix_breath_hack()
 		fix_breath_hack()
 	end)
 end
-
-fix_breath_hack()
+minetest.register_on_mods_loaded(function()
+	minetest.after(0,function()
+		fix_breath_hack()
+	end)
+end)

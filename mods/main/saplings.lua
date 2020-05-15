@@ -57,7 +57,7 @@ minetest.register_node("main:sapling", {
 		type = "fixed",
 		fixed = {-4 / 16, -0.5, -4 / 16, 4 / 16, 7 / 16, 4 / 16}
 	},
-	on_place =  on_rightclick or function(itemstack, placer, pointed_thing)
+	on_place =  function(itemstack, placer, pointed_thing)
 		if not pointed_thing.type == "node" then
 			return
 		end

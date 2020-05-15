@@ -1,5 +1,3 @@
-print("Initialized Main")
-
 main = {}
 
 local path = minetest.get_modpath("main")

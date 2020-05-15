@@ -217,8 +217,11 @@ local function do_snow()
 		do_snow()
 	end)
 end
-
-do_snow()
+minetest.register_on_mods_loaded(function()
+	minetest.after(0,function()
+		do_snow()
+	end)
+end)
 
 
 
@@ -233,7 +236,11 @@ local function randomize_weather()
 		randomize_weather()
 	end)
 end
-randomize_weather()
+minetest.register_on_mods_loaded(function()
+	minetest.after(0,function()
+		randomize_weather()
+	end)
+end)
 
 local snowball_throw = function(player)
 	local pos = player:get_pos()

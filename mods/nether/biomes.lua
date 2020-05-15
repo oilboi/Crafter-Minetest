@@ -38,12 +38,11 @@ minetest.register_decoration({
 --hi paramat :D
 
 -- Set the 3D noise parameters for the terrain.
-local perlin= minetest.get_mapgen_params()
 local np_terrain = {
 	offset = 0,
 	scale = 1,
 	spread = {x = 384, y = 192, z = 384},
-	seed = 5900033, --perlin.seed
+	seed = tonumber(minetest.get_mapgen_setting("seed")) or math.random(0,999999999),
 	octaves = 5,
 	persist = 0.63,
 	lacunarity = 2.0,

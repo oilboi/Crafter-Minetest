@@ -3,6 +3,7 @@ for i = 0,1 do
 	local light_level = i * 9
 	local groups
 	local on_punch = nil
+	local on_timer
 	if i == 0 then
 		groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1}
 		on_punch = function(pos, node, puncher, pointed_thing)

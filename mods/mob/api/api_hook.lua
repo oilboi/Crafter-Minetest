@@ -13,7 +13,7 @@ mobs.register_mob = function(def)
 
 
 
-mob_register = {}
+local mob_register = {}
 
 ------------------------------------------------
 mob_register.initial_properties = {

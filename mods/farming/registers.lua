@@ -121,7 +121,6 @@ minetest.register_plant("wheat", {
 	    tiles = {"wheat_stage"}, --automatically adds _X.png
 	    paramtype2 = "degrotate",
 	    buildable_to = false,
-	    grow_stage = i,
 	    groups = {leaves = 1, plant = 1, axe = 1, hand = 0,dig_immediate=1,attached_node=1,crops=1},
 	    sounds = main.grassSound(),
 	    sunlight_propagates = true,

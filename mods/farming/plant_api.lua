@@ -3,7 +3,7 @@
  local plant_max = 240
  
  minetest.register_plant = function(name,def)
-	 max = 1
+	local max = 1
 	 if def.stages then
 		 max = def.stages
 	 end

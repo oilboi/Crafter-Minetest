@@ -42,7 +42,6 @@ minetest.register_node("nether:glowstone", {
     end,
     drop = {
 			max_items = 5,
-			tools = tool_required,
 			items= {
 				{
 					tools = {"main:ironpick","main:goldpick","main:diamondpick"},

@@ -184,7 +184,11 @@ local function hunger_update()
 	end)
 end
 
-hunger_update()
+minetest.register_on_mods_loaded(function()
+	minetest.after(0,function()
+		hunger_update()
+	end)
+end)
 
 --take away hunger and satiation randomly while mining
 minetest.register_on_dignode(function(pos, oldnode, digger)

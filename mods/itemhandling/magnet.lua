@@ -16,7 +16,7 @@ minetest.register_globalstep(function(dtime)
                             
             meta:set_float("experience_collection_buffer", experience_collection_buffer)
                             
-			local pos = player:getpos()
+			local pos = player:get_pos()
 			local inv = player:get_inventory()
 			--radial detection
 			for _,object in ipairs(minetest.get_objects_inside_radius({x=pos.x,y=pos.y+0.5,z=pos.z}, 2)) do
