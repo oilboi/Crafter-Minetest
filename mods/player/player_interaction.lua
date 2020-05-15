@@ -13,7 +13,7 @@ end, true)
 
 --throw all items on death
 minetest.register_on_dieplayer(function(player, reason)
-	local pos = player:getpos()
+	local pos = player:get_pos()
 	local inv = player:get_inventory()
 	
 	for i = 1,inv:get_size("main") do
@@ -23,7 +23,7 @@ minetest.register_on_dieplayer(function(player, reason)
 		if name ~= "" then
 			local obj = minetest.add_item(pos, name.." "..count)
 			if obj then
-				obj:setvelocity(vector.new(math.random(-3,3),math.random(4,8),math.random(-3,3)))
+				obj:set_velocity(vector.new(math.random(-3,3),math.random(4,8),math.random(-3,3)))
 			end
 			inv:set_stack("main", i, ItemStack(""))
 		else
@@ -36,7 +36,7 @@ end)
 --this dumps the players crafting table on closing the inventory
 dump_craft = function(player)
 	local inv = player:get_inventory()
-	local pos = player:getpos()
+	local pos = player:get_pos()
 	pos.y = pos.y + player:get_properties().eye_height
 	for i = 1,inv:get_size("craft") do
 		local item = inv:get_stack("craft", i)
@@ -45,7 +45,7 @@ dump_craft = function(player)
 			local x=math.random(-2,2)*math.random()
 			local y=math.random(2,5)
 			local z=math.random(-2,2)*math.random()
-			obj:setvelocity({x=x, y=y, z=z})
+			obj:set_velocity({x=x, y=y, z=z})
 		end
 		inv:set_stack("craft", i, nil)
 	end
