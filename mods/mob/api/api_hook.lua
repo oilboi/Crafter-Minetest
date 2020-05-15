@@ -78,6 +78,9 @@ mob_register.hurt_sound = def.hurt_sound
 mob_register.die_sound = def.die_sound
 
 mob_register.attack_type = def.attack_type
+if def.attack_type == "explode" then
+	mob_register.tnt_tick_timer = 0
+end
 mob_register.explosion_radius = def.explosion_radius
 mob_register.explosion_power = def.explosion_power
 mob_register.tnt_timer = nil

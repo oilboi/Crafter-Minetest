@@ -281,6 +281,8 @@ mobs.create_interaction_functions = function(def,mob_register)
 							if not self.tnt_timer then
 								minetest.sound_play("tnt_ignite", {object = self.object, gain = 1.0,})
 								self.tnt_timer = self.explosion_time
+								self.tnt_tick_timer  = 0.2
+								self.tnt_mod_state = 1
 								self.object:set_texture_mod("^[colorize:white:130")
 							end
 						end

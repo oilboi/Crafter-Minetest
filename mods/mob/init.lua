@@ -368,8 +368,8 @@ mobs.register_mob(
 	 hp = 10,
 	 gravity = {x = 0, y = -9.81, z = 0},
 	 movement_type = "walk",
-	 max_speed = 6,
-	 hostile = false,
+	 max_speed = 4,
+	 hostile = true,
 	 state = 0,
 	 view_distance = 20,
 	 item_drop = "mob:cooked_porkchop",
@@ -405,7 +405,7 @@ mobs.register_mob(
 	 
 	 explosion_radius = 2, -- how far away the mob has to be to initialize the explosion
 	 explosion_power = 7, -- how big the explosion has to be
-	 explosion_time = 5, -- how long it takes for a mob to explode
+	 explosion_time = 3, -- how long it takes for a mob to explode
 	 
 	 die_in_light = false,
 	 --die_in_light_level = 12,
