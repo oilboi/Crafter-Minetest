@@ -106,8 +106,6 @@ mobs.create_interaction_functions = function(def,mob_register)
 		end
 		
 		local hp = hp-hurt
-		
-		print(self.punched_timer)
 
 		if (self.punched_timer <= 0 and hp > 1) and not self.dead then
 			self.object:set_texture_mod("^[colorize:red:130")
@@ -249,10 +247,10 @@ mobs.create_interaction_functions = function(def,mob_register)
 				local pos2 = object:get_pos()
 				pos2.y = pos2.y + 1.625
 				
-				player_found = true
+				player_found = false
 				
 				if self.head_bone then
- 					self.move_head(self,pos2,dtime)
+ 					player_found = self.move_head(self,pos2,dtime)
 				end
 				
 				
