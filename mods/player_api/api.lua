@@ -56,7 +56,7 @@ function player_api.set_wielded_item(player)
 	
 	if itemstring ~= player_wield_item then
 		wielded_item[name]:get_luaentity().itemstring = player_wield_item
-		local obj = wielded_item[name]:get_luaentity():set_item(obj, player_wield_item)
+		wielded_item[name]:get_luaentity():set_item(player_wield_item)
 	end
 end
 
