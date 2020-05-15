@@ -23,6 +23,7 @@ local radians_to_degrees = function(radians)
 	return(radians*180.0/math.pi)
 end
 arrow.spin = 0
+arrow.owner = ""
 arrow.on_step = function(self, dtime)
 	local pos = self.object:get_pos()
     local vel = self.object:get_velocity()
@@ -30,24 +31,27 @@ arrow.on_step = function(self, dtime)
 	if self.spin > math.pi then
 		self.spin = -math.pi
 	end
-    for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
+    for _,object in ipairs(minetest.get_objects_inside_radius(pos, 2)) do
 		if (object:is_player() and object:get_hp() > 0 and object:get_player_name() ~= self.thrower) or (object:get_luaentity() and object:get_luaentity().mob == true) then
-            if object:is_player() then
+            if object:is_player() and object:get_player_name() ~= self.owner then
                 object:punch(self.object, 2, 
                     {
                     full_punch_interval=1.5,
                     damage_groups = {fleshy=3},
-                })
-            else
+				})
+				hit = true
+				self.object:remove()
+				break
+            elseif not object:is_player() then
                 object:punch(self.object, 2, 
                     {
                     full_punch_interval=1.5,
                     damage_groups = {damage=3},
-                })
+				})
+				hit = true
+				self.object:remove()
+				break
             end
-			hit = true
-            self.object:remove()
-			break
 		end
 	end
     
@@ -142,6 +146,7 @@ minetest.register_globalstep(function(dtime)
 					pos.y = pos.y + 1.625
 					local object = minetest.add_entity(pos,"bow:arrow")
 					object:set_velocity(vel)
+					object:get_luaentity().owner = player:get_player_name()
 					minetest.sound_play("bow", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
 				end
 			
