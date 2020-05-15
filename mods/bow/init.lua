@@ -49,7 +49,10 @@ arrow.on_step = function(self, dtime)
 		end
 	end
     
-    if (self.oldvel and ((vel.x == 0 and self.oldvel.x ~= 0) or (vel.y == 0 and self.oldvel.y ~= 0) or (vel.x == 0 and self.oldvel.x ~= 0))) then
+	if (self.oldvel and ((vel.x == 0 and self.oldvel.x ~= 0) or (vel.z == 0 and self.oldvel.z ~= 0) or (vel.y == 0 and self.oldvel.y ~= 0))) then
+		--self.object:set_velocity(vector.new(0,0,0))
+		--self.object:set_acceleration(vector.new(0,0,0))
+		minetest.sound_play("arrow_hit",{object=self.object,gain=1,pitch=math.random(80,100)/100,max_hear_distance=64})
         minetest.throw_item(pos, "bow:arrow")
         self.object:remove()
     end
@@ -69,7 +72,6 @@ arrow.on_step = function(self, dtime)
 		self.object:set_animation({x=pitch,y=pitch}, 15, 0, true)
 	end
 	self.old_pos = pos
-    
     self.oldvel = vel
 end
 minetest.register_entity("bow:arrow", arrow)
