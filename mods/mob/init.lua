@@ -108,13 +108,16 @@ mobs.register_mob(
 	 automatic_face_movement_max_rotation_per_sec = 300,
 	 makes_footstep_sound = false,
 	 hp = 10,
-	 gravity = {x = 0, y = -9.81, z = 0},
+	 gravity = {x = 0, y = -1, z = 0},
 	 movement_type = "walk",
 	 max_speed = 5,
 	 state = 0,
 	 view_distance = 15,
 	 
-	 item_drop = "mob:raw_porkchop", 
+	 item_drop = "main:gold", 
+	 item_minimum = 4,
+	 item_max = 5,
+
 	 standing_frame = {x=0,y=0},
 	 moving_frame = {x=0,y=40},
 	 animation_multiplier = 20,

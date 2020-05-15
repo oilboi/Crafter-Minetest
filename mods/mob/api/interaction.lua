@@ -203,9 +203,9 @@ mobs.create_interaction_functions = function(def,mob_register)
 		--only throw items if registered
 		if self.item_drop then
 			--detect if multiple items are going to be added
-			if self.item_amount  and self.item_minumum then
-				local data_item_amount = math.random(self.item_minimum, self.item_amount)
-				for i = self.item_minimum,data_item_amount do
+			if self.item_max then
+				local data_item_amount = math.random(self.item_minimum, self.item_max)
+				for i = 1 ,data_item_amount do
 					minetest.throw_item(pos,self.item_drop)
 				end
 			else

@@ -98,8 +98,8 @@ mob_register.projectile_type = def.projectile_type
 
 
 mob_register.item_drop = def.item_drop
-mob_register.item_minimum = def.item_minimum or def.item_amount
-mob_register.item_amount = def.item_amount
+mob_register.item_minimum = def.item_minimum or 1
+mob_register.item_max = def.item_max
 
 mob_register.die_in_light = def.die_in_light
 mob_register.die_in_light_level = def.die_in_light_level
