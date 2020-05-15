@@ -21,7 +21,7 @@ mobs.create_movement_functions = function(def,mob_register)
 		end
 	end
 
-	local get_group = minetest.get_node_group
+	local get_group = minetest.get_item_group
 	local get_node = minetest.get_node
 	mob_register.hurt_inside = function(self,dtime)
 		if self.hp > 0 and self.hurt_inside_timer <= 0 then

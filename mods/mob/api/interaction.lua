@@ -107,6 +107,9 @@ mobs.create_interaction_functions = function(def,mob_register)
 		
 		local hp = hp-hurt
 		
+		self.object:set_texture_mod("^[colorize:red:130")
+		self.hurt_color_timer = 0.25
+
 		if (self.punched_timer <= 0 and hp > 1) and not self.dead then
 			if puncher ~= self.object then
 				if self.attacked_hostile then
@@ -169,8 +172,6 @@ mobs.create_interaction_functions = function(def,mob_register)
 				minetest.sound_play("critical", {object=self.object, gain = 0.1, max_hear_distance = 10,pitch = math.random(80,100)/100})
 			end
 			minetest.sound_play(self.die_sound, {object=self.object, gain = 1.0, max_hear_distance = 10,pitch = math.random(80,100)/100})
-			
-			self.object:set_texture_mod("^[colorize:red:130")
 			self.add_sword_wear(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		end
 	end

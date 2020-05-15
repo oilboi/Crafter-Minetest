@@ -12,7 +12,7 @@ mobs.create_timer_functions = function(def,mob_register)
 	end
 
 	--this controls the hostile state
-	if def.hostile == false then
+	if def.hostile == true or def.attacked_hostile == true then
 		mob_register.manage_hostile_timer = function(self,dtime)
 			if self.hostile_timer > 0 then
 				self.hostile_timer = self.hostile_timer - dtime
@@ -23,15 +23,21 @@ mobs.create_timer_functions = function(def,mob_register)
 		end
 	end
 
+	mob_register.manage_hurt_color_timer = function(self,dtime)
+		if self.hurt_color_timer > 0 then
+			self.hurt_color_timer = self.hurt_color_timer - dtime
+			if self.hurt_color_timer  <= 0 then
+				self.hurt_color_timer = 0
+				self.object:set_texture_mod("")
+			end
+		end
+	end
 
 	mob_register.manage_explode_timer = function(self,dtime)
 		self.tnt_timer = self.tnt_timer - dtime
 		if self.tnt_timer <= 0 and not self.dead then
 			
 			self.object:set_texture_mod("^[colorize:red:130")
-			if self.child then
-				self.child:set_texture_mod("^[colorize:red:130") 
-			end
 			
 			local pos = self.object:get_pos()
 			--direction.y = direction.y + 1
