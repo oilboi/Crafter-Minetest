@@ -43,7 +43,7 @@
 				local found = minetest.find_node_near(pos, 3, {"main:water","main:waterflow"})
 				pos.y = pos.y - 1
 				local noder = minetest.get_node(pos).name
-				local found_soil = minetest.get_node_group(noder, "soil") > 0
+				local found_soil = minetest.get_item_group(noder, "soil") > 0
 				local found_self--[[this is deep]]= (noder == nodename)
 				
 				if found and (found_soil or found_self) then

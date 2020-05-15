@@ -36,7 +36,7 @@ mobs.create_animation_functions = function(def,mob_register)
 			end
 			
 			--print(self.death_animation_timer)
-			local currentvel = self.object:getvelocity()
+			local currentvel = self.object:get_velocity()
 			local goal = vector.new(0,0,0)
 			local acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
 			acceleration = vector.multiply(acceleration, 0.05)

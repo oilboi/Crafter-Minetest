@@ -1,7 +1,7 @@
 --hurt sound and disable fall damage group handling
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
 	if reason.type == "fall" then
-		if minetest.get_node_group(minetest.get_node(player:get_pos()).name, "disable_fall_damage") > 0 then
+		if minetest.get_item_group(minetest.get_node(player:get_pos()).name, "disable_fall_damage") > 0 then
 			return(0)
 		end
 	end

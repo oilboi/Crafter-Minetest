@@ -43,7 +43,7 @@ if not creative_mode then
 					end
 				end
 			end
-	        local experience_amount = minetest.get_node_group(minetest.get_node(pos).name,"experience")
+	        local experience_amount = minetest.get_item_group(minetest.get_node(pos).name,"experience")
 	        if experience_amount > 0 then
 	            minetest.throw_experience(pos, experience_amount)
 	        end
@@ -106,7 +106,7 @@ function minetest.throw_item(pos, item)
 		local x=math.random(-2,2)*math.random()
 		local y=math.random(2,5)
 		local z=math.random(-2,2)*math.random()
-		obj:setvelocity({x=x, y=y, z=z})
+		obj:set_velocity({x=x, y=y, z=z})
 	end
 	return obj
 end

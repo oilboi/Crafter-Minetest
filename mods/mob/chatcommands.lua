@@ -27,7 +27,7 @@ minetest.register_chatcommand("spawn", {
 		
 		--add amount of entities if registered
 		if minetest.registered_entities[str] ~= nil then
-			local pos = minetest.get_player_by_name(name):getpos()
+			local pos = minetest.get_player_by_name(name):get_pos()
 			pos.y = pos.y + 1
 			--add in amount through loop
 			if amount > 1 then
