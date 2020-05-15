@@ -321,12 +321,12 @@ mobs.register_mob(
 	 
 	 --these are used to anchor a point to the head position
 	 -----
-	 automatic_face_movement_dir = -90,
+	 automatic_face_movement_dir = 0,
 	 head_bone = "head",
 	 debug_head_pos = true,
-	 head_directional_offset = 2, --used in vector.multiply(minetest.yaw_to_dir(body_yaw),head_offset)
+	 --this always has to be slightly positive
+	 head_directional_offset = 0.01,
 	 head_height_offset = 1.45, --added to the base y position
-	 head_rotation_offset = 0,
 	 --use this to correct the head position initially because it becomes severly offset - look at your blender model to get this perfect
 	 head_position_correction = vector.new(0,2.4,0),
 	 head_coord = "vertical",

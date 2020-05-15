@@ -122,48 +122,38 @@ mobs.create_head_functions = function(def,mob_register)
 					self.return_head_to_origin(self,dtime)
 					return(false)
 				end
-			--[[
+
 			elseif self.head_coord == "vertical" then
-				
 				--print(self.head_bone)
 				local head_position,head_rotation = self.object:get_bone_position(self.head_bone)
-				
-				-- debug
-				if head_rotation then
-					print("test")
+				--[[ debug
+				if rotation then
 					--print("--------------------------------")
-					--head_rotation.x = head_rotation.x + 1
-					head_rotation.y = head_rotation.y + 1
-					head_rotation.z = 0
+					--rotation.x = rotation.x + 1
+					rotation.z = rotation.z + 1
+					rotation.y = 0
 					
-					if head_rotation.x > 90 then
-						 head_rotation.x = -90
+					if rotation.x > 90 then
+						 rotation.x = -90
 					end
-					if head_rotation.z > 90 then
-						 head_rotation.z = -90
-					end
-					if head_rotation.y > 90 then
-						 head_rotation.y = -90
+					if rotation.z > 90 then
+						 rotation.z = -90
 					end
 					
 					--print(rotation.x)
-					self.object:set_bone_position(self.head_bone, head_position, head_rotation)
+					self.object:set_bone_position(self.head_bone, head_position, rotation)
 				end
-				
+				]]--
 				
 				--print(self.head_rotation.y)
 				--if passed a direction to look
-				
 				local pos = self.object:get_pos()
-				local body_yaw = self.object:get_yaw()
-				if not body_yaw then
-					return
-				end
-				
-				local dir = vector.multiply(minetest.yaw_to_dir(body_yaw+self.head_rotation_offset),self.head_directional_offset)
+				local body_yaw = self.object:get_yaw()-math.pi/2
+								
+				local dir = vector.multiply(minetest.yaw_to_dir(body_yaw),self.head_directional_offset)
 				
 				
-				local body_yaw = minetest.dir_to_yaw(dir)
+				body_yaw = minetest.dir_to_yaw(dir)
 				
 				--pos is where the head actually is
 				pos = vector.add(pos,dir)
@@ -186,28 +176,29 @@ mobs.create_head_functions = function(def,mob_register)
 				--if the function was given a pos
 				if pos2 then
 					--compare the head yaw to the body
+					--we must do a bunch of calculations to correct
+					--strange function returns
+					--for some reason get_yaw is offset 90 degrees
 					local head_yaw = minetest.dir_to_yaw(vector.direction(pos,pos2))
-					
-					local goal_yaw = body_yaw-head_yaw
-					
-					if goal_yaw < -math.pi then
-						goal_yaw = goal_yaw + math.pi
-					elseif goal_yaw > math.pi then
-						goal_yaw = goal_yaw - math.pi
+					head_yaw = minetest.dir_to_yaw(minetest.yaw_to_dir(head_yaw))
+					head_yaw = degrees(head_yaw)-degrees(body_yaw)
+
+					if head_yaw < -180 then
+						head_yaw = head_yaw + 360
+					elseif head_yaw > 180 then
+						head_yaw = head_yaw - 360
 					end
-					
-					print("goal_yaw="..goal_yaw,"body_yaw="..body_yaw,"head_yaw="..head_yaw)
-					
+
 					--if within range then do calculations
-					if goal_yaw <= math.pi/2 and goal_yaw >= -math.pi/2 then
+					if head_yaw >= -90 and head_yaw <= 90 then
 						---begin pitch calculation
 						--feed a 2D coordinate flipped into dir to yaw to calculate pitch
 						head_rotation.x = degrees(minetest.dir_to_yaw(vector.new(vector.distance(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z)),0,pos.y-pos2.y))+(math.pi/2))
-						head_rotation.y = degrees(goal_yaw)
+						head_rotation.y = -head_yaw
 						self.object:set_bone_position(self.head_bone, head_position, head_rotation)
 						return(true)
 					--nothing to look at
-					else--dofile(path.."movement.lua")
+					else
 						self.return_head_to_origin(self,dtime)
 						return(false)
 					end
@@ -217,7 +208,6 @@ mobs.create_head_functions = function(def,mob_register)
 					self.return_head_to_origin(self,dtime)
 					return(false)
 				end
-				]]--
 			end
 		end
 	end
