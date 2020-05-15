@@ -31,7 +31,7 @@ mobs.register_mob(
 
 	 -----
 	 head_bone = "head",
-	 debug_head_pos = true,
+	 debug_head_pos = false,
 	 head_directional_offset = 0.5, --used in vector.multiply(minetest.yaw_to_dir(body_yaw),head_offset)
 	 head_height_offset = 0.8, --added to the base y position
 	 --use this to correct the head position initially because it becomes severly offset - look at your blender model to get this perfect
@@ -307,7 +307,7 @@ mobs.register_mob(
 	 hp = 10,
 	 gravity = {x = 0, y = -9.81, z = 0},
 	 movement_type = "walk",
-	 max_speed = 0.1,
+	 max_speed = 6,
 	 hostile = false,
 	 state = 0,
 	 view_distance = 20,
@@ -323,7 +323,7 @@ mobs.register_mob(
 	 -----
 	 automatic_face_movement_dir = 0,
 	 head_bone = "head",
-	 debug_head_pos = true,
+	 debug_head_pos = false,
 	 --this always has to be slightly positive
 	 head_directional_offset = 0.01,
 	 head_height_offset = 1.45, --added to the base y position
@@ -335,8 +335,8 @@ mobs.register_mob(
 	 
 	 death_rotation = "x",
 	 
-	 hurt_sound = "pig",
-	 die_sound = "pig_die",
+	 hurt_sound = "creeper_hurt",
+	 die_sound = "creeper_hurt",
 	 
 	 attack_type = "explode",
 	 --projectile_timer_cooldown = 5,
