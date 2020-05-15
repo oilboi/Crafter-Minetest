@@ -70,35 +70,24 @@ mobs.create_movement_functions = function(def,mob_register)
 			acceleration = vector.multiply(acceleration, 0.05)
 			self.object:add_velocity(acceleration)
 		end
-		--use raycasting to jump
 		mob_register.jump = function(self)
+			local vel = self.object:get_velocity()
 			if self.jump_timer <= 0 then
-				local vel = self.object:get_velocity()
-				if (self.direction.x ~= 0 and vel.x == 0) or (self.direction.z ~= 0 and vel.z == 0) then
-					local pos = self.object:get_pos()
-					local ground_distance = self.object:get_properties().collisionbox[2]
-					local ray = minetest.raycast(pos, vector.add(pos, vector.new(0,ground_distance*1.1,0)), false, false)	
-					if ray then
-						for pointed_thing in ray do
-							local collision_point = pointed_thing.under
-							if collision_point then
-								local nodey = minetest.registered_nodes[minetest.get_node(collision_point).name]
-								if nodey then
-									local walkable = nodey.walkable
-									if walkable then
-										local distance = vector.subtract(collision_point,pos).y
-										if distance >= -0.11 then
-											local vel = self.object:get_velocity()
-											self.jump_timer = 0.5
-											self.object:add_velocity(vector.new(vel.x,5,vel.z))
-										end
-									end
-								end
-							end
+				if (vel.x == 0 and self.direction ~= 0) or (vel.z == 0 and self.direction ~= 0) then
+					if vel.y == 0 and self.oldvely and self.oldvely <= 0 then
+						local vel = self.object:get_velocity()
+						self.jump_timer = 1+math.random()
+						if self.hostile == true then
+							self.jump_timer = 0.5
 						end
+						self.object:set_velocity(vector.new(vel.x,5,vel.z))
 					end
 				end
 			end
+			--if vel.y == 0 and self.oldvely and self.oldvely < 0 then
+			--	self.object:set_velocity(vector.new(0,0,0))
+			--end
+			self.oldvely = vel.y
 		end
 	elseif def.movement_type == "jump" then
 		mob_register.move = function(self,dtime)
@@ -124,7 +113,7 @@ mobs.create_movement_functions = function(def,mob_register)
 
 			self.hurt_inside(self,dtime)	
 			
-			local currentvel = self.object:getvelocity()
+			local currentvel = self.object:get_velocity()
 			if currentvel.y ~= 0 then
 				local goal = vector.multiply(self.direction,self.speed)
 				local acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
