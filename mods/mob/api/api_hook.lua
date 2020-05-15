@@ -119,16 +119,26 @@ mob_register.on_step = function(self, dtime)
 		self.custom_function_begin(self,dtime)
 	end
 	
-	self.collision_detection(self)
+	--self.collision_detection(self)
 	self.fall_damage(self)
 	
 	if self.dead == false and self.death_animation_timer == 0 then
-		self.move(self,dtime)
+		--self.move(self,dtime)
+		
+		if not self.yaw then self.yaw = 0 end
+		self.yaw = self.yaw + dtime
+		if self.yaw > math.pi then
+			self.yaw = -math.pi
+		end
+		self.object:set_velocity(minetest.yaw_to_dir(self.yaw))
+		
 		self.set_animation(self)
 		
 		if self.look_around then
 			self.look_around(self,dtime)
 		end
+		
+		--print(self.object:get_yaw()-(math.pi/2))
 		
 		self.manage_punch_timer(self,dtime)
 		--self.debug_nametag(self,dtime)
