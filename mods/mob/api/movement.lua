@@ -86,7 +86,7 @@ mobs.create_movement_functions = function(def,mob_register)
 								if nodey then
 									local walkable = nodey.walkable
 									if walkable then
-										local distance = vector.subtract(collision_point,pos).y-self.object:get_properties().collisionbox[2]+0.4
+										local distance = vector.subtract(collision_point,pos).y
 										if distance >= -0.11 then
 											local vel = self.object:get_velocity()
 											self.jump_timer = 0.5

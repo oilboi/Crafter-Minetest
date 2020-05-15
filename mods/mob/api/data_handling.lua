@@ -8,7 +8,13 @@ mobs.create_data_handling_functions = function(def,mob_register)
 			hostile = self.hostile,
 			hostile_timer = self.hostile_timer,
 			death_animation_timer = self.death_animation_timer,
-			dead = self.dead
+			dead = self.dead,
+
+			tnt_timer = self.tnt_timer,
+			tnt_tick_timer = self.tnt_tick_timer,
+			tnt_mod_state = self.tnt_mod_state,
+			punch_timer = self.punch_timer,
+			projectile_timer = self.projectile_timer
 		})
 	end
 
@@ -29,6 +35,12 @@ mobs.create_data_handling_functions = function(def,mob_register)
 				self.hostile_timer = data.hostile_timer
 				self.death_animation_timer = data.death_animation_timer
 				self.dead = data.dead
+
+				self.tnt_timer = data.tnt_timer
+				self.tnt_tick_timer = data.tnt_tick_timer
+				self.tnt_mod_state = data.tnt_mod_state
+				self.punch_timer = data.punch_timer
+				self.projectile_timer = data.projectile_timer
 			end
 		end
 		
