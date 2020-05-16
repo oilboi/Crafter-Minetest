@@ -1,5 +1,5 @@
 --this is where mob spawning is defined
---[[
+
 --spawn mob in a square doughnut shaped radius
 local chance = 20
 --inner and outer part of square donut radius
@@ -10,8 +10,8 @@ local outer = 128
 local spawn = true
 
 local spawn_table = {"pig"}
-local dark_spawn_table = {"slime","creepig"}
-local aether_spawn_table = {"flying_pig"}
+local dark_spawn_table = {"creeper"}
+local aether_spawn_table = {"phyg"}
 
 local function spawn_mobs()
 	print("---------------------------------------------")
@@ -81,4 +81,3 @@ local function spawn_mobs()
 end
 
 spawn_mobs()
-]]--
