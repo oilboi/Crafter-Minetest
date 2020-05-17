@@ -57,6 +57,65 @@ enable_mod_channels = true
 - Redid bows and arrows
 - Added collision detection to mobs
 - Add fall damage to mobs
+- Make fishing work
+- Ice now breaks into water
+- Added FOV fade
+- Add experience
+- Added in shadow to heart statbar
+- Added enchanting
+- Add cake and cursed cake
+- Prevent player from getting suffocated while teleporting
+- Added in custom breath handling
+- Made drowning slower
+- Stopped infinite drowning death
+- Merged drowning functions with new player functions
+- Added in gerold55 bubble texture with countdown
+- Swapped bubble direction
+- Added in hunger
+- Tuned hunger
+- Added block breaking induced hunger exhaustion
+- Fixed dead players collecting xp
+- Overhauled hunger
+- Optimized hunger health regen
+- Overhauled farming and plants
+- Fire now uses node timers to run even faster and prevent forest fires from becoming extreme
+- Crops are now easier to grow
+- Various farming improvements
+- Optimized snow to the extreme
+- Added in broken nether trees
+- Added in melons and stem growth type plants
+- Make saplings use node timers with catchup
+- Made rain look even better
+- Stop FOV fading from causing motion sickness
+- Crops are now destroyed if not enough light
+- Begin experimental treecapitator test
+- Revert experimental treecapitator test and release experiment as mod
+- Add in xp debug test
+- Made minecarts work even "better"
+- Added in clientside WAILA
+- Fixed vignette having a streak of pixels across top of screen
+- Add in 22i's MC mobs
+- Overhaul mobs and make them use bone based head movement
+- Add in group_attack setting for mobs
+- Readded in creeper, phyg, and pig
+- Fix a lot of things
+- Fix a lot of deprecated calls
+- Fixed stone hoes actually being made out of stone
+- Add in better arrow hit sounds
+- Overhauled arrows
+- Added WAIH
+- Overhaul mobs damage color modifier
+- Make exploding mobs flash while charging
+- Fix more deprecated calls
+- Overhauled spawn command for mobs to use raycasting
+- Overhaul mobs again
+- Explosions now fling and hurt mobs
+- Phygs now flap wings and do not take fall damage
+- More deprecated call fixed for 3d noise in aether, void, and nether
+- Fix WAIH crashing with tool that has no tooldef
+- Fixed boat scaling
+- Use gerold55's nice xp orb texture
+- Updated readme.md
 ---
 
 
