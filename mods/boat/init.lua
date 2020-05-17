@@ -4,13 +4,13 @@ minetest.register_entity("boat:boat", {
 		hp_max = 1,
 		physical = true,
 		collide_with_objects = false,
-		collisionbox = {-0.4, -0.35, -0.4, 0.4, 0.3, 0.4},
+		collisionbox = {-0.4, 0, -0.4, 0.4, 0.5, 0.4},
 		visual = "mesh",
-		mesh = "boat.obj",
+		mesh = "boat.x",
 		textures = {"boat.png"},
-		visual_size = {x=3,y=3,z=3},
+		visual_size = {x=1,y=1,z=1},
 		is_visible = true,
-		automatic_face_movement_dir = 90.0,
+		automatic_face_movement_dir = -90.0,
 		automatic_face_movement_max_rotation_per_sec = 600,
 	},
 	
@@ -55,6 +55,9 @@ minetest.register_entity("boat:boat", {
 		elseif not self.rider then
 			self.rider = player_name
 			clicker:set_attach(self.object, "", {x=0, y=-4.5, z=0}, {x=0, y=0, z=0})
+			minetest.after(0.2, function()
+				player_api.set_animation(clicker, "sit" , 30)
+			end)
 			--player:set_eye_offset({x=0, y=-4, z=0},{x=0, y=-4, z=0})
 			--carts:manage_attachment(clicker, self.object)
 
