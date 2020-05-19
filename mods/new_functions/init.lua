@@ -309,3 +309,10 @@ minetest.register_on_mods_loaded(function()
 		fix_breath_hack()
 	end)
 end)
+
+function minetest.get_nodedef(nodename, fieldname)
+	if not minetest.registered_nodes[nodename] then
+		return nil
+	end
+	return minetest.registered_nodes[nodename][fieldname]
+end

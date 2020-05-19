@@ -127,7 +127,7 @@ mobs.create_animation_functions(def,mob_register)
 mobs.create_timer_functions(def,mob_register)
 
 
-mob_register.on_step = function(self, dtime)
+mob_register.on_step = function(self, dtime,moveresult)
 	if self.custom_function_begin then
 		self.custom_function_begin(self,dtime)
 	end
@@ -138,7 +138,7 @@ mob_register.on_step = function(self, dtime)
 	end
 	
 	if self.dead == false and self.death_animation_timer == 0 then
-		self.move(self,dtime)
+		self.move(self,dtime,moveresult)
 		--self.debug_nametag(self,dtime)
 		self.manage_hurt_color_timer(self,dtime)
 		self.set_animation(self)
@@ -152,6 +152,7 @@ mob_register.on_step = function(self, dtime)
 		self.manage_death_animation(self,dtime)
 		self.move_head(self,nil,dtime)
 	end
+
 	--fix zombie state again
 	if self.dead == true and self.death_animation_timer <= 0 then
 		self.on_death(self)

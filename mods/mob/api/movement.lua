@@ -41,12 +41,12 @@ mobs.create_movement_functions = function(def,mob_register)
 
 	--This makes the mob walk at a certain speed and jump
 	if def.movement_type == "walk" then
-		mob_register.move = function(self,dtime)
+		mob_register.move = function(self,dtime,moveresult)
 			self.manage_jump_timer(self,dtime)
 			self.timer = self.timer - dtime
-			
+
 			--jump
-			self.jump(self)
+			self.jump(self,moveresult)
 			
 			--swim
 			self.swim(self,dtime)
@@ -70,32 +70,45 @@ mobs.create_movement_functions = function(def,mob_register)
 			acceleration = vector.multiply(acceleration, 0.05)
 			self.object:add_velocity(acceleration)
 		end
-		mob_register.jump = function(self)
-			local vel = self.object:get_velocity()
-			if self.jump_timer <= 0 then
-				if (vel.x == 0 and self.direction ~= 0) or (vel.z == 0 and self.direction ~= 0) then
-					if vel.y == 0 and self.oldvely and self.oldvely <= 0 then
-						local vel = self.object:get_velocity()
-						self.jump_timer = 1+math.random()
-						if self.hostile == true then
-							self.jump_timer = 0.5
+		mob_register.jump = function(self,moveresult)
+			if moveresult and moveresult.touching_ground and self.direction then
+				local pos = self.object:get_pos()
+				pos.y = pos.y+0.1
+				--assume collisionbox is even x and z
+				local modifier = self.object:get_properties().collisionbox[4]*3
+				
+
+				local pos2 = vector.add(vector.multiply(self.direction,modifier),pos)
+
+				local ray = minetest.raycast(pos, pos2, false, false)
+
+				if ray then
+					local pointed_thing = ray:next()
+					if pointed_thing then
+						if minetest.get_nodedef(minetest.get_node(pointed_thing.under).name, "walkable") then
+							minetest.add_particle({
+								pos = pointed_thing.intersection_point,
+								velocity = {x=0, y=0, z=0},
+								acceleration = {x=0, y=0, z=0},
+								expirationtime = 5,
+								size = 1,
+								texture = "dirt.png",
+							})
+							local vel = self.object:get_velocity()
+							self.jump_timer = 1+math.random()
+							self.object:set_velocity(vector.new(vel.x,5,vel.z))
 						end
-						self.object:set_velocity(vector.new(vel.x,5,vel.z))
 					end
 				end
 			end
-			--if vel.y == 0 and self.oldvely and self.oldvely < 0 then
-			--	self.object:set_velocity(vector.new(0,0,0))
-			--end
-			self.oldvely = vel.y
 		end
 	elseif def.movement_type == "jump" then
-		mob_register.move = function(self,dtime)
+		mob_register.move = function(self,dtime,moveresult)
 			self.manage_jump_timer(self,dtime)
 			self.timer = self.timer - dtime
 			
 			--jump
-			self.jump(self)
+			self.jump(self,moveresult)
 			
 			--swim
 			self.swim(self,dtime)
@@ -122,26 +135,23 @@ mobs.create_movement_functions = function(def,mob_register)
 			end
 		end
 		
-		mob_register.jump = function(self)
-			local vel = self.object:get_velocity()
-			if self.jump_timer <= 0 then
-				if vel.y == 0 and self.oldvely and self.oldvely <= 0 then --use <= on self.oldvely to make slime make landing sound
-					if self.make_jump_noise then
-						minetest.sound_play("slime_splat", {object=self.object, gain = 1.0, max_hear_distance = 10,pitch = math.random(80,100)/100})
-					end
-					local vel = self.object:get_velocity()
-					self.jump_timer = 1+math.random()
+		mob_register.jump = function(self,moveresult)
+			if moveresult and moveresult.touching_ground and self.direction then
+				if self.make_jump_noise then
+					minetest.sound_play("slime_splat", {object=self.object, gain = 1.0, max_hear_distance = 10,pitch = math.random(80,100)/100})
+				end
+				local vel = self.object:get_velocity()
+				self.object:set_velocity(vector.new(vel.x,5,vel.z))
+				if self.jump_timer <= 0 then
 					if self.hostile == true then
 						self.jump_timer = 0.5
+					else
+						self.jump_timer = 1+math.random()
 					end
-					local goal = vector.multiply(self.direction,self.speed)
-					self.object:set_velocity(vector.new(goal.x,5,goal.z))
+				else
+					self.object:set_velocity(vector.new(0,0,0))
 				end
 			end
-			if vel.y == 0 and self.oldvely and self.oldvely < 0 then
-				self.object:set_velocity(vector.new(0,0,0))
-			end
-			self.oldvely = vel.y
 		end
 	end
 	
