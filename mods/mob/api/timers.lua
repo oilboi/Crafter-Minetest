@@ -44,7 +44,7 @@ mobs.create_timer_functions = function(def,mob_register)
 			if self.tnt_mod_state == 0 then
 				self.object:set_texture_mod("")
 			else
-				self.object:set_texture_mod("^[colorize:white:130")
+				self.object:set_texture_mod("^[colorize:"..self.explosion_blink_color..":130")
 			end
 			--print(self.object:get_texture_mod())
 			--self.object:set_texture_mod("^[colorize:red:130")
