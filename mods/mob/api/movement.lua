@@ -140,10 +140,10 @@ mobs.create_movement_functions = function(def,mob_register)
 				if self.make_jump_noise then
 					minetest.sound_play("slime_splat", {object=self.object, gain = 1.0, max_hear_distance = 10,pitch = math.random(80,100)/100})
 				end
-				local vel = self.object:get_velocity()
-				self.object:set_velocity(vector.new(vel.x,5,vel.z))
 				if self.jump_timer <= 0 then
-					if self.hostile == true then
+					local vel = self.object:get_velocity()
+					self.object:set_velocity(vector.new(vel.x,5,vel.z))
+					if self.following == true then
 						self.jump_timer = 0.5
 					else
 						self.jump_timer = 1+math.random()
