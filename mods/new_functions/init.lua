@@ -258,37 +258,46 @@ local function fix_breath_hack()
 		player:set_breath(50000)
 		name = player:get_player_name()
 		indexer = player_surroundings_index_table[name].head
-		
 		local meta = player:get_meta()
-		local ticker = meta:get_int("breath_ticker")
-		
-		ticker = ticker + 1
-		if ticker > 1 then ticker = 0 end
-		meta:set_int("breath_ticker", ticker)
+		local breath = meta:get_int("breath")
+		local breathbar = meta:get_int("breathbar")
 		
 		if indexer == "main:water" or indexer == "main:waterflow" then
-			local breath = meta:get_int("breath")
-			local breathbar = meta:get_int("breathbar")
-			breath = breath - 1
-			
-			if breath >= 0 and ticker == 1 then
+			local ticker = meta:get_int("breath_ticker")
+		
+			ticker = ticker + 1
+			if ticker > 5 then ticker = 0 end
+
+			meta:set_int("breath_ticker", ticker)
+						
+			if breath > 0 and ticker >= 5 then
+				breath = breath - 1
 				meta:set_int("breath", breath)
 				player:hud_change(breathbar, "number", breath*2)
-			end
-			if meta:get_int("breath") <= 0 then
+			elseif breath <= 0 and ticker >= 5 then
 				local hp =  player:get_hp()
+				meta:set_int("drowning", 1)
 				if hp > 0 then
-					player:set_hp(hp-1)
+					player:punch(player, 2, 
+						{
+						full_punch_interval=1.5,
+						damage_groups = {fleshy=2},
+						})
 				end
 			end
-		else --reset the bar
-			meta:set_int("breath", 10)
-			local breathbar = meta:get_int("breathbar")
-			player:hud_change(breathbar, "number", 20)
+		elseif breath < 10 then --reset the bar
+			
+			breath = breath + 1
+			meta:set_int("breath", breath)
+			meta:set_int("drowning", 0)
+			meta:set_int("breath_ticker", 0)
+			player:hud_change(breathbar, "number", breath*2)
 		end
+
+		print(meta:get_int("drowning"))
 	end
 	
-	minetest.after(0.5, function()
+	minetest.after(0.25, function()
 		fix_breath_hack()
 	end)
 end
