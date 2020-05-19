@@ -374,8 +374,6 @@ minetest.register_entity("boat:iron_boat", {
 			local goal = 3
 			local acceleration = vector.new(0,goal-vel.y,0)
 			self.object:add_velocity(acceleration)
-		else
-			print("nothing")
 		end
 	end,
 
