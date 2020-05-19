@@ -121,6 +121,9 @@ enable_mod_channels = true
 
 # IDEAS:
 
+## jetpack:
+- equipped like armor
+- uses XP
 
 
 ## REDSTONE:
