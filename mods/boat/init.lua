@@ -37,7 +37,7 @@ minetest.register_entity("boat:boat", {
 		self.object:set_acceleration({x = 0, y = -9.81, z = 0})
 	end,
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-		local pos = self.object:getpos()
+		local pos = self.object:get_pos()
 		minetest.add_item(pos, "boat:boat")
 		self.object:remove()
 	end,
@@ -69,7 +69,7 @@ minetest.register_entity("boat:boat", {
 	end,
 	--check if the boat is stuck on land
 	check_if_on_land = function(self)
-		local pos = self.object:getpos()
+		local pos = self.object:get_pos()
 		pos.y = pos.y - 0.37
 		local bottom_node = minetest.get_node(pos).name
 		if (bottom_node == "main:water" or bottom_node == "main:waterflow" or bottom_node == "air") then
@@ -87,7 +87,7 @@ minetest.register_entity("boat:boat", {
 			local move = rider:get_player_control().up
 			self.moving = nil
 			if move then
-				local currentvel = self.object:getvelocity()
+				local currentvel = self.object:get_velocity()
 				local goal = rider:get_look_dir()
 				goal = vector.multiply(goal,9)
 				local acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
@@ -102,14 +102,14 @@ minetest.register_entity("boat:boat", {
 	
 	--players push boat
 	push = function(self)
-		local pos = self.object:getpos()
+		local pos = self.object:get_pos()
 		for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
 			if object:is_player() and object:get_player_name() ~= self.rider then
-				local player_pos = object:getpos()
+				local player_pos = object:get_pos()
 				pos.y = 0
 				player_pos.y = 0
 				
-				local currentvel = self.object:getvelocity()
+				local currentvel = self.object:get_velocity()
 				local vel = vector.subtract(pos, player_pos)
 				vel = vector.normalize(vel)
 				local distance = vector.distance(pos,player_pos)
@@ -125,14 +125,14 @@ minetest.register_entity("boat:boat", {
 	
 	--makes the boat float
 	float = function(self)
-		local pos = self.object:getpos()
+		local pos = self.object:get_pos()
 		local node = minetest.get_node(pos).name
 		self.swimming = false
 		
 		--flow normally if floating else don't
 		if node == "main:water" or node =="main:waterflow" then
 			self.swimming = true
-			local vel = self.object:getvelocity()
+			local vel = self.object:get_velocity()
 			local goal = 3
 			local acceleration = vector.new(0,goal-vel.y,0)
 			self.object:add_velocity(acceleration)
@@ -141,7 +141,7 @@ minetest.register_entity("boat:boat", {
 	
 	--makes boats flow
 	flow = function(self)
-		local pos = self.object:getpos()
+		local pos = self.object:get_pos()
 		pos.y = pos.y - 0.4
 		local node = minetest.get_node(pos).name
 		local node_above = minetest.get_node(vector.new(pos.x,pos.y+1,pos.z)).name
@@ -149,9 +149,9 @@ minetest.register_entity("boat:boat", {
 		local goalz = 0
 		--print(node_above)
 		if (node == "main:waterflow" or node == "main:water" ) and not self.moving == true and (node_above ~= "main:water" and node_above ~= "main:waterflow") then
-			local currentvel = self.object:getvelocity()
+			local currentvel = self.object:get_velocity()
 			local level = minetest.get_node_level(pos)
-			local pos = self.object:getpos()
+			local pos = self.object:get_pos()
 			for x = -1,1 do
 				for y = -1,0 do
 					for z = -1,1 do
@@ -181,7 +181,7 @@ minetest.register_entity("boat:boat", {
 	--slows the boat down
 	slowdown = function(self)
 		if not self.moving == true then
-			local vel = self.object:getvelocity()
+			local vel = self.object:get_velocity()
 			local deceleration = vector.multiply(vel, -0.01)
 			self.object:add_velocity(deceleration)
 		end
@@ -285,7 +285,7 @@ minetest.register_entity("boat:iron_boat", {
 		self.object:set_acceleration({x = 0, y = -9.81, z = 0})
 	end,
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-		local pos = self.object:getpos()
+		local pos = self.object:get_pos()
 		minetest.add_item(pos, "boat:boat")
 		self.object:remove()
 	end,
@@ -323,7 +323,7 @@ minetest.register_entity("boat:iron_boat", {
 			local move = rider:get_player_control().up
 			self.moving = nil
 			if move then
-				local currentvel = self.object:getvelocity()
+				local currentvel = self.object:get_velocity()
 				local goal = rider:get_look_dir()
 				goal = vector.multiply(goal,20)
 				local acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
@@ -338,14 +338,14 @@ minetest.register_entity("boat:iron_boat", {
 	
 	--players push boat
 	push = function(self)
-		local pos = self.object:getpos()
+		local pos = self.object:get_pos()
 		for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
 			if object:is_player() and object:get_player_name() ~= self.rider then
-				local player_pos = object:getpos()
+				local player_pos = object:get_pos()
 				pos.y = 0
 				player_pos.y = 0
 				
-				local currentvel = self.object:getvelocity()
+				local currentvel = self.object:get_velocity()
 				local vel = vector.subtract(pos, player_pos)
 				vel = vector.normalize(vel)
 				local distance = vector.distance(pos,player_pos)
@@ -361,7 +361,7 @@ minetest.register_entity("boat:iron_boat", {
 	
 	--makes the boat float
 	float = function(self)
-		local pos = self.object:getpos()
+		local pos = self.object:get_pos()
 		local pos2 = vector.new(pos.x,pos.y-3,pos.z)
 
 		local ray = minetest.raycast(pos, pos2, false, true)
@@ -370,7 +370,7 @@ minetest.register_entity("boat:iron_boat", {
 
 		if pointed_thing then
 			self.swimming = true
-			local vel = self.object:getvelocity()
+			local vel = self.object:get_velocity()
 			local goal = 3
 			local acceleration = vector.new(0,goal-vel.y,0)
 			self.object:add_velocity(acceleration)
@@ -380,7 +380,7 @@ minetest.register_entity("boat:iron_boat", {
 	--slows the boat down
 	slowdown = function(self)
 		if not self.moving == true then
-			local vel = self.object:getvelocity()
+			local vel = self.object:get_velocity()
 			local deceleration = vector.multiply(vel, -0.01)
 			self.object:add_velocity(deceleration)
 		end
