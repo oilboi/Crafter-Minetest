@@ -54,12 +54,8 @@ mobs.create_timer_functions = function(def,mob_register)
 			self.object:set_texture_mod("^[colorize:red:130")
 			
 			local pos = self.object:get_pos()
-			--direction.y = direction.y + 1
-			
+			self.object:remove()
 			tnt(pos,self.explosion_power)
-			self.death_animation_timer = 1
-			self.dead = true
-			self.tnt_timer = 100
 		end
 	end
 
