@@ -100,6 +100,8 @@ mob_register.projectile_type = def.projectile_type
 
 mob_register.takes_fall_damage = def.takes_fall_damage or true
 mob_register.make_jump_noise = def.make_jump_noise
+mob_register.jump_animation = def.jump_animation
+mob_register.jumping_frame = def.jumping_frame
 
 mob_register.item_drop = def.item_drop
 mob_register.item_minimum = def.item_minimum or 1
@@ -111,6 +113,7 @@ mob_register.die_in_light_level = def.die_in_light_level
 mob_register.current_animation = 0
 mob_register.hurt_color_timer = 0
 mob_register.damage_color = def.damage_color or "red"
+mob_register.custom_on_death = def.custom_on_death
 
 mob_register.mob = true
 
@@ -141,7 +144,9 @@ mob_register.on_step = function(self, dtime,moveresult)
 		self.move(self,dtime,moveresult)
 		--self.debug_nametag(self,dtime)
 		self.manage_hurt_color_timer(self,dtime)
-		self.set_animation(self)
+		if self.set_animation then
+			self.set_animation(self)
+		end
 		
 		if self.look_around then
 			self.look_around(self,dtime)
@@ -150,7 +155,9 @@ mob_register.on_step = function(self, dtime,moveresult)
 		self.manage_punch_timer(self,dtime)
 	else
 		self.manage_death_animation(self,dtime)
-		self.move_head(self,nil,dtime)
+		if self.move_head then
+			self.move_head(self,nil,dtime)
+		end
 	end
 
 	--fix zombie state again

@@ -193,52 +193,119 @@ mobs.register_mob(
 	 --explosion_time = 3, -- how long it takes for a mob to explode
 	}
 )
-
+]]--
 
 mobs.register_mob(
 	{
-	 mobname = "slime",
-	 physical = true,
- 	 collide_with_objects = false,
- 	 collisionbox = {-0.37, -0.4, -0.37, 0.37, 0.5, 0.37},
-  	 visual = "mesh",
- 	 visual_size = {x = 3, y = 3},
-	 mesh = "slime.x",
-	 textures = {
-	 	"slimecore.png","slimeeye.png","slimeeye.png","slimeeye.png","slimeoutside.png"
-	 },
-	 is_visible = true,
-	 pointable = true,
-	 automatic_face_movement_dir = 180,
-	 automatic_face_movement_max_rotation_per_sec = 300,
-	 makes_footstep_sound = false,
-	 hp = 10,
-	 gravity = {x = 0, y = -9.81, z = 0},
-	 movement_type = "jump",
-	 max_speed = 5,
-	 hostile = true,
-	 state = 0,
-	 view_distance = 20,
-	 item_drop = "mob:slimeball",
-	
-	 standing_frame = {x=0,y=0},
-	 moving_frame = {x=0,y=0},
-	 animation_multiplier = 5,
-	 ----
-	 has_head = false, --remove this when mesh based head rotation is implemented
-	 
-	 death_rotation = "x",
-	 
-	 hurt_sound = "slime_die",
-	 die_sound = "slime_die",
-	 
-	 attack_type = "punch",
-	 die_in_light = true,
-	 die_in_light_level = 12,
+	mobname = "big_slime",
+	physical = true,
+ 	collide_with_objects = false,
+ 	collisionbox = {-1.25, 0, -1.25, 1.25, 2.5, 1.25},
+  	visual = "mesh",
+	visual_size = {x = 15, y = 15},
+	mesh = "slime.b3d",
+	textures = {
+		"slime.png"
+	},
+	is_visible = true,
+	pointable = true,
+	automatic_face_movement_dir = 90,
+	automatic_face_movement_max_rotation_per_sec = 300,
+	makes_footstep_sound = false,
+	hp = 10,
+	gravity = {x = 0, y = -9.81, z = 0},
+	movement_type = "jump",
+	make_jump_noise = true,
+	max_speed = 5,
+	hostile = true,
+	state = 0,
+	view_distance = 20,
+	death_rotation = "z",
+	hurt_sound = "slime_die",
+	die_sound = "slime_die",
+	attack_type = "punch",
+	custom_on_death = function(self)
+		local pos = self.object:get_pos()
+		for i = 1,4 do
+			minetest.add_entity(pos,"mob:medium_slime")
+		end
+	end,
 	}
 )
 
+mobs.register_mob(
+	{
+	mobname = "medium_slime",
+	physical = true,
+ 	collide_with_objects = false,
+ 	collisionbox = {-0.625, 0, -0.625, 0.625, 1.25, 0.625},
+  	visual = "mesh",
+	visual_size = {x = 7.5, y = 7.5},
+	mesh = "slime.b3d",
+	textures = {
+		"slime.png"
+	},
+	is_visible = true,
+	pointable = true,
+	automatic_face_movement_dir = 90,
+	automatic_face_movement_max_rotation_per_sec = 300,
+	makes_footstep_sound = false,
+	hp = 10,
+	gravity = {x = 0, y = -9.81, z = 0},
+	movement_type = "jump",
+	make_jump_noise = true,
+	max_speed = 5,
+	hostile = true,
+	state = 0,
+	view_distance = 20,
+	death_rotation = "z",
+	hurt_sound = "slime_die",
+	die_sound = "slime_die",
+	attack_type = "punch",
+	custom_on_death = function(self)
+		local pos = self.object:get_pos()
+		pos.y = pos.y + 0.2
+		for i = 1,4 do
+			minetest.add_entity(pos,"mob:small_slime")
+		end
+	end,
+	}
+)
 
+mobs.register_mob(
+	{
+	mobname = "small_slime",
+	physical = true,
+ 	collide_with_objects = false,
+ 	collisionbox = {-0.3, 0, -0.3, 0.3, 0.6, 0.3},
+  	visual = "mesh",
+	visual_size = {x = 3.7, y = 3.7},
+	mesh = "slime.b3d",
+	textures = {
+		"slime.png"
+	},
+	is_visible = true,
+	pointable = true,
+	automatic_face_movement_dir = 90,
+	automatic_face_movement_max_rotation_per_sec = 300,
+	makes_footstep_sound = false,
+	hp = 10,
+	gravity = {x = 0, y = -9.81, z = 0},
+	movement_type = "jump",
+	make_jump_noise = true,
+	max_speed = 5,
+	hostile = true,
+	state = 0,
+	view_distance = 20,
+	death_rotation = "z",
+	hurt_sound = "slime_die",
+	die_sound = "slime_die",
+	attack_type = "punch",
+	item_drop = "mob:slimeball"
+	}
+)
+
+--[[
 mobs.register_mob(
 	{
 	 mobname = "flying_pig",
@@ -439,7 +506,7 @@ mobs.register_mob(
 	 hp = 10,
 	 gravity = {x = 0, y = -9.81, z = 0},
 	 movement_type = "walk",
-	 max_speed = 4,
+	 max_speed = 9,
 	 hostile = true,
 	 hostile_cooldown = false,
 	 state = 0,
