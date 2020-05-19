@@ -287,12 +287,7 @@ local function fix_breath_hack()
 				local hp =  player:get_hp()
 				meta:set_int("drowning", 1)
 				if hp > 0 then
-					player:punch(player, 2, 
-						{
-						full_punch_interval=1.5,
-						damage_groups = {fleshy=2},
-						}
-					)
+					player:set_hp(hp-1)
 					player:add_player_velocity(vector.new(0,-15,0))
 				end
 			end
