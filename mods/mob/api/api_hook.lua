@@ -87,6 +87,7 @@ mob_register.explosion_power = def.explosion_power
 mob_register.tnt_timer = nil
 mob_register.explosion_time = def.explosion_time
 mob_register.explosion_blink_color = def.explosion_blink_color or "white"
+mob_register.explosion_blink_timer = def.explosion_blink_timer or 0.2
 
 mob_register.custom_function_begin = def.custom_function_begin
 mob_register.custom_function_end = def.custom_function_end

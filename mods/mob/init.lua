@@ -480,6 +480,7 @@ mobs.register_mob(
 	 explosion_radius = 6, -- how far away the mob has to be to initialize the explosion
 	 explosion_power = 14, -- how big the explosion is (radius)
 	 explosion_time = 3, -- how long it takes for a mob to explode
+	 explosion_blink_timer = 0.1, -- how fast the blinking happens
 	 
 	 die_in_light = false,
 	 --die_in_light_level = 12,

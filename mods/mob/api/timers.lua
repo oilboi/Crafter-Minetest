@@ -39,7 +39,7 @@ mobs.create_timer_functions = function(def,mob_register)
 		self.tnt_timer = self.tnt_timer - dtime
 		self.tnt_tick_timer = self.tnt_tick_timer  - dtime
 		if self.tnt_tick_timer <= 0 and not self.dead then
-			self.tnt_tick_timer = 0.2
+			self.tnt_tick_timer = self.explosion_blink_timer
 			self.tnt_mod_state = math.abs(self.tnt_mod_state-1)
 			if self.tnt_mod_state == 0 then
 				self.object:set_texture_mod("")
