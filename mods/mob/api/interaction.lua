@@ -207,10 +207,10 @@ mobs.create_interaction_functions = function(def,mob_register)
 			if self.item_max then
 				local data_item_amount = math.random(self.item_minimum, self.item_max)
 				for i = 1 ,data_item_amount do
-					minetest.throw_item(pos,self.item_drop)
+					minetest.throw_item(vector.new(pos.x,pos.y+0.1,pos.z),self.item_drop)
 				end
 			else
-				minetest.throw_item(pos,self.item_drop)
+				minetest.throw_item(vector.new(pos.x,pos.y+0.1,pos.z),self.item_drop)
 			end
 		end
 			

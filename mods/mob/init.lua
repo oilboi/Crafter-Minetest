@@ -445,7 +445,7 @@ mobs.register_mob(
 	 hostile_cooldown = false,
 	 state = 0,
 	 view_distance = 20,
-	 item_drop = "mob:cooked_porkchop",
+	 item_drop = "mob:gunpowder",
 	  
 	 standing_frame = {x=0,y=0},
 	 moving_frame = {x=0,y=40},
@@ -511,7 +511,7 @@ mobs.register_mob(
 	 hostile_cooldown = false,
 	 state = 0,
 	 view_distance = 20,
-	 item_drop = "mob:cooked_porkchop",
+	 item_drop = "mob:gunpowder",
 
 	 damage_color = "blue",
 	  

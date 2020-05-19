@@ -14,6 +14,10 @@ minetest.register_craftitem("mob:slimeball", {
 	description = "Slimeball",
 	inventory_image = "slimeball.png",
 })
+minetest.register_craftitem("mob:gunpowder", {
+	description = "Gunpowder",
+	inventory_image = "gunpowder.png",
+})
 --cooking
 minetest.register_craft({
 	type = "cooking",

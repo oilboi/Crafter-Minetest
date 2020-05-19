@@ -376,8 +376,8 @@ minetest.register_node("tnt:uh_oh", {
 minetest.register_craft({
 	output = "tnt:tnt",
 	recipe = {
-		{"main:wood", "main:wood", "main:wood"},
-		{"main:wood", "main:coal", "main:wood"},
-		{"main:wood", "main:wood", "main:wood"},
+		{"mob:gunpowder", "main:sand",     "mob:gunpowder"},
+		{"main:sand",     "mob:gunpowder", "main:sand"},
+		{"mob:gunpowder", "main:sand",     "mob:gunpowder"},
 	},
 })
