@@ -13,7 +13,7 @@ local spawn = true
 
 local spawn_table = {"pig"}
 local dark_spawn_table = {"creeper"}
-local nether_spawn_table = {"creeper"}
+local nether_spawn_table = {"nitro_creeper"}
 local aether_spawn_table = {"phyg"}
 
 local function spawn_mobs()

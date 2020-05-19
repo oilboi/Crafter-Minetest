@@ -418,3 +418,68 @@ mobs.register_mob(
 	}
 )
 
+
+
+mobs.register_mob(
+	{
+	 mobname = "nitro_creeper",
+	 physical = true,
+	 collide_with_objects = false,
+	 collisionbox = {-0.37,0, -0.37, 0.37, 1.5, 0.37},
+	 visual = "mesh",
+	 visual_size = {x = 3.2, y = 3.2},
+	 mesh = "creeper.b3d",
+	 textures = {
+		"nitro_creeper.png"
+	},
+	 is_visible = true,
+	 pointable = true,
+	 automatic_face_movement_max_rotation_per_sec = 300,
+	 makes_footstep_sound = false,
+	 hp = 10,
+	 gravity = {x = 0, y = -9.81, z = 0},
+	 movement_type = "walk",
+	 max_speed = 4,
+	 hostile = true,
+	 hostile_cooldown = false,
+	 state = 0,
+	 view_distance = 20,
+	 item_drop = "mob:cooked_porkchop",
+	  
+	 standing_frame = {x=0,y=0},
+	 moving_frame = {x=0,y=40},
+	 animation_multiplier = 20,
+	 ----
+	 pathfinds = true,
+	 
+	 --these are used to anchor a point to the head position
+	 -----
+	 automatic_face_movement_dir = 0,
+	 head_bone = "head",
+	 debug_head_pos = false,
+	 --this always has to be slightly positive
+	 head_directional_offset = 0.01,
+	 head_height_offset = 1.45, --added to the base y position
+	 --use this to correct the head position initially because it becomes severly offset - look at your blender model to get this perfect
+	 head_position_correction = vector.new(0,2.4,0),
+	 head_coord = "vertical",
+	 -----
+	  
+	 
+	 death_rotation = "x",
+	 
+	 hurt_sound = "creeper_hurt",
+	 die_sound = "creeper_hurt",
+	 
+	 attack_type = "explode",
+	 --projectile_timer_cooldown = 5,
+	 --projectile_type = "tnt:tnt",
+	 
+	 explosion_radius = 6, -- how far away the mob has to be to initialize the explosion
+	 explosion_power = 14, -- how big the explosion is (radius)
+	 explosion_time = 3, -- how long it takes for a mob to explode
+	 
+	 die_in_light = false,
+	 --die_in_light_level = 12,
+	}
+)

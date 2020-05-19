@@ -56,7 +56,7 @@ mobs.create_timer_functions = function(def,mob_register)
 			local pos = self.object:get_pos()
 			--direction.y = direction.y + 1
 			
-			tnt(pos,7)
+			tnt(pos,self.explosion_power)
 			self.death_animation_timer = 1
 			self.dead = true
 			self.tnt_timer = 100
