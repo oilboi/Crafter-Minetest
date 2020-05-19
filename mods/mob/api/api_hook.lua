@@ -108,6 +108,7 @@ mob_register.die_in_light_level = def.die_in_light_level
 
 mob_register.current_animation = 0
 mob_register.hurt_color_timer = 0
+mob_register.damage_color = def.damage_color or "red"
 
 mob_register.mob = true
 

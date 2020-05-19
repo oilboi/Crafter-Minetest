@@ -445,6 +445,8 @@ mobs.register_mob(
 	 state = 0,
 	 view_distance = 20,
 	 item_drop = "mob:cooked_porkchop",
+
+	 damage_color = "blue",
 	  
 	 standing_frame = {x=0,y=0},
 	 moving_frame = {x=0,y=40},

@@ -109,7 +109,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 		local hp = hp-hurt
 
 		if (self.punched_timer <= 0 and hp > 1) and not self.dead then
-			self.object:set_texture_mod("^[colorize:red:130")
+			self.object:set_texture_mod("^[colorize:"..self.damage_color..":130")
 			self.hurt_color_timer = 0.25
 			if puncher ~= self.object then
 				self.punched_timer = 0.8
@@ -148,7 +148,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 			self.object:add_velocity(dir)
 			self.add_sword_wear(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		elseif (self.punched_timer <= 0 and self.death_animation_timer == 0) then
-			self.object:set_texture_mod("^[colorize:red:130")
+			self.object:set_texture_mod("^[colorize:"..self.damage_color..":130")
 			self.hurt_color_timer = 0.25
 			if puncher ~= self.object then
 				self.punched_timer = 0.8
