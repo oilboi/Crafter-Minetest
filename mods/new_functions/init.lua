@@ -287,12 +287,11 @@ local function fix_breath_hack()
 				local hp =  player:get_hp()
 				meta:set_int("drowning", 1)
 				if hp > 0 then
-					player:set_hp(hp-1)
+					player:set_hp(hp-2)
 					player:add_player_velocity(vector.new(0,-15,0))
 				end
 			end
 		elseif breath < 10 then --reset the bar
-			
 			breath = breath + 1
 			meta:set_int("breath", breath)
 			meta:set_int("drowning", 0)
