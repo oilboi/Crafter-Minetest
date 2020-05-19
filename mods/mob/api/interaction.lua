@@ -217,6 +217,10 @@ mobs.create_interaction_functions = function(def,mob_register)
 		global_mob_amount = global_mob_amount - 1
 		print("Mobs Died. Current Mobs: "..global_mob_amount)
 		
+		if self.custom_on_death then
+			self.custom_on_death(self)
+		end
+
 		self.object:remove()
 	end
 	
@@ -309,7 +313,9 @@ mobs.create_interaction_functions = function(def,mob_register)
 		end
 		--stare straight if not found
 		if player_found == false then
-			self.move_head(self,nil,dtime)
+			if self.move_head then
+				self.move_head(self,nil,dtime)
+			end
 			if self.manage_hostile_timer then
 				self.manage_hostile_timer(self,dtime)
 			end
