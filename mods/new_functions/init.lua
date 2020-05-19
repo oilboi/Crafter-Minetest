@@ -249,6 +249,14 @@ minetest.register_on_joinplayer(function(player)
 	meta:set_int("breathbar", bubble_id)
 end)
 
+minetest.register_on_respawnplayer(function(player)
+	local meta = player:get_meta()
+	meta:set_int("breath", 10)
+	meta:set_int("drowning", 0)
+	meta:set_int("breath_ticker", 0)
+	player:hud_change(meta:get_int("breathbar"), "number", 20)
+end)
+
 --begin custom breathbar
 local name
 local indexer
@@ -274,6 +282,7 @@ local function fix_breath_hack()
 				breath = breath - 1
 				meta:set_int("breath", breath)
 				player:hud_change(breathbar, "number", breath*2)
+				meta:set_int("drowning", 0)
 			elseif breath <= 0 and ticker >= 5 then
 				local hp =  player:get_hp()
 				meta:set_int("drowning", 1)
@@ -282,7 +291,9 @@ local function fix_breath_hack()
 						{
 						full_punch_interval=1.5,
 						damage_groups = {fleshy=2},
-						})
+						}
+					)
+					player:add_player_velocity(vector.new(0,-15,0))
 				end
 			end
 		elseif breath < 10 then --reset the bar
@@ -293,8 +304,6 @@ local function fix_breath_hack()
 			meta:set_int("breath_ticker", 0)
 			player:hud_change(breathbar, "number", breath*2)
 		end
-
-		print(meta:get_int("drowning"))
 	end
 	
 	minetest.after(0.25, function()
