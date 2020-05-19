@@ -371,7 +371,7 @@ minetest.register_entity("boat:iron_boat", {
 		if pointed_thing then
 			self.swimming = true
 			local vel = self.object:get_velocity()
-			local goal = 3
+			local goal = 10
 			local acceleration = vector.new(0,goal-vel.y,0)
 			self.object:add_velocity(acceleration)
 		end
