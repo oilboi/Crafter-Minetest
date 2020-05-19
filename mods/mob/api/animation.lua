@@ -1,18 +1,20 @@
 -- 
 mobs.create_animation_functions = function(def,mob_register)
-	mob_register.set_animation = function(self)
-		if self.speed == 0 or vector.equals(self.direction,vector.new(0,0,0)) then
-			self.current_animation = 0
-			self.object:set_animation(def.standing_frame, 1, 0, true)
-		else
-			if self.current_animation ~= 1 then
-				self.object:set_animation(def.moving_frame, 1, 0, true)
-				self.current_animation = 1
+	if def.movement_type ~= "jump" then
+		mob_register.set_animation = function(self)
+			if self.speed == 0 or vector.equals(self.direction,vector.new(0,0,0)) then
+				self.current_animation = 0
+				self.object:set_animation(def.standing_frame, 1, 0, true)
+			else
+				if self.current_animation ~= 1 then
+					self.object:set_animation(def.moving_frame, 1, 0, true)
+					self.current_animation = 1
+				end
+				
+				local speed = self.object:get_velocity()
+				speed.y = 0
+				self.object:set_animation_frame_speed(vector.distance(vector.new(0,0,0),speed)*def.animation_multiplier)
 			end
-			
-			local speed = self.object:get_velocity()
-			speed.y = 0
-			self.object:set_animation_frame_speed(vector.distance(vector.new(0,0,0),speed)*def.animation_multiplier)
 		end
 	end
 
