@@ -116,6 +116,17 @@ enable_mod_channels = true
 - Fixed boat scaling
 - Use gerold55's nice xp orb texture
 - Updated readme.md
+- Added nitro creeper and it spawns in the nether
+- Added damage texture modifier
+- Add in custom explodey mob color modifier
+- Add in custom blink timer for explodey mobs
+- Overhauled drowning
+- Drowning now takes away a full heart
+- Overhauled mob jumping
+- Added in 22i's slime model
+- Exploding mobs now instantly dissapear when detonated
+- Added in gunpowder and tnt is now made from it
+- Added in prototype spider
 ---
 
 
