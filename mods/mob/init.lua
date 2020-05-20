@@ -588,7 +588,7 @@ mobs.register_mob(
 	 automatic_face_movement_dir = 90,
 	 automatic_face_movement_max_rotation_per_sec = 300,
 	 makes_footstep_sound = false,
-	 hp = 10,
+	 hp = 40,
 	 gravity = {x = 0, y = -9.81, z = 0},
 	 movement_type = "walk",
 	 max_speed = 5,
@@ -603,8 +603,8 @@ mobs.register_mob(
 	 ----
 	 death_rotation = "z",
 	 
-	 hurt_sound = "pig",
-	 die_sound = "pig_die",
+	 hurt_sound = "spider",
+	 die_sound = "spider_die",
 	 
 	 
 	 hostile = true,
