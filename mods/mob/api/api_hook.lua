@@ -74,6 +74,7 @@ mob_register.group_attack = def.group_attack
 mob_register.death_rotation = def.death_rotation
 
 mob_register.head_mount = def.head_mount
+mob_register.rotational_correction = def.rotational_correction or 0
 
 mob_register.hurt_sound = def.hurt_sound
 mob_register.die_sound = def.die_sound

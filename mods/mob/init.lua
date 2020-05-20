@@ -573,19 +573,20 @@ mobs.register_mob(
 
 
 	 -----
-	 --head_bone = "body.head",
+	 head_bone = "body.head",
 	 debug_head_pos = false,
-	 head_directional_offset = 0.5, --used in vector.multiply(minetest.yaw_to_dir(body_yaw),head_offset)
-	 head_height_offset = 0.8, --added to the base y position
+	 rotational_correction = -math.pi/2,
+	 head_directional_offset = 0.3, --used in vector.multiply(minetest.yaw_to_dir(body_yaw),head_offset)
+	 head_height_offset = 0.63, --added to the base y position
 	 --use this to correct the head position initially because it becomes severly offset - look at your blender model to get this perfect
-	 head_position_correction = vector.new(0,3,-0.5),
+	 head_position_correction = vector.new(0,1.24,0),
 	 --this is used to tell the game the orientation of the bone (swaps x to and y, then z and y)
 	 head_coord = "horizontal",
 	 -----
 	 
 	 is_visible = true,
 	 pointable = true,
-	 automatic_face_movement_dir = 0,
+	 automatic_face_movement_dir = 90,
 	 automatic_face_movement_max_rotation_per_sec = 300,
 	 makes_footstep_sound = false,
 	 hp = 10,
