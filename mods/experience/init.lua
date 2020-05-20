@@ -12,7 +12,7 @@ local experience_bar_max = 36
 minetest.register_on_joinplayer(function(player)
     local meta = player:get_meta()
     meta:set_float("experience_collection_buffer",0)
-        player:hud_add({
+    player:hud_add({
         hud_elem_type = "statbar",
         position = {x = 0.5, y = 1},
         text = "heart_bg.png",
@@ -105,7 +105,7 @@ minetest.register_on_joinplayer(function(player)
 
         offset = {x = 0, y = -(48 + 24 + 24)},
 
-        size = { x=28, y=28 },
+        --size = { x=28, y=28 },
         -- Size of element in pixels
 
         z_index = 0,
@@ -134,7 +134,7 @@ minetest.register_on_joinplayer(function(player)
 
         offset = {x = -1, y = -(48 + 24 + 25)},
 
-        size = { x=28, y=28 },
+        --size = { x=28, y=28 },
         -- Size of element in pixels
 
         z_index = 0,
