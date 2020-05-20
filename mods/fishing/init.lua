@@ -11,14 +11,14 @@
 	end,
 	
 	on_secondary_use = function(itemstack, user, pointed_thing)
-		if not players_fishing[name] then
+		local name = user:get_player_name()
+		if not players_fishing[name] or not players_fishing[name]:get_luaentity() then
 			local pos = user:get_pos()
             local anchor = table.copy(pos)
 			pos.y = pos.y + 1.625
 			--minetest.sound_play("gun_shot",{object=user, pitch = math.random(80,100)/100})
 			local dir = user:get_look_dir()
 			local force = vector.multiply(dir,20)
-			local name = user:get_player_name()
 			local obj = minetest.add_entity(pos,"fishing:lure")
 			if obj then
 				minetest.sound_play("woosh",{pos=pos})
@@ -31,18 +31,24 @@
 	end,
 })
 
+minetest.register_craft({
+	output = "fishing:pole",
+	recipe = {
+		{"",          "",           "main:stick"},
+		{"",          "main:stick", "mob:string"},
+		{"main:stick","",           "mob:string"},
+	}
+})
+
 
 local lure = {}
 lure.initial_properties = {
 	physical = false,
 	collide_with_objects = false,
 	collisionbox = {-0.1, -0.1, -0.1, 0.1, 0.1, 0.1},
-	visual = "mesh",
-	visual_size = {x = 1, y = 1},
-	mesh = "lure.b3d",
-	textures = {
-		"lure.png"
-	},
+	visual = "sprite",
+	visual_size = {x = 0.25, y = 0.25},
+	textures = {"lure.png"},
 	is_visible = true,
 	pointable = false,
 	--glow = -1,
@@ -54,6 +60,7 @@ lure.on_activate = function(self)
 end
 lure.in_water = false
 lure.interplayer = nil
+lure.catch_timer = 0
 lure.on_step = function(self, dtime)
 	local pos = self.object:get_pos()
 	local node = minetest.get_node(pos).name
@@ -68,10 +75,11 @@ lure.on_step = function(self, dtime)
         local newp = table.copy(pos)
         newp.y = newp.y - 0.1
         local node = minetest.get_node(newp).name
-        if node ~= "air" and node ~= "main:water" and node ~= "main:waterflow" then
+		if node ~= "air" and node ~= "main:water" and node ~= "main:waterflow" then
             if self.player then
-                players_fishing[self.player] = nil
-            end
+				players_fishing[self.player] = nil
+			end
+			minetest.sound_play("line_break",{pos=pos,gain=0.3})
             self.object:remove()
         end
 	end
@@ -80,27 +88,37 @@ lure.on_step = function(self, dtime)
 			local p = minetest.get_player_by_name(self.player)
 			if p:get_player_control().RMB then
                 local pos2 = p:get_pos()
-				local vel = vector.direction(pos,pos2)
+				local vel = vector.direction(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z))
 				self.object:set_velocity(vector.multiply(vel,2))
-                if math.random() > 0.97 then
-                   local obj = minetest.add_item(pos, "main:dirt")
-                   if obj then
-                       local distance = vector.distance(pos,pos2)
-                       local dir = vector.direction(pos,pos2)
-                       local force = vector.multiply(dir,distance)
-                       force.y = 6
-                       obj:set_velocity(force)
-                   end
-                   players_fishing[self.player] = nil
-                   self.object:remove()
+
+
+				self.catch_timer = self.catch_timer + dtime
+
+				if self.catch_timer >= 0.5 then
+					print("trying")
+					self.catch_timer = 0
+					if math.random() > 0.96 then
+						local obj = minetest.add_item(pos, "fishing:fish")
+						if obj then
+							local distance = vector.distance(pos,pos2)
+							local dir = vector.direction(pos,pos2)
+							local force = vector.multiply(dir,distance)
+							force.y = 6
+							obj:set_velocity(force)
+							minetest.sound_play("splash",{pos=obj:get_pos(),gain=0.25})
+						end
+						players_fishing[self.player] = nil
+						self.object:remove()
+					end
                 end
 			else
 				self.object:set_velocity(vector.new(0,0,0))
 			end
             if p then
                 local pos2 = p:get_pos()
-                if vector.distance(pos, pos2) < 1 then
-                    players_fishing[self.player] = nil
+                if vector.distance(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z)) < 1 then
+					players_fishing[self.player] = nil
+					minetest.sound_play("line_break",{pos=pos,gain=0.3,pitch=0.5})
                     self.object:remove()
                 end
             end
@@ -111,3 +129,20 @@ lure.on_step = function(self, dtime)
 	end
 end
 minetest.register_entity("fishing:lure", lure)
+
+minetest.register_craft({
+	type = "cooking",
+	output = "fishing:fish_cooked",
+	recipe = "fishing:fish",
+})
+
+minetest.register_craftitem("fishing:fish", {
+	description = "Raw Fish",
+	inventory_image = "fish.png",
+	groups = {satiation=1,hunger=2},
+})
+minetest.register_craftitem("fishing:fish_cooked", {
+	description = "Cooked Fish",
+	inventory_image = "fish_cooked.png",
+	groups = {satiation=3,hunger=5},
+})

@@ -126,7 +126,11 @@ enable_mod_channels = true
 - Added in 22i's slime model
 - Exploding mobs now instantly dissapear when detonated
 - Added in gunpowder and tnt is now made from it
-- Added in prototype spider
+- Added in spider
+- Improved mob jumping
+- Added in string
+- Added in fishing - Fishing poles are made from sticks and string
+- Fixed raw porkchops not being edible
 ---
 
 

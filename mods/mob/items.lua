@@ -2,7 +2,7 @@
 minetest.register_craftitem("mob:raw_porkchop", {
 	description = "Raw Porkchop",
 	inventory_image = "raw_porkchop.png",
-	health = 2,
+	groups = {satiation=1,hunger=2},
 })
 minetest.register_craftitem("mob:cooked_porkchop", {
 	description = "Cooked Porkchop",
@@ -27,5 +27,4 @@ minetest.register_craft({
 	type = "cooking",
 	output = "mob:cooked_porkchop",
 	recipe = "mob:raw_porkchop",
-	groups = {satiation=6,hunger=7},
 })
