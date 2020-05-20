@@ -325,6 +325,20 @@ minetest.register_node("weather:snow_block", {
 		},
 })
 
+minetest.register_abm({
+	label = "snow and ice melt",
+	nodenames = {"weather:snow","main:ice"},
+	neighbors = {"air"},
+	interval = 3,
+	chance = 10,
+	catch_up = true,
+	action = function(pos)
+		if weather_type ~= 1 then
+			minetest.remove_node(pos)
+		end
+	end,
+})
+
 minetest.register_craftitem("weather:snowball", {
 	description = "Snowball",
 	inventory_image = "snowball.png",

@@ -133,6 +133,7 @@ enable_mod_channels = true
 - Fixed raw porkchops not being edible
 - Fixed xp level number scaling huge
 - Added in cool spider sounds
+- Snow and ice now melts when not snowing
 ---
 
 
@@ -169,6 +170,12 @@ enable_mod_channels = true
 
 > #1 idea, - make mobs pathfind
 
+### snowman
+- only spawns when snowing
+- throws snowballs at the player
+- creates snow wherever it "walks"
+- you can put a pumpkin on it's head to make it survive when it's not snowing out
+- drops snowballs and coal
 
 ### sheep
 - sheep can be punched to drop wool without damage

@@ -95,9 +95,8 @@ lure.on_step = function(self, dtime)
 				self.catch_timer = self.catch_timer + dtime
 
 				if self.catch_timer >= 0.5 then
-					print("trying")
 					self.catch_timer = 0
-					if math.random() > 0.96 then
+					if math.random() > 0.94 then
 						local obj = minetest.add_item(pos, "fishing:fish")
 						if obj then
 							local distance = vector.distance(pos,pos2)
