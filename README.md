@@ -131,6 +131,8 @@ enable_mod_channels = true
 - Added in string
 - Added in fishing - Fishing poles are made from sticks and string
 - Fixed raw porkchops not being edible
+- Fixed xp level number scaling huge
+- Added in cool spider sounds
 ---
 
 
