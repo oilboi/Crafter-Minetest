@@ -12,7 +12,7 @@ local find_node_height = 32
 local spawn = true
 
 local spawn_table = {"pig"}
-local dark_spawn_table = {"creeper"}
+local dark_spawn_table = {"creeper","spider"}
 local nether_spawn_table = {"nitro_creeper"}
 local aether_spawn_table = {"phyg"}
 

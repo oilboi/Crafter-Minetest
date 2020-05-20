@@ -18,6 +18,10 @@ minetest.register_craftitem("mob:gunpowder", {
 	description = "Gunpowder",
 	inventory_image = "gunpowder.png",
 })
+minetest.register_craftitem("mob:string", {
+	description = "String",
+	inventory_image = "string.png",
+})
 --cooking
 minetest.register_craft({
 	type = "cooking",

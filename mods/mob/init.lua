@@ -565,7 +565,6 @@ mobs.register_mob(
 	 visual_size = {x = 3, y = 3},
 	 mesh = "spider.b3d",
 	 textures = {
-		 --blank out the first two to create adult pig
 		"spider.png"
 	 },
 	 
@@ -596,19 +595,19 @@ mobs.register_mob(
 	 state = 0,
 	 view_distance = 15,
 	 
-	 item_drop = "mob:raw_porkchop", 
+	 item_drop = "mob:string", 
 	 standing_frame = {x=21,y=21},
 	 moving_frame = {x=0,y=20},
 	 animation_multiplier = 20,
 	 ----
 	 ----
-	 death_rotation = "x",
+	 death_rotation = "z",
 	 
 	 hurt_sound = "pig",
 	 die_sound = "pig_die",
 	 
 	 
-	 hostile = false,
+	 hostile = true,
 	 attacked_hostile = false,
 	 attack_type = "punch",
 	 group_attack = true,

@@ -262,7 +262,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 				--print(self.hostile)
 				if self.hostile == true then
 					local distance = vector.distance(pos,pos2)
-					
+					self.following_pos = vector.new(pos.x,pos.y-1.625,pos.z)
 					--punch the player
 					if self.attack_type == "punch" then
 						if distance < 2.5 and self.punch_timer <= 0 and object:get_hp() > 0 then
@@ -315,6 +315,9 @@ mobs.create_interaction_functions = function(def,mob_register)
 		if player_found == false then
 			if self.move_head then
 				self.move_head(self,nil,dtime)
+			end
+			if self.following_pos then
+				self.following_pos = nil
 			end
 			if self.manage_hostile_timer then
 				self.manage_hostile_timer(self,dtime)
