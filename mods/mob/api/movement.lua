@@ -86,14 +86,6 @@ mobs.create_movement_functions = function(def,mob_register)
 					local pointed_thing = ray:next()
 					if pointed_thing then
 						if minetest.get_nodedef(minetest.get_node(pointed_thing.under).name, "walkable") then
-							minetest.add_particle({
-								pos = pointed_thing.intersection_point,
-								velocity = {x=0, y=0, z=0},
-								acceleration = {x=0, y=0, z=0},
-								expirationtime = 5,
-								size = 1,
-								texture = "dirt.png",
-							})
 							local vel = self.object:get_velocity()
 							self.jump_timer = 1+math.random()
 							self.object:set_velocity(vector.new(vel.x,5,vel.z))
@@ -137,10 +129,10 @@ mobs.create_movement_functions = function(def,mob_register)
 		
 		mob_register.jump = function(self,moveresult)
 			if moveresult and moveresult.touching_ground and self.direction then
-				if self.make_jump_noise then
-					minetest.sound_play("slime_splat", {object=self.object, gain = 1.0, max_hear_distance = 10,pitch = math.random(80,100)/100})
-				end
 				if self.jump_timer <= 0 then
+					if self.make_jump_noise then
+						minetest.sound_play("slime_splat", {object=self.object, gain = 1.0, max_hear_distance = 10,pitch = math.random(80,100)/100})
+					end
 					local vel = self.object:get_velocity()
 					self.object:set_velocity(vector.new(vel.x,5,vel.z))
 					if self.following == true then
