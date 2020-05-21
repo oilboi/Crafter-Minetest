@@ -74,6 +74,67 @@ mobs.register_mob(
 	}
 )
 
+
+mobs.register_mob(
+	{
+	 mobname = "snowman",
+	 physical = true,
+	 collide_with_objects = false,
+	 collisionbox = {-0.37, 0, -0.37, 0.37, 1.75, 0.37},
+	 visual = "mesh",
+	 visual_size = {x = 3, y = 3},
+	 mesh = "snowman.b3d",
+	 textures = {
+		"snowman.png","snowman.png","snowman.png","snowman.png","snowman.png","snowman.png",
+	 },
+	 
+	 --these are used to anchor a point to the head position
+
+
+	 -----
+	 --head_bone = "head",
+	 debug_head_pos = false,
+	 head_directional_offset = 0, --used in vector.multiply(minetest.yaw_to_dir(body_yaw),head_offset)
+	 head_height_offset = 1.625, --added to the base y position
+	 --use this to correct the head position initially because it becomes severly offset - look at your blender model to get this perfect
+	 head_position_correction = vector.new(0,4.6,0),
+	 --this is used to tell the game the orientation of the bone (swaps x to and y, then z and y)
+	 head_coord = "vertical",
+	 --rotational_correction = math.pi/2,
+	 -----
+	 
+	 is_visible = true,
+	 pointable = true,
+	 automatic_face_movement_dir = 0,
+	 automatic_face_movement_max_rotation_per_sec = 300,
+	 makes_footstep_sound = false,
+	 hp = 10,
+	 gravity = {x = 0, y = -9.81, z = 0},
+	 movement_type = "walk",
+	 max_speed = 5,
+	 state = 0,
+	 view_distance = 15,
+	 
+	 item_drop = "weather:snowball", 
+	 standing_frame = {x=0,y=0},
+	 moving_frame = {x=0,y=0},
+	 animation_multiplier = 10,
+	 ----
+	 ----
+	 death_rotation = "x",
+	 
+	 hurt_sound = "wool",
+	 die_sound = "wool",
+	 
+	 
+	 hostile = true,
+	 attack_type = "projectile",
+	 projectile_type = "weather:snowball",
+	 projectile_timer_cooldown = 1,
+
+	}
+)
+
 mobs.register_mob(
 	{
 	 mobname = "phyg",

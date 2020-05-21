@@ -148,7 +148,7 @@ mobs.create_head_functions = function(def,mob_register)
 				--print(self.head_rotation.y)
 				--if passed a direction to look
 				local pos = self.object:get_pos()
-				local body_yaw = self.object:get_yaw()-math.pi/2
+				local body_yaw = self.object:get_yaw()-math.pi/2+self.rotational_correction
 								
 				local dir = vector.multiply(minetest.yaw_to_dir(body_yaw),self.head_directional_offset)
 				

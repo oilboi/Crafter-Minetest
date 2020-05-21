@@ -295,11 +295,12 @@ mobs.create_interaction_functions = function(def,mob_register)
 						if self.projectile_timer <= 0 then
 							self.projectile_timer = self.projectile_timer_cooldown
 							
-							local obj = minetest.add_entity(pos, self.projectile_type)
+							local obj = minetest.add_entity(vector.new(pos.x,pos.y+self.object:get_properties().collisionbox[5],pos.z), self.projectile_type)
 							if obj then
-								local dir = vector.multiply(vector.direction(pos,pos2), 50)
+								local dir = vector.multiply(vector.direction(pos,vector.new(pos2.x,pos2.y-3,pos2.z)), 50)
 								obj:set_velocity(dir)
 								obj:get_luaentity().timer = 2
+								obj:get_luaentity().owner = self.object
 							end
 						end
 					end

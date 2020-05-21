@@ -391,11 +391,11 @@ snowball.on_step = function(self, dtime)
 	
 	--hit object with the snowball
 	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
-		if (object:is_player() and object:get_hp() > 0 and object:get_player_name() ~= self.thrower) or (object:get_luaentity() and object:get_luaentity().mob == true) then
+		if (object:is_player() and object:get_hp() > 0 and object:get_player_name() ~= self.thrower) or (object:get_luaentity() and object:get_luaentity().mob == true and object ~= self.owner) then
 			object:punch(self.object, 2, 
 				{
 				full_punch_interval=1.5,
-				damage_groups = {damage=0},
+				damage_groups = {damage=0,fleshy=0},
 			})
 			hit = true
 			break
