@@ -383,8 +383,8 @@ minetest.register_node("utility:furnace_active", {
 minetest.register_craft({
 	output = "utility:furnace",
 	recipe = {
-		{"group:stone", "group:stone", "group:stone"},
-		{"group:stone", "", "group:stone"},
-		{"group:stone", "group:stone", "group:stone"},
+		{"main:cobble", "main:cobble", "main:cobble"},
+		{"main:cobble", "",            "main:cobble"},
+		{"main:cobble", "main:cobble", "main:cobble"},
 	}
 })

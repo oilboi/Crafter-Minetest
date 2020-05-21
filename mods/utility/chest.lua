@@ -262,9 +262,9 @@ chest.register_chest("chest", {
 minetest.register_craft({
 	output = "utility:chest",
 	recipe = {
-		{"group:wood", "group:wood", "group:wood"},
-		{"group:wood", "",                          "group:wood"},
-		{"group:wood", "group:wood", "group:wood"},
+		{"main:wood", "main:wood", "main:wood"},
+		{"main:wood", "",          "main:wood"},
+		{"main:wood", "main:wood", "main:wood"},
 	}
 })
 
