@@ -134,6 +134,7 @@ enable_mod_channels = true
 - Fixed xp level number scaling huge
 - Added in cool spider sounds
 - Snow and ice now melts when not snowing
+- Implemented mob pathfinding
 ---
 
 
