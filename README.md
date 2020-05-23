@@ -136,6 +136,8 @@ enable_mod_channels = true
 - Snow and ice now melts when not snowing
 - Implemented mob pathfinding
 - Add in snowman with 22i's model redesigned by ElCeejo
+- Add in better particles for eating and treecapitator
+- Make player model's head pitch follow the player's look pitch
 ---
 
 
