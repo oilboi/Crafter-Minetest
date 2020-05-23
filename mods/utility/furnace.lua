@@ -91,6 +91,17 @@ local function allow_metadata_inventory_take(pos, listname, index, stack, player
 	return stack:get_count()
 end
 
+local function on_metadata_inventory_take(pos, listname, index, stack, player)
+	if listname == "dst" then
+		if stack and stack:get_count() then
+			local experience = math.ceil(stack:get_count()/1.5)
+			local dir = vector.divide(minetest.facedir_to_dir(minetest.get_node(pos).param2),-1.95)
+			local newpos = vector.add(pos,dir)
+			minetest.throw_experience(newpos, experience)
+		end
+	end
+end
+
 local function swap_node(pos, name)
 	local node = minetest.get_node(pos)
 	if node.name == name then
@@ -342,6 +353,7 @@ minetest.register_node("utility:furnace", {
 	allow_metadata_inventory_put = allow_metadata_inventory_put,
 	allow_metadata_inventory_move = allow_metadata_inventory_move,
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
+	on_metadata_inventory_take = on_metadata_inventory_take,
 })
 
 minetest.register_node("utility:furnace_active", {
@@ -375,6 +387,7 @@ minetest.register_node("utility:furnace_active", {
 	allow_metadata_inventory_put = allow_metadata_inventory_put,
 	allow_metadata_inventory_move = allow_metadata_inventory_move,
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
+	on_metadata_inventory_take = on_metadata_inventory_take,
 	on_destruct = function(pos)
 		destroy_furnace(pos)
 	end,
