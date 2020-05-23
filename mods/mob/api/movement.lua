@@ -189,7 +189,7 @@ mobs.create_movement_functions = function(def,mob_register)
 					local path = minetest.find_path(self.object:get_pos(),self.following_pos,self.view_distance*2,1,1,"A*")
 					if path then--or (self.path_data and table.getn(self.path_data) < 3)) then
 						self.path_data = path
-					elseif not path and self.path_data and table.getn(self.path_data) <= 2 then
+					elseif not path and self.path_data and table.getn(self.path_data) <= 4 then
 						self.path_data = nil
 					end
 
