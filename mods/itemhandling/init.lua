@@ -150,6 +150,7 @@ function minetest.item_drop(itemstack, dropper, pos)
 			dir.x = dir.x * 2.9
 			dir.y = dir.y * 2.9 + 2
 			dir.z = dir.z * 2.9
+			dir = vector.add(dir,dropper:get_player_velocity())
 			obj:set_velocity(dir)
 			obj:get_luaentity().dropped_by = dropper:get_player_name()
 			obj:get_luaentity().collection_timer = 0
