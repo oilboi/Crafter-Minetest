@@ -1,4 +1,7 @@
 These are pulled from multiple mods from 22i https://github.com/22i, also thank you 22i for attributing me to OpenAI
 
 Currently:
-pig - https://github.com/22i/minecraft-voxel-blender-models
+pig,creeper,nitro_creeper,spider - https://github.com/22i/minecraft-voxel-blender-models
+
+snowman - Originally by 22i (see above) redone by ElCeejo https://github.com/ElCeejo Thanks!
+

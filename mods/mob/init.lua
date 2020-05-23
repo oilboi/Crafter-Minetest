@@ -92,7 +92,7 @@ mobs.register_mob(
 
 
 	 -----
-	 --head_bone = "head",
+	 --head_bone = "Bone",
 	 debug_head_pos = false,
 	 head_directional_offset = 0, --used in vector.multiply(minetest.yaw_to_dir(body_yaw),head_offset)
 	 head_height_offset = 1.625, --added to the base y position
@@ -105,7 +105,7 @@ mobs.register_mob(
 	 
 	 is_visible = true,
 	 pointable = true,
-	 automatic_face_movement_dir = 0,
+	 automatic_face_movement_dir = -90,
 	 automatic_face_movement_max_rotation_per_sec = 300,
 	 makes_footstep_sound = false,
 	 hp = 10,
@@ -121,7 +121,7 @@ mobs.register_mob(
 	 animation_multiplier = 10,
 	 ----
 	 ----
-	 death_rotation = "x",
+	 death_rotation = "z",
 	 
 	 hurt_sound = "wool",
 	 die_sound = "wool",
@@ -132,6 +132,29 @@ mobs.register_mob(
 	 projectile_type = "weather:snowball",
 	 projectile_timer_cooldown = 1,
 
+	 custom_function = function(self,dtime,moveresult)
+		if moveresult and moveresult.touching_ground then
+			local pos = vector.floor(vector.add(self.object:get_pos(),0.5))
+
+			if self.custom_old_pos and not vector.equals(pos,self.custom_old_pos) then
+				if minetest.get_nodedef(minetest.get_node(pos).name,"buildable_to") == true and minetest.get_nodedef(minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name,"buildable_to") == false then
+					minetest.set_node(pos,{name="weather:snow"})
+				end
+			end
+			self.custom_old_pos = pos
+		end
+	 end,
+
+	 custom_timer = 0.75,
+	 custom_timer_function = function(self,dtime)
+		if weather_type and weather_type ~= 1 then
+			self.object:punch(self.object, 2, 
+				{
+				full_punch_interval=1.5,
+				damage_groups = {damage=2},
+				})
+		end
+	 end,
 	}
 )
 

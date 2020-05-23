@@ -59,6 +59,16 @@ mobs.create_timer_functions = function(def,mob_register)
 		end
 	end
 
+	if def.custom_timer then
+		mob_register.do_custom_timer = function(self,dtime)
+			self.c_timer = self.c_timer + dtime
+			if self.c_timer >= self.custom_timer then
+				self.c_timer = 0 
+				self.custom_timer_function(self,dtime)
+			end
+		end
+	end
+
 	mob_register.manage_projectile_timer = function(self,dtime)
 		self.projectile_timer = self.projectile_timer - dtime
 	end

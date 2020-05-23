@@ -97,7 +97,9 @@ mob_register.explosion_blink_color = def.explosion_blink_color or "white"
 mob_register.explosion_blink_timer = def.explosion_blink_timer or 0.2
 
 mob_register.custom_function_begin = def.custom_function_begin
+mob_register.custom_function = def.custom_function
 mob_register.custom_function_end = def.custom_function_end
+
 mob_register.projectile_timer_cooldown = def.projectile_timer_cooldown
 mob_register.attacked_hostile = def.attacked_hostile
 
@@ -131,6 +133,12 @@ if def.pathfinds then
 	mob_register.pathfinding_timer = 0
 end
 
+if def.custom_timer then
+	mob_register.c_timer = 0
+	mob_register.custom_timer = def.custom_timer
+	mob_register.custom_timer_function = def.custom_timer_function
+end
+
 mobs.create_movement_functions(def,mob_register)
 mobs.create_interaction_functions(def,mob_register)
 mobs.create_data_handling_functions(def,mob_register)
@@ -149,9 +157,20 @@ mob_register.on_step = function(self, dtime,moveresult)
 	end
 	
 	if self.dead == false and self.death_animation_timer == 0 then
+		if self.do_custom_timer then
+			self.do_custom_timer(self,dtime)
+		end
+
+		if self.custom_function then
+			self.custom_function(self,dtime,moveresult)
+		end
+
 		self.move(self,dtime,moveresult)
+		
 		--self.debug_nametag(self,dtime)
+
 		self.manage_hurt_color_timer(self,dtime)
+
 		if self.set_animation then
 			self.set_animation(self)
 		end
