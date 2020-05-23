@@ -183,13 +183,14 @@ mobs.create_movement_functions = function(def,mob_register)
 		mob_register.pathfinding = function(self,dtime)
 			if self.following and self.following_pos then
 				self.pathfinding_timer = self.pathfinding_timer + dtime
-				if self.pathfinding_timer > 1 then
+				if self.pathfinding_timer > 1 or not self.path_data then
 					self.pathfinding_timer = 0
 
-					local path = minetest.find_path(self.object:get_pos(),self.following_pos,self.view_distance*2,1,1,"A*_noprefetch")
-
-					if path and (not self.path_data or (self.path_data and table.getn(self.path_data) < 3)) then
+					local path = minetest.find_path(self.object:get_pos(),self.following_pos,self.view_distance*2,1,1,"A*")
+					if path then--or (self.path_data and table.getn(self.path_data) < 3)) then
 						self.path_data = path
+					elseif not path and self.path_data and table.getn(self.path_data) <= 2 then
+						self.path_data = nil
 					end
 
 					if self.path_data then
