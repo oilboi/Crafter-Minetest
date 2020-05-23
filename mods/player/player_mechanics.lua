@@ -73,11 +73,23 @@ minetest.register_globalstep(function(dtime)
 				eating = eating + dtime
 				eating_timer = eating_timer + dtime
 				
+				local pos = player:get_pos()
+
+				if sneaking then
+					pos.y = pos.y + 1.425
+				else
+					pos.y = pos.y + 1.625
+				end
+
+				local dir = vector.multiply(player:get_look_dir(),0.5)
+
+				local newpos = vector.add(pos,dir)
+
 				local ps = minetest.add_particlespawner({
 					amount = 30,
 					time = 0.00001,
-					minpos = {x=-0.2, y=-1.5, z=0.5},
-					maxpos = {x=0.2, y=1.7, z=0.5},
+					minpos = {x=newpos.x-0.2, y=newpos.y+0.2, z=newpos.z-0.2},
+					maxpos = {x=newpos.x+0.2, y=newpos.y-0.2, z=newpos.z+0.2},
 					minvel = vector.new(-0.5,0,-0.5),
 					maxvel = vector.new(0.5,0,0.5),
 					minacc = {x=0, y=-9.81, z=1},
@@ -86,7 +98,7 @@ minetest.register_globalstep(function(dtime)
 					maxexptime = 1.5,
 					minsize = 0,
 					maxsize = 0,
-					attached = player,
+					--attached = player,
 					collisiondetection = true,
 					collision_removal = true,
 					vertical = false,
@@ -94,25 +106,6 @@ minetest.register_globalstep(function(dtime)
 					--texture = "eat_particles_1.png"
 				})
 
-				--[[
-				minetest.add_particlespawner({
-					amount = 30,
-					time = 0.0001,
-					minpos = {x=pos.x-0.5, y=pos.y-0.5+y, z=pos.z-0.5},
-					maxpos = {x=pos.x+0.5, y=pos.y+0.5+y, z=pos.z+0.5},
-					minvel = vector.new(-1,0,-1),
-					maxvel = vector.new(1,0,1),
-					minacc = {x=0, y=-9.81, z=0},
-					maxacc = {x=0, y=-9.81, z=0},
-					minexptime = 0.5,
-					maxexptime = 1.5,
-					minsize = 0,
-					maxsize = 0,
-					collisiondetection = true,
-					vertical = false,
-					node = {name= "name"},
-				})
-				]]--
 
 				if eating_timer + dtime > 0.25 then
 					minetest.sound_play("eat", {
