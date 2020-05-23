@@ -55,7 +55,13 @@ mob_register.death_animation_timer = 0
 mob_register.dead = false
 
 mob_register.mob = true
+
 mob_register.hostile = def.hostile
+if def.friendly_in_daylight == true then
+	mob_register.friendly_in_daylight = def.friendly_in_daylight
+	mob_register.friendly_in_daylight_timer = 0
+end
+
 mob_register.hostile_cooldown = def.hostile_cooldown
 
 mob_register.hostile_timer = 0
@@ -153,6 +159,10 @@ mob_register.on_step = function(self, dtime,moveresult)
 			self.look_around(self,dtime)
 		end
 		
+		if self.handle_friendly_in_daylight_timer then
+			self.handle_friendly_in_daylight_timer(self,dtime)
+		end
+
 		self.manage_punch_timer(self,dtime)
 	else
 		self.manage_death_animation(self,dtime)

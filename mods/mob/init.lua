@@ -669,7 +669,8 @@ mobs.register_mob(
 	 
 	 
 	 hostile = true,
-	 attacked_hostile = false,
+	 friendly_in_daylight = true,
+	 attacked_hostile = true,
 	 attack_type = "punch",
 	 group_attack = true,
 	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion

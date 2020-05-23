@@ -64,7 +64,7 @@ mobs.create_data_handling_functions = function(def,mob_register)
 		--animation on the mob's body
 		
 		--we add in items we want to see in this list
-		local debug_items = {"hostile"}
+		local debug_items = {"hostile","hostile_timer"}
 		local text = ""
 		for _,item in pairs(debug_items) do
 			if self[item] ~= nil then

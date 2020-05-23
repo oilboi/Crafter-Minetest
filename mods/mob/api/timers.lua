@@ -63,6 +63,23 @@ mobs.create_timer_functions = function(def,mob_register)
 		self.projectile_timer = self.projectile_timer - dtime
 	end
 
+	if def.friendly_in_daylight then
+		mob_register.handle_friendly_in_daylight_timer = function(self,dtime)
+			self.friendly_in_daylight_timer = self.friendly_in_daylight_timer + dtime
+			if self.friendly_in_daylight_timer >= 2 then
+				self.friendly_in_daylight_timer = 0
+				local pos = self.object:get_pos()
+				if minetest.get_node_light(pos) >= 13 then --1 greater than torch light
+					if self.following == false then
+						self.hostile = false
+					end
+				else
+					self.hostile = true
+				end
+			end
+		end
+	end
+
 	--this stops the pig from flying into the air
 	mob_register.manage_jump_timer = function(self,dtime)
 		if self.jump_timer > 0 then
