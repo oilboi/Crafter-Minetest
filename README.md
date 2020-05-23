@@ -135,7 +135,7 @@ enable_mod_channels = true
 - Added in cool spider sounds
 - Snow and ice now melts when not snowing
 - Implemented mob pathfinding
-- Add in snowman
+- Add in snowman with 22i's model redesigned by ElCeejo
 ---
 
 
