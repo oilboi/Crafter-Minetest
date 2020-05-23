@@ -216,23 +216,27 @@ minetest.register_node("main:tree", {
 		--check if wielding axe?
 		--turn treecapitator into an enchantment?
 		local meta = minetest.get_meta(pos)
-		local tool_meta = digger:get_wielded_item():get_meta()
-		if tool_meta:get_int("treecapitator") > 0 then
-			if not meta:contains("placed") then
-				--remove tree
-				for y = -6,6 do
-					local name = minetest.get_node(vector.new(pos.x,pos.y+y,pos.z)).name
-					--print(y)
-					if name == "main:tree" or name == "redstone:node_activated_tree" then
-						minetest.node_dig(vector.new(pos.x,pos.y+y,pos.z), node, digger)
+		--local tool_meta = digger:get_wielded_item():get_meta()
+		--if tool_meta:get_int("treecapitator") > 0 then
+		if not meta:contains("placed") then
+			--remove tree
+			for y = -6,6 do
+				local name = minetest.get_node(vector.new(pos.x,pos.y+y,pos.z)).name
+				--print(y)
+				if name == "main:tree" or name == "redstone:node_activated_tree" then
+					minetest.node_dig(vector.new(pos.x,pos.y+y,pos.z), node, digger)
+					local name2 = minetest.get_node(vector.new(pos.x,pos.y+y-1,pos.z)).name
+					if name2 == "main:dirt" or name2 == "main:grass" then
+						minetest.add_node(vector.new(pos.x,pos.y+y,pos.z),{name="main:sapling"})
 					end
 				end
-			else
-				minetest.node_dig(pos, node, digger)
 			end
 		else
 			minetest.node_dig(pos, node, digger)
 		end
+		--else
+		--	minetest.node_dig(pos, node, digger)
+		--end
 	end
 })
 
