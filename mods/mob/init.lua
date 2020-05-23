@@ -537,8 +537,8 @@ mobs.register_mob(
 	 --projectile_timer_cooldown = 5,
 	 --projectile_type = "tnt:tnt",
 	 
-	 explosion_radius = 3, -- how far away the mob has to be to initialize the explosion
-	 explosion_power = 7, -- how big the explosion has to be
+	 explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
+	 explosion_power = 4, -- how big the explosion has to be
 	 explosion_time = 3, -- how long it takes for a mob to explode
 	 
 	 die_in_light = false,
