@@ -1,15 +1,17 @@
 --item definition
 
-minetest.register_craftitem("main:apple", {
+minetest.register_food("main:apple",{
 	description = "Apple",
-	inventory_image = "apple.png",
-	groups = {satiation=1,hunger=2},
+	texture = "apple.png",
+	satiation=1,
+	hunger=2,
 })
 
-minetest.register_craftitem("main:sugar", {
+minetest.register_food("main:sugar",{
 	description = "Sugar",
-	inventory_image = "sugar.png",
-	groups = {satiation=1,hunger=1},
+	texture = "sugar.png",
+	satiation=1,
+	hunger=1,
 })
 
 minetest.register_craftitem("main:stick", {

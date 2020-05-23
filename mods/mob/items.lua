@@ -1,14 +1,19 @@
 --items
-minetest.register_craftitem("mob:raw_porkchop", {
+minetest.register_food("mob:raw_porkchop",{
 	description = "Raw Porkchop",
-	inventory_image = "raw_porkchop.png",
-	groups = {satiation=1,hunger=2},
+	texture = "raw_porkchop.png",
+	satiation=1,
+	hunger=2,
 })
-minetest.register_craftitem("mob:cooked_porkchop", {
+
+
+minetest.register_food("mob:cooked_porkchop",{
 	description = "Cooked Porkchop",
-	inventory_image = "cooked_porkchop.png",
-	groups = {satiation=3,hunger=5},
+	texture = "cooked_porkchop.png",
+	satiation=3,
+	hunger=5,
 })
+
 
 minetest.register_craftitem("mob:slimeball", {
 	description = "Slimeball",
@@ -22,6 +27,7 @@ minetest.register_craftitem("mob:string", {
 	description = "String",
 	inventory_image = "string.png",
 })
+
 --cooking
 minetest.register_craft({
 	type = "cooking",

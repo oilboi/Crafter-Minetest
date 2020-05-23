@@ -84,15 +84,36 @@ minetest.register_globalstep(function(dtime)
 					maxacc = {x=0, y=-9.81, z=1},
 					minexptime = 0.5,
 					maxexptime = 1.5,
-					minsize = 0.5,
-					maxsize = 1,
+					minsize = 0,
+					maxsize = 0,
 					attached = player,
 					collisiondetection = true,
 					collision_removal = true,
 					vertical = false,
-					texture = "eat_particles_1.png"
+					node = {name= item.."node"},
+					--texture = "eat_particles_1.png"
 				})
-				
+
+				--[[
+				minetest.add_particlespawner({
+					amount = 30,
+					time = 0.0001,
+					minpos = {x=pos.x-0.5, y=pos.y-0.5+y, z=pos.z-0.5},
+					maxpos = {x=pos.x+0.5, y=pos.y+0.5+y, z=pos.z+0.5},
+					minvel = vector.new(-1,0,-1),
+					maxvel = vector.new(1,0,1),
+					minacc = {x=0, y=-9.81, z=0},
+					maxacc = {x=0, y=-9.81, z=0},
+					minexptime = 0.5,
+					maxexptime = 1.5,
+					minsize = 0,
+					maxsize = 0,
+					collisiondetection = true,
+					vertical = false,
+					node = {name= "name"},
+				})
+				]]--
+
 				if eating_timer + dtime > 0.25 then
 					minetest.sound_play("eat", {
 						to_player = player:get_player_name(),

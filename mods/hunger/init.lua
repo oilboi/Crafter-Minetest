@@ -241,3 +241,38 @@ function minetest.eat_food(player,item)
 	stack:take_item()
 	player:set_wielded_item(stack)
 end
+
+
+function minetest.register_food(name,def)
+	minetest.register_craftitem(":"..name, {
+		description = def.description,
+		inventory_image = def.texture,
+		groups = {satiation=def.satiation,hunger=def.hunger},
+	})
+
+	minetest.register_node(":"..name.."node", {
+		description = "NIL",
+		tiles = {def.texture},
+		groups = {},
+		drop = "",
+		drawtype = "allfaces",
+		on_construct = function(pos)
+			minetest.remove_node(pos)
+		end,
+	})
+end
+
+minetest.register_chatcommand("hungry", {
+	params = "<mob>",
+	description = "A debug command to test food",
+	privs = {server = true},
+	func = function(name)
+		local player = minetest.get_player_by_name(name)
+		local meta = player:get_meta()
+		meta:set_int("exhaustion_tick", 0)
+		meta:set_int("hunger", 1)
+		meta:set_int("satiation", 0)
+		local hunger_bar = meta:get_int("hunger_bar")
+		player:hud_change(hunger_bar, "number", 1)
+	end
+})

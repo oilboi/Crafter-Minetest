@@ -256,12 +256,13 @@ minetest.register_plant("melon_stem", {
 		seed_inventory_image = "melon_seeds.png",
 		seed_plants = "farming:melon_stem_1",
 })
-minetest.register_craftitem("farming:melon_slice", {
-	description = "Melon Slice",
-	inventory_image = "melon_slice.png",
-	groups = {satiation=1,hunger=2},
-})
 
+minetest.register_food("farming:melon_slice",{
+	description = "Melon Slice",
+	texture = "melon_slice.png",
+	satiation=1,
+	hunger=2,
+})
 
 
 minetest.register_plant("pumpkin_stem", {
@@ -341,18 +342,21 @@ minetest.register_craft({
 	recipe = "farming:pumpkin",
 	burntime = 3,
 })
+
 minetest.register_craft({
 	type = "cooking",
 	output = "farming:pumpkin_pie",
 	recipe = "farming:pumpkin",
 	cooktime = 2,
 })
-minetest.register_craftitem("farming:pumpkin_pie", {
-	description = "Pumpkin Pie",
-	inventory_image = "pumpkin_pie.png",
-	groups = {satiation=4,hunger=3},
-})
 
+
+minetest.register_food("farming:pumpkin_pie",{
+	description = "Pumpkin Pie",
+	texture = "pumpkin_pie.png",
+	satiation=4,
+	hunger=3,
+})
 
 minetest.register_decoration({
 	name = "farming:sugarcane",

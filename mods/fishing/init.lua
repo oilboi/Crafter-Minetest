@@ -135,13 +135,16 @@ minetest.register_craft({
 	recipe = "fishing:fish",
 })
 
-minetest.register_craftitem("fishing:fish", {
+minetest.register_food("fishing:fish",{
 	description = "Raw Fish",
-	inventory_image = "fish.png",
-	groups = {satiation=1,hunger=2},
+	texture = "fish.png",
+	satiation=1,
+	hunger=2,
 })
-minetest.register_craftitem("fishing:fish_cooked", {
+
+minetest.register_food("fishing:fish_cooked",{
 	description = "Cooked Fish",
-	inventory_image = "fish_cooked.png",
-	groups = {satiation=3,hunger=5},
+	texture = "fish_cooked.png",
+	satiation=3,
+	hunger=5,
 })

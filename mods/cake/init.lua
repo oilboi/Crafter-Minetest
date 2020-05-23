@@ -30,7 +30,7 @@ for i = 0,13 do
 		},
 		drop = "",
 		sounds = main.woolSound(),
-		groups = {wool=1,cake=i,falling_node=1,satiation=5,hunger=3},
+		groups = {wool=1,cake=i,falling_node=1},
 		on_construct = function(pos)
 			--randomly cake eats itself
 			if math.random() > 0.995 then

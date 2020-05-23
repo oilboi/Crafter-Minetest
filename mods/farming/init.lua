@@ -10,17 +10,18 @@ minetest.register_craftitem("farming:wheat", {
 	inventory_image = "wheat_harvested.png",
 })
 
-
-minetest.register_craftitem("farming:bread", {
+minetest.register_food("farming:bread",{
 	description = "Bread",
-	inventory_image = "bread.png",
-	groups = {satiation=3,hunger=3},
+	texture = "bread.png",
+	satiation=2,
+	hunger=2,
 })
 
-minetest.register_craftitem("farming:toast", {
+minetest.register_food("farming:toast",{
 	description = "Toast",
-	inventory_image = "bread.png^[colorize:black:100",
-	groups = {satiation=4,hunger=4},
+	texture = "bread.png^[colorize:black:100",
+	satiation=4,
+	hunger=4,
 })
 
 minetest.register_craft({
