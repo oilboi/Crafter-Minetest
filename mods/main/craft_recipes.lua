@@ -82,6 +82,12 @@ minetest.register_craft({
 	recipe = "main:coal",
 	burntime = 20,
 })
+
+minetest.register_craft({
+	type = "fuel",
+	recipe = "main:charcoal",
+	burntime = 7,
+})
 ---crafting
 minetest.register_craft({
 	type = "shapeless",
