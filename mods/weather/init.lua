@@ -4,8 +4,10 @@ local weather_nodes_channel = minetest.mod_channel_join("weather_nodes")
 
 
 local weather_max = 2
-weather_type = math.random(0,weather_max)
-local weather_timer = 0
+
+local mod_storage = minetest.get_mod_storage()
+
+weather_type = 0
 
 local path = minetest.get_modpath(minetest.get_current_modname())
 dofile(path.."/commands.lua")
@@ -74,7 +76,7 @@ end)
 --have the client send the server the ready signal
 minetest.register_on_modchannel_message(function(channel_name, sender, message)
 	if channel_name == "weather_intake" then
-		print("sending player weather")
+		--print("sending player weather")
 		--for some reason this variable assignment does not work outside the scope of this function
 		local all_nodes_serialized = minetest.serialize(all_nodes)
 		weather_nodes_channel:send_all(all_nodes_serialized)
@@ -226,20 +228,36 @@ end)
 
 
 --this sets random weather
-local weather_timer_goal = (math.random(5,7)+math.random())*60
---minetest.register_globalstep(function(dtime)
+local initial_run = true
 local function randomize_weather()
-	weather_type = math.random(0,weather_max)
+	if initial_run == false then
+		weather_type = math.random(0,weather_max)
+	else
+		initial_run = false
+	end
+
 	function_send_weather_type()
 	update_player_sky()
+
 	minetest.after((math.random(5,7)+math.random())*60, function()
 		randomize_weather()
 	end)
 end
-minetest.register_on_mods_loaded(function()
+
+minetest.register_on_mods_loaded(function()	
+	if mod_storage:get_int("weather_initialized") == 0 then
+		mod_storage:set_int("weather_initialized",1)
+		weather_type = math.random(0,weather_max)
+	else
+		weather_type = mod_storage:get_int("weather_type")
+	end
 	minetest.after(0,function()
 		randomize_weather()
 	end)
+end)
+
+minetest.register_on_shutdown(function()
+	mod_storage:set_int("weather_type", weather_type)
 end)
 
 local snowball_throw = function(player)
