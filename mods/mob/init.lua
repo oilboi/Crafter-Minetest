@@ -630,8 +630,6 @@ mobs.register_mob(
 	 },
 	 
 	 --these are used to anchor a point to the head position
-
-
 	 -----
 	 head_bone = "body.head",
 	 debug_head_pos = false,
@@ -668,6 +666,8 @@ mobs.register_mob(
 	 die_sound = "spider_die",
 	 
 	 
+	 pathfinds = true,
+
 	 hostile = true,
 	 friendly_in_daylight = true,
 	 attacked_hostile = true,

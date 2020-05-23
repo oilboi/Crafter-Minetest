@@ -74,38 +74,54 @@ mobs.create_movement_functions = function(def,mob_register)
 			if moveresult and moveresult.touching_ground and self.direction then
 				local pos = self.object:get_pos()
 				pos.y = pos.y+0.1
-				--assume collisionbox is even x and z
-				local modifier = self.object:get_properties().collisionbox[4]*3
-				
 
-				local pos2 = vector.add(vector.multiply(self.direction,modifier),pos)
-
-				local ray = minetest.raycast(pos, pos2, false, false)
-				
-				local pointed_thing
-
-				if ray then
-					pointed_thing = ray:next()
-				end
-					
-				if pointed_thing then
-					if minetest.get_nodedef(minetest.get_node(pointed_thing.under).name, "walkable") then
-						--print("jump")
-						local vel = self.object:get_velocity()
-						--self.jump_timer = 1+math.random()
+				if self.path_data and table.getn(self.path_data) > 0 then
+					--smart jump
+					local y = math.floor(pos.y+0.5)
+					local vel = self.object:get_velocity()
+					if y < self.path_data[1].y then
 						self.object:set_velocity(vector.new(vel.x,5,vel.z))
+					elseif self.path_data[2] and y < self.path_data[2].y then
+						self.object:set_velocity(vector.new(vel.x,5,vel.z))
+					elseif self.path_data[3] and y < self.path_data[3].y then
+						self.object:set_velocity(vector.new(vel.x,5,vel.z))
+					elseif ((vel.x == 0 and self.direction.x ~= 0) or (vel.z == 0 and self.direction.z ~= 0)) then
+						self.object:set_velocity(vector.new(vel.x,5,vel.z))
+					end
+				else
+					--assume collisionbox is even x and z
+					local modifier = self.object:get_properties().collisionbox[4]*3
+					
+
+					local pos2 = vector.add(vector.multiply(self.direction,modifier),pos)
+
+					local ray = minetest.raycast(pos, pos2, false, false)
+					
+					local pointed_thing
+
+					if ray then
+						pointed_thing = ray:next()
+					end
+						
+					if pointed_thing then
+						if minetest.get_nodedef(minetest.get_node(pointed_thing.under).name, "walkable") then
+							--print("jump")
+							local vel = self.object:get_velocity()
+							--self.jump_timer = 1+math.random()
+							self.object:set_velocity(vector.new(vel.x,5,vel.z))
+						else
+							--print("velocity check")
+							local vel = self.object:get_velocity()
+							if (vel.x == 0 and self.direction.x ~= 0) or (vel.z == 0 and self.direction.z ~= 0) then
+								self.object:set_velocity(vector.new(vel.x,5,vel.z))
+							end
+						end
 					else
-						--print("velocity check")
+						--print("velcheck 2")
 						local vel = self.object:get_velocity()
 						if (vel.x == 0 and self.direction.x ~= 0) or (vel.z == 0 and self.direction.z ~= 0) then
 							self.object:set_velocity(vector.new(vel.x,5,vel.z))
 						end
-					end
-				else
-					--print("velcheck 2")
-					local vel = self.object:get_velocity()
-					if (vel.x == 0 and self.direction.x ~= 0) or (vel.z == 0 and self.direction.z ~= 0) then
-						self.object:set_velocity(vector.new(vel.x,5,vel.z))
 					end
 				end
 			end
@@ -164,8 +180,43 @@ mobs.create_movement_functions = function(def,mob_register)
 	end
 	
 	if def.pathfinds then
+		mob_register.pathfinding = function(self,dtime)
+			if self.following and self.following_pos then
+				self.pathfinding_timer = self.pathfinding_timer + dtime
+				if self.pathfinding_timer > 1 then
+					self.pathfinding_timer = 0
 
+					local path = minetest.find_path(self.object:get_pos(),self.following_pos,self.view_distance*2,1,1,"A*_noprefetch")
 
+					if path and (not self.path_data or (self.path_data and table.getn(self.path_data) < 3)) then
+						self.path_data = path
+					end
+
+					if self.path_data then
+						for index,pos_data in pairs(self.path_data) do
+							--print(dump(pos_data))
+							minetest.add_particle({
+								pos = pos_data,
+								velocity = {x=0, y=0, z=0},
+								acceleration = {x=0, y=0, z=0},
+								expirationtime = 1,
+								size = 1,
+								texture = "dirt.png",
+							})
+						end
+					end
+				end
+			end
+			local selfpos = self.object:get_pos()
+			local pos1 = vector.new(selfpos.x,0,selfpos.z)
+			if self.path_data and table.getn(self.path_data) > 0 and vector.distance(pos1,vector.new(self.path_data[1].x,0,self.path_data[1].z)) < 1 then
+				--shift whole list down
+				for i = 2,table.getn(self.path_data) do
+					self.path_data[i-1] = self.path_data[i]
+				end
+				self.path_data[table.getn(self.path_data)] = nil
+			end
+		end
 	end
 	
 	return(mob_register)

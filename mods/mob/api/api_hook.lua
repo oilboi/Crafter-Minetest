@@ -127,7 +127,8 @@ mob_register.mob = true
 mob_register.collision_boundary = def.collision_boundary or 1
 
 if def.pathfinds then
-	mob_register.path = {}
+	--mob_register.path = {}
+	mob_register.pathfinding_timer = 0
 end
 
 mobs.create_movement_functions(def,mob_register)
@@ -159,6 +160,10 @@ mob_register.on_step = function(self, dtime,moveresult)
 			self.look_around(self,dtime)
 		end
 		
+		if self.pathfinding then
+			self.pathfinding(self,dtime)
+		end
+
 		if self.handle_friendly_in_daylight_timer then
 			self.handle_friendly_in_daylight_timer(self,dtime)
 		end

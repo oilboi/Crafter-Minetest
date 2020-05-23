@@ -262,7 +262,8 @@ mobs.create_interaction_functions = function(def,mob_register)
 				--print(self.hostile)
 				if self.hostile == true then
 					local distance = vector.distance(pos,pos2)
-					self.following_pos = vector.new(pos.x,pos.y-1.625,pos.z)
+					self.following_pos = vector.new(pos2.x,pos2.y-1.625,pos2.z)
+
 					--punch the player
 					if self.attack_type == "punch" then
 						if distance < 2.5 and self.punch_timer <= 0 and object:get_hp() > 0 then
@@ -304,7 +305,13 @@ mobs.create_interaction_functions = function(def,mob_register)
 							end
 						end
 					end
-					self.direction = vector.direction(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z))
+					--smart
+					if self.path_data and table.getn(self.path_data) > 0 then
+						self.direction = vector.direction(vector.new(pos.x,0,pos.z), vector.new(self.path_data[1].x,0,self.path_data[1].z))
+					--dumb
+					else
+						self.direction = vector.direction(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z))
+					end
 					self.speed = self.max_speed
 					self.following = true
 				end
