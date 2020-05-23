@@ -12,6 +12,7 @@ local find_node_height = 32
 local spawn = true
 
 local spawn_table = {"pig"}
+local snow_spawn_table = {"snowman"}
 local dark_spawn_table = {"creeper","spider","big_slime","medium_slime","small_slime"}
 local nether_spawn_table = {"nitro_creeper"}
 local aether_spawn_table = {"phyg"}
@@ -62,7 +63,11 @@ local function spawn_mobs()
 					minetest.add_entity(mob_pos,"mob:"..mob_spawning)
 				else
 					local light_level = minetest.get_node_light(spawner[1])
-					if light_level < 10 then
+					if weather_type == 1 then
+						local mob_spawning = snow_spawn_table[math.random(1,table.getn(snow_spawn_table))]
+						print("Snow Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
+						minetest.add_entity(mob_pos,"mob:"..mob_spawning)
+					elseif light_level < 10 then
 						local mob_spawning = dark_spawn_table[math.random(1,table.getn(dark_spawn_table))]
 						print("Dark Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
 						minetest.add_entity(mob_pos,"mob:"..mob_spawning)
