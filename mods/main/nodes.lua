@@ -232,6 +232,24 @@ minetest.register_node("main:tree", {
 				if name == "main:tree" or name == "redstone:node_activated_tree" then
 					wield_stack:add_wear(wear)
 					minetest.node_dig(vector.new(pos.x,pos.y+y,pos.z), node, digger)
+					minetest.add_particlespawner({
+						amount = 30,
+						time = 0.0001,
+						minpos = {x=pos.x-0.5, y=pos.y-0.5+y, z=pos.z-0.5},
+						maxpos = {x=pos.x+0.5, y=pos.y+0.5+y, z=pos.z+0.5},
+						minvel = vector.new(-1,0,-1),
+						maxvel = vector.new(1,0,1),
+						minacc = {x=0, y=-9.81, z=0},
+						maxacc = {x=0, y=-9.81, z=0},
+						minexptime = 0.5,
+						maxexptime = 1.5,
+						minsize = 0,
+						maxsize = 0,
+						collisiondetection = true,
+						vertical = false,
+						node = {name= name},
+					})
+					
 					local name2 = minetest.get_node(vector.new(pos.x,pos.y+y-1,pos.z)).name
 					if name2 == "main:dirt" or name2 == "main:grass" then
 						minetest.add_node(vector.new(pos.x,pos.y+y,pos.z),{name="main:sapling"})
