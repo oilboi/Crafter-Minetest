@@ -218,12 +218,19 @@ minetest.register_node("main:tree", {
 		local meta = minetest.get_meta(pos)
 		--local tool_meta = digger:get_wielded_item():get_meta()
 		--if tool_meta:get_int("treecapitator") > 0 then
-		if not meta:contains("placed") then
+		if not meta:contains("placed") and string.match(digger:get_wielded_item():get_name(), "axe") then
+			local tool_capabilities = digger:get_wielded_item():get_tool_capabilities()
+			
+			local wear = minetest.get_dig_params({wood=1}, tool_capabilities).wear
+
+			local wield_stack = digger:get_wielded_item()
+
 			--remove tree
 			for y = -6,6 do
 				local name = minetest.get_node(vector.new(pos.x,pos.y+y,pos.z)).name
-				--print(y)
+
 				if name == "main:tree" or name == "redstone:node_activated_tree" then
+					wield_stack:add_wear(wear)
 					minetest.node_dig(vector.new(pos.x,pos.y+y,pos.z), node, digger)
 					local name2 = minetest.get_node(vector.new(pos.x,pos.y+y-1,pos.z)).name
 					if name2 == "main:dirt" or name2 == "main:grass" then
@@ -231,12 +238,11 @@ minetest.register_node("main:tree", {
 					end
 				end
 			end
+			digger:set_wielded_item(wield_stack)
 		else
 			minetest.node_dig(pos, node, digger)
 		end
-		--else
-		--	minetest.node_dig(pos, node, digger)
-		--end
+		
 	end
 })
 
