@@ -176,12 +176,17 @@ function minetest.calculate_knockback(player, ...)
 	return old_calculate_knockback(player, ...)
 end
 
+--converts yaw to degrees
+local degrees = function(yaw)
+	return(yaw*180.0/math.pi)
+end
+
 -- Check each player and apply animations
 minetest.register_globalstep(function()
 	for _, player in pairs(minetest.get_connected_players()) do
 		--update the player wielded item model
 		player_api.set_wielded_item(player)
-		
+
 		local name = player:get_player_name()
 		local model_name = player_model[name]
 		local model = model_name and models[model_name]
@@ -196,6 +201,13 @@ minetest.register_globalstep(function()
 			
 			local meta = player:get_meta()
 			local movement_state = meta:get_string("player.player_movement_state")
+
+			local pitch = -degrees(player:get_look_vertical())
+			if movement_state == "3" then
+				pitch = pitch + 15
+			end
+			player:set_bone_position("Head", vector.new(0,6.3,0), vector.new(pitch,0,0))
+
 
 			-- Apply animations based on what the player is doing
 			if player:get_hp() == 0 then
