@@ -81,17 +81,18 @@ minetest.register_globalstep(function(dtime)
 					pos.y = pos.y + 1.625
 				end
 
-				local dir = vector.multiply(player:get_look_dir(),0.5)
-
+				local dir = vector.multiply(player:get_look_dir(),0.3)
 				local newpos = vector.add(pos,dir)
 
+				local vel = player:get_player_velocity()
+
 				local ps = minetest.add_particlespawner({
-					amount = 30,
+					amount = 6,
 					time = 0.00001,
 					minpos = {x=newpos.x-0.2, y=newpos.y+0.2, z=newpos.z-0.2},
 					maxpos = {x=newpos.x+0.2, y=newpos.y-0.2, z=newpos.z+0.2},
-					minvel = vector.new(-0.5,0,-0.5),
-					maxvel = vector.new(0.5,0,0.5),
+					minvel = vector.new(vel.x-0.5,0.2,vel.z-0.5),
+					maxvel = vector.new(vel.x+0.5,0.6,vel.z+0.5),
 					minacc = {x=0, y=-9.81, z=1},
 					maxacc = {x=0, y=-9.81, z=1},
 					minexptime = 0.5,
