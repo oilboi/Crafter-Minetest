@@ -1,4 +1,4 @@
-0.1) do jetboat
+0) Make armor
 1.5) make bookshelves
 2.) make better enchanting
 --find mod that has these?
@@ -18,5 +18,6 @@
 16.) Make the buildtest pipes actually work
 17.) Make the quarry
 42.) Make treecapitator check for axe
-11.) Make saplings use node timers
 234.) Make all nodes that use ABM use node timers
+432432.) fix the redstone piston bug https://forum.minetest.net/viewtopic.php?p=372505#p372505
+23432244.) overhaul redstone again https://forum.minetest.net/viewtopic.php?p=372654#p372654
