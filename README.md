@@ -138,6 +138,7 @@ enable_mod_channels = true
 - Add in snowman with 22i's model redesigned by ElCeejo
 - Add in better particles for eating and treecapitator
 - Make player model's head pitch follow the player's look pitch
+- Make music play during certain parts of the day/night
 ---
 
 
