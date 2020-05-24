@@ -34,6 +34,7 @@ mobs.create_movement_functions = function(def,mob_register)
 					damage_groups = {damage=hurty},
 				})
 			end
+			self.hurt_inside_timer = 0.25
 		else
 			self.hurt_inside_timer = self.hurt_inside_timer - dtime
 		end
