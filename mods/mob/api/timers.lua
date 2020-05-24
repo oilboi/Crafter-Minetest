@@ -79,7 +79,7 @@ mobs.create_timer_functions = function(def,mob_register)
 			if self.friendly_in_daylight_timer >= 2 then
 				self.friendly_in_daylight_timer = 0
 				local pos = self.object:get_pos()
-				if minetest.get_node_light(pos) >= 13 then --1 greater than torch light
+				if pos and minetest.get_node_light(pos) >= 13 then --1 greater than torch light
 					if self.following == false then
 						self.hostile = false
 					end

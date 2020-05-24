@@ -55,6 +55,7 @@ mob_register.death_animation_timer = 0
 mob_register.dead = false
 
 mob_register.mob = true
+mob_register.mobname = def.mobname
 
 mob_register.hostile = def.hostile
 if def.friendly_in_daylight == true then
@@ -123,8 +124,6 @@ mob_register.current_animation = 0
 mob_register.hurt_color_timer = 0
 mob_register.damage_color = def.damage_color or "red"
 mob_register.custom_on_death = def.custom_on_death
-
-mob_register.mob = true
 
 mob_register.custom_on_activate = def.custom_on_activate
 

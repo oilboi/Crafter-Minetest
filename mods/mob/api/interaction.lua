@@ -74,8 +74,6 @@ mobs.create_interaction_functions = function(def,mob_register)
 				local y_top_diff = (pos.y + collisionbox[5]) - pos2.y
 
 
-				
-
 				local distance = vector.distance(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z))
 
 				if distance <= collision_boundary + object_collision_boundary and y_base_diff >= 0 and y_top_diff >= 0 then
@@ -155,6 +153,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 					self.hostile_timer = 20
 					if self.group_attack == true then
 						for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.view_distance)) do
+
 							if not object:is_player() and object:get_luaentity() and object:get_luaentity().mobname == self.mobname then
 								object:get_luaentity().hostile = true
 								object:get_luaentity().hostile_timer = 20

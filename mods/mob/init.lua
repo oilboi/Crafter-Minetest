@@ -699,9 +699,21 @@ mobs.register_mob(
 	 group_attack = true,
 
 	 custom_on_activate = function(self)
-		local obj = minetest.add_entity(self.object:get_pos(),"mob:pig")
-		obj:set_attach(self.object,"",vector.new(0,3,0),vector.new(0,90,0))
-		obj:set_properties({visual_size={x=1,y=1}})
+		if math.random() > 0.998 then
+			local obj = minetest.add_entity(self.object:get_pos(),"mob:pig")
+			local obj2 = minetest.add_entity(self.object:get_pos(),"tnt:tnt")
+			local obj3 = minetest.add_entity(self.object:get_pos(),"boat:boat")
+
+			obj2:get_luaentity().timer = 7
+			obj2:get_luaentity().radius = 7
+
+			obj:set_attach(self.object,"",vector.new(0,3,0),vector.new(0,90,0))
+			obj2:set_attach(obj,"",vector.new(0,4.5,0),vector.new(0,90,0))
+			obj3:set_attach(obj2,"",vector.new(0,6.5,0),vector.new(0,0,0))
+
+			obj:set_properties({visual_size={x=1,y=1}})
+			obj2:set_properties({visual_size={x=1/3,y=1/3}})
+		end
 	 end
 	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
 	 --explosion_power = 7, -- how big the explosion has to be
