@@ -77,6 +77,70 @@ mobs.register_mob(
 
 mobs.register_mob(
 	{
+	 mobname = "chicken",
+	 physical = true,
+	 collide_with_objects = false,
+	 collisionbox = {-0.225, 0, -0.225, 0.225, 0.675, 0.225},
+	 visual = "mesh",
+	 visual_size = {x = 3, y = 3},
+	 mesh = "chicken.b3d",
+	 textures = {
+		 --blank out the first two to create adult pig
+		"chicken.png"
+	 },
+	 
+	 --these are used to anchor a point to the head position
+
+
+	 -----
+	 head_bone = "head",
+	 debug_head_pos = false,
+	 rotational_correction = -math.pi/2,
+	 head_directional_offset = 0.2, --used in vector.multiply(minetest.yaw_to_dir(body_yaw),head_offset)
+	 head_height_offset = 0.82, --added to the base y position
+	 --use this to correct the head position initially because it becomes severly offset - look at your blender model to get this perfect
+	 head_position_correction = vector.new(0,1.8,-0.89),
+	 --this is used to tell the game the orientation of the bone (swaps x to and y, then z and y)
+	 head_coord = "vertical",
+	 flip_pitch = true,
+	 -----
+	 
+	 is_visible = true,
+	 pointable = true,
+	 automatic_face_movement_dir = 90,
+	 automatic_face_movement_max_rotation_per_sec = 300,
+	 makes_footstep_sound = false,
+	 hp = 10,
+	 gravity = {x = 0, y = -9.81, z = 0},
+	 movement_type = "walk",
+	 max_speed = 5,
+	 state = 0,
+	 view_distance = 15,
+	 
+	 item_drop = "mob:egg", 
+	 standing_frame = {x=20,y=20},
+	 moving_frame = {x=0,y=20},
+	 animation_multiplier = 20,
+	 ----
+	 ----
+	 death_rotation = "z",
+	 
+	 hurt_sound = "chicken_hurt",
+	 die_sound = "chicken_die",
+	 
+	 
+	 hostile = false,
+	 attacked_hostile = false,
+	 attack_type = "punch",
+	 group_attack = true,
+	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
+	 --explosion_power = 7, -- how big the explosion has to be
+	 --explosion_time = 3, -- how long it takes for a mob to explode
+	}
+)
+
+mobs.register_mob(
+	{
 	 mobname = "snowman",
 	 physical = true,
 	 collide_with_objects = false,
@@ -391,61 +455,6 @@ mobs.register_mob(
 )
 
 --[[
-mobs.register_mob(
-	{
-	 mobname = "flying_pig",
-	 physical = true,
-	 collide_with_objects = false,
-	 collisionbox = {-0.37, -0.4, -0.37, 0.37, 0.5, 0.37},
-	 visual = "mesh",
-	 visual_size = {x = 3, y = 3},
-	 mesh = "pig.x",
-	 textures = {
-		"flying_pig_body.png","flying_pig_leg.png","flying_pig_leg.png","flying_pig_leg.png","flying_pig_leg.png"
-	},
-	 is_visible = true,
-	 pointable = true,
-	 automatic_face_movement_dir = -90.0,
-	 automatic_face_movement_max_rotation_per_sec = 300,
-	 makes_footstep_sound = false,
-	 hp = 10,
-	 gravity = {x = 0, y = -1, z = 0},
-	 movement_type = "jump",
-	 max_speed = 5,
-	 hostile = true,
-	 state = 0,
-	 view_distance = 50,
-	 item_drop = "main:gold",
-	 item_minimum = 4,
-	 item_amount = 5,
-	  
-	 standing_frame = {x=0,y=0},
-	 moving_frame = {x=5,y=15},
-	 animation_multiplier = 5,
-	 ----
-	  
-	 has_head = true, --remove this when mesh based head rotation is implemented
-	 head_visual = "mesh",
-	 head_visual_size = {x = 1.1, y = 1.1},
-	 head_mesh = "pig_head.x",
-	 head_textures ={"flying_pig_head.png","flying_pig_nose.png"},
-	 head_mount = vector.new(0,1.2,1.9),
-	 
-	 death_rotation = "z",
-	 
-	 hurt_sound = "pig",
-	 die_sound = "pig_die",
-	 
-	 attack_type = "projectile",
-	 projectile_timer_cooldown = 5,
-	 projectile_type = "tnt:tnt",
-	 
-	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
-	 --explosion_power = 7, -- how big the explosion has to be
-	 --explosion_time = 3, -- how long it takes for a mob to explode
-	}
-)
-
 
 
 mobs.register_mob(

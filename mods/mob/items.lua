@@ -15,6 +15,13 @@ minetest.register_food("mob:cooked_porkchop",{
 })
 
 
+minetest.register_food("mob:egg",{
+	description = "Egg",
+	texture = "egg.png",
+	satiation=1,
+	hunger=3,
+})
+
 minetest.register_craftitem("mob:slimeball", {
 	description = "Slimeball",
 	inventory_image = "slimeball.png",

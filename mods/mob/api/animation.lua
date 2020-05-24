@@ -43,7 +43,7 @@ mobs.create_animation_functions = function(def,mob_register)
 			local acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
 			acceleration = vector.multiply(acceleration, 0.05)
 			self.object:add_velocity(acceleration)
-			self.object:set_animation({x=0,y=0}, 15, 0, true)
+			self.object:set_animation(def.standing_frame, 15, 0, true)
 		end
 	end
 	return(mob_register)

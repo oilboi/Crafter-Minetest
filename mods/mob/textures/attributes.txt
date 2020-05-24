@@ -1,3 +1,4 @@
 mob skins - 22i https://github.com/22i
 gunpowder, porkchop - https://github.com/minetest-texture-packs/Pixel-Perfection
 string, slimeball - oil_boi
+egg - Mineclone

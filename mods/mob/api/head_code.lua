@@ -108,6 +108,9 @@ mobs.create_head_functions = function(def,mob_register)
 						---begin pitch calculation
 						--feed a 2D coordinate flipped into dir to yaw to calculate pitch
 						head_rotation.x = degrees(minetest.dir_to_yaw(vector.new(vector.distance(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z)),0,pos.y-pos2.y))+(math.pi/2))
+						if self.flip_pitch then
+							head_rotation.x = head_rotation.x * -1
+						end
 						head_rotation.z = head_yaw
 						self.object:set_bone_position(self.head_bone, head_position, head_rotation)
 						return(true)
@@ -194,6 +197,9 @@ mobs.create_head_functions = function(def,mob_register)
 						---begin pitch calculation
 						--feed a 2D coordinate flipped into dir to yaw to calculate pitch
 						head_rotation.x = degrees(minetest.dir_to_yaw(vector.new(vector.distance(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z)),0,pos.y-pos2.y))+(math.pi/2))
+						if self.flip_pitch then
+							head_rotation.x = head_rotation.x * -1
+						end
 						head_rotation.y = -head_yaw
 						self.object:set_bone_position(self.head_bone, head_position, head_rotation)
 						return(true)
