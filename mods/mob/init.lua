@@ -291,6 +291,7 @@ mobs.register_mob(
 	textures = {
 		"slime.png"
 	},
+	collision_boundary = 2.5,
 	is_visible = true,
 	pointable = true,
 	automatic_face_movement_dir = 90,
@@ -329,6 +330,7 @@ mobs.register_mob(
 	textures = {
 		"slime.png"
 	},
+	collision_boundary = 1.25,
 	is_visible = true,
 	pointable = true,
 	automatic_face_movement_dir = 90,
@@ -368,6 +370,7 @@ mobs.register_mob(
 	textures = {
 		"slime.png"
 	},
+	collision_boundary = 0.6,
 	is_visible = true,
 	pointable = true,
 	automatic_face_movement_dir = 90,

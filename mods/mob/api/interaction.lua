@@ -40,28 +40,33 @@ mobs.create_interaction_functions = function(def,mob_register)
 		local pos = self.object:get_pos()
 		--do collision detection from the base of the mob
 		pos.y = pos.y - self.object:get_properties().collisionbox[2]
-		for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.collision_boundary)) do
+		for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.collision_boundary*2)) do
 			if object:is_player() or object:get_luaentity().mob == true then
 				local pos2 = object:get_pos()
 				
-				local dir = vector.direction(pos,pos2)
-				dir.y = 0
-				
-				--eliminate mob being stuck in corners
-				if dir.x == 0 and dir.z == 0 then
-					dir = vector.new(math.random(-1,1)*math.random(),0,math.random(-1,1)*math.random())
-				end
-				
-				local velocity = vector.multiply(dir,1.1)
-				
-				local vel1 = vector.multiply(velocity, -1)
-				local vel2 = velocity
-				self.object:add_velocity(vel1)
-				
-				if object:is_player() then
-					object:add_player_velocity(vel2)
-				else
-					object:add_velocity(vel2)
+				local distance = vector.distance(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z))
+
+				if distance <= self.collision_boundary then
+
+					local dir = vector.direction(pos,pos2)
+					dir.y = 0
+					
+					--eliminate mob being stuck in corners
+					if dir.x == 0 and dir.z == 0 then
+						dir = vector.new(math.random(-1,1)*math.random(),0,math.random(-1,1)*math.random())
+					end
+					
+					local velocity = vector.multiply(dir,1.1)
+					
+					local vel1 = vector.multiply(velocity, -1)
+					local vel2 = velocity
+					self.object:add_velocity(vel1)
+					
+					if object:is_player() then
+						object:add_player_velocity(vel2)
+					else
+						object:add_velocity(vel2)
+					end
 				end
 			end
 		end

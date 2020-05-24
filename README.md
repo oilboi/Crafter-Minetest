@@ -139,6 +139,7 @@ enable_mod_channels = true
 - Add in better particles for eating and treecapitator
 - Make player model's head pitch follow the player's look pitch
 - Make music play during certain parts of the day/night
+- Tweaked collision detection for mobs and make slime collision radius fit their size
 ---
 
 
@@ -177,7 +178,7 @@ enable_mod_channels = true
 
 ### snowman
 - you can put a pumpkin on it's head to make it survive when it's not snowing out
-- drops snowballs and coal
+- drops snowballs, coal, or carrot
 
 ### sheep
 - sheep can be punched to drop wool without damage
@@ -206,16 +207,11 @@ enable_mod_channels = true
 - drops all nodes that it's made of when killed
 
 
-### Exploder
-- sneaks up on you and then explodes
-- drops gun powder
-
 
 ---
 
 
 ## Game Mechanics:
-- xp (edit the node drops code to check if node has tag for xp)
 - brewing
 - enchanting/upgrading
 - magic (wands, spells, etc)
@@ -242,8 +238,6 @@ enable_mod_channels = true
 
 
 ### HALLOWEEN!
-- lava acts like water in the nether but lava in the other worlds
-- pumpkins
 - Jack O'Lanterns
 - corn and corn stalks
 - decorations
