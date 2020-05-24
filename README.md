@@ -173,12 +173,9 @@ enable_mod_channels = true
 
 ## MOBS:
 
-> #1 idea, - make mobs pathfind
+> #1 idea: weakness items, items that damage the mob more than diamond swords
 
 ### snowman
-- only spawns when snowing
-- throws snowballs at the player
-- creates snow wherever it "walks"
 - you can put a pumpkin on it's head to make it survive when it's not snowing out
 - drops snowballs and coal
 
