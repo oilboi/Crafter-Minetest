@@ -11,7 +11,7 @@ local find_node_height = 32
 --for debug testing to isolate mobs
 local spawn = true
 
-local spawn_table = {"pig"}
+local spawn_table = {"pig","chicken"}
 local snow_spawn_table = {"snowman"}
 local dark_spawn_table = {"creeper","spider","big_slime","medium_slime","small_slime"}
 local nether_spawn_table = {"nitro_creeper"}
