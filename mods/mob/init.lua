@@ -120,7 +120,7 @@ mobs.register_mob(
 	 item_drop = "mob:egg", 
 	 standing_frame = {x=20,y=20},
 	 moving_frame = {x=0,y=20},
-	 animation_multiplier = 20,
+	 animation_multiplier = 15,
 	 ----
 	 ----
 	 death_rotation = "z",
@@ -289,59 +289,6 @@ mobs.register_mob(
 	}
 )
 
-
---[[
-mobs.register_mob(
-	{
-	 mobname = "chicken",
-	 physical = true,
-	 collide_with_objects = false,
-	 collisionbox = {-0.37, -0.4, -0.37, 0.37, 0.5, 0.37},
-	 visual = "mesh",
-	 visual_size = {x = 3, y = 3},
-	 mesh = "chicken.b3d",
-	 textures = {
-		 --if you're wondering what mob this is, it's a chicken
-	 	"chicken.png","chicken.png","chicken.png","chicken.png","chicken.png","chicken.png","chicken.png","chicken.png","chicken.png","chicken.png","chicken.png","chicken.png","chicken.png","chicken.png"
-	 },
-	 is_visible = true,
-	 pointable = true,
-	 automatic_face_movement_dir = -90.0,
-	 automatic_face_movement_max_rotation_per_sec = 300,
-	 makes_footstep_sound = false,
-	 hp = 10,
-	 gravity = {x = 0, y = -9.81, z = 0},
-	 movement_type = "walk",
-	 max_speed = 5,
-	 hostile = false,
-	 state = 0,
-	 view_distance = 15,
-	 
-	 item_drop = "mob:raw_porkchop", 
-	 standing_frame = {x=0,y=0},
-	 moving_frame = {x=5,y=15},
-	 animation_multiplier = 5,
-	 ----
-	  
-	 has_head = true, --remove this when mesh based head rotation is implemented
-	 head_visual = "mesh",
-	 head_visual_size = {x = 1.1, y = 1.1},
-	 head_mesh = "pig_head.x",
-	 head_textures ={"head.png","nose.png"},
-	 head_mount = vector.new(0,1.2,1.9),
-	 
-	 death_rotation = "z",
-	 
-	 hurt_sound = "pig",
-	 die_sound = "pig_die",
-	 
-	 attack_type = "punch",
-	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
-	 --explosion_power = 7, -- how big the explosion has to be
-	 --explosion_time = 3, -- how long it takes for a mob to explode
-	}
-)
-]]--
 
 mobs.register_mob(
 	{
