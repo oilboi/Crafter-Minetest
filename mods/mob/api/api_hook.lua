@@ -126,7 +126,7 @@ mob_register.custom_on_death = def.custom_on_death
 
 mob_register.mob = true
 
-mob_register.collision_boundary = def.collision_boundary or 1
+mob_register.custom_on_activate = def.custom_on_activate
 
 if def.pathfinds then
 	--mob_register.path = {}

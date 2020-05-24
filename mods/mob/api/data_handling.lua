@@ -55,6 +55,9 @@ mobs.create_data_handling_functions = function(def,mob_register)
 		end
 		self.is_mob = true
 		self.object:set_armor_groups({immortal = 1})
+		if self.custom_on_activate then
+			self.custom_on_activate(self)
+		end
 		--self.object:set_yaw(math.pi*math.random(-1,1)*math.random())
 	end
 

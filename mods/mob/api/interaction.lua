@@ -39,14 +39,46 @@ mobs.create_interaction_functions = function(def,mob_register)
 	mob_register.collision_detection = function(self)
 		local pos = self.object:get_pos()
 		--do collision detection from the base of the mob
-		pos.y = pos.y - self.object:get_properties().collisionbox[2]
-		for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.collision_boundary*2)) do
-			if object:is_player() or object:get_luaentity().mob == true then
+		
+		local collisionbox = self.object:get_properties().collisionbox
+
+		pos.y = pos.y + collisionbox[2]
+		
+		local collision_boundary = collisionbox[4]
+
+		local radius = collision_boundary
+
+		if collisionbox[5] > collision_boundary then
+			radius = collisionbox[5]
+		end
+
+		for _,object in ipairs(minetest.get_objects_inside_radius(pos, radius*1.25)) do
+			if object ~= self.object and (object:is_player() or object:get_luaentity().mob == true) and
+			--don't collide with rider, rider don't collide with thing
+			(not object:get_attach() or (object:get_attach() and object:get_attach() ~= self.object)) and 
+			(not self.object:get_attach() or (self.object:get_attach() and self.object:get_attach() ~= object)) then
+
 				local pos2 = object:get_pos()
 				
+				local object_collisionbox = object:get_properties().collisionbox
+
+				pos2.y = pos2.y + object_collisionbox[2]
+
+				local object_collision_boundary = object_collisionbox[4]
+
+
+				--this is checking the difference of the object collided with's possision
+				--if positive top of other object is inside (y axis) of current object
+				local y_base_diff = (pos2.y + object_collisionbox[5]) - pos.y
+
+				local y_top_diff = (pos.y + collisionbox[5]) - pos2.y
+
+
+				
+
 				local distance = vector.distance(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z))
 
-				if distance <= self.collision_boundary then
+				if distance <= collision_boundary + object_collision_boundary and y_base_diff >= 0 and y_top_diff >= 0 then
 
 					local dir = vector.direction(pos,pos2)
 					dir.y = 0

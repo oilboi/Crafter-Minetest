@@ -302,7 +302,7 @@ mobs.register_mob(
 	movement_type = "jump",
 	make_jump_noise = true,
 	max_speed = 5,
-	hostile = true,
+	hostile = false,
 	state = 0,
 	view_distance = 20,
 	death_rotation = "z",
@@ -330,7 +330,6 @@ mobs.register_mob(
 	textures = {
 		"slime.png"
 	},
-	collision_boundary = 1.25,
 	is_visible = true,
 	pointable = true,
 	automatic_face_movement_dir = 90,
@@ -370,7 +369,6 @@ mobs.register_mob(
 	textures = {
 		"slime.png"
 	},
-	collision_boundary = 0.6,
 	is_visible = true,
 	pointable = true,
 	automatic_face_movement_dir = 90,
@@ -699,6 +697,12 @@ mobs.register_mob(
 	 attacked_hostile = true,
 	 attack_type = "punch",
 	 group_attack = true,
+
+	 custom_on_activate = function(self)
+		local obj = minetest.add_entity(self.object:get_pos(),"mob:pig")
+		obj:set_attach(self.object,"",vector.new(0,3,0),vector.new(0,90,0))
+		obj:set_properties({visual_size={x=1,y=1}})
+	 end
 	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
 	 --explosion_power = 7, -- how big the explosion has to be
 	 --explosion_time = 3, -- how long it takes for a mob to explode
