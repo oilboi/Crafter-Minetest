@@ -313,7 +313,7 @@ mobs.register_mob(
 	movement_type = "jump",
 	make_jump_noise = true,
 	max_speed = 5,
-	hostile = false,
+	hostile = true,
 	state = 0,
 	view_distance = 20,
 	death_rotation = "z",
