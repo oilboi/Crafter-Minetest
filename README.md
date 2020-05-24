@@ -140,6 +140,9 @@ enable_mod_channels = true
 - Make player model's head pitch follow the player's look pitch
 - Make music play during certain parts of the day/night
 - Tweaked collision detection for mobs and make slime collision radius fit their size
+- FINALLY fix client not initializing properly in the world - fixes clientmods not loading on first startup and randomly failing to load :D :D :D
+- Add in safety net to client not initializing clientmods from game memory leak
+- 
 ---
 
 

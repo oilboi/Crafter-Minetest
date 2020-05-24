@@ -3,11 +3,15 @@ local weather_intake = minetest.mod_channel_join("weather_intake")
 local weather_nodes_channel = minetest.mod_channel_join("weather_nodes")
 
 
+weather_channel:send_all("")
+weather_intake:send_all("")
+weather_nodes_channel:send_all("")
+
 local weather_max = 2
 
 local mod_storage = minetest.get_mod_storage()
 
-weather_type = 0
+weather_type = mod_storage:get_int("weather_type")
 
 local path = minetest.get_modpath(minetest.get_current_modname())
 dofile(path.."/commands.lua")
@@ -85,6 +89,15 @@ minetest.register_on_modchannel_message(function(channel_name, sender, message)
 	end
 end)
 
+
+minetest.register_on_joinplayer(function(player)
+	minetest.after(3,function()
+		local all_nodes_serialized = minetest.serialize(all_nodes)
+		weather_nodes_channel:send_all(all_nodes_serialized)
+		function_send_weather_type()
+		update_player_sky()
+	end)
+end)
 
 --spawn snow nodes
 local pos
@@ -230,8 +243,9 @@ end)
 --this sets random weather
 local initial_run = true
 local function randomize_weather()
-	if initial_run == false then
+	if not initial_run then
 		weather_type = math.random(0,weather_max)
+		mod_storage:set_int("weather_type", weather_type)
 	else
 		initial_run = false
 	end
@@ -244,16 +258,14 @@ local function randomize_weather()
 	end)
 end
 
-minetest.register_on_mods_loaded(function()	
+minetest.register_on_mods_loaded(function()
 	if mod_storage:get_int("weather_initialized") == 0 then
 		mod_storage:set_int("weather_initialized",1)
 		weather_type = math.random(0,weather_max)
-	else
-		weather_type = mod_storage:get_int("weather_type")
+		mod_storage:set_int("weather_type", weather_type)
 	end
-	minetest.after(0,function()
-		randomize_weather()
-	end)
+
+	randomize_weather()
 end)
 
 minetest.register_on_shutdown(function()
