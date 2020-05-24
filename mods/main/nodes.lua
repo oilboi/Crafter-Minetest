@@ -6,6 +6,12 @@ for id,ore in pairs(ores) do
 	for i = id,5 do
 		table.insert(tool_required, tool[i])
 	end
+	local experience
+	if ore == "iron" or ore == "gold" then 
+		experience = 0
+	else
+		experience = id
+	end
 
 	local drops = {"main:"..ore.."ore"}
 	if ore == "diamond" then drops = {"main:diamond"} elseif ore == "coal" then drops = {"main:coal"} end
@@ -13,7 +19,7 @@ for id,ore in pairs(ores) do
 	minetest.register_node("main:"..ore.."ore", {
 		description = ore:gsub("^%l", string.upper).." Ore",
 		tiles = {"stone.png^"..ore.."ore.png"},
-		groups = {stone = id, pathable = 1,experience=id},
+		groups = {stone = id, pathable = 1,experience=experience},
 		sounds = main.stoneSound(),
 		--light_source = 14,--debugging ore spawn
 		drop = {
