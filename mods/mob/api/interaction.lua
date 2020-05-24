@@ -217,6 +217,9 @@ mobs.create_interaction_functions = function(def,mob_register)
 	--this is what happens when a mob dies
 	mob_register.on_death = function(self, killer)
 		local pos = self.object:get_pos()
+		if def.hp then
+			minetest.throw_experience(pos,math.ceil(def.hp/5)+math.random(0,1))
+		end
 		--pos.y = pos.y + 0.4
 		minetest.sound_play("mob_die", {pos = pos, gain = 1.0})
 		minetest.add_particlespawner({

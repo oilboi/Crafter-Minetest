@@ -143,6 +143,8 @@ enable_mod_channels = true
 - FINALLY fix client not initializing properly in the world - fixes clientmods not loading on first startup and randomly failing to load :D :D :D
 - Add in safety net to client not initializing clientmods from game memory leak
 - Made chickens spawn
+- Tuned chicken
+- Made experience drop on mob death based on their hp
 ---
 
 
