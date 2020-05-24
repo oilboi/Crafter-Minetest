@@ -98,17 +98,29 @@ minetest.register_craftitem("torch:torch", {
 			return itemstack
 		end
 
-		local wdir = minetest.dir_to_wallmounted(vector.subtract(pointed_thing.under,pointed_thing.above))
+		local buildable = minetest.get_nodedef(minetest.get_node(pointed_thing.under).name, "buildable_to")
+
+		local wdir
+
+		if buildable then
+			wdir = minetest.dir_to_wallmounted(vector.subtract(pointed_thing.under,pointed_thing.under))
+		else
+			wdir = minetest.dir_to_wallmounted(vector.subtract(pointed_thing.under,pointed_thing.above))
+		end
 
 		local fakestack = itemstack
 		local retval = false
-		if wdir < 1 then
+		
+		if buildable and wdir == 4 then
+			retval = fakestack:set_name("torch:floor")
+		elseif wdir < 1 then
 			return itemstack
 		elseif wdir == 1 then
 			retval = fakestack:set_name("torch:floor")
 		else
 			retval = fakestack:set_name("torch:wall")
 		end
+
 		if not retval then
 			return itemstack
 		end
