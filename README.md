@@ -270,6 +270,7 @@ enable_mod_channels = true
 
 ### Fishing
 - enchanted fish
+- player casts out a better lure if on a boat
 
 
 ---
