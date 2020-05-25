@@ -485,7 +485,7 @@ mobs.register_mob(
 	 hostile = true,
 	 hostile_cooldown = false,
 	 state = 0,
-	 view_distance = 20,
+	 view_distance = 40,
 	 item_drop = "mob:gunpowder",
 	  
 	 standing_frame = {x=0,y=0},
@@ -632,7 +632,7 @@ mobs.register_mob(
 	 movement_type = "walk",
 	 max_speed = 6,
 	 state = 0,
-	 view_distance = 15,
+	 view_distance = 45,
 	 
 	 item_drop = "mob:string", 
 	 standing_frame = {x=21,y=21},

@@ -188,13 +188,11 @@ mobs.create_movement_functions = function(def,mob_register)
 					self.pathfinding_timer = 0
 
 					local path = minetest.find_path(self.object:get_pos(),self.following_pos,self.view_distance*2,1,1,"A*")
-					if path then--or (self.path_data and table.getn(self.path_data) < 3)) then
+					
+					if path and not self.path_data or (self.path_data and table.getn(self.path_data) < 1) then
 						self.path_data = path
 					end
-					if self.path_data and table.getn(self.path_data) <= 4 then
-						self.path_data = nil
-					end
-
+					
 					if self.path_data then
 						for index,pos_data in pairs(self.path_data) do
 							--print(dump(pos_data))
@@ -209,9 +207,19 @@ mobs.create_movement_functions = function(def,mob_register)
 						end
 					end
 				end
+			elseif not self.following then
+				self.path_data = nil
 			end
+
+
+			--this is the real time one
 			local selfpos = self.object:get_pos()
 			local pos1 = vector.new(selfpos.x,0,selfpos.z)
+
+			if (self.path_data and table.getn(self.path_data) > 0 and vector.distance(self.object:get_pos(),self.path_data[1]) > 2) or self.swimming == true then
+				self.path_data = nil
+			end
+
 			if self.path_data and table.getn(self.path_data) > 0 and vector.distance(pos1,vector.new(self.path_data[1].x,0,self.path_data[1].z)) < 1 then
 				--shift whole list down
 				for i = 2,table.getn(self.path_data) do
