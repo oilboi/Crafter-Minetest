@@ -192,7 +192,7 @@ mobs.create_movement_functions = function(def,mob_register)
 					if path and not self.path_data or (self.path_data and table.getn(self.path_data) < 1) then
 						self.path_data = path
 					end
-					
+					--[[
 					if self.path_data then
 						for index,pos_data in pairs(self.path_data) do
 							--print(dump(pos_data))
@@ -206,6 +206,7 @@ mobs.create_movement_functions = function(def,mob_register)
 							})
 						end
 					end
+					]]--
 				end
 			elseif not self.following then
 				self.path_data = nil
