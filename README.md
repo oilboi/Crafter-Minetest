@@ -221,6 +221,7 @@ enable_mod_channels = true
 - enchanting/upgrading
 - magic (wands, spells, etc)
 - better combat ( sweep hit enemies, falling while hitting deals more damage )
+- Enchanting food - gives buffs
 
 
 ---
@@ -268,8 +269,7 @@ enable_mod_channels = true
 
 
 ### Fishing
-- have a rod that you can cast into water
-- bobber entity which goes under water when fish on line
+- enchanted fish
 
 
 ---
@@ -279,11 +279,9 @@ enable_mod_channels = true
 
 > These don't seem to fit into any theme so list them all here
 
-- sugar and sugar cane (grow near water on sand)
 - rope and tnt arrows
 - vehicles (car, powered minecarts, trains)
 - hitscan flintlocks
-- bows
 
 
 ---
@@ -298,7 +296,6 @@ enable_mod_channels = true
 - upgrade minecart physics even more 
 - make torches abm that checks if player in area
 - make furnace abm that checks if player in area
-- 3d character
 - make tnt hurt player
 - rewrite minecart
 - fix tool rightclick torch placement to replace buildable to nodes

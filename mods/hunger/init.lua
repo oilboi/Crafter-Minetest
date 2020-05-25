@@ -71,6 +71,8 @@ local function hunger_update()
 			local hunger = meta:get_int("hunger")
 			local exhaustion_tick = meta:get_int("exhaustion_tick")
 			
+			print(satiation)
+
 			--movement states
 			local movement_state =  meta:get_string("player.player_movement_state")
 			local running = (movement_state == "1")
@@ -225,11 +227,8 @@ function minetest.eat_food(player,item)
 			player_hunger = 20
 		end
 	end
-	if player_satiation < 20 then
-		player_satiation = player_satiation + satiation
-		if player_satiation > 20 then
-			player_satiation = 20
-		end
+	if player_satiation < satiation then
+		player_satiation =  satiation
 	end
 	
 	meta:set_int("exhaustion_tick", 0)
