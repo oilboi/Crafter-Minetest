@@ -2,7 +2,7 @@
 minetest.register_food("mob:raw_porkchop",{
 	description = "Raw Porkchop",
 	texture = "raw_porkchop.png",
-	satiation=1,
+	satiation=10,
 	hunger=2,
 })
 
@@ -10,7 +10,7 @@ minetest.register_food("mob:raw_porkchop",{
 minetest.register_food("mob:cooked_porkchop",{
 	description = "Cooked Porkchop",
 	texture = "cooked_porkchop.png",
-	satiation=3,
+	satiation=20,
 	hunger=5,
 })
 
@@ -18,8 +18,8 @@ minetest.register_food("mob:cooked_porkchop",{
 minetest.register_food("mob:egg",{
 	description = "Egg",
 	texture = "egg.png",
-	satiation=1,
-	hunger=3,
+	satiation=5,
+	hunger=2,
 })
 
 minetest.register_craftitem("mob:slimeball", {

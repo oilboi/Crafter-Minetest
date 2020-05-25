@@ -138,13 +138,13 @@ minetest.register_craft({
 minetest.register_food("fishing:fish",{
 	description = "Raw Fish",
 	texture = "fish.png",
-	satiation=1,
-	hunger=2,
+	satiation=6,
+	hunger=3,
 })
 
 minetest.register_food("fishing:fish_cooked",{
 	description = "Cooked Fish",
 	texture = "fish_cooked.png",
-	satiation=3,
+	satiation=22,
 	hunger=5,
 })

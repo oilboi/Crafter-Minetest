@@ -7,7 +7,7 @@
 minetest.register_food("cake:cake_item_placeholder",{
 	description = "",
 	texture = "nothing.png",
-	satiation=10,
+	satiation=30,
 	hunger=6,
 })
 

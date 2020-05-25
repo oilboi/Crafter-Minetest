@@ -261,7 +261,7 @@ minetest.register_food("farming:melon_slice",{
 	description = "Melon Slice",
 	texture = "melon_slice.png",
 	satiation=1,
-	hunger=2,
+	hunger=1,
 })
 
 
@@ -354,7 +354,7 @@ minetest.register_craft({
 minetest.register_food("farming:pumpkin_pie",{
 	description = "Pumpkin Pie",
 	texture = "pumpkin_pie.png",
-	satiation=4,
+	satiation=6,
 	hunger=3,
 })
 
