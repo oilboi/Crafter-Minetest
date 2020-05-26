@@ -51,6 +51,9 @@ minetest.register_entity("boat:boat", {
 		
 		if self.rider and player_name == self.rider then
 			clicker:set_detach()
+			local pos = self.object:get_pos()
+			pos.y = pos.y + 1
+			clicker:move_to(pos)
 			clicker:add_player_velocity(vector.new(0,11,0))
 			self.rider = nil
 		elseif not self.rider then
@@ -319,6 +322,9 @@ minetest.register_entity("boat:iron_boat", {
 		
 		if self.rider and player_name == self.rider then
 			clicker:set_detach()
+			local pos = self.object:get_pos()
+			pos.y = pos.y + 1
+			clicker:move_to(pos)
 			clicker:add_player_velocity(vector.new(0,11,0))
 			self.rider = nil
 		elseif not self.rider then
