@@ -149,6 +149,7 @@ enable_mod_channels = true
 - You no longer get hurt in nether lava when in an iron boat
 - Boats now throw players up so they can make it to land
 - Nether songs play 3-6 seconds after entering the nether
+- Snowballs now explode when they hit something in the nether
 ---
 
 
