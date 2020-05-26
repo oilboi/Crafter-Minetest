@@ -91,7 +91,11 @@ local function handle_hurt_inside(player)
 			if get_group(head, "hurt_inside") > hurt_more then
 				hurt_more = get_group(head, "hurt_inside")
 			end
-			
+			if legs == "nether:lava" or legs == "nether:lavaflow" or head == "nether:lava" or head == "nether:lavaflow" then
+				if player:get_attach() and player:get_attach():get_luaentity() and player:get_attach():get_luaentity().iron_boat == true then
+					return(false)
+				end
+			end
 			heart = player:get_hp()
 			player:set_hp(heart - hurt_more)
 			return(true)

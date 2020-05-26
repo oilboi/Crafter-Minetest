@@ -15,7 +15,7 @@ minetest.register_entity("boat:boat", {
 	},
 	
 	rider = nil,
-
+	boat = true,
 
 	get_staticdata = function(self)
 		return minetest.serialize({
@@ -34,7 +34,7 @@ minetest.register_entity("boat:boat", {
 		end
 		self.object:set_armor_groups({immortal = 1})
 		self.object:set_velocity({x = 0, y = 0, z = 0})
-		self.object:set_acceleration({x = 0, y = -9.81, z = 0})
+		self.object:set_acceleration({x = 0, y = 0, z = 0})
 	end,
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		local pos = self.object:get_pos()
@@ -89,7 +89,7 @@ minetest.register_entity("boat:boat", {
 			if move then
 				local currentvel = self.object:get_velocity()
 				local goal = rider:get_look_dir()
-				goal = vector.multiply(goal,9)
+				goal = vector.multiply(goal,20)
 				local acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
 				acceleration = vector.multiply(acceleration, 0.01)
 				self.object:add_velocity(acceleration)
@@ -133,9 +133,18 @@ minetest.register_entity("boat:boat", {
 		if node == "main:water" or node =="main:waterflow" then
 			self.swimming = true
 			local vel = self.object:get_velocity()
-			local goal = 3
+			local goal = 9
 			local acceleration = vector.new(0,goal-vel.y,0)
+			acceleration = vector.multiply(acceleration, 0.01)
 			self.object:add_velocity(acceleration)
+			--self.object:set_acceleration(vector.new(0,0,0))
+		else
+			local vel = self.object:get_velocity()
+			local goal = -9.81
+			local acceleration = vector.new(0,goal-vel.y,0)
+			acceleration = vector.multiply(acceleration, 0.01)
+			self.object:add_velocity(acceleration)
+			--self.object:set_acceleration(vector.new(0,0,0))
 		end
 	end,
 	
@@ -182,9 +191,27 @@ minetest.register_entity("boat:boat", {
 	slowdown = function(self)
 		if not self.moving == true then
 			local vel = self.object:get_velocity()
-			local deceleration = vector.multiply(vel, -0.01)
+			local acceleration = vector.new(-vel.x,0,-vel.z)
+			local deceleration = vector.multiply(acceleration, 0.01)
 			self.object:add_velocity(deceleration)
 		end
+	end,
+
+	lag_correction = function(self,dtime)
+		local pos = self.object:get_pos()
+		local velocity = self.object:get_velocity()
+		if self.lag_check then
+			local chugent = math.ceil((os.clock() - self.lag_check) * 1000)
+
+			--print("lag = "..chugent.." ms")
+			if chugent > 70 and  self.old_pos and self.old_velocity then
+				self.object:move_to(self.old_pos)
+				self.object:set_velocity(self.old_velocity)
+			end
+		end
+		self.old_pos = pos
+		self.old_velocity = vel
+		self.lag_check = os.clock()
 	end,
 
 	on_step = function(self, dtime)
@@ -194,6 +221,7 @@ minetest.register_entity("boat:boat", {
 		self.float(self)
 		self.flow(self)
 		self.slowdown(self)
+		self.lag_correction(self,dtime)
 	end,
 })
 
@@ -234,19 +262,10 @@ minetest.register_craft({
 	},
 })
 
+----------------------------------
 
 
 
-
-
-
-
-
-
-
-
-
---minetest.get_node_level(pos)
 minetest.register_entity("boat:iron_boat", {
 	initial_properties = {
 		hp_max = 1,
@@ -263,7 +282,7 @@ minetest.register_entity("boat:iron_boat", {
 	},
 	
 	rider = nil,
-
+	iron_boat = true,
 
 	get_staticdata = function(self)
 		return minetest.serialize({
@@ -282,7 +301,7 @@ minetest.register_entity("boat:iron_boat", {
 		end
 		self.object:set_armor_groups({immortal = 1})
 		self.object:set_velocity({x = 0, y = 0, z = 0})
-		self.object:set_acceleration({x = 0, y = -9.81, z = 0})
+		self.object:set_acceleration({x = 0, y = 0, z = 0})
 	end,
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		local pos = self.object:get_pos()
@@ -315,6 +334,18 @@ minetest.register_entity("boat:iron_boat", {
 			--player_api.set_animation(clicker, "stand")
 		end
 	end,
+	--check if the boat is stuck on land
+	check_if_on_land = function(self)
+		local pos = self.object:get_pos()
+		pos.y = pos.y - 0.37
+		local bottom_node = minetest.get_node(pos).name
+		if (bottom_node == "nether:lava" or bottom_node == "nether:lavaflow" or bottom_node == "air") then
+			self.on_land = false
+		else
+			self.on_land = true
+		end
+	
+	end,
 	
 	--players drive the baot
 	drive = function(self)
@@ -327,7 +358,7 @@ minetest.register_entity("boat:iron_boat", {
 				local goal = rider:get_look_dir()
 				goal = vector.multiply(goal,20)
 				local acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
-				acceleration = vector.multiply(acceleration, 0.05)
+				acceleration = vector.multiply(acceleration, 0.01)
 				self.object:add_velocity(acceleration)
 				self.moving = true
 			end
@@ -362,35 +393,102 @@ minetest.register_entity("boat:iron_boat", {
 	--makes the boat float
 	float = function(self)
 		local pos = self.object:get_pos()
-		local pos2 = vector.new(pos.x,pos.y-3,pos.z)
-
-		local ray = minetest.raycast(pos, pos2, false, true)
-
-		local pointed_thing = ray:next()
-
-		if pointed_thing then
+		local node = minetest.get_node(pos).name
+		self.swimming = false
+		
+		--flow normally if floating else don't
+		if node == "nether:lava" or node =="nether:lavaflow" then
 			self.swimming = true
 			local vel = self.object:get_velocity()
-			local goal = 10
+			local goal = 9
 			local acceleration = vector.new(0,goal-vel.y,0)
+			acceleration = vector.multiply(acceleration, 0.01)
 			self.object:add_velocity(acceleration)
+			--self.object:set_acceleration(vector.new(0,0,0))
+		else
+			local vel = self.object:get_velocity()
+			local goal = -9.81
+			local acceleration = vector.new(0,goal-vel.y,0)
+			acceleration = vector.multiply(acceleration, 0.01)
+			self.object:add_velocity(acceleration)
+			--self.object:set_acceleration(vector.new(0,0,0))
 		end
 	end,
-
+	
+	--makes boats flow
+	flow = function(self)
+		local pos = self.object:get_pos()
+		pos.y = pos.y - 0.4
+		local node = minetest.get_node(pos).name
+		local node_above = minetest.get_node(vector.new(pos.x,pos.y+1,pos.z)).name
+		local goalx = 0
+		local goalz = 0
+		--print(node_above)
+		if (node == "nether:lavaflow" or node == "nether:lava" ) and not self.moving == true and (node_above ~= "nether:lava" and node_above ~= "nether:lavaflow") then
+			local currentvel = self.object:get_velocity()
+			local level = minetest.get_node_level(pos)
+			local pos = self.object:get_pos()
+			for x = -1,1 do
+				for y = -1,0 do
+					for z = -1,1 do
+						if (x == 0 and z ~= 0) or (z == 0 and x ~=0) then
+							local nodename = minetest.get_node(vector.new(pos.x+x,pos.y+y,pos.z+z)).name
+							local level2 = minetest.get_node_level(vector.new(pos.x+x,pos.y+y,pos.z+z))
+							if (level2 < level and nodename == "main:lavaflow") or (nodename == "main:lava" and level2 == 7)  then
+								goalx = x*7
+								goalz = z*7
+								--break
+							end
+						end
+					end
+				end
+			end
+			--only add velocity if there is one
+			--else this stops the boat
+			if goalx ~= 0 or goalz ~= 0 then
+				local acceleration = vector.new(goalx-currentvel.x,0,goalz-currentvel.z)
+				acceleration = vector.multiply(acceleration, 0.01)
+				self.object:add_velocity(acceleration)
+			end
+		end
+	end,
+	
+	
 	--slows the boat down
 	slowdown = function(self)
 		if not self.moving == true then
 			local vel = self.object:get_velocity()
-			local deceleration = vector.multiply(vel, -0.01)
+			local acceleration = vector.new(-vel.x,0,-vel.z)
+			local deceleration = vector.multiply(acceleration, 0.01)
 			self.object:add_velocity(deceleration)
 		end
 	end,
 
+	lag_correction = function(self,dtime)
+		local pos = self.object:get_pos()
+		local velocity = self.object:get_velocity()
+		if self.lag_check then
+			local chugent = math.ceil((os.clock() - self.lag_check) * 1000)
+
+			--print("lag = "..chugent.." ms")
+			if chugent > 70 and  self.old_pos and self.old_velocity then
+				self.object:move_to(self.old_pos)
+				self.object:set_velocity(self.old_velocity)
+			end
+		end
+		self.old_pos = pos
+		self.old_velocity = vel
+		self.lag_check = os.clock()
+	end,
+
 	on_step = function(self, dtime)
+		self.check_if_on_land(self)
 		self.push(self)
 		self.drive(self)
 		self.float(self)
+		self.flow(self)
 		self.slowdown(self)
+		self.lag_correction(self,dtime)
 	end,
 })
 

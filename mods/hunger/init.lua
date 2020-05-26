@@ -70,8 +70,6 @@ local function hunger_update()
 			local satiation = meta:get_int("satiation")
 			local hunger = meta:get_int("hunger")
 			local exhaustion_tick = meta:get_int("exhaustion_tick")
-			
-			print(satiation)
 
 			--movement states
 			local movement_state =  meta:get_string("player.player_movement_state")
