@@ -51,6 +51,7 @@ minetest.register_entity("boat:boat", {
 		
 		if self.rider and player_name == self.rider then
 			clicker:set_detach()
+			clicker:add_player_velocity(vector.new(0,11,0))
 			self.rider = nil
 		elseif not self.rider then
 			self.rider = player_name
@@ -305,7 +306,7 @@ minetest.register_entity("boat:iron_boat", {
 	end,
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		local pos = self.object:get_pos()
-		minetest.add_item(pos, "boat:boat")
+		minetest.add_item(pos, "boat:iron_boat")
 		self.object:remove()
 	end,
 	
@@ -318,6 +319,7 @@ minetest.register_entity("boat:iron_boat", {
 		
 		if self.rider and player_name == self.rider then
 			clicker:set_detach()
+			clicker:add_player_velocity(vector.new(0,11,0))
 			self.rider = nil
 		elseif not self.rider then
 			self.rider = player_name
