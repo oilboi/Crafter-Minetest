@@ -147,6 +147,8 @@ enable_mod_channels = true
 - Made experience drop on mob death based on their hp
 - Added lag correction to boats
 - You no longer get hurt in nether lava when in an iron boat
+- Boats now throw players up so they can make it to land
+- Nether songs play 3-6 seconds after entering the nether
 ---
 
 
