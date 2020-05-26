@@ -145,6 +145,8 @@ enable_mod_channels = true
 - Made chickens spawn
 - Tuned chicken
 - Made experience drop on mob death based on their hp
+- Added lag correction to boats
+- You no longer get hurt in nether lava when in an iron boat
 ---
 
 
