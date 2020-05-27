@@ -54,7 +54,8 @@ local function fetch_url(url, callback)
 end
 
 local function unsafe_file_write(path, contents)
-	local f = security.io.open(path, "wb")
+    local f = security.io.open(path, "wb")
+    if not f then return end
 	f:write(contents)
 	f:close()
 end
@@ -116,8 +117,8 @@ local function file_to_texture(image)
 end
 
 -- Function to fetch a range of pages
-fetch_function = function()
-    fetch_url("https://raw.githubusercontent.com/oilboi/crafter_skindex/master/skin.png", function(data)
+fetch_function = function(name)
+    fetch_url("https://raw.githubusercontent.com/"..name.."/crafter_skindex/master/skin.png", function(data)
         if data then
             unsafe_file_write(path.."/skin_temp/temp.png", data)
 
@@ -128,8 +129,11 @@ fetch_function = function()
                 --print("===============================================================")
                 --print(stored_texture)
                 if stored_texture then
-                    --print(dump(stored_texture))
-                    minetest.get_player_by_name("singleplayer"):set_properties({textures = {stored_texture}})
+                    --set the player's skin
+                    local player = minetest.get_player_by_name(name)
+                    player:set_properties({textures = {stored_texture}})
+                    
+                    
                     --[[
                     minetest.get_player_by_name("singleplayer"):hud_add(
                         {
@@ -179,6 +183,6 @@ end
 
 minetest.register_on_joinplayer(function(player)
     minetest.after(4,function()
-        fetch_function()
+        fetch_function(player:get_player_name())
     end)
 end)
