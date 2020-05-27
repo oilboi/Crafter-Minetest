@@ -3,6 +3,8 @@ PNGLua
 
 A pure lua implementation of a PNG decoder
 
+Modified to work with the Minetest engine.
+
 Usage
 -----
 
