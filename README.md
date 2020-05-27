@@ -150,6 +150,7 @@ enable_mod_channels = true
 - Boats now throw players up so they can make it to land
 - Nether songs play 3-6 seconds after entering the nether
 - Snowballs now explode when they hit something in the nether
+- Skins now automatically download and apply when you join a server with your github name if you have a "crafter_skindex" github repo with a skin.png file in it
 ---
 
 
