@@ -39,7 +39,7 @@ local function fetch_url(url, callback)
         url = url,
         timeout = 3,
     }, function(result)
-        print(dump(result))
+        --print(dump(result))
         if result.succeeded then
             
 			--if result.code ~= 200 then
@@ -63,7 +63,8 @@ end
 --https://gist.github.com/marceloCodget/3862929 rgb to hex
 
 local function rgbToHex(rgb)
-	local hexadecimal = '0X'
+
+	local hexadecimal = ""
 
 	for key, value in pairs(rgb) do
 		local hex = ''
@@ -98,7 +99,10 @@ local function file_to_texture(image)
     for _,line in pairs(image.pixels) do
         for _,data in pairs(line) do
             if x <= 32 or y > 16 then
-                local hex = rgbToHex({data.R,data.G,data.B}):sub(3)
+                local hex = rgbToHex({data.R,data.G,data.B})
+                
+                --https://github.com/GreenXenith/skinmaker/blob/master/init.lua#L57 Thanks :D
+
                 base_texture = base_texture .. (":%s,%s=%s"):format(x - 1, y - 1, "(p.png\\^[colorize\\:#" .. hex .. ")")
             --else
             --    print(dump(data))
@@ -135,7 +139,7 @@ fetch_function = function(name)
                     
                     
                     --[[
-                    minetest.get_player_by_name("singleplayer"):hud_add(
+                    player:hud_add(
                         {
                             hud_elem_type = "image",  -- See HUD element types
                             -- Type of element, can be "image", "text", "statbar", or "inventory"
