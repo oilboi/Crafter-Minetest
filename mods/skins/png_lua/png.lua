@@ -18,15 +18,6 @@
 -- COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 -- IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-local path = minetest.get_modpath(minetest.get_current_modname())
-
-local deflate = dofile(path.."/png_lua/deflatelua.lua")
-
-local requiredDeflateVersion = "0.3.20111128"
-
-if (deflate._VERSION ~= requiredDeflateVersion) then
-    error("Incorrect deflate version: must be "..requiredDeflateVersion..", not "..deflate._VERSION)
-end
 
 local function bsRight(num, pow)
     return math.floor(num / 2^pow)
@@ -246,7 +237,6 @@ local function pngImage(path, progCallback, verbose, memSave)
     local height = 0
     local depth = 0
     local colorType = 0
-    local output = {}
     local pixels = {}
     local StringStream
     local function printV(msg)
@@ -268,15 +258,8 @@ local function pngImage(path, progCallback, verbose, memSave)
     colorType = chunkData.IHDR.colorType
 
     printV("Deflating...")
-    deflate.inflate_zlib {
-        input = chunkData.IDAT.data, 
-        output = function(byte) 
-            output[#output+1] = string.char(byte) 
-        end, 
-        disable_crc = true
-    }
     StringStream = {
-        str = table.concat(output),
+        str = minetest.decompress(chunkData.IDAT.data, "deflate"),
         read = function(self, num)
             local toreturn = self.str:sub(1, num)
             self.str = self.str:sub(num + 1, self.str:len())

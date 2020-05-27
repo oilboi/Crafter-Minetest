@@ -1,6 +1,7 @@
-local security = minetest.request_insecure_environment()
-
 local path = minetest.get_modpath(minetest.get_current_modname())
+
+-- path for the temporary skins file
+local temppath = minetest.get_worldpath() .. "/skins_temp.png"
 
 local pngimage = dofile(path.."/png_lua/png.lua")
 
@@ -12,16 +13,16 @@ local id = "Lua Skins Updater"
 -- Binary downloads are required
 if not core.features.httpfetch_binary_data then
 	print("outdated version of MINETEST detected!")
+    return(nil)
 end
 
-if not http or not security then
+if not http then
     for i = 1,5 do
         print("!WARNING!")
     end
     print("---------------------------------------------------------------")
     print("HTTP access is required. Please add this to your minetest.conf:")
     print("secure.http_mods = skins")
-    print("secure.trusted_mods = skins")
     print("!!Skins will not work without this!!")
     print("---------------------------------------------------------------")
     return(nil)
@@ -51,13 +52,6 @@ local function fetch_url(url, callback)
 		core.log("warning", ("%s: Failed to download URL=%s"):format(
 			id, url))
 	end)
-end
-
-local function unsafe_file_write(path, contents)
-    local f = security.io.open(path, "wb")
-    if not f then return end
-	f:write(contents)
-	f:close()
 end
 
 --https://gist.github.com/marceloCodget/3862929 rgb to hex
@@ -100,10 +94,12 @@ local function file_to_texture(image)
         for _,data in pairs(line) do
             if x <= 32 or y > 16 then
                 local hex = rgbToHex({data.R,data.G,data.B})
-                
-                --https://github.com/GreenXenith/skinmaker/blob/master/init.lua#L57 Thanks :D
+                --skip transparent pixels
+                if data.A > 0 then 
+                    --https://github.com/GreenXenith/skinmaker/blob/master/init.lua#L57 Thanks :D
 
-                base_texture = base_texture .. (":%s,%s=%s"):format(x - 1, y - 1, "(p.png\\^[colorize\\:#" .. hex .. ")")
+                    base_texture = base_texture .. (":%s,%s=%s"):format(x - 1, y - 1, "(p.png\\^[colorize\\:#" .. hex .. ")")
+                end
             --else
             --    print(dump(data))
             end
@@ -124,9 +120,11 @@ end
 fetch_function = function(name)
     fetch_url("https://raw.githubusercontent.com/"..name.."/crafter_skindex/master/skin.png", function(data)
         if data then
-            unsafe_file_write(path.."/skin_temp/temp.png", data)
+            local f = io.open(temppath, "wb")
+            f:write(data)
+            f:close()
 
-            local img = pngimage(minetest.get_modpath("skins").."/skin_temp/temp.png", nil, false, false)
+            local img = pngimage(temppath, nil, false, false)
             if img then
                 local stored_texture = file_to_texture(img)
 
