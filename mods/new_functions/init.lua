@@ -154,9 +154,9 @@ local hurt_amount
 local gotten_node
 local function index_players_surroundings()
 	for _,player in ipairs(minetest.get_connected_players()) do
-		if player:get_hp() > 0 then
+		name = player:get_player_name()
+		if player:get_hp() > 0 and player_surroundings_index_table[name] then
 			--if not dead begin index
-			name = player:get_player_name()
 			pos = player:get_pos()
 			
 			--under player position (useful for walking on hot stuff)
@@ -269,38 +269,40 @@ local function fix_breath_hack()
 	for _,player in ipairs(minetest.get_connected_players()) do
 		player:set_breath(50000)
 		name = player:get_player_name()
-		indexer = player_surroundings_index_table[name].head
-		local meta = player:get_meta()
-		local breath = meta:get_int("breath")
-		local breathbar = meta:get_int("breathbar")
-		
-		if indexer == "main:water" or indexer == "main:waterflow" then
-			local ticker = meta:get_int("breath_ticker")
-		
-			ticker = ticker + 1
-			if ticker > 5 then ticker = 0 end
+		if player_surroundings_index_table[name] then
+			indexer = player_surroundings_index_table[name].head
+			local meta = player:get_meta()
+			local breath = meta:get_int("breath")
+			local breathbar = meta:get_int("breathbar")
+			
+			if indexer == "main:water" or indexer == "main:waterflow" then
+				local ticker = meta:get_int("breath_ticker")
+			
+				ticker = ticker + 1
+				if ticker > 5 then ticker = 0 end
 
-			meta:set_int("breath_ticker", ticker)
-						
-			if breath > 0 and ticker >= 5 then
-				breath = breath - 1
-				meta:set_int("breath", breath)
-				player:hud_change(breathbar, "number", breath*2)
-				meta:set_int("drowning", 0)
-			elseif breath <= 0 and ticker >= 5 then
-				local hp =  player:get_hp()
-				meta:set_int("drowning", 1)
-				if hp > 0 then
-					player:set_hp(hp-2)
-					player:add_player_velocity(vector.new(0,-15,0))
+				meta:set_int("breath_ticker", ticker)
+							
+				if breath > 0 and ticker >= 5 then
+					breath = breath - 1
+					meta:set_int("breath", breath)
+					player:hud_change(breathbar, "number", breath*2)
+					meta:set_int("drowning", 0)
+				elseif breath <= 0 and ticker >= 5 then
+					local hp =  player:get_hp()
+					meta:set_int("drowning", 1)
+					if hp > 0 then
+						player:set_hp(hp-2)
+						player:add_player_velocity(vector.new(0,-15,0))
+					end
 				end
+			elseif breath < 10 then --reset the bar
+				breath = breath + 1
+				meta:set_int("breath", breath)
+				meta:set_int("drowning", 0)
+				meta:set_int("breath_ticker", 0)
+				player:hud_change(breathbar, "number", breath*2)
 			end
-		elseif breath < 10 then --reset the bar
-			breath = breath + 1
-			meta:set_int("breath", breath)
-			meta:set_int("drowning", 0)
-			meta:set_int("breath_ticker", 0)
-			player:hud_change(breathbar, "number", breath*2)
 		end
 	end
 	

@@ -134,7 +134,10 @@ fetch_function = function(name)
                     --set the player's skin
                     local player = minetest.get_player_by_name(name)
                     player:set_properties({textures = {stored_texture}})
-                    
+                    local meta = player:get_meta()
+                    meta:set_string("skin",stored_texture)
+
+                    recalculate_armor(player)
                     
                     --[[
                     player:hud_add(
@@ -184,7 +187,9 @@ end
 --print(dump(img))
 
 minetest.register_on_joinplayer(function(player)
-    minetest.after(4,function()
+    local meta = player:get_meta()
+    meta:set_string("skin","player.png")
+    minetest.after(0,function()
         fetch_function(player:get_player_name())
     end)
 end)

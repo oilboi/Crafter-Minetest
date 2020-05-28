@@ -30,6 +30,50 @@ minetest.register_on_dieplayer(function(player, reason)
 			inv:set_stack("main", i, ItemStack(""))
 		end
 	end
+
+	local stack = inv:get_stack("armor_head", 1)
+	local name = stack:get_name()
+	if name ~= "" then
+		local obj = minetest.add_item(pos, name)
+		if obj then
+			obj:set_velocity(vector.new(math.random(-3,3),math.random(4,8),math.random(-3,3)))
+		end
+		inv:set_stack("armor_head", 1, ItemStack(""))
+	end
+
+	stack = inv:get_stack("armor_torso", 1)
+	name = stack:get_name()
+	if name ~= "" then
+		local obj = minetest.add_item(pos, name)
+		if obj then
+			obj:set_velocity(vector.new(math.random(-3,3),math.random(4,8),math.random(-3,3)))
+		end
+		inv:set_stack("armor_torso", 1, ItemStack(""))
+	end
+
+	stack = inv:get_stack("armor_legs", 1)
+	name = stack:get_name()
+	if name ~= "" then
+		local obj = minetest.add_item(pos, name)
+		if obj then
+			obj:set_velocity(vector.new(math.random(-3,3),math.random(4,8),math.random(-3,3)))
+		end
+		inv:set_stack("armor_legs", 1, ItemStack(""))
+	end
+
+
+	stack = inv:get_stack("armor_feet", 1)
+	name = stack:get_name()
+	if name ~= "" then
+		local obj = minetest.add_item(pos, name)
+		if obj then
+			obj:set_velocity(vector.new(math.random(-3,3),math.random(4,8),math.random(-3,3)))
+		end
+		inv:set_stack("armor_feet", 1, ItemStack(""))
+	end
+
+
+	recalculate_armor(player)
 end)
 
 
@@ -135,7 +179,7 @@ minetest.register_globalstep(function(dtime)
 	for _,player in ipairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
 		--limit this so the game engine isn't calculating huge floats
-		if punch_timers[name] <= 10 then
+		if punch_timers[name] and punch_timers[name] <= 10 then
 			punch_timers[name] = punch_timers[name] + dtime
 		end
 	end
