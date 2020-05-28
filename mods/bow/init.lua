@@ -125,7 +125,7 @@ arrow.on_step = function(self, dtime,moveresult)
 			end
 		end
 
-		if moveresult and moveresult.collides and self.stuck == false then
+		if moveresult and moveresult.collides and moveresult.collisions and self.stuck == false then
 
 			if moveresult.collisions[1].new_velocity.x == 0 and moveresult.collisions[1].old_velocity.x ~= 0 then
 				self.check_dir = vector.direction(vector.new(pos.x,0,0),vector.new(moveresult.collisions[1].node_pos.x,0,0))
