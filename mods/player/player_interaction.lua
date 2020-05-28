@@ -104,13 +104,69 @@ minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
 	end,pos, newnode, placer, oldnode, itemstack, pointed_thing,old)
 end)
 
---this throws the player when they're punched
-minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
-	dir = vector.multiply(dir,10)
-	local vel = player:get_player_velocity()
-	dir.y = 0
-	if vel.y <= 0 then
-		dir.y = 7
-	end
-	player:add_player_velocity(dir)
+local do_critical_particles = function(pos)
+	minetest.add_particlespawner({
+		amount = 40,
+		time = 0.001,
+		minpos = pos,
+		maxpos = pos,
+		minvel = vector.new(-2,-2,-2),
+		maxvel = vector.new(2,8,2),
+		minacc = {x=0, y=4, z=0},
+		maxacc = {x=0, y=12, z=0},
+		minexptime = 1.1,
+		maxexptime = 1.5,
+		minsize = 1,
+		maxsize = 2,
+		collisiondetection = false,
+		vertical = false,
+		texture = "critical.png",
+	})
+end
+
+--we need to do this to override the default damage mechanics
+local punch_timers = {}
+minetest.register_on_joinplayer(function(player)
+	local name = player:get_player_name()
+	punch_timers[name] = 0
 end)
+
+minetest.register_globalstep(function(dtime)
+	for _,player in ipairs(minetest.get_connected_players()) do
+		local name = player:get_player_name()
+		--limit this so the game engine isn't calculating huge floats
+		if punch_timers[name] <= 10 then
+			punch_timers[name] = punch_timers[name] + dtime
+		end
+	end
+end)
+
+--this throws the player when they're punched and activates the custom damage mechanics
+minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
+	local name = player:get_player_name()
+	local hurt = tool_capabilities.damage_groups.damage
+	local hp = player:get_hp()
+	if punch_timers[name] > 0.8 and hp > 0 then
+		if hitter:is_player() then
+			local puncher_vel = hitter:get_player_velocity().y
+			if puncher_vel < 0 then
+				hurt = hurt * 1.5
+				critical = true
+				do_critical_particles(player:get_pos())
+				minetest.sound_play("critical", {pos=player:get_pos(), gain = 0.1, max_hear_distance = 16,pitch = math.random(80,100)/100})
+			end
+		end
+
+		dir = vector.multiply(dir,10)
+		local vel = player:get_player_velocity()
+		dir.y = 0
+		if vel.y <= 0 then
+			dir.y = 7
+		end
+		punch_timers[name] = 0
+		player:add_player_velocity(dir)
+		player:set_hp(hp-hurt)
+	end
+end)
+
+

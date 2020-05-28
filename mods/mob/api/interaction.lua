@@ -312,7 +312,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 								object:punch(self.object, 2, 
 									{
 									full_punch_interval=1.5,
-									damage_groups = {fleshy=2},
+									damage_groups = {damage=2},
 								},vector.direction(pos,pos2))
 							end
 						end

@@ -25,7 +25,7 @@ minetest.register_item(":", {
 			--instant = {times={[1]=0.1,},uses=0,maxlevel=1},
 			dig_immediate = {times={[2]=0,[3]=0,[1]=0,},uses=0,maxlevel=1},
 		},
-		damage_groups = {damage=1,fleshy=1},
+		damage_groups = {damage=1},
 	}
 })
 
