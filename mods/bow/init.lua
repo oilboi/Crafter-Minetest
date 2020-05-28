@@ -211,49 +211,54 @@ minetest.register_globalstep(function(dtime)
 		if minetest.get_item_group(item, "bow") > 0 then
 			--begin to pull the bow back
 			if player:get_player_control().RMB == true then
-					local meta = player:get_meta()
-					local animation = meta:get_float("bow_loading_animation")
-					
-					if animation <= 5 then
-					
-						if animation == 0 then
-							animation = 1
-							player:set_wielded_item(ItemStack("bow:bow_1"))
-						end
-						animation = animation + (dtime*2)
+					local inv = player:get_inventory()
+					if inv:contains_item("main", ItemStack("bow:arrow")) then
+						local meta = player:get_meta()
+						local animation = meta:get_float("bow_loading_animation")
 						
-						--print(animation)
+						if animation <= 5 then
 						
-						meta:set_float("bow_loading_animation", animation)
-						
-						local level = minetest.get_item_group(item, "bow_loaded")
-						
-						
-						local new_level = math.floor(animation + 0.5)
-						
-						--print(new_level,level)
-						
-						if new_level > level then
-							if level > 0 then
-								minetest.sound_play("bow_pull_back", {object=player, gain = 1.0, max_hear_distance = 60,pitch = 0.7+new_level*0.1})
+							if animation == 0 then
+								animation = 1
+								player:set_wielded_item(ItemStack("bow:bow_1"))
 							end
-							player:set_wielded_item(ItemStack("bow:bow_"..new_level))
+							animation = animation + (dtime*2)
+							
+							--print(animation)
+							
+							meta:set_float("bow_loading_animation", animation)
+							
+							local level = minetest.get_item_group(item, "bow_loaded")
+							
+							
+							local new_level = math.floor(animation + 0.5)
+							
+							--print(new_level,level)
+							
+							if new_level > level then
+								if level > 0 then
+									minetest.sound_play("bow_pull_back", {object=player, gain = 1.0, max_hear_distance = 60,pitch = 0.7+new_level*0.1})
+								end
+								player:set_wielded_item(ItemStack("bow:bow_"..new_level))
+							end
 						end
 					end
-					
-					--player:set_wielded_item(ItemStack("main:glass"))
 			else
 				local power = minetest.get_item_group(item, "bow_loaded")
 				
 				if power > 0 then
-					local dir = player:get_look_dir()
-					local vel = vector.multiply(dir,power*10)
-					local pos = player:get_pos()
-					pos.y = pos.y + 1.625
-					local object = minetest.add_entity(pos,"bow:arrow")
-					object:set_velocity(vel)
-					object:get_luaentity().owner = player:get_player_name()
-					minetest.sound_play("bow", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
+					local inv = player:get_inventory()
+					if inv:contains_item("main", ItemStack("bow:arrow")) then
+						local dir = player:get_look_dir()
+						local vel = vector.multiply(dir,power*10)
+						local pos = player:get_pos()
+						pos.y = pos.y + 1.625
+						local object = minetest.add_entity(pos,"bow:arrow")
+						object:set_velocity(vel)
+						object:get_luaentity().owner = player:get_player_name()
+						minetest.sound_play("bow", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
+						inv:remove_item("main", ItemStack("bow:arrow"))
+					end
 				end
 			
 				player:set_wielded_item(ItemStack("bow:bow_empty"))
