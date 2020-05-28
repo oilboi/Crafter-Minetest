@@ -244,7 +244,7 @@ minetest.register_globalstep(function(dtime)
 							
 							if new_level > level then
 								if new_level == 5 then
-									minetest.sound_play("bow_pull_back", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(70,100)/100})
+									minetest.sound_play("bow_pull_back", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(70,110)/100})
 								end
 								player:set_wielded_item(ItemStack("bow:bow_"..new_level))
 							end
