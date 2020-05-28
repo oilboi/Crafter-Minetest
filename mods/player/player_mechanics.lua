@@ -1,7 +1,8 @@
-local player_state_channel = minetest.mod_channel_join("player.player_movement_state")
+local player_state_channels = {}
 
 minetest.register_on_modchannel_message(function(channel_name, sender, message)
-	if channel_name == "player.player_movement_state" then
+	local channel_decyphered = channel_name:gsub(sender,"")
+	if channel_decyphered == ":player_movement_state" then
 		local player = minetest.get_player_by_name(sender)
 		local meta = player:get_meta()
 		meta:set_string("player.player_movement_state", message)
@@ -9,6 +10,8 @@ minetest.register_on_modchannel_message(function(channel_name, sender, message)
 end)
 
 minetest.register_on_joinplayer(function(player)
+	local name = player:get_player_name()
+	player_state_channels[name] = minetest.mod_channel_join(name..":player_movement_state")
 	player:set_physics_override({jump=1.25,gravity=1.25})
 	local meta = player:get_meta()
 	meta:set_string("player.player_movement_state", "0")
