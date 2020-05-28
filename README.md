@@ -37,6 +37,7 @@ enable_mod_channels = true
 - Players now use the same damage mechaninism as mobs
 - Fixed wrong variable for durability assigned to all swords
 - Fix bug in experience
+- Fully implemented bows and arrows
 ---
 
 

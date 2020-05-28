@@ -117,7 +117,7 @@ mobs.register_mob(
 	 state = 0,
 	 view_distance = 15,
 	 
-	 item_drop = "mob:egg", 
+	 item_drop = {"mob:egg","mob:feather"}, 
 	 standing_frame = {x=20,y=20},
 	 moving_frame = {x=0,y=20},
 	 animation_multiplier = 15,

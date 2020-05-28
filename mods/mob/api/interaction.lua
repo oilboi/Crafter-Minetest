@@ -242,14 +242,20 @@ mobs.create_interaction_functions = function(def,mob_register)
 		
 		--only throw items if registered
 		if self.item_drop then
+			local item
+			if type(self.item_drop) == "string" then
+				item = self.item_drop
+			elseif type(self.item_drop) == "table" then
+				item = self.item_drop[math.random(1,table.getn(self.item_drop))]
+			end
 			--detect if multiple items are going to be added
 			if self.item_max then
 				local data_item_amount = math.random(self.item_minimum, self.item_max)
 				for i = 1 ,data_item_amount do
-					minetest.throw_item(vector.new(pos.x,pos.y+0.1,pos.z),self.item_drop)
+					minetest.throw_item(vector.new(pos.x,pos.y+0.1,pos.z),item)
 				end
 			else
-				minetest.throw_item(vector.new(pos.x,pos.y+0.1,pos.z),self.item_drop)
+				minetest.throw_item(vector.new(pos.x,pos.y+0.1,pos.z),item)
 			end
 		end
 			
