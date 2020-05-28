@@ -391,12 +391,16 @@ minetest.register_entity("experience:orb", {
 		end
 
 		local pos = self.object:get_pos()
-		local node = minetest.get_node_or_nil({
-			x = pos.x,
-			y = pos.y + self.object:get_properties().collisionbox[2] - 0.05,
-			z = pos.z
-		})
-		
+		local node
+		if pos then
+			node = minetest.get_node_or_nil({
+				x = pos.x,
+				y = pos.y + self.object:get_properties().collisionbox[2] - 0.05,
+				z = pos.z
+			})
+		else
+			return
+		end
 
 		-- Remove nodes in 'ignore'
 		if node and node.name == "ignore" then
