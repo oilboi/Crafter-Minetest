@@ -1,4 +1,10 @@
-local aether_channel = minetest.mod_channel_join("aether_teleporters")
+local aether_channels = {}
+
+minetest.register_on_joinplayer(function(player)
+	local name = player:get_player_name()
+	aether_channels[name] = minetest.mod_channel_join(name..":aether_teleporters")
+end)
+
 
 local path = minetest.get_modpath("aether")
 dofile(path.."/schem.lua")
@@ -295,7 +301,8 @@ end
 
 --this initializes all teleporter commands from the client
 minetest.register_on_modchannel_message(function(channel_name, sender, message)
-	if channel_name == "aether_teleporters" then
+	local channel_decyphered = channel_name:gsub(sender,"")
+	if channel_decyphered == ":aether_teleporters" then
 		local player = minetest.get_player_by_name(sender)
 		local pos = player:get_pos()
 		

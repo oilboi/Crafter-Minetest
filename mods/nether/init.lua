@@ -1,4 +1,9 @@
-local nether_channel = minetest.mod_channel_join("nether_teleporters")
+local nether_channels = {}
+
+minetest.register_on_joinplayer(function(player)
+	local name = player:get_player_name()
+	nether_channels[name] = minetest.mod_channel_join(name..":nether_teleporters")
+end)
 
 local path = minetest.get_modpath("nether")
 dofile(path.."/schem.lua")
@@ -298,7 +303,8 @@ end
 
 --this initializes all teleporter commands from the client
 minetest.register_on_modchannel_message(function(channel_name, sender, message)
-	if channel_name == "nether_teleporters" then
+	local channel_decyphered = channel_name:gsub(sender,"")
+	if channel_decyphered == ":nether_teleporters" then
 		local player = minetest.get_player_by_name(sender)
 		local pos = player:get_pos()
 		

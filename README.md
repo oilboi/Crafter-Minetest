@@ -32,7 +32,8 @@ enable_mod_channels = true
 ## Alpha 0.05
 
 > Multiplayer Polishing Update
-- 
+- Fixed only one player being able to run on a server
+- Fixed only one person being able to teleport in the same server step
 
 ---
 
