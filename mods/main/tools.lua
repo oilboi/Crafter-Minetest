@@ -1,8 +1,9 @@
 --Quick definition of tools
 local tool = {"shovel","axe","pick"}
 local material = {"wood","stone","iron","gold","diamond"}
+local sword_durability ={52,131,250,32,1561}
 
-for _,material in pairs(material) do
+for level_id,material in pairs(material) do
 	for id,tool in pairs(tool) do
 
 		--print(id,tool,level,material)
@@ -209,9 +210,9 @@ for _,material in pairs(material) do
 		description = material:gsub("^%l", string.upper).." Sword",
 		inventory_image = material.."sword.png",
 		tool_capabilities = {
-			--full_punch_interval = 1.2,
+			full_punch_interval = 0,
 			--max_drop_level=0,
-			groupcaps={leaves = {times={[4]=0.7,[3]=0.7,[2]=0.7,[1]=0.7}, uses=10, maxlevel=1},},
+			groupcaps={leaves = {times={[4]=0.7,[3]=0.7,[2]=0.7,[1]=0.7}, uses=sword_durability[level_id], maxlevel=1},},
 			damage_groups = {damage = damage},
 		},
 		mob_hit_wear = wear,
