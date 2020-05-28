@@ -15,6 +15,7 @@ arrow.initial_properties = {
 }
 arrow.on_activate = function(self, staticdata, dtime_s)
 	--self.object:set_animation({x=0,y=180}, 15, 0, true)
+	local vel = nil
 	if string.sub(staticdata, 1, string.len("return")) == "return" then
 		local data = minetest.deserialize(staticdata)
 		if data and type(data) == "table" then
@@ -24,10 +25,14 @@ arrow.on_activate = function(self, staticdata, dtime_s)
 			self.timer = data.timer
 			self.collecting = data.collecting
 			self.check_dir = data.check_dir
+			vel = data.vel
 		end
 	end
 	if not self.stuck then
 		self.object:set_acceleration(vector.new(0,-9.81,0))
+		if vel then
+			self.object:set_velocity(vel)
+		end
 	end
 end
 
@@ -38,7 +43,8 @@ arrow.get_staticdata = function(self)
 		stuck = self.stuck,
 		timer = self.timer,
 		collecting = self.collecting,
-		check_dir = self.check_dir
+		check_dir = self.check_dir,
+		vel = self.object:get_velocity()
 	})
 end
 
