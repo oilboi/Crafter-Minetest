@@ -168,10 +168,11 @@ minetest.register_node("bed:bed_back", {
 		create_spawnpoint(vector.add(pos,facedir),clicker)
 	end,
 })
+
 minetest.register_craft({
 	output = "bed:bed",
 	recipe = {
-		{"main:leaves", "main:leaves", "main:leaves"},
-		{"main:wood", "main:wood", "main:wood"},
+		{"main:dropped_leaves", "main:dropped_leaves", "main:dropped_leaves"},
+		{"main:wood"          , "main:wood"          , "main:wood"          },
 	},
 })
