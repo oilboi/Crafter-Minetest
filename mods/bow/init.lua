@@ -24,6 +24,7 @@ arrow.on_activate = function(self, staticdata, dtime_s)
 			self.stuck = data.stuck
 			self.timer = data.timer
 			self.collecting = data.collecting
+			self.check_dir = data.check_dir
 		end
 	end
 	if not self.stuck then
@@ -37,13 +38,11 @@ arrow.get_staticdata = function(self)
 		owner = self.owner,
 		stuck = self.stuck,
 		timer = self.timer,
-		collecting = self.collecting
+		collecting = self.collecting,
+		check_dir = self.check_dir
 	})
 end
 
-local radians_to_degrees = function(radians)
-	return(radians*180.0/math.pi)
-end
 arrow.spin = 0
 arrow.owner = ""
 arrow.stuck = false
@@ -142,15 +141,6 @@ arrow.on_step = function(self, dtime,moveresult)
 			self.object:set_acceleration(vector.new(0,0,0))
 		elseif self.stuck == true and self.check_dir then
 			local pos2 = vector.add(pos,vector.multiply(self.check_dir,0.2))
-
-			minetest.add_particle({
-				pos = pos2,
-				velocity = {x=0, y=0, z=0},
-				acceleration = {x=0, y=0, z=0},
-				expirationtime = 0.2,
-				size = 1,
-				texture = "dirt.png",
-			})
 			
 			local ray = minetest.raycast(pos, pos2, false, false)
 			local pointed_thing = ray:next()
@@ -268,3 +258,22 @@ minetest.register_globalstep(function(dtime)
 		end
 	end
 end)
+
+
+minetest.register_craft({
+	output = "bow:bow_empty",
+	recipe = {
+		{""           , "main:stick", "mob:string"},
+		{"main:stick" , ""          , "mob:string"},
+		{""           , "main:stick", "mob:string"},
+	},
+})
+
+minetest.register_craft({
+	output = "bow:arrow 16",
+	recipe = {
+		{"main:iron", ""          , ""           },
+		{""         , "main:stick", ""           },
+		{""         , ""          , "mob:feather"},
+	},
+})
