@@ -38,6 +38,8 @@ enable_mod_channels = true
 - Fixed wrong variable for durability assigned to all swords
 - Fix bug in experience
 - Fully implemented bows and arrows
+- Tuned the bow and arrows even further
+- Snowmen now drop a carrot, coal, stick, or snowball
 ---
 
 

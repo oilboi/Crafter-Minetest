@@ -179,7 +179,7 @@ mobs.register_mob(
 	 state = 0,
 	 view_distance = 15,
 	 
-	 item_drop = "weather:snowball", 
+	 item_drop = {"weather:snowball","main:coal","mob:carrot","main:stick"}, 
 	 standing_frame = {x=0,y=0},
 	 moving_frame = {x=0,y=0},
 	 animation_multiplier = 10,
