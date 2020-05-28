@@ -34,7 +34,9 @@ enable_mod_channels = true
 > Multiplayer Polishing Update
 - Fixed only one player being able to run on a server
 - Fixed only one person being able to teleport in the same server step
-
+- Players now use the same damage mechaninism as mobs
+- Fixed wrong variable for durability assigned to all swords
+- Fix bug in experience
 ---
 
 
