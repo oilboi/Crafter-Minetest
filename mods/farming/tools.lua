@@ -59,7 +59,7 @@ for level,material in pairs(material) do
 		description = material:gsub("^%l", string.upper).." Hoe",
 		inventory_image = material.."hoe.png",
 		tool_capabilities = {
-				--full_punch_interval = 1.2,
+				full_punch_interval = 0,
 				--max_drop_level=0,
 				groupcaps=groupcaps2,
 				damage_groups = {damage=damage},
