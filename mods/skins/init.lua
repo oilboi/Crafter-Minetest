@@ -28,12 +28,6 @@ if not http then
     return(nil)
 end
 
-
--- http://minetest.fensta.bplaced.net/api/apidoku.md
-local root_url = "http://minetest.fensta.bplaced.net"
-local page_url = root_url .. "/api/v2/get.json.php?getlist&page=%i&outformat=base64" -- [1] = Page#
-local preview_url = root_url .. "/skins/1/%i.png" -- [1] = ID
-
 -- Fancy debug wrapper to download an URL
 local function fetch_url(url, callback)
 	http.fetch({
