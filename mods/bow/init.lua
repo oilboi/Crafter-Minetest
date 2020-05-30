@@ -295,7 +295,7 @@ minetest.register_globalstep(function(dtime)
 
 							local pos = player:get_pos()
 
-							pos.y = pos.y + 1.625
+							pos.y = pos.y + 1.5
 
 							local add_pos = vector.add(pos,vector.divide(dir,10))
 
