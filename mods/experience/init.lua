@@ -349,7 +349,7 @@ minetest.register_entity("experience:orb", {
                     local goal = velocity--vector.add(player_velocity,velocity)
 					acceleration = vector.new(goal.x-currentvel.x,goal.y-currentvel.y,goal.z-currentvel.z)
 					self.object:add_velocity(vector.add(acceleration,player_velocity))
-				elseif distance > 0.9 then
+				elseif distance > 0.9 and experience_collection_buffer > 0 then
 					local multiplier = (self.radius*5) - distance
 					local velocity = vector.multiply(direction,multiplier)
 					local goal = vector.multiply(minetest.yaw_to_dir(minetest.dir_to_yaw(vector.direction(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z)))+math.pi/2),10)
