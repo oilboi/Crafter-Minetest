@@ -80,12 +80,14 @@ end)
 --have the client send the server the ready signal
 minetest.register_on_modchannel_message(function(channel_name, sender, message)
 	if channel_name == "weather_intake" then
+		minetest.after(0,function()
 		--print("sending player weather")
 		--for some reason this variable assignment does not work outside the scope of this function
 		local all_nodes_serialized = minetest.serialize(all_nodes)
 		weather_nodes_channel:send_all(all_nodes_serialized)
 		function_send_weather_type()
 		update_player_sky()
+		end)
 	end
 end)
 
@@ -259,13 +261,14 @@ local function randomize_weather()
 end
 
 minetest.register_on_mods_loaded(function()
+	minetest.after(0,function()
 	if mod_storage:get_int("weather_initialized") == 0 then
 		mod_storage:set_int("weather_initialized",1)
 		weather_type = math.random(0,weather_max)
 		mod_storage:set_int("weather_type", weather_type)
 	end
-
 	randomize_weather()
+	end)
 end)
 
 minetest.register_on_shutdown(function()

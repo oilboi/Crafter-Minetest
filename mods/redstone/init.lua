@@ -23,7 +23,7 @@ dofile(path.."/pressure_plate.lua")
 get_old_power = function(pos)
 	local meta = minetest.get_meta(pos)
 	local oldpower = meta:get_int("old_power")
-	return(oldpower)	
+	return(oldpower)
 end
 --set the data for powered states
 get_local_power = function(pos)
