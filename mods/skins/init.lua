@@ -127,11 +127,11 @@ fetch_function = function(name)
                 if stored_texture then
                     --set the player's skin
                     local player = minetest.get_player_by_name(name)
-                    player:set_properties({textures = {stored_texture}})
+                    player:set_properties({textures = {stored_texture, "blank_skin.png"}})
                     local meta = player:get_meta()
                     meta:set_string("skin",stored_texture)
 
-                    recalculate_armor(player)
+                    recalculate_armor(player) --redundancy
                     
                     --[[
                     player:hud_add(

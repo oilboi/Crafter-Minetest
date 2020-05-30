@@ -2,7 +2,8 @@ function recalculate_armor(player)
     if not player or (player and not player:is_player()) then return end
     local inv = player:get_inventory()
     local meta = player:get_meta()
-    local player_skin = meta:get_string("skin")
+    local player_skin = meta:get_string("skin") 
+    local armor_skin = "blank_skin.png"
 
     local stack = inv:get_stack("armor_head",1):get_name()
     stack = stack:gsub("_item.png","")
@@ -15,23 +16,23 @@ function recalculate_armor(player)
     stack = stack:gsub("_item.png","")
     stack = stack:gsub("armor:","")
     if stack ~= "" then
-        player_skin = player_skin.."^"..stack..".png"
+        armor_skin = armor_skin.."^"..stack..".png"
     end
 
     stack = inv:get_stack("armor_legs",1):get_name()
     stack = stack:gsub("_item.png","")
     stack = stack:gsub("armor:","")
     if stack ~= "" then
-        player_skin = player_skin.."^"..stack..".png"
+        armor_skin = armor_skin.."^"..stack..".png"
     end
 
     stack = inv:get_stack("armor_feet",1):get_name()
     stack = stack:gsub("_item.png","")
     stack = stack:gsub("armor:","")
     if stack ~= "" then
-        player_skin = player_skin.."^"..stack..".png"
+        armor_skin = armor_skin.."^"..stack..".png"
     end
-    player:set_properties({textures = {player_skin}})
+    player:set_properties({textures = {player_skin,armor_skin}})
 end
 
 

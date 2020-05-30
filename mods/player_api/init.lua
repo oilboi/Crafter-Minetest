@@ -5,7 +5,7 @@ dofile(minetest.get_modpath("player_api") .. "/api.lua")
 -- Default player appearance
 player_api.register_model("character.b3d", {
 	animation_speed = 24,
-	textures = {"player.png", },
+	textures = {"player.png", "blank_skin.png"},
 	animations = {
 		-- Standard animations.
 		stand     = {x = 5,   y = 5},
