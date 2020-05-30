@@ -39,7 +39,7 @@ if not creative_mode then
 						local x=math.random(-2,2)*math.random()
 						local y=math.random(2,5)
 						local z=math.random(-2,2)*math.random()
-						obj:setvelocity({x=x, y=y, z=z})
+						obj:set_velocity({x=x, y=y, z=z})
 					end
 				end
 			end
@@ -120,7 +120,7 @@ function minetest.throw_experience(pos, amount)
             local x=math.random(-2,2)*math.random()
             local y=math.random(2,5)
             local z=math.random(-2,2)*math.random()
-            obj:setvelocity({x=x, y=y, z=z})
+            obj:set_velocity({x=x, y=y, z=z})
         end
     end
 	--return obj
@@ -274,7 +274,7 @@ minetest.register_entity(":__builtin:item", {
 			local x=math.random(-2,2)*math.random()
 			local y=math.random(2,5)
 			local z=math.random(-2,2)*math.random()
-			self.object:setvelocity(vector.new(x,y,z))
+			self.object:set_velocity(vector.new(x,y,z))
 		     -- print(self.collection_timer)
 		end
 		self.object:set_armor_groups({immortal = 1})
@@ -309,11 +309,11 @@ minetest.register_entity(":__builtin:item", {
 			end
 			local collector = minetest.get_player_by_name(self.collector)
 			if collector then
-				self.object:setacceleration(vector.new(0,0,0))
+				self.object:set_acceleration(vector.new(0,0,0))
 				self.disable_physics(self)
 				--get the variables
-				local pos = self.object:getpos()
-				local pos2 = collector:getpos()
+				local pos = self.object:get_pos()
+				local pos2 = collector:get_pos()
 				local player_velocity = collector:get_player_velocity()
 				pos2.y = pos2.y + self.collection_height
 								
@@ -331,7 +331,7 @@ minetest.register_entity(":__builtin:item", {
 				
 				local velocity = vector.add(player_velocity,velocity)
 				
-				self.object:setvelocity(velocity)
+				self.object:set_velocity(velocity)
 				
 				if distance < 0.2 then
 					self.object:remove()

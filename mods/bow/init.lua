@@ -64,7 +64,7 @@ arrow.on_step = function(self, dtime,moveresult)
 		for _,object in ipairs(minetest.get_objects_inside_radius(pos, self.radius)) do
 			local owner = minetest.get_player_by_name(self.owner)
 			if owner then
-				self.object:setacceleration(vector.new(0,0,0))
+				self.object:set_acceleration(vector.new(0,0,0))
 				--get the variables
 				local pos2 = owner:get_pos()
 				local player_velocity = owner:get_player_velocity()
@@ -84,7 +84,7 @@ arrow.on_step = function(self, dtime,moveresult)
 				
 				local velocity = vector.add(player_velocity,velocity)
 				
-				self.object:setvelocity(velocity)
+				self.object:set_velocity(velocity)
 				
 				if distance < 0.2 then
 					self.object:remove()
