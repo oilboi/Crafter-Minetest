@@ -4,11 +4,11 @@ for _,material in pairs({"wood","iron"}) do
 local door_rightclick = function(pos)
 	local node = minetest.get_node(pos)
 	local name = node.name
-	local opened = minetest.get_node_group(name, "door_open")
-	local closed = minetest.get_node_group(name, "door_closed")
-	local closed = minetest.get_node_group(name, "door_closed")
-	local top = minetest.get_node_group(name, "top")
-	local bottom = minetest.get_node_group(name, "bottom")
+	local opened = minetest.get_item_group(name, "door_open")
+	local closed = minetest.get_item_group(name, "door_closed")
+	local closed = minetest.get_item_group(name, "door_closed")
+	local top = minetest.get_item_group(name, "top")
+	local bottom = minetest.get_item_group(name, "bottom")
 	local param2 = node.param2
 	local pos2 = table.copy(pos)
 	
