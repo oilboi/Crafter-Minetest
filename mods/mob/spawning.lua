@@ -12,13 +12,13 @@ local find_node_height = 32
 local spawn = true
 
 local spawn_table = {"pig","chicken"}
-local snow_spawn_table = {"snowman"}
+local snow_spawn_table = {"snowman","creeper","spider",}
 local dark_spawn_table = {"creeper","spider","big_slime","medium_slime","small_slime"}
 local nether_spawn_table = {"nitro_creeper"}
 local aether_spawn_table = {"phyg"}
 
 local function spawn_mobs()
-	print("---------------------------------------------")
+	--print("---------------------------------------------")
 	if spawn and global_mob_amount < mob_limit then
 		--check through players
 		for _,player in ipairs(minetest.get_connected_players()) do			
@@ -55,25 +55,25 @@ local function spawn_mobs()
 				--aether spawning
 				if mob_pos.y >= 21000 then
 					local mob_spawning = aether_spawn_table[math.random(1,table.getn(aether_spawn_table))]
-					print("Aether Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
+					--print("Aether Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
 					minetest.add_entity(mob_pos,"mob:"..mob_spawning)
 				elseif mob_pos.y <= -10033 and mob_pos.y >= -20112 then
 					local mob_spawning = nether_spawn_table[math.random(1,table.getn(nether_spawn_table))]
-					print("Nether Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
+					--print("Nether Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
 					minetest.add_entity(mob_pos,"mob:"..mob_spawning)
 				else
 					local light_level = minetest.get_node_light(spawner[1])
 					if weather_type == 1 then
 						local mob_spawning = snow_spawn_table[math.random(1,table.getn(snow_spawn_table))]
-						print("Snow Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
+						--print("Snow Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
 						minetest.add_entity(mob_pos,"mob:"..mob_spawning)
 					elseif light_level < 10 then
 						local mob_spawning = dark_spawn_table[math.random(1,table.getn(dark_spawn_table))]
-						print("Dark Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
+						--print("Dark Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
 						minetest.add_entity(mob_pos,"mob:"..mob_spawning)
 					else
 						local mob_spawning = spawn_table[math.random(1,table.getn(spawn_table))]
-						print("Light Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
+						--print("Light Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
 						minetest.add_entity(mob_pos,"mob:"..mob_spawning)
 					end
 				end
@@ -84,5 +84,8 @@ local function spawn_mobs()
 		spawn_mobs()
 	end)
 end
-
-spawn_mobs()
+minetest.register_on_mods_loaded(function()
+	minetest.after(0,function()
+		spawn_mobs()
+	end)
+end)

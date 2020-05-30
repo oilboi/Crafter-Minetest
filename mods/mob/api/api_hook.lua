@@ -48,7 +48,7 @@ if def.head_bone then
 	mob_register.head_coord = def.head_coord
 	mob_register.flip_pitch = def.flip_pitch
 else
-	print("create some other functions to turn mob " .. def.mobname)
+	--print("create some other functions to turn mob " .. def.mobname)
 end
 
 mob_register.hurt_inside_timer = 0

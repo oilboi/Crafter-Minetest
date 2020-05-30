@@ -97,7 +97,7 @@ end
 
 for material_id,material in pairs(materials) do
     for armor_id,armor in pairs(armor_type) do
-        print(material_id,material,"|",armor_id,armor)
+        --print(material_id,material,"|",armor_id,armor)
         minetest.register_tool("armor:"..material_id.."_"..armor_id,{
             description = material_id:gsub("^%l", string.upper).." "..armor_id:gsub("^%l", string.upper),
     
