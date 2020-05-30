@@ -37,7 +37,7 @@ minetest.register_on_respawnplayer(function(player)
 	local string_pos = mod_storage:get_string(name)
 	if string_pos ~= "" then
 		local pos = minetest.string_to_pos(string_pos)
-		player:setpos(pos)
+		player:set_pos(pos)
 		return(true)
 	end
 end)

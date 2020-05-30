@@ -7,7 +7,7 @@ mobs.create_movement_functions = function(def,mob_register)
 		local node = minetest.get_node(pos).name
 		self.swimming = false
 		if node == "main:water" or node =="main:waterflow" then
-			local vel = self.object:getvelocity()
+			local vel = self.object:get_velocity()
 			local goal = 3
 			local acceleration = vector.new(0,goal-vel.y,0)
 			--jump out of the water
