@@ -319,7 +319,7 @@ minetest.register_entity("experience:orb", {
 				return
 			end
 			local collector = minetest.get_player_by_name(self.collector)
-			if collector and collector:get_hp() > 0 then
+			if collector and collector:get_hp() > 0 and vector.distance(self.object:get_pos(),collector:get_pos()) < 5 then
 				self.object:set_acceleration(vector.new(0,0,0))
 				self.disable_physics(self)
 				--get the variables
@@ -364,8 +364,8 @@ minetest.register_entity("experience:orb", {
 				end
 				return
 			else
-				--print(self.collector.." does not exist")
-				self.object:remove()
+				self.collector = nil
+				self.enable_physics(self)
 			end
 		end
 		
