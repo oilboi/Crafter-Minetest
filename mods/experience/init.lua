@@ -173,7 +173,7 @@ function add_experience(player,experience)
         minetest.sound_play("experience",{gain=0.1,to_player = player:get_player_name(),pitch=math.random(75,99)/100})
     end
     meta:set_int("experience_bar_count",bar_count)
-    player:hud_change(hud_id, number, bar_count)
+    player:hud_change(hud_id, "number", bar_count)
 end
 
 --[[
@@ -196,7 +196,7 @@ minetest.register_on_dieplayer(function(player)
     --bar
     meta:set_int("experience_bar_count",0)
     local hud_id = meta:get_int("experience_bar")
-    player:hud_change(hud_id, number, 0)
+    player:hud_change(hud_id, "number", 0)
                               
     --level number
     local level = 0
@@ -338,38 +338,30 @@ minetest.register_entity("experience:orb", {
                 end
 				local goal = vector.multiply(direction,multiplier)
                 local currentvel = self.object:get_velocity()
-                local acceleration
-				if distance > 1 then
+				local acceleration
+
+				local meta = collector:get_meta()
+				local experience_collection_buffer = meta:get_float("experience_collection_buffer")
+
+				if distance > 0.5 then
                     local multiplier = (self.radius*5) - distance
                     local velocity = vector.multiply(direction,multiplier)
                     local goal = velocity--vector.add(player_velocity,velocity)
-                    acceleration = vector.new(goal.x-currentvel.x,goal.y-currentvel.y,goal.z-currentvel.z)
-                else
-                    acceleration = vector.new(goal.x,goal.y,goal.z)
+					acceleration = vector.new(goal.x-currentvel.x,goal.y-currentvel.y,goal.z-currentvel.z)
+					self.object:add_velocity(vector.add(acceleration,player_velocity))
+				else
+					local multiplier = (self.radius*5) - distance
+					local velocity = vector.multiply(direction,multiplier)
+					
+					local goal = vector.multiply(minetest.yaw_to_dir(minetest.dir_to_yaw(vector.direction(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z)))+math.pi/2),10)
+					acceleration = vector.new(goal.x-currentvel.x,goal.y-currentvel.y,goal.z-currentvel.z)
+					self.object:add_velocity(acceleration)
                 end
-				--acceleration = vector.multiply(acceleration, )
-                                            
-                
-				
-				self.object:add_velocity(acceleration)
-				
-                                            
-                                            
-                    
-                local meta = collector:get_meta()
-                local experience_collection_buffer = meta:get_float("experience_collection_buffer")
-				if distance < 0.2 and experience_collection_buffer == 0 then
+				if experience_collection_buffer <= 0 then
                     meta:set_float("experience_collection_buffer",0.04)
                     add_experience(collector,2)
 					self.object:remove()
 				end
-				
-				
-				--self.delete_timer = self.delete_timer + dtime
-				--this is where the item gets removed from world
-				--if self.delete_timer > 1 then
-				--	self.object:remove()
-				--end
 				return
 			else
 				--print(self.collector.." does not exist")
