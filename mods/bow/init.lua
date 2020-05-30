@@ -104,7 +104,7 @@ arrow.on_step = function(self, dtime,moveresult)
 		end
 	else
 		for _,object in ipairs(minetest.get_objects_inside_radius(pos, 2)) do
-			if (object:is_player() and object:get_player_name() ~= self.owner and object:get_hp() > 0) or (object:get_luaentity() and object:get_luaentity().mob == true) then
+			if self.stuck == false and (object:is_player() and object:get_player_name() ~= self.owner and object:get_hp() > 0) or (object:get_luaentity() and object:get_luaentity().mob == true) then
 				object:punch(self.object, 2, 
 					{
 					full_punch_interval=1.5,
@@ -131,7 +131,6 @@ arrow.on_step = function(self, dtime,moveresult)
 		end
 
 		if moveresult and moveresult.collides and moveresult.collisions and moveresult.collisions[1] and moveresult.collisions[1].new_velocity and self.stuck == false then
-
 			if moveresult.collisions[1].new_velocity.x == 0 and moveresult.collisions[1].old_velocity.x ~= 0 then
 				self.check_dir = vector.direction(vector.new(pos.x,0,0),vector.new(moveresult.collisions[1].node_pos.x,0,0))
 			elseif moveresult.collisions[1].new_velocity.y == 0 and moveresult.collisions[1].old_velocity.y ~= 0 then
@@ -291,13 +290,24 @@ minetest.register_globalstep(function(dtime)
 						local inv = player:get_inventory()
 						if inv:contains_item("main", ItemStack("bow:arrow")) then
 							local dir = player:get_look_dir()
+
 							local vel = vector.multiply(dir,power*10)
+
 							local pos = player:get_pos()
+
 							pos.y = pos.y + 1.625
-							local object = minetest.add_entity(pos,"bow:arrow")
+
+							local add_pos = vector.add(pos,vector.divide(dir,10))
+
+							local object = minetest.add_entity(add_pos,"bow:arrow")
+
 							object:set_velocity(vel)
+
 							object:get_luaentity().owner = player:get_player_name()
+							object:get_luaentity().oldpos = pos
+
 							minetest.sound_play("bow", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
+
 							inv:remove_item("main", ItemStack("bow:arrow"))
 						end
 					end
