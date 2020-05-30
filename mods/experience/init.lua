@@ -372,7 +372,7 @@ minetest.register_entity("experience:orb", {
 				--end
 				return
 			else
-				print(self.collector.." does not exist")
+				--print(self.collector.." does not exist")
 				self.object:remove()
 			end
 		end
