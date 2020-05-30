@@ -132,7 +132,7 @@ function create_craft_formspec(item)
 	local recipe = minetest.get_craft_recipe(item)
 	
 	local usable_table = recipe_converter(recipe.items, recipe.width)
-	output = "size[17.2,8.75]"..
+	local output = "size[17.2,8.75]"..
 		"background[-0.19,-0.25;9.41,9.49;gui_hb_bg.png]"..
 		"listcolors[#8b8a89;#c9c3c6;#3e3d3e;#000000;#FFFFFF]"..
 		"list[current_player;main;0,4.5;9,1;]".. --hot bar
@@ -290,7 +290,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
 
 		if creative_mode or (cheating == 1 and privved == true) then
-			local pos = player:getpos()
+			local pos = player:get_pos()
 			local inv = player:get_inventory()
 			local stack = ItemStack(item.." 64")
 			
