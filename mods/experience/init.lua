@@ -280,7 +280,7 @@ minetest.register_entity("experience:orb", {
 			local x=math.random(-2,2)*math.random()
 			local y=math.random(2,5)
 			local z=math.random(-2,2)*math.random()
-			self.object:setvelocity(vector.new(x,y,z))
+			self.object:set_velocity(vector.new(x,y,z))
 		     -- print(self.collection_timer)
 		end
 		self.object:set_armor_groups({immortal = 1})
@@ -320,11 +320,11 @@ minetest.register_entity("experience:orb", {
 			end
 			local collector = minetest.get_player_by_name(self.collector)
 			if collector and collector:get_hp() > 0 then
-				self.object:setacceleration(vector.new(0,0,0))
+				self.object:set_acceleration(vector.new(0,0,0))
 				self.disable_physics(self)
 				--get the variables
-				local pos = self.object:getpos()
-				local pos2 = collector:getpos()
+				local pos = self.object:get_pos()
+				local pos2 = collector:get_pos()
 				
                 local player_velocity = collector:get_player_velocity()
                                             
