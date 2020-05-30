@@ -104,7 +104,7 @@ arrow.on_step = function(self, dtime,moveresult)
 		end
 	else
 		for _,object in ipairs(minetest.get_objects_inside_radius(pos, 2)) do
-			if self.stuck == false and (object:is_player() and object:get_player_name() ~= self.owner and object:get_hp() > 0) or (object:get_luaentity() and object:get_luaentity().mob == true) then
+			if self.stuck == false and ((object:is_player() and object:get_player_name() ~= self.owner and object:get_hp() > 0) or (object:get_luaentity() and object:get_luaentity().mob == true)) then
 				object:punch(self.object, 2, 
 					{
 					full_punch_interval=1.5,
