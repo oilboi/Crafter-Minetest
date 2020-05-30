@@ -2,7 +2,7 @@
 --Item collection
 minetest.register_globalstep(function(dtime)
 	--collection
-	for _,player in ipairs(minetest.get_connected_players()) do                    
+	for _,player in ipairs(minetest.get_connected_players()) do
 		--don't magnetize to dead players
 		if player:get_hp() > 0 then
             local meta = player:get_meta()
