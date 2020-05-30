@@ -249,6 +249,7 @@ minetest.register_entity(":__builtin:item", {
 			collected = self.collected,
 			delete_timer = self.delete_timer,
 			collector = self.collector,
+			magnet_timer = self.magnet_timer,
 		})
 	end,
 
@@ -259,7 +260,7 @@ minetest.register_entity(":__builtin:item", {
 				self.itemstring = data.itemstring
 				self.age = (data.age or 0) + dtime_s
 				self.dropped_by = data.dropped_by
-				
+				self.magnet_timer = data.magnet_timer
 				self.collection_timer = data.collection_timer
 				self.collectable = data.collectable
 				self.try_timer = data.try_timer
@@ -300,15 +301,17 @@ minetest.register_entity(":__builtin:item", {
 			self.object:set_acceleration({x=0, y=0, z=0})
 		end
 	end,
+	magnet_timer = 0,
 	on_step = function(self, dtime)
 		--if item set to be collected then only execute go to player
 		if self.collected == true then
 			if not self.collector then
-				self.collected = false
+				self.object:remove()
 				return
 			end
 			local collector = minetest.get_player_by_name(self.collector)
 			if collector then
+				self.magnet_timer = self.magnet_timer + dtime
 				self.object:set_acceleration(vector.new(0,0,0))
 				self.disable_physics(self)
 				--get the variables
@@ -320,7 +323,6 @@ minetest.register_entity(":__builtin:item", {
 				local direction = vector.normalize(vector.subtract(pos2,pos))
 				local distance = vector.distance(pos2,pos)
 								
-				
 				--remove if too far away
 				if distance > self.radius then
 					distance = 0
@@ -333,11 +335,11 @@ minetest.register_entity(":__builtin:item", {
 				
 				self.object:set_velocity(velocity)
 				
-				if distance < 0.2 then
+				if distance < 0.3 or self.magnet_timer > 0.2 or (self.old_magnet_distance and self.old_magnet_distance < distance) then
 					self.object:remove()
 				end
 				
-				
+				self.old_magnet_distance = distance
 				--self.delete_timer = self.delete_timer + dtime
 				--this is where the item gets removed from world
 				--if self.delete_timer > 1 then
@@ -345,7 +347,7 @@ minetest.register_entity(":__builtin:item", {
 				--end
 				return
 			else
-				print(self.collector.." does not exist")
+				--print(self.collector.." does not exist")
 				self.object:remove()
 			end
 		end
