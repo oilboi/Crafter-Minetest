@@ -4,7 +4,7 @@ local function comparator_logic(pos)
 	
 	local param2 = minetest.get_node(pos).param2
 	local dir = minetest.facedir_to_dir(param2)
-	local get_group = minetest.get_node_group
+	local get_group = minetest.get_item_group
 	
 	--get inputs and outputs
 	local input_pos_straight = vector.subtract(pos,dir)

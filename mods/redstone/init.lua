@@ -1,6 +1,7 @@
 --define the class
 redstone = {}
 local r_index = {}
+r_copy = nil
 
 local path = minetest.get_modpath("redstone")
 dofile(path.."/functions.lua")
@@ -34,7 +35,7 @@ get_local_power = function(pos)
 		--index only direct neighbors
 		if not (math.abs(x)+math.abs(z) > 1) or (math.abs(x)+math.abs(z) == 0) then
 			--print(minetest.get_node(vector.add(vector.new(x,y,z),pos)).name)
-			local level = minetest.get_node_group(minetest.get_node(vector.add(vector.new(x,y,z),pos)).name, "redstone_power")
+			local level = minetest.get_item_group(minetest.get_node(vector.add(vector.new(x,y,z),pos)).name, "redstone_power")
 			if level > max_level then
 				max_level = level
 			end
@@ -58,7 +59,7 @@ get_powered_state_directional = function(pos)
 	local dir = minetest.facedir_to_dir(param2)
 	local input_pos = vector.subtract(pos,dir)
 	local behind_node = minetest.get_node(input_pos)
-	local level = minetest.get_node_group(behind_node.name, "redstone_power")
+	local level = minetest.get_item_group(behind_node.name, "redstone_power")
 	return(level)
 end
 
@@ -102,7 +103,7 @@ function redstone.collect_info(pos)
 		--print("started indexing")
 	--end
 	local get_node = minetest.get_node 
-	local group = minetest.get_node_group
+	local group = minetest.get_item_group
 	
 	local function get_group(i,gotten_group)
 		return(group(get_node(i).name, gotten_group))

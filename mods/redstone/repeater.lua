@@ -27,7 +27,7 @@ repeater_get_new_power = function(pos)
 end
 
 function repeater_on_timer(pos)
-	local self_repeater_level = minetest.get_node_group(minetest.get_node(pos).name, "repeater_level")
+	local self_repeater_level = minetest.get_item_group(minetest.get_node(pos).name, "repeater_level")
 	local param2 = minetest.get_node(pos).param2
 	local power = get_powered_state_directional(pos)
 	local buffer = repeater_get_buffer(pos)
@@ -51,17 +51,17 @@ function repeater_on_timer(pos)
 	local output = minetest.facedir_to_dir(param2)
 	output = vector.add(pos,output)
 	local output_node = minetest.get_node(output)
-	if minetest.get_node_group(output_node.name, "repeater") > 0 then
+	if minetest.get_item_group(output_node.name, "repeater") > 0 then
 	
 	
 		repeater_input(output)
 		
 		
-	elseif minetest.get_node_group(output_node.name, "redstone_dust") > 0 then
+	elseif minetest.get_item_group(output_node.name, "redstone_dust") > 0 then
 		minetest.after(0,function(output)
 			redstone.collect_info(output)
 		end,output)
-	elseif minetest.get_node_group(output_node.name, "redstone_activation") > 0 then
+	elseif minetest.get_item_group(output_node.name, "redstone_activation") > 0 then
 		minetest.after(0,function(output)
 			redstone.collect_info(output)
 		end,output)
@@ -71,7 +71,7 @@ function repeater_on_timer(pos)
 end
 
 function repeater_input(pos)
-	local self_repeater_level = minetest.get_node_group(minetest.get_node(pos).name, "repeater_level")
+	local self_repeater_level = minetest.get_item_group(minetest.get_node(pos).name, "repeater_level")
 	local param2 = minetest.get_node(pos).param2
 	local power = get_powered_state_directional(pos)
 	

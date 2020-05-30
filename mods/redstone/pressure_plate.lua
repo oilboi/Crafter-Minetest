@@ -51,7 +51,7 @@ minetest.register_abm{
 	chance = 1,
 	action = function(pos)
 		local power_level = 0
-		local level = minetest.get_node_group(minetest.get_node(pos).name, "pressure_plate_on")
+		local level = minetest.get_item_group(minetest.get_node(pos).name, "pressure_plate_on")
 		--detect players
 		for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1.2)) do
 			if object:is_player() and object:get_hp() > 0 then

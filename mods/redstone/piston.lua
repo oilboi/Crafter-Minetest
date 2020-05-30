@@ -97,7 +97,7 @@ minetest.register_node("redstone:piston_off", {
     after_place_node = function(pos, placer, itemstack, pointed_thing)
 		local look = placer:get_look_dir()
 		look = vector.multiply(look,-1)
-		dir = minetest.dir_to_facedir(look, true)
+		local dir = minetest.dir_to_facedir(look, true)
 		minetest.set_node(pos,{name="redstone:piston_off",param2=dir})
 		redstone.collect_info(pos)
     end,
@@ -327,7 +327,7 @@ minetest.register_node("redstone:sticky_piston_off", {
     after_place_node = function(pos, placer, itemstack, pointed_thing)
 		local look = placer:get_look_dir()
 		look = vector.multiply(look,-1)
-		dir = minetest.dir_to_facedir(look, true)
+		local dir = minetest.dir_to_facedir(look, true)
 		minetest.set_node(pos,{name="redstone:sticky_piston_off",param2=dir})
 		redstone.collect_info(pos)
     end,

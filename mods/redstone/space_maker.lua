@@ -40,7 +40,7 @@ minetest.register_node("redstone:space", {
 		vm:set_data(data)
 		vm:write_to_map()
 		
-		local placer_pos = placer:getpos()
+		local placer_pos = placer:get_pos()
 		placer_pos.y = pos.y + 1
 		placer:move_to(placer_pos)
 		

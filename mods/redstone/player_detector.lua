@@ -37,7 +37,7 @@ minetest.register_abm{
 		local found_player = false
 		for _,object in ipairs(minetest.get_objects_inside_radius(pos, 9)) do
 			if object:is_player() and object:get_hp() > 0 then
-				local level = minetest.get_node_group(minetest.get_node(pos).name, "redstone_power")
+				local level = minetest.get_item_group(minetest.get_node(pos).name, "redstone_power")
 				found_player = true
 				local pos2 = object:get_pos()
 				pos2 = vector.floor(vector.add(pos2,0.5))
