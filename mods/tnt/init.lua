@@ -171,15 +171,20 @@ function tnt(pos,range)
 					end
 				end
 				if clear == true then
-					local power = (range - vector.distance(pos,ppos))*10
+					local power = (range - vector.distance(pos,ppos))*8
 					
 					local dir = vector.direction(pos,ppos)
 					local force = vector.multiply(dir,power)
 					if object:is_player() then
 						--damage the player
 						local hp = object:get_hp()
-						if hp then
-							object:set_hp(hp - math.floor(power*2))
+						if hp > 0 then
+							--object:set_hp(hp - math.floor(power*2))
+							object:punch(object, 2, 
+								{
+								full_punch_interval=1.5,
+								damage_groups = {damage=math.floor(power)},
+								})
 						end
 						object:add_player_velocity(force)
 					elseif object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt" or object:get_luaentity().is_mob == true)  then
@@ -189,7 +194,7 @@ function tnt(pos,range)
 							object:punch(object, 2, 
 								{
 								full_punch_interval=1.5,
-								damage_groups = {damage=math.floor(power*2)},
+								damage_groups = {damage=math.floor(power)},
 								})
 							object:set_velocity(force)
 						end
