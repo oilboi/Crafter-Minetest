@@ -7,14 +7,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 			minetest.sound_play("hurt", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
 		end
 	elseif hp_change < 0 then
-		local hp_modifier = math.ceil(calculate_armor_absorbtion(player)/2)
-		damage_armor(player,math.abs(hp_change))
-		hp_change = hp_change + hp_modifier
 		minetest.sound_play("hurt", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
-
-		if hp_change >= 0 then
-			hp_change = -1
-		end
 	end
 	return(hp_change)
 end, true)
@@ -214,6 +207,13 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 		dir.y = 0
 		if vel.y <= 0 then
 			dir.y = 7
+		end
+
+		local hp_modifier = math.ceil(calculate_armor_absorbtion(player)/2)
+		damage_armor(player,math.abs(hurt))
+		hurt = hurt - hp_modifier
+		if hurt <= 0 then
+			hurt = 1
 		end
 		punch_timers[name] = 0
 		player:add_player_velocity(dir)

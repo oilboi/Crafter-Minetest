@@ -74,6 +74,16 @@ function calculate_armor_absorbtion(player)
     return(armor_absorbtion)
 end
 
+function set_armor_gui(player)
+    if not player or (player and not player:is_player()) then return end
+    local meta  = player:get_meta()
+    local level = calculate_armor_absorbtion(player)
+    local hud = meta:get_int("armor_bar")
+    player:hud_change(hud, "number", level)
+end
+
+
+
 function damage_armor(player,damage)
     if not player or (player and not player:is_player()) then return end
 
@@ -132,13 +142,35 @@ function damage_armor(player,damage)
     if recalc == true then
         minetest.sound_play("armor_break",{to_player=player:get_player_name(),gain=1,pitch=math.random(80,100)/100})
         recalculate_armor(player)
+        set_armor_gui(player)
         --do particles too
     end
 end
 
-minetest.register_on_joinplayer(function(player)
-    local inv = player:get_inventory()
 
+minetest.register_on_joinplayer(function(player)
+    local meta = player:get_meta()
+	player:hud_add({
+		hud_elem_type = "statbar",
+		position = {x = 0.5, y = 1},
+		text = "armor_icon_bg.png",
+		number = 20,
+		--direction = 1,
+		size = {x = 24, y = 24},
+		offset = {x = (-10 * 24) - 25, y = -(48 + 50 + 39)},
+	})
+	local armor_bar = player:hud_add({
+		hud_elem_type = "statbar",
+		position = {x = 0.5, y = 1},
+		text = "armor_icon.png",
+		number = calculate_armor_absorbtion(player),--meta:get_int("hunger"),
+		--direction = 1,
+		size = {x = 24, y = 24},
+		offset = {x = (-10 * 24) - 25, y = -(48 + 50 + 39)},
+	})
+    meta:set_int("armor_bar", armor_bar)
+    
+    local inv = player:get_inventory()
     inv:set_size("armor_head" ,1)
     inv:set_size("armor_torso",1)
     inv:set_size("armor_legs" ,1)
@@ -149,11 +181,16 @@ minetest.register_on_joinplayer(function(player)
     end)
 end)
 
+minetest.register_on_dieplayer(function(player)
+    set_armor_gui(player)
+end)
+
 minetest.register_on_player_inventory_action(function(player, action, inventory, inventory_info)
     if inventory_info.from_list == "armor_head" or inventory_info.from_list == "armor_torso" or inventory_info.from_list == "armor_legs" or inventory_info.from_list == "armor_feet" or
        inventory_info.to_list   == "armor_head" or inventory_info.to_list   == "armor_torso" or inventory_info.to_list   == "armor_legs" or inventory_info.to_list   == "armor_feet" then
         minetest.after(0,function()
             recalculate_armor(player)
+            set_armor_gui(player)
         end)
     end
 end)
