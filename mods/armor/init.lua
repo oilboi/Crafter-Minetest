@@ -71,7 +71,6 @@ function calculate_armor_absorbtion(player)
     if armor_absorbtion > 0 then
         armor_absorbtion = math.ceil(armor_absorbtion/4)
     end
-    print(armor_absorbtion)
     return(armor_absorbtion)
 end
 
