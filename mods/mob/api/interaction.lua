@@ -147,7 +147,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 			self.object:set_texture_mod("^[colorize:"..self.damage_color..":130")
 			self.hurt_color_timer = 0.25
 			if puncher ~= self.object then
-				self.punched_timer = 0.5
+				self.punched_timer = 0.25
 				if self.attacked_hostile then
 					self.hostile = true
 					self.hostile_timer = 20
@@ -187,7 +187,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 			self.object:set_texture_mod("^[colorize:"..self.damage_color..":130")
 			self.hurt_color_timer = 0.25
 			if puncher ~= self.object then
-				self.punched_timer = 0.5
+				self.punched_timer = 0.25
 				if self.attacked_hostile then
 					self.hostile = true
 					self.hostile_timer = 20
@@ -311,14 +311,18 @@ mobs.create_interaction_functions = function(def,mob_register)
 					--punch the player
 					if self.attack_type == "punch" then
 						if distance < 2.5 and self.punch_timer <= 0 and object:get_hp() > 0 then
-							local line_of_sight = minetest.line_of_sight(pos, pos2)
-							if line_of_sight == true then
-								self.punch_timer = 1
-								object:punch(self.object, 2, 
-									{
-									full_punch_interval=1.5,
-									damage_groups = {damage=self.attack_damage},
-								},vector.direction(pos,pos2))
+							local meta = object:get_meta()
+							local player_punch_timer = meta:get_float("player_punch_timer")
+							if player_punch_timer <= 0 then
+								local line_of_sight = minetest.line_of_sight(pos, pos2)
+								if line_of_sight == true then
+									self.punch_timer = 0.25
+									object:punch(self.object, 2, 
+										{
+										full_punch_interval=1.5,
+										damage_groups = {damage=self.attack_damage},
+									},vector.direction(pos,pos2))
+								end
 							end
 						end
 					elseif self.attack_type == "explode" then

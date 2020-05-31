@@ -196,7 +196,7 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 	local hurt = tool_capabilities.damage_groups.damage
 	local hp = player:get_hp()
 	if punch_timer <= 0 and hp > 0 then
-		meta:set_float("player_punch_timer",0.5)
+		meta:set_float("player_punch_timer",0.25)
 		if hitter:is_player() and hitter ~= player then
 			local puncher_vel = hitter:get_player_velocity().y
 			if puncher_vel < 0 then
