@@ -147,7 +147,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 			self.object:set_texture_mod("^[colorize:"..self.damage_color..":130")
 			self.hurt_color_timer = 0.25
 			if puncher ~= self.object then
-				self.punched_timer = 0.8
+				self.punched_timer = 0.5
 				if self.attacked_hostile then
 					self.hostile = true
 					self.hostile_timer = 20
@@ -187,7 +187,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 			self.object:set_texture_mod("^[colorize:"..self.damage_color..":130")
 			self.hurt_color_timer = 0.25
 			if puncher ~= self.object then
-				self.punched_timer = 0.8
+				self.punched_timer = 0.5
 				if self.attacked_hostile then
 					self.hostile = true
 					self.hostile_timer = 20
