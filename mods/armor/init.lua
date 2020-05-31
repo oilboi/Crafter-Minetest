@@ -297,6 +297,16 @@ for material_id,material in pairs(materials) do
                     {"main:"..material_id, "", "main:"..material_id}
                 }
             })
+            minetest.register_node("armor:"..material_id.."_"..armor_id.."particletexture", {
+                description = "NIL",
+                tiles = {material_id.."_"..armor_id.."_item.png"},
+                groups = {},
+                drop = "",
+                drawtype = "allfaces",
+                on_construct = function(pos)
+                    minetest.remove_node(pos)
+                end,
+            })
         end
         
     end
