@@ -6,7 +6,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 		else
 			--boots absorb fall damage
 			local fall_damage = math.floor(player:get_player_velocity().y+0.5)+13
-			print("fall damage:",fall_damage)
+			--print("fall damage:",fall_damage)
 			local inv = player:get_inventory()
 			local stack = inv:get_stack("armor_feet", 1)
 			local name = stack:get_name()
@@ -14,7 +14,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 				local absorption = 0
 
 				absorption = minetest.get_item_group(name,"armor_level")*2
-				print("absorbtion:",absorption)
+				--print("absorbtion:",absorption)
 				local wear_level = ((9-minetest.get_item_group(name,"armor_level"))*8)*(5-minetest.get_item_group(name,"armor_type"))*math.abs(fall_damage)
 				
 				stack:add_wear(wear_level)
@@ -63,7 +63,7 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 			else
 				minetest.sound_play("hurt", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
 			end
-			print("returned fall damage",fall_damage)
+			--print("returned fall damage",fall_damage)
 			return(fall_damage)
 		end
 	elseif hp_change < 0 then
@@ -277,9 +277,16 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 		local hp_modifier = math.ceil(calculate_armor_absorbtion(player)/3)
 		--print("hp_modifier:",hp_modifier)
 		damage_armor(player,math.abs(hurt))
+
+		print("hurt:",hurt,"|","hp_modifier:",hp_modifier)
+		local modify_output = (hurt == 0)
+		
 		hurt = hurt - hp_modifier
-		if hurt <= 0 then
+
+		if modify_output == false and hurt <= 0 then
 			hurt = 1
+		elseif modify_output == true then
+			hurt = 0
 		end
 		player:add_player_velocity(dir)
 		player:set_hp(hp-hurt)

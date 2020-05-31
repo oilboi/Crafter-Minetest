@@ -171,8 +171,7 @@ function tnt(pos,range)
 					end
 				end
 				if clear == true then
-					local power = (range - vector.distance(pos,ppos))*8
-					
+					local power = (range - vector.distance(pos,ppos))*10
 					local dir = vector.direction(pos,ppos)
 					local force = vector.multiply(dir,power)
 					if object:is_player() then
