@@ -214,8 +214,8 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 			dir.y = 7
 		end
 
-		local hp_modifier = math.ceil(calculate_armor_absorbtion(player)/2)
-		print(hurt)
+		local hp_modifier = math.ceil(calculate_armor_absorbtion(player)/3)
+		--print("hp_modifier:",hp_modifier)
 		damage_armor(player,math.abs(hurt))
 		hurt = hurt - hp_modifier
 		if hurt <= 0 then
