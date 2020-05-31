@@ -40,6 +40,10 @@ enable_mod_channels = true
 - Fully implemented bows and arrows
 - Tuned the bow and arrows even further
 - Snowmen now drop a carrot, coal, stick, or snowball
+- Added in armor
+- Tuned a lot of things
+- Made armor work
+- Added in Krock's awesome Colored Names mod for csm chat
 ---
 
 

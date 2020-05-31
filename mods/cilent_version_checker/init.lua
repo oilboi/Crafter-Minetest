@@ -1,7 +1,7 @@
 local client_versions = {}
 local client_version_channels = {}
 
-local current_version = 0.05001
+local current_version = 0.05002
 
 local function do_version_check(player)
     local name = player:get_player_name()
@@ -22,7 +22,7 @@ end
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
     client_version_channels[name] = minetest.mod_channel_join(name..":client_version_channel")
-    minetest.after(5,function()
+    minetest.after(3,function()
         do_version_check(player)
     end)
 end)
