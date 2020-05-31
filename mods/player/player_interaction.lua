@@ -278,7 +278,7 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 		--print("hp_modifier:",hp_modifier)
 		damage_armor(player,math.abs(hurt))
 
-		print("hurt:",hurt,"|","hp_modifier:",hp_modifier)
+		--print("hurt:",hurt,"|","hp_modifier:",hp_modifier)
 		local modify_output = (hurt == 0)
 		
 		hurt = hurt - hp_modifier
