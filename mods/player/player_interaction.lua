@@ -170,29 +170,34 @@ local do_critical_particles = function(pos)
 end
 
 --we need to do this to override the default damage mechanics
-local punch_timers = {}
 minetest.register_on_joinplayer(function(player)
-	local name = player:get_player_name()
-	punch_timers[name] = 0
+	local meta = player:get_meta()
+	meta:set_float("player_punch_timer",0)
 end)
 
 minetest.register_globalstep(function(dtime)
 	for _,player in ipairs(minetest.get_connected_players()) do
-		local name = player:get_player_name()
+		local meta = player:get_meta()
+		local punch_timer = meta:get_float("player_punch_timer")
+
 		--limit this so the game engine isn't calculating huge floats
-		if punch_timers[name] and punch_timers[name] <= 10 then
-			punch_timers[name] = punch_timers[name] + dtime
+		if punch_timer > 0 then
+			punch_timer = punch_timer - dtime
+			if punch_timer < 0 then punch_timer = 0 end
+			meta:set_float("player_punch_timer",punch_timer)
 		end
 	end
 end)
 
 --this throws the player when they're punched and activates the custom damage mechanics
 minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, tool_capabilities, dir, damage)
-	local name = player:get_player_name()
+	local meta = player:get_meta()
+	local punch_timer = meta:get_float("player_punch_timer")
 	local hurt = tool_capabilities.damage_groups.damage
 	local hp = player:get_hp()
-	if punch_timers[name] >= 0.5 and hp > 0 then
-		if hitter:is_player() then
+	if punch_timer <= 0 and hp > 0 then
+		meta:set_float("player_punch_timer",0.5)
+		if hitter:is_player() and hitter ~= player then
 			local puncher_vel = hitter:get_player_velocity().y
 			if puncher_vel < 0 then
 				hurt = hurt * 1.5
@@ -210,12 +215,12 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 		end
 
 		local hp_modifier = math.ceil(calculate_armor_absorbtion(player)/2)
+		print(hurt)
 		damage_armor(player,math.abs(hurt))
 		hurt = hurt - hp_modifier
 		if hurt <= 0 then
 			hurt = 1
 		end
-		punch_timers[name] = 0
 		player:add_player_velocity(dir)
 		player:set_hp(hp-hurt)
 	end
