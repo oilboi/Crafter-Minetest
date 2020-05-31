@@ -277,11 +277,10 @@ mobs.create_interaction_functions = function(def,mob_register)
 			local light_level = minetest.get_node_light(pos)
 			if light_level then
 				if (self.die_in_light == true and light_level > self.die_in_light_level) then
-					local damage = self.hp
 					self.object:punch(self.object, 2, 
 						{
 						full_punch_interval=1.5,
-						damage_groups = {damage=damage},
+						damage_groups = {damage=2},
 					})
 				end
 			end
@@ -318,7 +317,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 								object:punch(self.object, 2, 
 									{
 									full_punch_interval=1.5,
-									damage_groups = {damage=2},
+									damage_groups = {damage=self.attack_damage},
 								},vector.direction(pos,pos2))
 							end
 						end

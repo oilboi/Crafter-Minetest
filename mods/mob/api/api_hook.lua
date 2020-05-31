@@ -104,7 +104,7 @@ mob_register.custom_function_end = def.custom_function_end
 
 mob_register.projectile_timer_cooldown = def.projectile_timer_cooldown
 mob_register.attacked_hostile = def.attacked_hostile
-
+mob_register.attack_damage = def.attack_damage
 
 mob_register.projectile_timer = 0
 mob_register.projectile_type = def.projectile_type

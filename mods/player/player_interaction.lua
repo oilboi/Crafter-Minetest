@@ -3,10 +3,18 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 	if reason.type == "fall" then
 		if minetest.get_item_group(minetest.get_node(player:get_pos()).name, "disable_fall_damage") > 0 then
 			return(0)
+		else
+			minetest.sound_play("hurt", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
 		end
-	end
-	if hp_change < 0 then
+	elseif hp_change < 0 then
+		local hp_modifier = math.ceil(calculate_armor_absorbtion(player)/2)
+		damage_armor(player,math.abs(hp_change))
+		hp_change = hp_change + hp_modifier
 		minetest.sound_play("hurt", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
+
+		if hp_change >= 0 then
+			hp_change = -1
+		end
 	end
 	return(hp_change)
 end, true)

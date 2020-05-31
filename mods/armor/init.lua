@@ -35,6 +35,107 @@ function recalculate_armor(player)
     player:set_properties({textures = {player_skin,armor_skin}})
 end
 
+function calculate_armor_absorbtion(player)
+    if not player or (player and not player:is_player()) then return end
+
+    local inv = player:get_inventory()
+    local armor_absorbtion = 0
+
+    local stack = inv:get_stack("armor_head",1):get_name()
+    if stack ~= "" then
+        local level = minetest.get_item_group(stack,"armor_level")
+        local defense = minetest.get_item_group(stack,"armor_defense")
+        armor_absorbtion = armor_absorbtion + (level*defense)
+    end
+
+    stack = inv:get_stack("armor_torso",1):get_name()
+    if stack ~= "" then
+        local level = minetest.get_item_group(stack,"armor_level")
+        local defense = minetest.get_item_group(stack,"armor_defense")
+        armor_absorbtion = armor_absorbtion + (level*defense)
+    end
+
+    stack = inv:get_stack("armor_legs",1):get_name()
+    if stack ~= "" then
+        local level = minetest.get_item_group(stack,"armor_level")
+        local defense = minetest.get_item_group(stack,"armor_defense")
+        armor_absorbtion = armor_absorbtion + (level*defense)
+    end
+
+    stack = inv:get_stack("armor_feet",1):get_name()
+    if stack ~= "" then
+        local level = minetest.get_item_group(stack,"armor_level")
+        local defense = minetest.get_item_group(stack,"armor_defense")
+        armor_absorbtion = armor_absorbtion + (level*defense)
+    end
+    if armor_absorbtion > 0 then
+        armor_absorbtion = math.ceil(armor_absorbtion/4)
+    end
+    print(armor_absorbtion)
+    return(armor_absorbtion)
+end
+
+function damage_armor(player,damage)
+    if not player or (player and not player:is_player()) then return end
+
+    local inv = player:get_inventory()
+    
+    local recalc = false
+
+    local stack = inv:get_stack("armor_head",1)
+    local name = stack:get_name()
+    if name ~= "" then
+        local wear_level = ((9-minetest.get_item_group(name,"armor_level"))*8)*(5-minetest.get_item_group(name,"armor_type"))*damage
+        stack:add_wear(wear_level)
+        inv:set_stack("armor_head", 1, stack)
+        local new_stack = inv:get_stack("armor_head",1):get_name()
+        if new_stack == "" then
+            recalc = true
+        end
+    end
+
+    stack = inv:get_stack("armor_torso",1)
+    name = stack:get_name()
+    if name ~= "" then
+        local wear_level = ((9-minetest.get_item_group(name,"armor_level"))*4)*(5-minetest.get_item_group(name,"armor_type"))*damage
+        stack:add_wear(wear_level)
+        inv:set_stack("armor_torso", 1, stack)
+        local new_stack = inv:get_stack("armor_torso",1):get_name()
+        if new_stack == "" then
+            recalc = true
+        end
+    end
+
+    stack = inv:get_stack("armor_legs",1)
+    name = stack:get_name()
+    if name ~= "" then
+        local wear_level = ((9-minetest.get_item_group(name,"armor_level"))*6)*(5-minetest.get_item_group(name,"armor_type"))*damage
+        stack:add_wear(wear_level)
+        inv:set_stack("armor_legs", 1, stack)
+        local new_stack = inv:get_stack("armor_legs",1):get_name()
+        if new_stack == "" then
+            recalc = true
+        end
+    end
+
+    stack = inv:get_stack("armor_feet",1)
+    name = stack:get_name()
+    if name ~= "" then
+        local wear_level = ((9-minetest.get_item_group(name,"armor_level"))*10)*(5-minetest.get_item_group(name,"armor_type"))*damage
+        stack:add_wear(wear_level)
+        inv:set_stack("armor_feet", 1, stack)
+        local new_stack = inv:get_stack("armor_feet",1):get_name()
+        if new_stack == "" then
+            recalc = true
+        end
+    end
+
+    if recalc == true then
+        minetest.sound_play("armor_break",{to_player=player:get_player_name(),gain=1,pitch=math.random(80,100)/100})
+        recalculate_armor(player)
+        --do particles too
+    end
+end
 
 minetest.register_on_joinplayer(function(player)
     local inv = player:get_inventory()
@@ -87,8 +188,8 @@ minetest.register_allow_player_inventory_action(function(player, action, invento
     end
 end)
 
-local armor_type = {["helmet"]=2,["chestplate"]=5,["leggings"]=3,["boots"]=2}
-local materials = {["iron"]=2,["chain"]=4,["gold"]=3,["diamond"]=7}
+local materials = {["iron"]=4,["chain"]=6,["gold"]=2,["diamond"]=8} --max 8
+local armor_type = {["helmet"]=2,["chestplate"]=4,["leggings"]=3,["boots"]=1} --max 4
 
 local function bool_int(state)
     if state == true then return(1) end

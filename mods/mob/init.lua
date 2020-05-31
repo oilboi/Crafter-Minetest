@@ -320,6 +320,7 @@ mobs.register_mob(
 	hurt_sound = "slime_die",
 	die_sound = "slime_die",
 	attack_type = "punch",
+	attack_damage = 10,
 	custom_on_death = function(self)
 		local pos = self.object:get_pos()
 		for i = 1,4 do
@@ -357,6 +358,7 @@ mobs.register_mob(
 	death_rotation = "z",
 	hurt_sound = "slime_die",
 	die_sound = "slime_die",
+	attack_damage = 5,
 	attack_type = "punch",
 	custom_on_death = function(self)
 		local pos = self.object:get_pos()
@@ -396,6 +398,7 @@ mobs.register_mob(
 	death_rotation = "z",
 	hurt_sound = "slime_die",
 	die_sound = "slime_die",
+	attack_damage = 2,
 	attack_type = "punch",
 	item_drop = "mob:slimeball"
 	}
@@ -651,6 +654,7 @@ mobs.register_mob(
 	 hostile = true,
 	 friendly_in_daylight = true,
 	 attacked_hostile = true,
+	 attack_damage = 8,
 	 attack_type = "punch",
 	 group_attack = true,
 
