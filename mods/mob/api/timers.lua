@@ -23,6 +23,15 @@ mobs.create_timer_functions = function(def,mob_register)
 				end
 			end
 		end
+	else
+		mob_register.manage_scared_timer = function(self,dtime)
+			if self.scared_timer > 0 then
+				self.scared_timer = self.scared_timer - dtime
+			end
+			if self.scared_timer <= 0 then
+				self.scared = false
+			end
+		end
 	end
 
 	mob_register.manage_hurt_color_timer = function(self,dtime)

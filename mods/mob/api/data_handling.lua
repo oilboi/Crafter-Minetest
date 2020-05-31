@@ -13,7 +13,9 @@ mobs.create_data_handling_functions = function(def,mob_register)
 			tnt_tick_timer = self.tnt_tick_timer,
 			tnt_mod_state = self.tnt_mod_state,
 			punch_timer = self.punch_timer,
-			projectile_timer = self.projectile_timer
+			projectile_timer = self.projectile_timer,
+			scared = self.scared,
+			scared_timer = self.scared_timer,
 		})
 	end
 
@@ -39,6 +41,8 @@ mobs.create_data_handling_functions = function(def,mob_register)
 				self.tnt_mod_state = data.tnt_mod_state
 				self.punch_timer = data.punch_timer
 				self.projectile_timer = data.projectile_timer
+				self.scared = data.scared
+				self.scared_timer = data.scared_timer
 			end
 		end
 		

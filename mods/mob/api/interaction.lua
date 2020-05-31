@@ -160,6 +160,9 @@ mobs.create_interaction_functions = function(def,mob_register)
 							end
 						end
 					end
+				else
+					self.scared = true
+					self.scared_timer = 10
 				end
 			end
 			
@@ -172,7 +175,6 @@ mobs.create_interaction_functions = function(def,mob_register)
 			
 			self.hp = hp
 			
-			self.direction = vector.multiply(dir,-1)
 			dir = vector.multiply(dir,10)
 			if vel.y <= 0 then
 				dir.y = 4
@@ -362,6 +364,10 @@ mobs.create_interaction_functions = function(def,mob_register)
 					end
 					self.speed = self.max_speed
 					self.following = true
+				elseif self.scared == true then
+					self.speed = self.max_speed
+					self.direction = vector.direction(vector.new(pos2.x,0,pos2.z),vector.new(pos.x,0,pos.z))
+					self.scared_timer = 10
 				end
 				--only look at one player
 				break

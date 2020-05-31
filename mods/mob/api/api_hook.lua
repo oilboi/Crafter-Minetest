@@ -104,6 +104,10 @@ mob_register.custom_function_end = def.custom_function_end
 
 mob_register.projectile_timer_cooldown = def.projectile_timer_cooldown
 mob_register.attacked_hostile = def.attacked_hostile
+if not def.hostile and not def.attacked_hostile then
+	mob_register.scared = false
+	mob_register.scared_timer = 0
+end
 mob_register.attack_damage = def.attack_damage
 
 mob_register.projectile_timer = 0
@@ -170,6 +174,10 @@ mob_register.on_step = function(self, dtime,moveresult)
 		--self.debug_nametag(self,dtime)
 
 		self.manage_hurt_color_timer(self,dtime)
+
+		if self.manage_scared_timer then
+			self.manage_scared_timer(self,dtime)
+		end
 
 		if self.set_animation then
 			self.set_animation(self)
