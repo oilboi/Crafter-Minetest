@@ -302,7 +302,7 @@ minetest.register_entity(":__builtin:item", {
 		end
 	end,
 	magnet_timer = 0,
-	on_step = function(self, dtime)
+	on_step = function(self, dtime,moveresult)
 		--if item set to be collected then only execute go to player
 		if self.collected == true then
 			if not self.collector then

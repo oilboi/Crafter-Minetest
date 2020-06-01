@@ -138,7 +138,9 @@ arrow.on_step = function(self, dtime,moveresult)
 			elseif moveresult.collisions[1].new_velocity.z == 0 and moveresult.collisions[1].old_velocity.z ~= 0 then
 				self.check_dir = vector.direction(vector.new(0,0,pos.z),vector.new(0,0,moveresult.collisions[1].node_pos.z))
 			end
-
+			print(dump(moveresult.collisions[1].new_pos))
+			self.object:set_pos(moveresult.collisions[1].new_pos)
+			--print(dump(moveresult.collisions[1].new_pos))
 			minetest.sound_play("arrow_hit",{object=self.object,gain=1,pitch=math.random(80,100)/100,max_hear_distance=64})
 			self.stuck = true
 			self.object:set_velocity(vector.new(0,0,0))
