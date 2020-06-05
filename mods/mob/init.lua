@@ -84,8 +84,8 @@ mobs.register_mob(
 	 visual_size = {x = 3, y = 3},
 	 mesh = "sheep.b3d",
 	 textures = {
-		 --blank out the first two to create adult pig
-		"nothing.png","sheep.png"
+		"sheep_head_wool.png","sheep_wool.png","sheep.png"
+		--"sheep_head_shaved.png","nothing.png","sheep.png"
 	 },
 	 
 	 --these are used to anchor a point to the head position
@@ -94,10 +94,10 @@ mobs.register_mob(
 	 -----
 	 head_bone = "head",
 	 debug_head_pos = false,
-	 head_directional_offset = 0.5, --used in vector.multiply(minetest.yaw_to_dir(body_yaw),head_offset)
-	 head_height_offset = 0.8, --added to the base y position
+	 head_directional_offset = 0.571, --used in vector.multiply(minetest.yaw_to_dir(body_yaw),head_offset)
+	 head_height_offset = 1.15, --added to the base y position
 	 --use this to correct the head position initially because it becomes severly offset - look at your blender model to get this perfect
-	 head_position_correction = vector.new(0,3,-0.5),
+	 head_position_correction = vector.new(0,4.1,-0.86),
 	 --this is used to tell the game the orientation of the bone (swaps x to and y, then z and y)
 	 head_coord = "horizontal",
 	 -----
@@ -122,17 +122,33 @@ mobs.register_mob(
 	 ----
 	 death_rotation = "x",
 	 
-	 hurt_sound = "pig",
-	 die_sound = "pig_die",
+	 hurt_sound = "sheep",
+	 die_sound = "sheep",
 	 
 	 
 	 hostile = false,
 	 attacked_hostile = false,
 	 attack_type = "punch",
 	 group_attack = true,
-	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
-	 --explosion_power = 7, -- how big the explosion has to be
-	 --explosion_time = 3, -- how long it takes for a mob to explode
+
+	 c_mob_data = {sheared = false},
+
+	 custom_on_activate = function(self)
+		--print(dump(self.c_mob_data))
+		if self.c_mob_data.sheared == true then
+			self.object:set_properties({textures = {"sheep_head_shaved.png","nothing.png","sheep.png"}})
+		end
+	 end,
+
+	 custom_on_punch = function(self)
+		if self.c_mob_data.sheared == false then
+			self.object:set_properties({textures = {"sheep_head_shaved.png","nothing.png","sheep.png"}})
+			self.c_mob_data = {sheared=true}
+			local pos = self.object:get_pos()
+			pos.y = pos.y + 0.5
+			minetest.throw_item(pos,{name="weather:snow_block"})
+		end
+	end
 	}
 )
 

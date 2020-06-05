@@ -164,6 +164,9 @@ mobs.create_interaction_functions = function(def,mob_register)
 					self.scared = true
 					self.scared_timer = 10
 				end
+				if self.custom_on_punch then
+					self.custom_on_punch(self)
+				end
 			end
 			
 			--critical effect

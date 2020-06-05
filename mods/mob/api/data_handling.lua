@@ -16,6 +16,7 @@ mobs.create_data_handling_functions = function(def,mob_register)
 			projectile_timer = self.projectile_timer,
 			scared = self.scared,
 			scared_timer = self.scared_timer,
+			c_mob_data = self.c_mob_data,
 		})
 	end
 
@@ -42,7 +43,8 @@ mobs.create_data_handling_functions = function(def,mob_register)
 				self.punch_timer = data.punch_timer
 				self.projectile_timer = data.projectile_timer
 				self.scared = data.scared
-				self.scared_timer = data.scared_timer
+				self.scared_timer = data.scared_timer				
+				self.c_mob_data = data.c_mob_data
 			end
 		end
 		
@@ -59,6 +61,7 @@ mobs.create_data_handling_functions = function(def,mob_register)
 		end
 		self.is_mob = true
 		self.object:set_armor_groups({immortal = 1})
+
 		if self.custom_on_activate then
 			self.custom_on_activate(self)
 		end

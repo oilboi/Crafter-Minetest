@@ -132,6 +132,10 @@ mob_register.custom_on_death = def.custom_on_death
 
 mob_register.custom_on_activate = def.custom_on_activate
 
+mob_register.custom_on_punch = def.custom_on_punch
+
+mob_register.c_mob_data = def.c_mob_data
+
 if def.pathfinds then
 	--mob_register.path = {}
 	mob_register.pathfinding_timer = 0
@@ -155,7 +159,7 @@ mob_register.on_step = function(self, dtime,moveresult)
 		self.custom_function_begin(self,dtime)
 	end
 	
-	self.collision_detection(self)
+	--self.collision_detection(self)
 	if self.fall_damage then
 		self.fall_damage(self)
 	end
@@ -169,7 +173,7 @@ mob_register.on_step = function(self, dtime,moveresult)
 			self.custom_function(self,dtime,moveresult)
 		end
 
-		self.move(self,dtime,moveresult)
+		--self.move(self,dtime,moveresult)
 		
 		--self.debug_nametag(self,dtime)
 

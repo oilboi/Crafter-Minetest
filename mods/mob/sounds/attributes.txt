@@ -8,3 +8,4 @@ critical https://freesound.org/people/FunWithSound/sounds/361482/
 creeper hurt - https://freesound.org/people/adcbicycle/sounds/14199/
 spider - https://freesound.org/people/columbia23/sounds/395395/ Attribution 3.0 Unported (CC BY 3.0)
 chicken - https://freesound.org/people/Breviceps/sounds/456803/ cc0
+sheep - https://freesound.org/people/acclivity/sounds/39947/ Attribution-NonCommercial 3.0 Unported (CC BY-NC 3.0)
