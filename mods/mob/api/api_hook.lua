@@ -159,7 +159,7 @@ mob_register.on_step = function(self, dtime,moveresult)
 		self.custom_function_begin(self,dtime)
 	end
 	
-	--self.collision_detection(self)
+	self.collision_detection(self)
 	if self.fall_damage then
 		self.fall_damage(self)
 	end
@@ -173,7 +173,7 @@ mob_register.on_step = function(self, dtime,moveresult)
 			self.custom_function(self,dtime,moveresult)
 		end
 
-		--self.move(self,dtime,moveresult)
+		self.move(self,dtime,moveresult)
 		
 		--self.debug_nametag(self,dtime)
 
