@@ -1,7 +1,9 @@
 --this is where mob spawning is defined
 
 --spawn mob in a square doughnut shaped radius
-local chance = 20
+local timer = 6
+--the amount of mobs that the game will try to spawn
+local spawn_goal = 30
 --inner and outer part of square donut radius
 local inner = 24
 local outer = 80
@@ -11,7 +13,7 @@ local find_node_height = 32
 --for debug testing to isolate mobs
 local spawn = true
 
-local spawn_table = {"pig","chicken"}
+local spawn_table = {"pig","chicken","sheep"}
 local snow_spawn_table = {"snowman","creeper","spider",}
 local dark_spawn_table = {"creeper","spider","big_slime","medium_slime","small_slime"}
 local nether_spawn_table = {"nitro_creeper"}
@@ -80,7 +82,7 @@ local function spawn_mobs()
 			end
 		end
 	end
-	minetest.after(6, function()
+	minetest.after(global_mob_amount/spawn_goal, function()
 		spawn_mobs()
 	end)
 end
