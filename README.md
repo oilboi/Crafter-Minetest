@@ -44,6 +44,8 @@ enable_mod_channels = true
 - Tuned a lot of things
 - Made armor work
 - Added in Krock's awesome Colored Names mod for csm chat
+- Added sheep
+- Fixed global mob handling
 ---
 
 

@@ -1,6 +1,18 @@
 --
 mobs.create_data_handling_functions = function(def,mob_register)
 	mob_register.get_staticdata = function(self)
+		if self.deactivating == false then
+			global_mob_amount = global_mob_amount + 1
+			print("Mob Spawned. Current Mobs: "..global_mob_amount)
+		elseif self.deactivating == true then
+			minetest.after(0, function()
+				if not self.object:get_luaentity() then
+					global_mob_amount = global_mob_amount - 1
+					print("Mob Deactivated. Current Mobs: "..global_mob_amount)
+				end
+			end)
+		end
+
 		return minetest.serialize({
 			--range = self.range,
 			hp = self.hp,
@@ -22,8 +34,6 @@ mobs.create_data_handling_functions = function(def,mob_register)
 
 
 	mob_register.on_activate = function(self, staticdata, dtime_s)
-		global_mob_amount = global_mob_amount + 1
-		--print("Mobs Spawned. Current Mobs: "..global_mob_amount)
 		self.object:set_armor_groups({immortal = 1})
 		--self.object:set_velocity({x = math.random(-5,5), y = 5, z = math.random(-5,5)})
 		self.object:set_acceleration(def.gravity)
@@ -66,6 +76,11 @@ mobs.create_data_handling_functions = function(def,mob_register)
 			self.custom_on_activate(self)
 		end
 		--self.object:set_yaw(math.pi*math.random(-1,1)*math.random())
+
+		--use this to handle the global mob table
+		minetest.after(0,function()
+			self.deactivating = true
+		end)
 	end
 
 	--this is the info on the mob

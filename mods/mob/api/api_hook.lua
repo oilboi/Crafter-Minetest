@@ -136,6 +136,8 @@ mob_register.custom_on_punch = def.custom_on_punch
 
 mob_register.c_mob_data = def.c_mob_data
 
+mob_register.deactivating = false
+
 if def.pathfinds then
 	--mob_register.path = {}
 	mob_register.pathfinding_timer = 0
