@@ -650,7 +650,8 @@ mobs.register_mob(
 	 head_position_correction = vector.new(0,2.4,0),
 	 head_coord = "vertical",
 	 -----
-	  
+	 
+	 damage_color = "blue",
 	 
 	 death_rotation = "x",
 	 
