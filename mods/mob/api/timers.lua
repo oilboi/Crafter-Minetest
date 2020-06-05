@@ -64,7 +64,7 @@ mobs.create_timer_functions = function(def,mob_register)
 			
 			local pos = self.object:get_pos()
 			self.object:remove()
-			tnt(pos,self.explosion_power)
+			tnt(pos,self.explosion_power,self.explosion_type)
 		end
 	end
 

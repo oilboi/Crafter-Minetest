@@ -1,5 +1,5 @@
 --here is where tnt is defined
-local function extreme_tnt(pos,range)
+local function extreme_tnt(pos,range,explosion_type)
 	local pos = vector.floor(vector.add(pos,0.5))
 	
 	--kill
@@ -78,7 +78,7 @@ local stop
 local found
 local positional_data
 local pos2 = vector.new(0,0,0)
-function tnt(pos,range)
+function tnt(pos,range,explosion_type)
 	local in_node = minetest.get_node(pos).name
 	local in_water =  ( in_node == "main:water" or minetest.get_node(pos).name == "main:waterflow")
 	local min = vector.add(pos,range)
@@ -88,7 +88,12 @@ function tnt(pos,range)
 	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
 	local data = vm:get_data()
 	
-	local air = minetest.get_content_id("air")
+	local air
+	if explosion_type ~= nil then
+		air = minetest.get_content_id(explosion_type)
+	else
+		air = minetest.get_content_id("air")
+	end
 	local content_id = minetest.get_name_from_content_id
 	
 	local insert = table.insert
