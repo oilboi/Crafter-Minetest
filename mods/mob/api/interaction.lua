@@ -205,6 +205,9 @@ mobs.create_interaction_functions = function(def,mob_register)
 						end
 					end
 				end
+				if self.custom_on_punch then
+					self.custom_on_punch(self)
+				end
 			end
 			self.death_animation_timer = 1
 			self.dead = true
