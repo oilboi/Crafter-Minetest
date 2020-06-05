@@ -15,7 +15,7 @@ local spawn = true
 
 local spawn_table = {"pig","chicken","sheep"}
 local snow_spawn_table = {"snowman","creeper","spider",}
-local dark_spawn_table = {"creeper","spider","big_slime","medium_slime","small_slime"}
+local dark_spawn_table = {"creeper","creeper","creeper","spider","spider","spider","big_slime","medium_slime","small_slime"}
 local nether_spawn_table = {"nitro_creeper"}
 local aether_spawn_table = {"phyg"}
 
