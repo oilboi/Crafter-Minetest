@@ -55,7 +55,7 @@ minetest.register_globalstep(function(dtime)
 						size = 1+math.random(),
 						texture = "smoke.png",
 					})
-                    stack:add_wear(10)
+                    stack:add_wear(5)
                     inv:set_stack("armor_torso", 1, stack)
 
                     if not sound_handling_loop[player_name] then
