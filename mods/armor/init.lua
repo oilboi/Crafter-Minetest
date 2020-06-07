@@ -6,31 +6,27 @@ function recalculate_armor(player)
     local armor_skin = "blank_skin.png"
 
     local stack = inv:get_stack("armor_head",1):get_name()
-    stack = stack:gsub("_item.png","")
-    stack = stack:gsub("armor:","")
     if stack ~= "" then
-        player_skin = player_skin.."^"..stack..".png"
+        local skin_element = minetest.get_itemdef(stack, "wearing_texture")
+        player_skin = player_skin.."^"..skin_element
     end
 
     stack = inv:get_stack("armor_torso",1):get_name()
-    stack = stack:gsub("_item.png","")
-    stack = stack:gsub("armor:","")
     if stack ~= "" then
-        armor_skin = armor_skin.."^"..stack..".png"
+        local skin_element = minetest.get_itemdef(stack, "wearing_texture")
+        armor_skin = armor_skin.."^"..skin_element
     end
 
     stack = inv:get_stack("armor_legs",1):get_name()
-    stack = stack:gsub("_item.png","")
-    stack = stack:gsub("armor:","")
     if stack ~= "" then
-        armor_skin = armor_skin.."^"..stack..".png"
+        local skin_element = minetest.get_itemdef(stack, "wearing_texture")
+        armor_skin = armor_skin.."^"..skin_element
     end
 
     stack = inv:get_stack("armor_feet",1):get_name()
-    stack = stack:gsub("_item.png","")
-    stack = stack:gsub("armor:","")
     if stack ~= "" then
-        armor_skin = armor_skin.."^"..stack..".png"
+        local skin_element = minetest.get_itemdef(stack, "wearing_texture")
+        armor_skin = armor_skin.."^"..skin_element
     end
     player:set_properties({textures = {player_skin,armor_skin}})
 end
@@ -249,6 +245,7 @@ for material_id,material in pairs(materials) do
             },
             inventory_image = material_id.."_"..armor_id.."_item.png",
             stack_max = 1,
+            wearing_texture = material_id.."_"..armor_id..".png",
             tool_capabilities = {
                 full_punch_interval = 0,
                 max_drop_level = 0,

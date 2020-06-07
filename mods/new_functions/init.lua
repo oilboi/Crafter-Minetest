@@ -322,3 +322,10 @@ function minetest.get_nodedef(nodename, fieldname)
 	end
 	return minetest.registered_nodes[nodename][fieldname]
 end
+
+function minetest.get_itemdef(itemname, fieldname)
+	if not minetest.registered_items[itemname] then
+		return nil
+	end
+	return minetest.registered_items[itemname][fieldname]
+end

@@ -11,7 +11,7 @@ local outer = 80
 local find_node_height = 32
 
 --for debug testing to isolate mobs
-local spawn = true
+local spawn = false
 
 local spawn_table = {"pig","chicken","sheep"}
 local snow_spawn_table = {"snowman","snoider","sneeper",}
