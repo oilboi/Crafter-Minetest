@@ -1,5 +1,5 @@
 minetest.register_node("fire:fire", {
-    description = "How did you even get this?",
+    description = "Fire",
     drawtype = "firelike",
 	tiles = {
 		{
@@ -13,7 +13,7 @@ minetest.register_node("fire:fire", {
 		},
 	},
 	inventory_image = "fire.png",
-    groups = {dig_immediate = 1,hurt_inside=2},
+    groups = {dig_immediate = 1,hurt_inside=2,fire=1},
     sounds = main.stoneSound(),
     floodable = true,
     drop = "",
@@ -91,3 +91,11 @@ minetest.register_craft({
 	output = "fire:flint_and_steel",
 	recipe = {"main:flint","main:iron"},
 })
+
+
+local fire = {}
+
+fire.initial_properties = {
+	glow = -1,
+	
+}
