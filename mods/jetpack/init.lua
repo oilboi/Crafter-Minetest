@@ -31,13 +31,15 @@ minetest.register_globalstep(function(dtime)
                     --boost
                     if player:get_player_control().jump and player:get_player_velocity().y < 20 then
                         player:add_player_velocity(vector.new(0,1,0))
+                        player:set_physics_override({gravity=1.25})
                     --hover
                     elseif player:get_player_control().sneak then
                         local currentvel = player:get_player_velocity()
-                        local goal = 8.1
+                        local goal = 0
 			            local acceleration = vector.new(0,goal-currentvel.y,0)
 			            acceleration = vector.multiply(acceleration, 0.05)
-			            player:add_player_velocity(acceleration)
+                        player:add_player_velocity(acceleration)
+                        player:set_physics_override({gravity=0})
                     end
                     
                     local particle_pos = player:get_pos()
@@ -65,6 +67,7 @@ minetest.register_globalstep(function(dtime)
                     if inv:get_stack("armor_torso",1):get_name() == "" then
                         recalculate_armor(player)
                         set_armor_gui(player)
+                        player:set_physics_override({gravity=1.25})
                         if sound_handling_loop[player_name] then
                             --minetest.sound_play("armor_break",{to_player=player:get_player_name(),gain=1,pitch=math.random(80,100)/100})
                             --minetest.sound_stop(sound_handling_loop[player_name])
@@ -74,6 +77,7 @@ minetest.register_globalstep(function(dtime)
                     end
                 end
             elseif sound_handling_loop[player_name] then
+                player:set_physics_override({gravity=1.25})
                 minetest.sound_stop(sound_handling_loop[player_name])
                 sound_handling_loop[player_name] = nil
             end
