@@ -747,12 +747,11 @@ spider_eyes.initial_properties = {
 	mesh = "spider_eyes.b3d",
 	textures = {"spider_eyes.png"},
 	pointable = false,
-	--visual_size = {x = 4, y = 4, z = 4},
 }
 spider_eyes.glow = -1
 spider_eyes.on_step = function(self)
 	if not self.owner or not self.owner:get_luaentity() then
-		--self.object:remove()
+		self.object:remove()
 	else
 		local owner_head_bone = self.owner:get_luaentity().head_bone
 		local position,rotation = self.owner:get_bone_position(owner_head_bone)
