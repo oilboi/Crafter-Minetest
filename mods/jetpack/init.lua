@@ -23,14 +23,23 @@ minetest.register_globalstep(function(dtime)
     for _,player in ipairs(minetest.get_connected_players()) do
         local player_name = player:get_player_name()
         if player:get_hp() > 0 then
-            if player:get_player_control().jump then
+            if player:get_player_control().jump or player:get_player_control().sneak then
                 local inv = player:get_inventory()
                 local stack = inv:get_stack("armor_torso",1)
                 local name = stack:get_name()
                 if name ~= "" and name == "jetpack:jetpack" then
-                    if player:get_player_velocity().y < 20 then
+                    --boost
+                    if player:get_player_control().jump and player:get_player_velocity().y < 20 then
                         player:add_player_velocity(vector.new(0,1,0))
+                    --hover
+                    elseif player:get_player_control().sneak then
+                        local currentvel = player:get_player_velocity()
+                        local goal = 8.1
+			            local acceleration = vector.new(0,goal-currentvel.y,0)
+			            acceleration = vector.multiply(acceleration, 0.05)
+			            player:add_player_velocity(acceleration)
                     end
+                    
                     local particle_pos = player:get_pos()
                     local yaw = player:get_look_horizontal()
                     local p_dir = vector.divide(minetest.yaw_to_dir(yaw + math.pi),8)
