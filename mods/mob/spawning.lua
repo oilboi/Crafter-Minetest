@@ -3,7 +3,7 @@
 --spawn mob in a square doughnut shaped radius
 local timer = 6
 --the amount of mobs that the game will try to spawn
-local spawn_goal = 30
+local spawn_goal = 14
 --inner and outer part of square donut radius
 local inner = 24
 local outer = 80
@@ -11,7 +11,7 @@ local outer = 80
 local find_node_height = 32
 
 --for debug testing to isolate mobs
-local spawn = false
+local spawn = true
 
 local spawn_table = {"pig","chicken","sheep"}
 local snow_spawn_table = {"snowman","snoider","sneeper",}
