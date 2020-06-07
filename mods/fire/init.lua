@@ -129,6 +129,17 @@ fire.on_step = function(self,dtime)
 end
 minetest.register_entity("fire:fire",fire)
 
+
+
+--this is the handling part
+
+local fire_channels = {}
+
+minetest.register_on_joinplayer(function(player)
+	local name = player:get_player_name()
+	fire_channels[name] = minetest.mod_channel_join(name..":fire_state")
+end)
+
 function start_fire(player)
 	local name = player:get_player_name()
 	if not fire_table[name] then
@@ -144,6 +155,8 @@ function start_fire(player)
 		end
 		fire_table[name] = object_table
 		local meta = player:get_meta()
+
+		fire_channels[name]:send_all("1")
 		meta:set_int("on_fire", 1)
 	end
 end
@@ -157,6 +170,7 @@ function put_fire_out(player)
 		fire_table[name] = nil
 
 		local meta = player:get_meta()
+		fire_channels[name]:send_all("0")
 		meta:set_int("on_fire", 0)
 	end
 end

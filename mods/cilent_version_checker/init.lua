@@ -1,7 +1,7 @@
 local client_versions = {}
 local client_version_channels = {}
 
-local current_version = 0.05002
+local current_version = 0.05003
 
 local function do_version_check(player)
     local name = player:get_player_name()
