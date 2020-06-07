@@ -61,7 +61,7 @@ minetest.register_globalstep(function(dtime)
                     inv:set_stack("armor_torso", 1, stack)
 
                     if not sound_handling_loop[player_name] then
-                        sound_handling_loop[player_name] = minetest.sound_play("jetpack", {object = player,loop=true})
+                        sound_handling_loop[player_name] = minetest.sound_play("jetpack", {object = player,loop=true,gain=0.3})
                     end
 
                     if inv:get_stack("armor_torso",1):get_name() == "" then

@@ -375,7 +375,7 @@ minetest.register_node("main:water", {
 	liquid_alternative_source = "main:water",
 	liquid_viscosity = 1,
 	post_effect_color = {a = 103, r = 30, g = 60, b = 90},
-	groups = {water = 1, liquid = 1, cools_lava = 1, bucket = 1, source = 1,pathable = 1,drowning=1,disable_fall_damage=1},
+	groups = {water = 1, liquid = 1, cools_lava = 1, bucket = 1, source = 1,pathable = 1,drowning=1,disable_fall_damage=1,extinguish=1},
 	--sounds = default.node_sound_water_defaults(),
 	
 	--water explodes in the nether
@@ -439,7 +439,7 @@ minetest.register_node("main:waterflow", {
 	liquid_alternative_source = "main:water",
 	liquid_viscosity = 1,
 	post_effect_color = {a = 103, r = 30, g = 60, b = 90},
-	groups = {water = 1, liquid = 1, notInCreative = 1, cools_lava = 1,pathable = 1,drowning=1,disable_fall_damage=1},
+	groups = {water = 1, liquid = 1, notInCreative = 1, cools_lava = 1,pathable = 1,drowning=1,disable_fall_damage=1,extinguish=1},
 	--sounds = default.node_sound_water_defaults(),
 })
 
@@ -483,7 +483,7 @@ minetest.register_node("main:lava", {
 	liquid_viscosity = 7,
 	liquid_renewable = false,
 	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
-	groups = {lava = 3, liquid = 2, igniter = 1,hurt_inside=2},
+	groups = {lava = 3, liquid = 2, igniter = 1, fire=1},
 })
 
 minetest.register_node("main:lavaflow", {
@@ -535,7 +535,7 @@ minetest.register_node("main:lavaflow", {
 	liquid_renewable = false,
 	liquid_range = 3,
 	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
-	groups = {lava = 3, liquid = 2, igniter = 1,hurt_inside=2},
+	groups = {lava = 3, liquid = 2, igniter = 1, fire=1},
 })
 
 minetest.register_node("main:ladder", {

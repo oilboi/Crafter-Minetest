@@ -13,7 +13,7 @@ minetest.register_node("fire:fire", {
 		},
 	},
 	inventory_image = "fire.png",
-    groups = {dig_immediate = 1,hurt_inside=2,fire=1},
+    groups = {dig_immediate = 1,fire=1},
     sounds = main.stoneSound(),
     floodable = true,
     drop = "",
@@ -93,9 +93,74 @@ minetest.register_craft({
 })
 
 
+fire_table = {}
+
 local fire = {}
 
 fire.initial_properties = {
-	glow = -1,
-	
+	hp_max = 1,
+	physical = false,
+	collide_with_objects = false,
+	collisionbox = {-0.2, -0.2, -0.2, 0.2, 0.2, 0.2},
+	visual = "sprite",
+	visual_size = {x = 1, y = 1, z = 1},
+	textures = {name="fire.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=8.0}},
+	spritediv = {x = 1, y = 8},
+	initial_sprite_basepos = {x = 0, y = 0},
+	is_visible = true,
+	pointable = false,
 }
+
+fire.on_activate = function(self)
+	self.object:set_sprite({x=1,y=math.random(1,8)}, 8, 0.05, false)
+end
+fire.timer = 0
+fire.on_step = function(self,dtime)
+	if not self.player or (self.player and not self.player:is_player()) then
+		self.object:remove()
+	end
+	if self.master then
+		self.timer = self.timer + dtime
+		if self.timer >= 0.5 then
+			self.timer = 0
+			self.player:set_hp(self.player:get_hp()-1)
+		end
+	end
+end
+minetest.register_entity("fire:fire",fire)
+
+function start_fire(player)
+	local name = player:get_player_name()
+	if not fire_table[name] then
+		local object_table = {}
+		for i = 1,3 do
+			local obj = minetest.add_entity(player:get_pos(),"fire:fire")
+			if i == 1 then
+				obj:get_luaentity().master = true
+			end
+			obj:get_luaentity().player = player
+			obj:set_attach(player, "", vector.new(0,i*5,0),vector.new(0,0,0))
+			table.insert(object_table,obj)
+		end
+		fire_table[name] = object_table
+		local meta = player:get_meta()
+		meta:set_int("on_fire", 1)
+	end
+end
+
+function put_fire_out(player)
+	local name = player:get_player_name()
+	if fire_table[name] then
+		for _,object in pairs(fire_table[name]) do
+			object:remove()
+		end
+		fire_table[name] = nil
+
+		local meta = player:get_meta()
+		meta:set_int("on_fire", 0)
+	end
+end
+
+minetest.register_on_respawnplayer(function(player)
+	put_fire_out(player)
+end)

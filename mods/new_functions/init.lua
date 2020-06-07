@@ -104,6 +104,34 @@ local function handle_hurt_inside(player)
 	return(false)
 end
 
+--handle inside hurt
+local c_player
+local heart
+local legs
+local head
+local name = ""
+local function handle_fire_temp(player)
+	if player:get_hp() > 0 then
+		player_pos = player:get_pos()
+		name = player:get_player_name()
+		local meta = player:get_meta()
+
+		legs = player_surroundings_index_table[name].legs
+		head = player_surroundings_index_table[name].head
+		if legs and head then
+			if get_group(head, "fire") > 0 or get_group(legs, "fire") > 0 then
+				start_fire(player)
+			elseif meta:get_int("on_fire") > 0 then
+				if get_group(head, "extinguish") > 0 or get_group(legs, "extinguish") > 0 or weather_type == 2  then
+					put_fire_out(player)
+				end
+			end
+			return(true)
+		end
+	end
+	return(false)
+end
+
 --handle player suffocating inside solid node
 local c_player
 local heart
@@ -175,12 +203,14 @@ local function index_players_surroundings()
 			handle_player_suffocation(player)
 			handle_hurt_inside(player)
 
+			handle_fire_temp(player)
+
 			--used for finding a damage node next to the player (centered at player's waist)
 			pos.y = pos.y - 0.74
 			a_min = v_sub(pos,1)
 			a_max = v_add(pos,1)
 			damage_pos = minetest.find_nodes_in_area(a_min, a_max, hurt_nodes)
-			
+
 			if get_number(damage_pos) > 0 then
 				for _,found_location in ipairs(damage_pos) do
 					gotten_node = get_node(found_location).name
