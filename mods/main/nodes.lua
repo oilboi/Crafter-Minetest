@@ -483,7 +483,7 @@ minetest.register_node("main:lava", {
 	liquid_viscosity = 7,
 	liquid_renewable = false,
 	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
-	groups = {lava = 3, liquid = 2, igniter = 1, fire=1},
+	groups = {lava = 3, liquid = 2, igniter = 1, fire=1,hurt_inside=1},
 })
 
 minetest.register_node("main:lavaflow", {
@@ -535,7 +535,7 @@ minetest.register_node("main:lavaflow", {
 	liquid_renewable = false,
 	liquid_range = 3,
 	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
-	groups = {lava = 3, liquid = 2, igniter = 1, fire=1},
+	groups = {lava = 3, liquid = 2, igniter = 1, fire=1,hurt_inside=1},
 })
 
 minetest.register_node("main:ladder", {

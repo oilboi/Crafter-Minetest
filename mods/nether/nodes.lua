@@ -122,7 +122,7 @@ minetest.register_node("nether:lava", {
 	liquid_viscosity = 1,
 	liquid_renewable = true,
 	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
-	groups = {lava = 3, liquid = 2, igniter = 1, fire=1},
+	groups = {lava = 3, liquid = 2, igniter = 1, fire=1,hurt_inside=1},
 })
 
 minetest.register_node("nether:lavaflow", {
@@ -173,7 +173,7 @@ minetest.register_node("nether:lavaflow", {
 	liquid_viscosity = 1,
 	liquid_renewable = true,
 	post_effect_color = {a = 191, r = 255, g = 64, b = 0},
-	groups = {lava = 3, liquid = 2, igniter = 1, fire=1},
+	groups = {lava = 3, liquid = 2, igniter = 1, fire=1,hurt_inside=1},
 })
 
 local ores = {"redstone_","coal","iron","gold","diamond"}

@@ -13,7 +13,7 @@ minetest.register_node("fire:fire", {
 		},
 	},
 	inventory_image = "fire.png",
-    groups = {dig_immediate = 1,fire=1},
+    groups = {dig_immediate = 1,fire=1,hurt_inside=1},
     sounds = main.stoneSound(),
     floodable = true,
     drop = "",
