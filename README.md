@@ -49,6 +49,7 @@ enable_mod_channels = true
 - Added in better fire
 - Overhauled weather effects
 - Added in clientside modchannel lockout to check if server sending message
+- Added in capes
 ---
 
 

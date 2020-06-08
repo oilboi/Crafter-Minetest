@@ -182,8 +182,8 @@ local degrees = function(yaw)
 end
 
 -- Check each player and apply animations
-minetest.register_globalstep(function()
-	for _, player in pairs(minetest.get_connected_players()) do
+minetest.register_globalstep(function(dtime)
+	for _,player in pairs(minetest.get_connected_players()) do
 		--update the player wielded item model
 		player_api.set_wielded_item(player)
 

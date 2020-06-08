@@ -3,12 +3,12 @@ mobs.create_data_handling_functions = function(def,mob_register)
 	mob_register.get_staticdata = function(self)
 		if self.deactivating == false then
 			global_mob_amount = global_mob_amount + 1
-			print("Mob Spawned. Current Mobs: "..global_mob_amount)
+			--print("Mob Spawned. Current Mobs: "..global_mob_amount)
 		elseif self.deactivating == true then
 			minetest.after(0, function()
 				if not self.object:get_luaentity() then
 					global_mob_amount = global_mob_amount - 1
-					print("Mob Deactivated. Current Mobs: "..global_mob_amount)
+					--print("Mob Deactivated. Current Mobs: "..global_mob_amount)
 				end
 			end)
 		end

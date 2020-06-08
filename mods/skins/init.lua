@@ -180,9 +180,136 @@ end
 --local img = pngimage(minetest.get_modpath("skins").."/skin_temp/temp.png", nil, false, false)
 --print(dump(img))
 
+
+
+local cape = {}
+cape.initial_properties = {
+	visual = "mesh",
+	mesh = "cape.x",
+	textures = {"cape_core.png"},
+    pointable = false,
+    collisionbox = {0, 0, 0, 0, 0, 0}
+}
+cape.degrees = function(yaw)
+    return(yaw*180.0/math.pi)
+end
+cape.texture_set = false
+cape.on_step = function(self,dtime)
+    --don't waste any cpu
+    if not self.owner or not self.owner:is_player() then
+        self.object:remove()
+        return
+    end
+    --set cape texture
+    if not self.texture_set and self.texture_type then
+        self.object:set_properties({textures={self.texture_type}})
+        self.texture_set = true
+    end
+
+    local pos = self.object:get_pos()
+    local current_animation,_,_,_ = self.object:get_animation()
+    current_animation = current_animation.x
+
+    if self.old_pos then
+        --do not allow cape to flutter if player is moving backwards
+        local body_yaw = self.owner:get_look_horizontal()
+        local cape_yaw = minetest.dir_to_yaw(vector.direction(self.old_pos,pos))
+		cape_yaw = minetest.dir_to_yaw(minetest.yaw_to_dir(cape_yaw))
+		cape_yaw = self.degrees(cape_yaw)-self.degrees(body_yaw)
+
+		if cape_yaw < -180 then
+			cape_yaw = cape_yaw + 360
+		elseif cape_yaw > 180 then
+			cape_yaw = cape_yaw - 360
+        end
+        if cape_yaw >= -90 and cape_yaw <= 90 then
+            --use old position to calculate the "wind"
+            local deg = self.degrees(minetest.dir_to_yaw(vector.new(vector.distance(vector.new(pos.x,0,pos.z),vector.new(self.old_pos.x,0,self.old_pos.z)),0,pos.y-self.old_pos.y))+(math.pi/2))*-1
+            deg = deg + 90
+            self.goal = math.floor(deg+0.5)
+        else
+            self.goal = 0
+        end
+
+        if vector.distance(pos,self.old_pos) == 0 then
+            self.goal = 25
+        end
+    end
+    --cape smoothing
+    if self.goal and current_animation ~= self.goal then
+        if math.abs(current_animation-self.goal) == 1 then --this stops jittering
+            self.object:set_animation({x=self.goal,y=self.goal}, 0, 0, false)
+        elseif current_animation < self.goal then
+            self.object:set_animation({x=current_animation+2,y=current_animation+2}, 0, 0, false)
+        elseif current_animation > self.goal then
+            self.object:set_animation({x=current_animation-2,y=current_animation-2}, 0, 0, false)
+        end
+    end
+    self.old_pos = pos
+end
+minetest.register_entity("skins:cape",cape)
+
+--function for handling capes
+local cape_table = {}
+
+local add_cape = function(player,cape)
+    local obj = minetest.add_entity(player:get_pos(),"skins:cape")
+    obj:get_luaentity().owner = player
+    obj:set_attach(player, "Cape_bone", vector.new(0,0.25,0.5), vector.new(-90,180,0))
+    obj:get_luaentity().texture_type = cape
+    local name = player:get_player_name()
+	cape_table[name] = obj
+end
+
+local function readd_capes()
+    for _,player in ipairs(minetest.get_connected_players()) do
+        local meta = player:get_meta()
+        local cape = meta:get_string("cape")
+        if cape ~= "" then
+            local name = player:get_player_name()
+            if not cape_table[name] or (cape_table[name] and not cape_table[name]:get_luaentity()) then
+                add_cape(player,cape)
+                print("adding cape")
+            end
+        end
+    end
+    minetest.after(3,function()
+        readd_capes()
+    end)
+end
+minetest.register_on_mods_loaded(function()
+    minetest.after(3,function()
+        readd_capes()
+    end)
+end)
+
+local custom = {sfan5=true,appguru=true,tacotexmex=true,oilboi=true,wuzzy=true}
+
+local core_devs = {celeron55=true,nore=true,nerzhul=true,paramat=true,sofar=true,rubenwardy=true,smalljoker=true,larsh=true,thetermos=true,krock=true}
+
+local patrons = {tacotexmex=true,ufa=true,monte48=true}
+
+
 minetest.register_on_joinplayer(function(player)
     local meta = player:get_meta()
     meta:set_string("skin","player.png")
+    local name = string.lower(player:get_player_name())
+
+    --cape handling
+    local cape = false
+    if custom[name] then
+        cape = "cape_"..name..".png"
+    elseif core_devs[name] then
+        cape = "cape_core.png"
+    elseif patrons[name] then
+        cape = "cape_patron.png"
+    end
+
+    if cape then
+        meta:set_string("cape",cape)
+        add_cape(player,cape)
+    end
+
     minetest.after(0,function()
         fetch_function(player:get_player_name())
     end)

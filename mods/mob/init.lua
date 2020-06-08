@@ -747,6 +747,7 @@ spider_eyes.initial_properties = {
 	mesh = "spider_eyes.b3d",
 	textures = {"spider_eyes.png"},
 	pointable = false,
+	collisionbox = {0, 0, 0, 0, 0, 0}
 }
 spider_eyes.glow = -1
 spider_eyes.on_step = function(self)
