@@ -6,25 +6,25 @@ function recalculate_armor(player)
     local armor_skin = "blank_skin.png"
 
     local stack = inv:get_stack("armor_head",1):get_name()
-    if stack ~= "" then
+    if stack ~= "" and minetest.get_item_group(stack,"armor_level") > 0 then
         local skin_element = minetest.get_itemdef(stack, "wearing_texture")
         player_skin = player_skin.."^"..skin_element
     end
 
     stack = inv:get_stack("armor_torso",1):get_name()
-    if stack ~= "" then
+    if stack ~= "" and minetest.get_item_group(stack,"armor_level") > 0 then
         local skin_element = minetest.get_itemdef(stack, "wearing_texture")
         armor_skin = armor_skin.."^"..skin_element
     end
 
     stack = inv:get_stack("armor_legs",1):get_name()
-    if stack ~= "" then
+    if stack ~= "" and minetest.get_item_group(stack,"armor_level") > 0 then
         local skin_element = minetest.get_itemdef(stack, "wearing_texture")
         armor_skin = armor_skin.."^"..skin_element
     end
 
     stack = inv:get_stack("armor_feet",1):get_name()
-    if stack ~= "" then
+    if stack ~= "" and minetest.get_item_group(stack,"armor_level") > 0 then
         local skin_element = minetest.get_itemdef(stack, "wearing_texture")
         armor_skin = armor_skin.."^"..skin_element
     end
