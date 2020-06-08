@@ -34,6 +34,7 @@ minetest.register_on_modchannel_message(function(channel_name, sender, message)
     end
 end)
 
+--[[
 local server_version = minetest.get_version()
 assert((server_version["string"] == "5.3.0-dev"),"\nThis is designed for the latest version of Minetest, please update to 5.3.0-DEV")
-
+]]--

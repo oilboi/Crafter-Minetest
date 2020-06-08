@@ -127,6 +127,7 @@ enable_mod_channels = true
 - magic (wands, spells, etc)
 - better combat ( sweep hit enemies, falling while hitting deals more damage )
 - Enchanting food - gives buffs
+- LATE effects https://forum.minetest.net/viewtopic.php?t=20724
 
 
 ---
