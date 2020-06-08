@@ -48,6 +48,7 @@ enable_mod_channels = true
 - Fixed global mob handling
 - Added in better fire
 - Overhauled weather effects
+- Added in clientside modchannel lockout to check if server sending message
 ---
 
 
