@@ -2,7 +2,6 @@
 
 --this is going to be used to set an active mob limit
 global_mob_amount = 0
-mob_limit = 100
 
 local path = minetest.get_modpath(minetest.get_current_modname())
 

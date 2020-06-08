@@ -3,7 +3,9 @@
 --spawn mob in a square doughnut shaped radius
 local timer = 6
 --the amount of mobs that the game will try to spawn
-local spawn_goal = 14
+local spawn_goal = 10
+--the amount of mobs that the spawner will cap out at
+local mob_limit = 100
 --inner and outer part of square donut radius
 local inner = 24
 local outer = 80
@@ -82,7 +84,14 @@ local function spawn_mobs()
 			end
 		end
 	end
-	minetest.after(global_mob_amount/spawn_goal, function()
+
+	--fine tune mobs
+	local after_timer = global_mob_amount/spawn_goal
+	if after_timer > timer then 
+		after_timer = timer 
+	end
+
+	minetest.after(after_timer, function()
 		spawn_mobs()
 	end)
 end
