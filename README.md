@@ -50,6 +50,7 @@ enable_mod_channels = true
 - Overhauled weather effects
 - Added in clientside modchannel lockout to check if server sending message
 - Added in capes
+- Overhauled client mod version checking
 ---
 
 
