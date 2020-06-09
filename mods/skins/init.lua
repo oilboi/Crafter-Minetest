@@ -308,6 +308,8 @@ minetest.register_on_joinplayer(function(player)
     if cape then
         meta:set_string("cape",cape)
         add_cape(player,cape)
+    else
+        meta:set_string("cape","")
     end
 
     minetest.after(0,function()

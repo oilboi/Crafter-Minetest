@@ -333,6 +333,11 @@ mobs.create_movement_functions = function(def,mob_register)
 					--end
 				end
 			end
+			--charge at the player
+			if self.path_data and table.getn(self.path_data) < 2 then
+				self.path_data = nil
+			end
+
 		end
 	end
 	
