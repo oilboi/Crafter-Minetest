@@ -227,6 +227,8 @@ mobs.create_movement_functions = function(def,mob_register)
 						local path = minetest.find_path(self.object:get_pos(),self.following_pos,self.view_distance,1,5,"A*_noprefetch")
 
 						--if the path fails then raycast down to scare player or accidentally find new path
+						--disabled for extreme cpu usage
+						--[[
 						if not path then
 							local ray = minetest.raycast(acute_following_pos, vector.new(acute_following_pos.x,acute_following_pos.y-self.view_distance,acute_following_pos.z), false, false)
 							for pointed_thing in ray do
@@ -236,6 +238,7 @@ mobs.create_movement_functions = function(def,mob_register)
 								end
 							end
 						end
+						]]--
 						if path then
 							self.path_data = path
 
