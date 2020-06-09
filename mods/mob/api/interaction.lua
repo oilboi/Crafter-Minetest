@@ -96,6 +96,11 @@ mobs.create_interaction_functions = function(def,mob_register)
 						object:add_player_velocity(vel2)
 						if self.on_fire then
 							start_fire(object)
+						else
+							local meta = object:get_meta()
+							if meta:get_int("on_fire") > 0 then
+								start_fire(self.object)
+							end
 						end
 					else
 						object:add_velocity(vel2)
