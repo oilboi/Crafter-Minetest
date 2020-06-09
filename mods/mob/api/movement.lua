@@ -205,11 +205,11 @@ mobs.create_movement_functions = function(def,mob_register)
 					if (not self.old_path_pos or (self.old_path_pos and not vector.equals(acute_pos,self.old_path_pos))) and
 							(not self.old_acute_following_pos or (self.old_acute_following_pos and vector.distance(self.old_acute_following_pos,acute_following_pos) > 2)) then
 						
-						local path = minetest.find_path(self.object:get_pos(),self.following_pos,self.view_distance*2,1,1,"A*_noprefetch")
+						local path = minetest.find_path(self.object:get_pos(),self.following_pos,2,1,1,"A*_noprefetch")
 						
 						if path then
 							self.path_data = path
-							
+
 							--remove the first element of the list
 							--shift whole list down
 							for i = 2,table.getn(self.path_data) do
@@ -224,7 +224,7 @@ mobs.create_movement_functions = function(def,mob_register)
 									local pos1 = self.path_data[number-2]
 									local pos2 = self.path_data[number]
 
-									print(number)
+									--print(number)
 									--check if diagonal and has direct line of sight
 									if pos1 and pos2 and pos1.x ~= pos2.x and pos1.z ~= pos2.z and pos1.y == pos2.y then
 										local pos3 = vector.divide(vector.add(pos1,pos2),2)
@@ -234,7 +234,7 @@ mobs.create_movement_functions = function(def,mob_register)
 
 											if minetest.get_nodedef(minetest.get_node(pos3).name, "walkable") == true then
 												--shift whole list down
-												print("removing"..number-1)
+												--print("removing"..number-1)
 												for z = number-1,table.getn(self.path_data) do
 													self.path_data[z-1] = self.path_data[z]
 												end
@@ -268,7 +268,7 @@ mobs.create_movement_functions = function(def,mob_register)
 				self.old_path_pos = nil
 				self.old_acute_following_pos = nil
 			end
-			
+			--[[
 			if self.path_data then
 				for index,pos_data in pairs(self.path_data) do
 					--print(dump(pos_data))
@@ -282,7 +282,7 @@ mobs.create_movement_functions = function(def,mob_register)
 					})
 				end
 			end
-
+			]]--
 			--this is the real time path deletion as it goes along it
 			if (self.path_data and table.getn(self.path_data) > 0 and vector.distance(self.object:get_pos(),self.path_data[1]) > 2) or self.swimming == true then
 				self.path_data = nil
@@ -295,7 +295,7 @@ mobs.create_movement_functions = function(def,mob_register)
 						self.path_data[i-1] = self.path_data[i]
 					end
 					self.path_data[table.getn(self.path_data)] = nil
-					self.whip_turn = 0.05
+					self.whip_turn = 0.01
 					--if table.getn(self.path_data) == 0 then
 					--	self.path_data = nil
 					--end
