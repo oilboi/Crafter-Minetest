@@ -300,7 +300,7 @@ mobs.create_movement_functions = function(def,mob_register)
 				self.old_path_pos = nil
 				self.old_acute_following_pos = nil
 			end
-			
+			--[[
 			if self.path_data then
 				for index,pos_data in pairs(self.path_data) do
 					--print(dump(pos_data))
@@ -314,7 +314,7 @@ mobs.create_movement_functions = function(def,mob_register)
 					})
 				end
 			end
-
+			]]--
 			--this is the real time path deletion as it goes along it
 			if self.swimming == true then
 				self.path_data = nil
