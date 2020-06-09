@@ -12,7 +12,7 @@ minetest.register_node("fire:fire", {
 			},
 		},
 	},
-	inventory_image = "fire.png",
+	--inventory_image = "fire.png",
     groups = {dig_immediate = 1,fire=1,hurt_inside=1},
     sounds = main.stoneSound(),
     floodable = true,
@@ -101,36 +101,81 @@ fire.initial_properties = {
 	hp_max = 1,
 	physical = false,
 	collide_with_objects = false,
-	collisionbox = {-0.2, -0.2, -0.2, 0.2, 0.2, 0.2},
-	visual = "sprite",
+	collisionbox = {0, 0, 0, 0, 0, 0},
+	visual = "cube",
+	textures = {"nothing.png","nothing.png","fire.png","fire.png","fire.png","fire.png"},
 	visual_size = {x = 1, y = 1, z = 1},
-	textures = {name="fire.png", animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=8.0}},
-	spritediv = {x = 1, y = 8},
-	initial_sprite_basepos = {x = 0, y = 0},
+	--textures = {"nothing.png","nothing.png","fire.png","fire.png","fire.png","fire.png"},--, animation={type="vertical_frames", aspect_w=16, aspect_h=16, length=8.0}},
 	is_visible = true,
 	pointable = false,
 }
 
 fire.on_activate = function(self)
-	self.object:set_sprite({x=1,y=math.random(1,8)}, 8, 0.05, false)
+	local texture_list = {
+		"nothing.png",
+		"nothing.png",
+		"fire.png^[opacity:180^[verticalframe:8:0",
+		"fire.png^[opacity:180^[verticalframe:8:0",
+		"fire.png^[opacity:180^[verticalframe:8:0",
+		"fire.png^[opacity:180^[verticalframe:8:0",
+	}
+	self.object:set_properties({textures=texture_list})
 end
+--animation stuff
+fire.frame = 0
+fire.frame_timer = 0
+fire.frame_update = function(self)
+	self.frame = self.frame + 1
+	if self.frame > 7 then
+		self.frame = 0
+	end
+	local texture_list = {
+		"nothing.png",
+		"nothing.png",
+		"fire.png^[opacity:180^[verticalframe:8:"..self.frame,
+		"fire.png^[opacity:180^[verticalframe:8:"..self.frame,
+		"fire.png^[opacity:180^[verticalframe:8:"..self.frame,
+		"fire.png^[opacity:180^[verticalframe:8:"..self.frame,
+	}
+	self.object:set_properties({textures=texture_list})
+end
+
 fire.timer = 0
 fire.life = 0
-fire.on_step = function(self,dtime)
-	if not self.player or (self.player and not self.player:is_player()) then
+fire.on_step = function(self,dtime)	
+	--master is the flag of the entity that controls the hurt
+	--owner is the flag that tells the entity who to hurt
+	if self.owner and (self.owner:is_player() or self.owner:get_luaentity()) then
+		if self.master then
+			self.timer = self.timer + dtime
+			self.life = self.life + dtime
+	
+			if self.life >= 7 then
+				put_fire_out(self.owner)
+				self.object:remove()
+				return
+			end
+			
+			if self.timer >= 1 then
+				self.timer = 0
+				if self.owner:is_player() then
+					self.owner:set_hp(self.owner:get_hp()-1)
+				elseif self.owner and self.owner:get_luaentity() then
+					self.owner:punch(self.object, 2, 
+						{
+						full_punch_interval=0,
+						damage_groups = {damage=2},
+					})
+				end
+			end
+		end
+	else
 		self.object:remove()
 	end
-	if self.master then
-		self.timer = self.timer + dtime
-		self.life = self.life + dtime
-		if self.life >= 7 then
-			put_fire_out(self.master)
-			return
-		end
-		if self.timer >= 1 then
-			self.timer = 0
-			self.player:set_hp(self.player:get_hp()-1)
-		end
+	self.frame_timer = self.frame_timer + dtime
+	if self.frame_timer >= 0.015 then
+		self.frame_timer = 0
+		self.frame_update(self)
 	end
 end
 minetest.register_entity("fire:fire",fire)
@@ -145,46 +190,62 @@ minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 	fire_channels[name] = minetest.mod_channel_join(name..":fire_state")
 
-	local meta = player:get_meta()
-	if meta:get_int("on_fire") > 0 then
-		minetest.after(2,function()
+	minetest.after(4,function()
+		local meta = player:get_meta()
+		if meta:get_int("on_fire") > 0 then
 			start_fire(player)
-		end)
-	end
+		end
+	end)
 end)
 
-function start_fire(player)
-	local name = player:get_player_name()
-	if not fire_table[name] then
-		local object_table = {}
-		for i = 1,3 do
-			local obj = minetest.add_entity(player:get_pos(),"fire:fire")
-			if i == 1 then
-				obj:get_luaentity().master = player
-			end
-			obj:get_luaentity().player = player
-			obj:set_attach(player, "", vector.new(0,i*5,0),vector.new(0,0,0))
-			table.insert(object_table,obj)
-		end
-		fire_table[name] = object_table
-		local meta = player:get_meta()
+function start_fire(object)
+	if object:is_player() then
+		local name = object:get_player_name()
+		if not fire_table[name] then
+			local obj = minetest.add_entity(object:get_pos(),"fire:fire")
+			obj:get_luaentity().master = true
+			obj:get_luaentity().owner = object
+			obj:set_attach(object, "", vector.new(0,11,0),vector.new(0,0,0))
+			obj:set_properties({visual_size=vector.new(1,2,1)})
+			fire_table[name] = obj
 
-		fire_channels[name]:send_all("1")
-		meta:set_int("on_fire", 1)
+			local meta = object:get_meta()
+			fire_channels[name]:send_all("1")
+			meta:set_int("on_fire", 1)
+		end
+	elseif object and object:get_luaentity() then
+		object:get_luaentity().on_fire = true
+		local divisor = object:get_properties().visual_size.y
+		local obj = minetest.add_entity(object:get_pos(),"fire:fire")
+		--obj:set_properties
+		obj:get_luaentity().master = true
+		obj:get_luaentity().owner = object
+
+		local fire_table = object:get_luaentity().fire_table
+		obj:set_attach(object, "", fire_table.position,vector.new(0,0,0))
+		obj:set_properties({visual_size=fire_table.visual_size})
+
+		object:get_luaentity().fire_entity = obj
 	end
 end
 
-function put_fire_out(player)
-	local name = player:get_player_name()
-	if fire_table[name] then
-		for _,object in pairs(fire_table[name]) do
-			object:remove()
-		end
-		fire_table[name] = nil
+function put_fire_out(object)
+	if object:is_player() then
+		local name = object:get_player_name()
+		if fire_table[name] then
+			local obj = fire_table[name]
+			if obj:get_luaentity() then
+				obj:remove()
+			end
+			fire_table[name] = nil
 
-		local meta = player:get_meta()
-		fire_channels[name]:send_all("0")
-		meta:set_int("on_fire", 0)
+			local meta = object:get_meta()
+			fire_channels[name]:send_all("0")
+			meta:set_int("on_fire", 0)
+		end
+	elseif object and object:get_luaentity() then
+		object:get_luaentity().on_fire = false
+		object:get_luaentity().fire_entity = nil
 	end
 end
 

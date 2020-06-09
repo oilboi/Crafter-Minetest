@@ -139,6 +139,10 @@ mob_register.c_mob_data = def.c_mob_data
 
 mob_register.deactivating = false
 
+mob_register.on_fire = false
+
+mob_register.fire_table = def.fire_table
+
 if def.pathfinds then
 	--mob_register.path = {}
 	mob_register.pathfinding_timer = 0

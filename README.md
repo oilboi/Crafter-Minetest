@@ -52,6 +52,7 @@ enable_mod_channels = true
 - Added in capes
 - Overhauled client mod version checking
 - Overhauled mob pathfinding AI
+- Overhauled fire
 ---
 
 

@@ -94,8 +94,14 @@ mobs.create_interaction_functions = function(def,mob_register)
 					
 					if object:is_player() then
 						object:add_player_velocity(vel2)
+						if self.on_fire then
+							start_fire(object)
+						end
 					else
 						object:add_velocity(vel2)
+						if self.on_fire and not object:get_luaentity().on_fire then
+							start_fire(object)
+						end
 					end
 				end
 			end
@@ -330,6 +336,10 @@ mobs.create_interaction_functions = function(def,mob_register)
 										full_punch_interval=1.5,
 										damage_groups = {damage=self.attack_damage},
 									},vector.direction(pos,pos2))
+									--light the player on fire
+									if self.on_fire then
+										start_fire(object)
+									end
 								end
 							end
 						end

@@ -36,7 +36,7 @@ mobs.create_movement_functions = function(def,mob_register)
 				})
 			end
 			local firey = get_group(noder, "fire")
-			if firey > 0 then
+			if not self.on_fire and firey > 0 then
 				start_fire(self.object)
 			end
 			self.hurt_inside_timer = 0.25

@@ -67,9 +67,15 @@ mobs.register_mob(
 	 attacked_hostile = false,
 	 attack_type = "punch",
 	 group_attack = true,
+
+	 
 	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
 	 --explosion_power = 7, -- how big the explosion has to be
 	 --explosion_time = 3, -- how long it takes for a mob to explode
+	 fire_table = {
+		visual_size = vector.new(1/3,2/3,1/3),
+		position = vector.new(0,3,0),
+	}
 	}
 )
 
@@ -147,8 +153,13 @@ mobs.register_mob(
 			pos.y = pos.y + 0.5
 			minetest.throw_item(pos,{name="weather:snow_block"})
 		end
-	end
+	end,
+	fire_table = {
+		visual_size = vector.new(1/3,2/3,1/3),
+		position = vector.new(0,3,0),
 	}
+	}
+	
 )
 
 mobs.register_mob(
@@ -212,6 +223,10 @@ mobs.register_mob(
 	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
 	 --explosion_power = 7, -- how big the explosion has to be
 	 --explosion_time = 3, -- how long it takes for a mob to explode
+	 fire_table = {
+		visual_size = vector.new(1/6,1/2.2,1/6),
+		position = vector.new(0,2.3,0),
+	}
 	}
 )
 
@@ -295,6 +310,10 @@ mobs.register_mob(
 				})
 		end
 	 end,
+	 fire_table = {
+		visual_size = vector.new(1/4,2/3,1/4),
+		position = vector.new(0,3.3,0),
+	}
 	}
 )
 
@@ -362,6 +381,10 @@ mobs.register_mob(
 	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
 	 --explosion_power = 7, -- how big the explosion has to be
 	 --explosion_time = 3, -- how long it takes for a mob to explode
+	 fire_table = {
+		visual_size = vector.new(1/3,2/3,1/3),
+		position = vector.new(0,3,0),
+	}
 	}
 )
 
@@ -400,9 +423,17 @@ mobs.register_mob(
 	custom_on_death = function(self)
 		local pos = self.object:get_pos()
 		for i = 1,4 do
-			minetest.add_entity(pos,"mob:medium_slime")
+			local obj = minetest.add_entity(pos,"mob:medium_slime")
+			if self.on_fire then
+				start_fire(obj)
+			end
 		end
 	end,
+	--this is used to properly position fire when the mob catches on fire
+	fire_table = {
+		visual_size = vector.new(1/5.8,1/3.3,1/5.8),
+		position = vector.new(0,1.5,0),
+	}
 	}
 )
 
@@ -440,9 +471,16 @@ mobs.register_mob(
 		local pos = self.object:get_pos()
 		pos.y = pos.y + 0.2
 		for i = 1,4 do
-			minetest.add_entity(pos,"mob:small_slime")
+			local obj = minetest.add_entity(pos,"mob:small_slime")
+			if self.on_fire then
+				start_fire(obj)
+			end
 		end
 	end,
+	fire_table = {
+		visual_size = vector.new(1/5.8,1/3.3,1/5.8),
+		position = vector.new(0,1.5,0),
+	}
 	}
 )
 
@@ -476,7 +514,11 @@ mobs.register_mob(
 	die_sound = "slime_die",
 	attack_damage = 1,
 	attack_type = "punch",
-	item_drop = "mob:slimeball"
+	item_drop = "mob:slimeball",
+	fire_table = {
+		visual_size = vector.new(1/5.8,1/3.3,1/5.8),
+		position = vector.new(0,1.5,0),
+	}
 	}
 )
 
@@ -602,6 +644,10 @@ mobs.register_mob(
 	 
 	 die_in_light = false,
 	 --die_in_light_level = 12,
+	 fire_table = {
+		visual_size = vector.new(1/4,2/3,1/4),
+		position = vector.new(0,3.3,0),
+	}
 	}
 )
 
@@ -668,6 +714,10 @@ mobs.register_mob(
 	 
 	 die_in_light = false,
 	 --die_in_light_level = 12,
+	 fire_table = {
+		visual_size = vector.new(1/4,2/3,1/4),
+		position = vector.new(0,3.3,0),
+	}
 	}
 )
 
@@ -736,6 +786,10 @@ mobs.register_mob(
 	 
 	 die_in_light = false,
 	 --die_in_light_level = 12,
+	 fire_table = {
+		visual_size = vector.new(1/4,2/3,1/4),
+		position = vector.new(0,3.3,0),
+	}
 	}
 )
 
@@ -838,10 +892,15 @@ mobs.register_mob(
 			obj:set_properties({visual_size={x=1,y=1}})
 			obj2:set_properties({visual_size={x=1/3,y=1/3}})
 		end
-	 end
+	 end,
 	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
 	 --explosion_power = 7, -- how big the explosion has to be
 	 --explosion_time = 3, -- how long it takes for a mob to explode
+	 --this is used to properly position fire when the mob catches on fire
+	fire_table = {
+		visual_size = vector.new(1.3/3,2/3,1.3/3),
+		position = vector.new(0,4,0),
+	}
 	}
 )
 
@@ -907,5 +966,9 @@ mobs.register_mob(
 	 --explosion_radius = 4, -- how far away the mob has to be to initialize the explosion
 	 --explosion_power = 7, -- how big the explosion has to be
 	 --explosion_time = 3, -- how long it takes for a mob to explode
+	 fire_table = {
+		visual_size = vector.new(1.3/3,2/3,1.3/3),
+		position = vector.new(0,4,0),
+	}
 	}
 )

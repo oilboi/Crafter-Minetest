@@ -29,6 +29,7 @@ mobs.create_data_handling_functions = function(def,mob_register)
 			scared = self.scared,
 			scared_timer = self.scared_timer,
 			c_mob_data = self.c_mob_data,
+			on_fire = self.on_fire,
 		})
 	end
 
@@ -55,6 +56,7 @@ mobs.create_data_handling_functions = function(def,mob_register)
 				self.scared = data.scared
 				self.scared_timer = data.scared_timer				
 				self.c_mob_data = data.c_mob_data
+				self.on_fire = data.on_fire
 			end
 		end
 		
@@ -75,7 +77,10 @@ mobs.create_data_handling_functions = function(def,mob_register)
 		if self.custom_on_activate then
 			self.custom_on_activate(self)
 		end
-		--self.object:set_yaw(math.pi*math.random(-1,1)*math.random())
+
+		if self.on_fire == true then
+			start_fire(self.object)
+		end
 
 		--use this to handle the global mob table
 		minetest.after(0,function()
