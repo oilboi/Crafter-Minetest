@@ -95,8 +95,10 @@ local function spawn_mobs()
 		spawn_mobs()
 	end)
 end
-minetest.register_on_mods_loaded(function()
-	minetest.after(0,function()
-		spawn_mobs()
+if spawning then
+	minetest.register_on_mods_loaded(function()
+		minetest.after(0,function()
+			spawn_mobs()
+		end)
 	end)
-end)
+end

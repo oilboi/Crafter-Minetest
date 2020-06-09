@@ -26,13 +26,18 @@ mobs.create_movement_functions = function(def,mob_register)
 	mob_register.hurt_inside = function(self,dtime)
 		if self.hp > 0 and self.hurt_inside_timer <= 0 then
 			local pos = self.object:get_pos()
-			local hurty = get_group(get_node(pos).name, "hurt_inside")
+			local noder = get_node(pos).name
+			local hurty = get_group(noder, "hurt_inside")
 			if hurty > 0 then
 				self.object:punch(self.object, 2, 
 					{
 					full_punch_interval=1.5,
 					damage_groups = {damage=hurty},
 				})
+			end
+			local firey = get_group(noder, "fire")
+			if firey > 0 then
+				start_fire(self.object)
 			end
 			self.hurt_inside_timer = 0.25
 		else
@@ -184,49 +189,83 @@ mobs.create_movement_functions = function(def,mob_register)
 		mob_register.pathfinding = function(self,dtime)
 			if self.following and self.following_pos then
 				self.pathfinding_timer = self.pathfinding_timer + dtime
-				if self.pathfinding_timer > 1 or not self.path_data then
-					self.pathfinding_timer = 0
+				if self.pathfinding_timer >= 0.5 then
+					local acute_pos = vector.floor(vector.add(self.object:get_pos(),0.5))
+					local acute_following_pos = vector.floor(vector.add(self.following_pos,0.5))
 
-					local path = minetest.find_path(self.object:get_pos(),self.following_pos,self.view_distance*2,1,1,"A*")
-					
-					if path and not self.path_data or (self.path_data and table.getn(self.path_data) < 1) then
-						self.path_data = path
-					end
-					--[[
-					if self.path_data then
-						for index,pos_data in pairs(self.path_data) do
-							--print(dump(pos_data))
-							minetest.add_particle({
-								pos = pos_data,
-								velocity = {x=0, y=0, z=0},
-								acceleration = {x=0, y=0, z=0},
-								expirationtime = 1,
-								size = 1,
-								texture = "dirt.png",
-							})
+					if (not self.old_path_pos or (self.old_path_pos and not vector.equals(acute_pos,self.old_path_pos))) and
+							(not self.old_acute_following_pos or (self.old_acute_following_pos and not vector.equals(self.old_acute_following_pos,acute_following_pos))) then
+						
+						local path = minetest.find_path(self.object:get_pos(),self.following_pos,self.view_distance,1,1,"A*_noprefetch")
+						
+						if path then--and not self.path_data or (self.path_data and table.getn(self.path_data) < 1) then
+							self.path_data = path
 						end
+						
+						if self.path_data then
+							for index,pos_data in pairs(self.path_data) do
+								--print(dump(pos_data))
+								minetest.add_particle({
+									pos = pos_data,
+									velocity = {x=0, y=0, z=0},
+									acceleration = {x=0, y=0, z=0},
+									expirationtime = 0.5,
+									size = 1,
+									texture = "dirt.png",
+								})
+							end
+						end
+						
+						self.old_path_pos = acute_pos
+						self.old_acute_following_pos = acute_following_pos
 					end
-					]]--
 				end
 			elseif not self.following then
 				self.path_data = nil
+				self.old_path_pos = nil
+				self.old_acute_following_pos = nil
 			end
 
 
-			--this is the real time one
-			local selfpos = self.object:get_pos()
-			local pos1 = vector.new(selfpos.x,0,selfpos.z)
-
+			--this is the real time path deletion as it goes along it
 			if (self.path_data and table.getn(self.path_data) > 0 and vector.distance(self.object:get_pos(),self.path_data[1]) > 2) or self.swimming == true then
 				self.path_data = nil
 			end
 
-			if self.path_data and table.getn(self.path_data) > 0 and vector.distance(pos1,vector.new(self.path_data[1].x,0,self.path_data[1].z)) < 1 then
-				--shift whole list down
-				for i = 2,table.getn(self.path_data) do
-					self.path_data[i-1] = self.path_data[i]
+			if self.path_data and table.getn(self.path_data) > 0 then
+				if vector.distance(self.object:get_pos(),self.path_data[1]) <= 1 then
+					--shift whole list down
+					for i = 2,table.getn(self.path_data) do
+						self.path_data[i-1] = self.path_data[i]
+					end
+					self.path_data[table.getn(self.path_data)] = nil
+					if table.getn(self.path_data) == 0 then
+						self.path_data = nil
+					end
 				end
-				self.path_data[table.getn(self.path_data)] = nil
+			end
+
+			--cut corners (go diagonal)
+			--this needs to be done in real time for some reason otherwise mobs become dumb again
+			if self.path_data and table.getn(self.path_data) > 3 then
+				for i = 3,table.getn(self.path_data) do
+					local pos1 = self.path_data[i-2]
+					local pos2 = self.path_data[i]
+					--check if diagonal and has direct line of sight
+					if pos1 and pos2 and pos1.x ~= pos2.x and pos1.z ~= pos2.z then
+						local can_cut,_ = minetest.line_of_sight(pos1, pos2)
+						if can_cut then
+							--shift whole list down
+							for z = i-1,table.getn(self.path_data) do
+								self.path_data[z-1] = self.path_data[z]
+							end
+							self.path_data[table.getn(self.path_data)] = nil
+							if table.getn(self.path_data) == 0 then
+								self.path_data = nil
+							end
+						end
+					end
+				end
 			end
 		end
 	end
