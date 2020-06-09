@@ -54,6 +54,7 @@ enable_mod_channels = true
 - Overhauled mob pathfinding AI
 - Overhauled fire
 - Fixed Crafter Client from crashing if joining a non-crafter server
+- Heavily optimized network usage with player mechanics to client mod
 ---
 
 

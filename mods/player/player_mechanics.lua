@@ -2,12 +2,17 @@ local player_state_channels = {}
 
 minetest.register_on_modchannel_message(function(channel_name, sender, message)
 	local channel_decyphered = channel_name:gsub(sender,"")
-	if channel_decyphered == ":player_movement_state" then
+	if sender ~= "" and channel_decyphered == ":player_movement_state" then
 		local player = minetest.get_player_by_name(sender)
 		local meta = player:get_meta()
 		meta:set_string("player.player_movement_state", message)
 	end
 end)
+
+local send_running_cancellation = function(player,sneaking)
+	local name = player:get_player_name()
+	player_state_channels[name]:send_all(minetest.serialize({stop_running=true,state=sneaking}))
+end
 
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
@@ -15,47 +20,54 @@ minetest.register_on_joinplayer(function(player)
 	player:set_physics_override({jump=1.25,gravity=1.25})
 	local meta = player:get_meta()
 	meta:set_string("player.player_movement_state", "0")
+	meta:set_string("player.old_player_movement_state", "0")
+end)
+
+minetest.register_on_dieplayer(function(player)
+	local meta = player:get_meta()
+	meta:set_string("player.player_movement_state", "0")
+	send_running_cancellation(player,sneaking)
 end)
 
 minetest.register_globalstep(function(dtime)
 	for _,player in ipairs(minetest.get_connected_players()) do
 		local meta = player:get_meta()
-		
 		local hunger = meta:get_int("hunger")
+		local state = meta:get_string("player.player_movement_state")
+		local old_state = meta:get_string("player.old_player_movement_state")
 		
-		local running = (meta:get_string("player.player_movement_state") == "1")
-		local bunny_hopping = (meta:get_string("player.player_movement_state") == "2")
-		local sneaking = (meta:get_string("player.player_movement_state") == "3")
-		
-		--print(running, bunny_hopping)
-		
-		
-		--running FOV modifier
-		if hunger > 6 and (running or bunny_hopping) then
-			player:set_fov(1.25, true,0.15)
-			
-			if bunny_hopping == true then
-                --player:set_fov(1.45, true,0.15)
-				player:set_physics_override({speed=1.75})
-			else
-                --player:set_fov(1.25, true,0.15)
-				player:set_physics_override({speed=1.5})
+		if state ~= old_state or ((state == "1" or state == "2") and hunger <= 6) then
+			local running = (state == "1")
+			local bunny_hopping = (state == "2")
+			local sneaking = (state == "3")
+
+			--running FOV modifier
+			if hunger > 6 and (running or bunny_hopping) then
+				player:set_fov(1.25, true,0.15)
+				
+				if bunny_hopping == true then
+					--player:set_fov(1.45, true,0.15)
+					player:set_physics_override({speed=1.75})
+				else
+					--player:set_fov(1.25, true,0.15)
+					player:set_physics_override({speed=1.5})
+				end
+			elseif not (running or bunny_hopping) and (old_state == "1" or old_state == "2")  then
+				player:set_fov(1, true,0.15)
+				player:set_physics_override({speed=1})
+				send_running_cancellation(player,sneaking) --preserve network data
 			end
-		else
-            player:set_fov(1, true,0.15)
-			player:set_physics_override({speed=1})
-			--meta:set_float("running_timer", 0)
+
+			--sneaking
+			if sneaking then
+				--player:set_fov(0.8, true,0.1)
+				player:set_eye_offset({x=0,y=-1,z=0},{x=0,y=-1,z=0})
+			else
+				player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
+			end
 		end
-		
-		--sneaking
-		if sneaking then
-            --player:set_fov(0.8, true,0.1)
-			player:set_eye_offset({x=0,y=-1,z=0},{x=0,y=-1,z=0})
-		else
-			player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
-		end
-		
-		--remember to implement hunger
+
+		meta:set_string("player.old_player_movement_state", state)
 		
 		--eating
 		if player:get_player_control().RMB then
