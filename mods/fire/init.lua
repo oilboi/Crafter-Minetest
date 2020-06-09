@@ -115,13 +115,19 @@ fire.on_activate = function(self)
 	self.object:set_sprite({x=1,y=math.random(1,8)}, 8, 0.05, false)
 end
 fire.timer = 0
+fire.life = 0
 fire.on_step = function(self,dtime)
 	if not self.player or (self.player and not self.player:is_player()) then
 		self.object:remove()
 	end
 	if self.master then
 		self.timer = self.timer + dtime
-		if self.timer >= 0.5 then
+		self.life = self.life + dtime
+		if self.life >= 7 then
+			put_fire_out(self.master)
+			return
+		end
+		if self.timer >= 1 then
 			self.timer = 0
 			self.player:set_hp(self.player:get_hp()-1)
 		end
@@ -138,6 +144,13 @@ local fire_channels = {}
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 	fire_channels[name] = minetest.mod_channel_join(name..":fire_state")
+
+	local meta = player:get_meta()
+	if meta:get_int("on_fire") > 0 then
+		minetest.after(2,function()
+			start_fire(player)
+		end)
+	end
 end)
 
 function start_fire(player)
@@ -147,7 +160,7 @@ function start_fire(player)
 		for i = 1,3 do
 			local obj = minetest.add_entity(player:get_pos(),"fire:fire")
 			if i == 1 then
-				obj:get_luaentity().master = true
+				obj:get_luaentity().master = player
 			end
 			obj:get_luaentity().player = player
 			obj:set_attach(player, "", vector.new(0,i*5,0),vector.new(0,0,0))
