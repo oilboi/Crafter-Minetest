@@ -3,7 +3,7 @@ local client_version_channels = {}
 
 --I needed to add in a dev cycle to adopt for a decimal place error
 local current_development_cycle = "alpha"
-local current_version = 0.05005
+local current_version = 0.05006
 
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
