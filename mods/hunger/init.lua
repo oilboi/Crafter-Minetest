@@ -158,7 +158,7 @@ local function hunger_update()
 			
 			local hp = player:get_hp()
 			--make regeneration happen every second
-			if meta:get_int("drowning") == 0 and hunger >= 20 and hp < 20 then
+			if meta:get_int("drowning") == 0 and meta:get_int("on_fire") == 0 and hunger >= 20 and hp < 20 then
 				local regeneration_interval = meta:get_int("regeneration_interval")
 				--print(regeneration_interval,"--------------------------")
 				regeneration_interval = regeneration_interval + 1
