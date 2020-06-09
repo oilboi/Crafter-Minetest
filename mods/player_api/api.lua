@@ -161,6 +161,7 @@ minetest.register_on_leaveplayer(function(player)
 	player_model[name] = nil
 	player_anim[name] = nil
 	player_textures[name] = nil
+	meta:set_string("player.old_player_control_table","")
 end)
 
 -- Localize for better performance.
@@ -184,99 +185,116 @@ end
 -- Check each player and apply animations
 minetest.register_globalstep(function(dtime)
 	for _,player in pairs(minetest.get_connected_players()) do
+
+		--these are the only things that should be real time
 		--update the player wielded item model
 		player_api.set_wielded_item(player)
+		--update player head position
+		local pitch = -degrees(player:get_look_vertical())
+		local controls = player:get_player_control() --this needs to be dumped into here so it can be used for the head offset in RT
+		if controls.sneak then
+			pitch = pitch + 15
+		end
+		player:set_bone_position("Head", vector.new(0,6.3,0), vector.new(pitch,0,0))
 
-		local name = player:get_player_name()
-		local model_name = player_model[name]
-		local model = model_name and models[model_name]
-		if model and not player_attached[name] then
-			local controls = player:get_player_control()
-			local animation_speed_mod = model.animation_speed or 30
-
-			-- Determine if the player is sneaking, and reduce animation speed if so
-			--if controls.sneak then
-			--	animation_speed_mod = 0
-			--end
-			
-			local meta = player:get_meta()
-			local movement_state = meta:get_string("player.player_movement_state")
-
-			local pitch = -degrees(player:get_look_vertical())
-			if movement_state == "3" then
-				pitch = pitch + 15
+		--check if the player has done anything with their keyboard/mouse
+		local meta = player:get_meta() --unfortunately meta has to be indexed here
+		local control_table = meta:get_string("player.old_player_control_table")
+		local equals_old = true
+		if control_table ~= "" then
+			control_table = minetest.deserialize(control_table)
+			for index,boolean in pairs(control_table) do
+				if controls[index] ~= boolean then
+					equals_old = false
+					break
+				end
 			end
-			player:set_bone_position("Head", vector.new(0,6.3,0), vector.new(pitch,0,0))
+		else
+			equals_old = false
+		end
 
+		--here begins the most complex pyramid of Giza
+		if not equals_old then
+			local name = player:get_player_name()
+			local model_name = player_model[name]
+			local model = model_name and models[model_name]
 
-			-- Apply animations based on what the player is doing
-			if player:get_hp() == 0 then
-				player_set_animation(player, "lay")
-			elseif movement_state == "0" then
-				--walking normal
-				if controls.up or controls.down or controls.left or controls.right then
-					if controls.LMB or controls.RMB then
-						player_set_animation(player, "walk_mine", animation_speed_mod)
+			if model and not player_attached[name] then
+				local animation_speed_mod = model.animation_speed or 30
+				local movement_state = meta:get_string("player.player_movement_state")
+				meta:set_string("player.old_player_control_table",minetest.serialize(controls))
+
+				--print("sending data player api")
+
+				-- Apply animations based on what the player is doing
+				if player:get_hp() == 0 then
+					player_set_animation(player, "lay")
+				elseif movement_state == "0" then
+					--walking normal
+					if controls.up or controls.down or controls.left or controls.right then
+						if controls.LMB or controls.RMB then
+							player_set_animation(player, "walk_mine", animation_speed_mod)
+						else
+							player_set_animation(player, "walk", animation_speed_mod)
+						end
 					else
-						player_set_animation(player, "walk", animation_speed_mod)
+						if controls.LMB or controls.RMB then
+							player_set_animation(player, "mine", animation_speed_mod)
+						else
+							player_set_animation(player, "stand", animation_speed_mod)
+						end
 					end
+				elseif movement_state == "1" then
+					--running
+					if controls.up or controls.down or controls.left or controls.right then
+						if controls.LMB or controls.RMB then
+							player_set_animation(player, "walk_mine", animation_speed_mod*1.5)
+						else
+							player_set_animation(player, "walk", animation_speed_mod*1.5)
+						end
+					else
+						if controls.LMB or controls.RMB then
+							player_set_animation(player, "mine", animation_speed_mod*1.5)
+						else
+							player_set_animation(player, "stand", animation_speed_mod*1.5)
+						end
+					end
+				elseif movement_state == "2" then
+					--bunnyhopping
+					if controls.up or controls.down or controls.left or controls.right then
+						if controls.LMB or controls.RMB then
+							player_set_animation(player, "walk_mine", animation_speed_mod*1.75)
+						else
+							player_set_animation(player, "walk", animation_speed_mod*1.75)
+						end
+					else
+						if controls.LMB or controls.RMB then
+							player_set_animation(player, "mine", animation_speed_mod*1.75)
+						else
+							player_set_animation(player, "stand", animation_speed_mod*1.75)
+						end
+					end
+				elseif movement_state == "3" then
+					--sneaking
+					if controls.up or controls.down or controls.left or controls.right then
+						if controls.LMB or controls.RMB then
+							player_set_animation(player, "sneak_mine_walk", 30)
+						else
+							player_set_animation(player, "sneak_walk", 30)
+						end
+					else
+						if controls.LMB or controls.RMB then
+							player_set_animation(player, "sneak_mine_stand", 30)
+						else
+							player_set_animation(player, "sneak", 30)
+						end
+					end
+				--safety catches
+				elseif controls.LMB or controls.RMB then
+					player_set_animation(player, "mine", animation_speed_mod)
 				else
-					if controls.LMB or controls.RMB then
-						player_set_animation(player, "mine", animation_speed_mod)
-					else
-						player_set_animation(player, "stand", animation_speed_mod)
-					end
+					player_set_animation(player, "sneak", animation_speed_mod)
 				end
-			elseif movement_state == "1" then
-				--running
-				if controls.up or controls.down or controls.left or controls.right then
-					if controls.LMB or controls.RMB then
-						player_set_animation(player, "walk_mine", animation_speed_mod*1.5)
-					else
-						player_set_animation(player, "walk", animation_speed_mod*1.5)
-					end
-				else
-					if controls.LMB or controls.RMB then
-						player_set_animation(player, "mine", animation_speed_mod*1.5)
-					else
-						player_set_animation(player, "stand", animation_speed_mod*1.5)
-					end
-				end
-			elseif movement_state == "2" then
-				--bunnyhopping
-				if controls.up or controls.down or controls.left or controls.right then
-					if controls.LMB or controls.RMB then
-						player_set_animation(player, "walk_mine", animation_speed_mod*1.75)
-					else
-						player_set_animation(player, "walk", animation_speed_mod*1.75)
-					end
-				else
-					if controls.LMB or controls.RMB then
-						player_set_animation(player, "mine", animation_speed_mod*1.75)
-					else
-						player_set_animation(player, "stand", animation_speed_mod*1.75)
-					end
-				end
-			elseif movement_state == "3" then
-				--sneaking
-				if controls.up or controls.down or controls.left or controls.right then
-					if controls.LMB or controls.RMB then
-						player_set_animation(player, "sneak_mine_walk", 30)
-					else
-						player_set_animation(player, "sneak_walk", 30)
-					end
-				else
-					if controls.LMB or controls.RMB then
-						player_set_animation(player, "sneak_mine_stand", 30)
-					else
-						player_set_animation(player, "sneak", 30)
-					end
-				end
-			--safety catches
-			elseif controls.LMB or controls.RMB then
-				player_set_animation(player, "mine", animation_speed_mod)
-			else
-				player_set_animation(player, "sneak", animation_speed_mod)
 			end
 		end
 	end
