@@ -198,15 +198,44 @@ mobs.create_movement_functions = function(def,mob_register)
 		mob_register.pathfinding = function(self,dtime)
 			if self.following and self.following_pos then
 				self.pathfinding_timer = self.pathfinding_timer + dtime
-				if self.pathfinding_timer >= 0.5 then
+				local height_diff
+				if self.object:get_pos().y > self.following_pos.y then
+					height_diff = math.abs(self.object:get_pos().y-self.following_pos.y)
+				elseif self.object:get_pos().y <= self.following_pos.y then
+					height_diff = math.abs(self.following_pos.y-self.object:get_pos().y)
+				end
+				--delete path if height too far
+				if self.path_data and height_diff > self.view_distance/2 then
+					self.path_data = nil
+					self.old_path_pos = nil
+					self.old_acute_following_pos = nil
+					return
+				end
+
+				if self.pathfinding_timer >= 0.5 and height_diff <= self.view_distance/2 then
 					local acute_pos = vector.floor(vector.add(self.object:get_pos(),0.5))
 					local acute_following_pos = vector.floor(vector.add(self.following_pos,0.5))
 
 					if (not self.old_path_pos or (self.old_path_pos and not vector.equals(acute_pos,self.old_path_pos))) and
 							(not self.old_acute_following_pos or (self.old_acute_following_pos and vector.distance(self.old_acute_following_pos,acute_following_pos) > 2)) then
 						
-						local path = minetest.find_path(self.object:get_pos(),self.following_pos,2,1,1,"A*_noprefetch")
+						--if a player tries to hide in a node
+						if minetest.get_nodedef(minetest.get_node(acute_following_pos).name, "walkable") then
+							acute_following_pos.y = acute_following_pos.y + 1
+						end
 						
+						local path = minetest.find_path(self.object:get_pos(),self.following_pos,self.view_distance,1,5,"A*_noprefetch")
+
+						--if the path fails then raycast down to scare player or accidentally find new path
+						if not path then
+							local ray = minetest.raycast(acute_following_pos, vector.new(acute_following_pos.x,acute_following_pos.y-self.view_distance,acute_following_pos.z), false, false)
+							for pointed_thing in ray do
+								if pointed_thing.above then
+									path = minetest.find_path(self.object:get_pos(),pointed_thing.above,self.view_distance,1,5,"A*_noprefetch")
+									break
+								end
+							end
+						end
 						if path then
 							self.path_data = path
 
@@ -216,7 +245,7 @@ mobs.create_movement_functions = function(def,mob_register)
 								self.path_data[i-1] = self.path_data[i]
 							end
 							self.path_data[table.getn(self.path_data)] = nil
-
+							
 							--cut corners (go diagonal)
 							if self.path_data and table.getn(self.path_data) >= 3 then
 								local number = 3
@@ -253,22 +282,22 @@ mobs.create_movement_functions = function(def,mob_register)
 										number = number + 1
 									end
 								end
-								if self.path_data and table.getn(self.path_data) <= 2 then
-									self.path_data = nil
-								end
+								--if self.path_data and table.getn(self.path_data) <= 2 then
+								--	self.path_data = nil
+								--end
 							end
 						end
 												
 						self.old_path_pos = acute_pos
-						self.old_acute_following_pos = acute_following_pos
+						self.old_acute_following_pos = acute_following_pos	
 					end
 				end
-			elseif not self.following then
+			elseif (not self.following and self.path_data) or (self.path_data and height_diff > self.view_distance/2) then
 				self.path_data = nil
 				self.old_path_pos = nil
 				self.old_acute_following_pos = nil
 			end
-			--[[
+			
 			if self.path_data then
 				for index,pos_data in pairs(self.path_data) do
 					--print(dump(pos_data))
@@ -282,9 +311,9 @@ mobs.create_movement_functions = function(def,mob_register)
 					})
 				end
 			end
-			]]--
+
 			--this is the real time path deletion as it goes along it
-			if (self.path_data and table.getn(self.path_data) > 0 and vector.distance(self.object:get_pos(),self.path_data[1]) > 2) or self.swimming == true then
+			if self.swimming == true then
 				self.path_data = nil
 			end
 
@@ -295,7 +324,7 @@ mobs.create_movement_functions = function(def,mob_register)
 						self.path_data[i-1] = self.path_data[i]
 					end
 					self.path_data[table.getn(self.path_data)] = nil
-					self.whip_turn = 0.01
+					self.whip_turn = 0.05
 					--if table.getn(self.path_data) == 0 then
 					--	self.path_data = nil
 					--end
