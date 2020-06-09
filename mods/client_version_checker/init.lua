@@ -1,11 +1,11 @@
-minetest.mod_channel_join("namespace_reserved_the_game_is_crafter")
+minetest.register_node("client_version_checker:this_is_the_signature_of_crafter00111010010001000011110000110011",{})
 
 local client_versions = {}
 local client_version_channels = {}
 
 --I needed to add in a dev cycle to adopt for a decimal place error
 local current_development_cycle = "alpha"
-local current_version = 0.05006
+local current_version = 0.05007
 
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
