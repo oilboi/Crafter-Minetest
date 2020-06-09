@@ -139,7 +139,7 @@ fire.frame_update = function(self)
 	}
 	self.object:set_properties({textures=texture_list})
 end
-
+fire.glow = -1
 fire.timer = 0
 fire.life = 0
 fire.on_step = function(self,dtime)	
