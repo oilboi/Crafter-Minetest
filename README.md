@@ -51,6 +51,7 @@ enable_mod_channels = true
 - Added in clientside modchannel lockout to check if server sending message
 - Added in capes
 - Overhauled client mod version checking
+- Overhauled mob pathfinding AI
 ---
 
 
