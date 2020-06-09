@@ -1,3 +1,5 @@
+minetest.mod_channel_join("namespace_reserved_the_game_is_crafter")
+
 local client_versions = {}
 local client_version_channels = {}
 
