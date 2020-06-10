@@ -30,6 +30,25 @@ if not http then
     return(nil)
 end
 
+
+--use this to retrieve skin data
+local player_skin_table = {}
+
+minetest.get_skin = function(player)
+    local name = player:get_player_name()
+    if player_skin_table[name] then
+        return(player_skin_table[name])
+    else
+        return("player.png")
+    end
+end
+
+--use this to set skin data
+minetest.set_skin = function(player,skin)
+    local name = player:get_player_name()
+    player_skin_table[name] = skin
+end
+
 -- Fancy debug wrapper to download an URL
 local function fetch_url(url, callback)
 	http.fetch({
@@ -260,53 +279,32 @@ minetest.register_entity("skins:cape",cape)
 --function for handling capes
 local cape_table = {}
 
-local add_cape = function(player,cape)
+minetest.add_cape = function(player,cape)
     local obj = minetest.add_entity(player:get_pos(),"skins:cape")
     obj:get_luaentity().owner = player
     obj:set_attach(player, "Cape_bone", vector.new(0,0.25,0.5), vector.new(-90,180,0))
     obj:get_luaentity().texture_type = cape
     local name = player:get_player_name()
-	cape_table[name] = obj
+	cape_table[name] = {cape_texture=cape,object=obj}
 end
 
-local function readd_capes()
+minetest.readd_capes = function()
     for _,player in ipairs(minetest.get_connected_players()) do
-        local meta = player:get_meta()
-        local cape = meta:get_string("cape")
-        if cape ~= "" then
-            local name = player:get_player_name()
-            if not cape_table[name] or (cape_table[name] and not cape_table[name]:get_luaentity()) then
-                add_cape(player,cape)
-            end
+        local name = player:get_player_name()
+        if cape_table[name] and not cape_table[name].object:get_luaentity() then
+            minetest.add_cape(player,cape_table[name].cape_texture)
         end
     end
     minetest.after(3,function()
-        readd_capes()
+        minetest.readd_capes()
     end)
 end
+
 minetest.register_on_mods_loaded(function()
     minetest.after(3,function()
-        readd_capes()
+        minetest.readd_capes()
     end)
 end)
-
-
---use this to retrieve skin data
-local player_skin_table = {}
-minetest.get_skin = function(player)
-    local name = player:get_player_name()
-    if player_skin_table[name] then
-        return(player_skin_table[name])
-    else
-        return("player.png")
-    end
-end
-
---use this to set skin data
-minetest.set_skin = function(player,skin)
-    local name = player:get_player_name()
-    player_skin_table[name] = skin
-end
 
 
 local custom = {sfan5=true,appguru=true,tacotexmex=true,oilboi=true,wuzzy=true}
@@ -329,12 +327,9 @@ minetest.register_on_joinplayer(function(player)
     elseif patrons[name] then
         cape = "cape_patron.png"
     end
-    local meta = player:get_meta()
+
     if cape then
-        meta:set_string("cape",cape)
-        add_cape(player,cape)
-    else
-        meta:set_string("cape","")
+        minetest.add_cape(player,cape)
     end
 
     minetest.after(0,function()
