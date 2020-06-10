@@ -20,13 +20,13 @@ end
 
 if not http then
     for i = 1,5 do
-        print("!WARNING!")
+        minetest.log("error","!WARNING!")
     end
-    print("---------------------------------------------------------------")
-    print("HTTP access is required. Please add this to your minetest.conf:")
-    print("secure.http_mods = skins")
-    print("!!Skins will not work without this!!")
-    print("---------------------------------------------------------------")
+    minetest.log("error","---------------------------------------------------------------")
+    minetest.log("error","HTTP access is required. Please add this to your minetest.conf:")
+    minetest.log("error","secure.http_mods = skins")
+    minetest.log("error","!!Skins will not work without this!!")
+    minetest.log("error","---------------------------------------------------------------")
     return(nil)
 end
 
