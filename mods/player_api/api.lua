@@ -1,18 +1,16 @@
--- Minetest 0.4 mod: player
--- See README.txt for licensing and other information.
-
-player_api = {}
+local minetest,math = minetest,math
+minetest.player_api = {}
 
 -- Player animation blending
 -- Note: This is currently broken due to a bug in Irrlicht, leave at 0
 local animation_blend = 0
 
-player_api.registered_models = { }
+minetest.player_api.registered_models = { }
 
 -- Local for speed.
-local models = player_api.registered_models
+local models = minetest.player_api.registered_models
 
-function player_api.register_model(name, def)
+function minetest.player_api.register_model(name, def)
 	models[name] = def
 end
 
@@ -22,11 +20,11 @@ local player_textures = {}
 local wielded_item = {}
 local player_anim = {}
 local player_sneak = {}
-player_api.player_attached = {}
+minetest.player_api.player_attached = {}
 
 
 --modify the player's wielded item
-function player_api.set_wielded_item(player)
+function minetest.player_api.set_wielded_item(player)
 	local name = player:get_player_name()
 	
 	
@@ -62,7 +60,7 @@ end
 
 
 
-function player_api.get_animation(player)
+function minetest.player_api.get_animation(player)
 	local name = player:get_player_name()
 	return {
 		model = player_model[name],
@@ -72,7 +70,7 @@ function player_api.get_animation(player)
 end
 
 -- Called when a player's appearance needs to be updated
-function player_api.set_model(player, model_name)
+function minetest.player_api.set_model(player, model_name)
 	local name = player:get_player_name()
 	local model = models[model_name]
 	if player_model[name] == model_name then
@@ -87,11 +85,11 @@ function player_api.set_model(player, model_name)
 		stepheight = model.stepheight or 0.6,
 		eye_height = model.eye_height or 1.47,
 	})
-	player_api.set_animation(player, "stand")
+	minetest.player_api.set_animation(player, "stand")
 	player_model[name] = model_name
 end
 
-function player_api.set_textures(player, textures)
+function minetest.player_api.set_textures(player, textures)
 	local name = player:get_player_name()
 	local model = models[player_model[name]]
 	local model_textures = model and model.textures or nil
@@ -99,7 +97,7 @@ function player_api.set_textures(player, textures)
 	player:set_properties({textures = textures or model_textures,})
 end
 
-function player_api.set_animation(player, anim_name, speed)
+function minetest.player_api.set_animation(player, anim_name, speed)
 	local name = player:get_player_name()
 	if player_anim[name] == anim_name then
 		return
@@ -113,8 +111,6 @@ function player_api.set_animation(player, anim_name, speed)
 	
 	--calculate local animation
 	--update player's frame speed
-	
-	local local_player_animation = player:get_local_animation()
 	local idle_animation = {x = 0,   y = 79}
 	local walk_animation = {x = 168, y = 187}
 	local dig_animation =  {x = 189, y = 198}
@@ -136,13 +132,6 @@ function player_api.set_animation(player, anim_name, speed)
 		sneaker_speed = sneak_speed
 	end
 	
-	player:set_local_animation(
-		idle_animation,--idle
-		walk_animation,--walk
-		dig_animation,--dig
-		walk_and_dig,--walk and dig
-		speed
-	)
 	player:set_nametag_attributes(
 	{color = {
                 r = 255,
@@ -151,7 +140,7 @@ function player_api.set_animation(player, anim_name, speed)
                 g = 255
         }
 	})
-	player_api.set_model(player, "character.b3d")
+	minetest.player_api.set_model(player, "character.b3d")
 	player_anim[name] = anim_name
 	player:set_animation(anim, sneaker_speed, animation_blend)
 end
@@ -164,8 +153,8 @@ minetest.register_on_leaveplayer(function(player)
 end)
 
 -- Localize for better performance.
-local player_set_animation = player_api.set_animation
-local player_attached = player_api.player_attached
+local player_set_animation = minetest.player_api.set_animation
+local player_attached = minetest.player_api.player_attached
 
 -- Prevent knockback for attached players
 local old_calculate_knockback = minetest.calculate_knockback
@@ -187,7 +176,7 @@ minetest.register_globalstep(function(dtime)
 
 		--these are the only things that should be real time
 		--update the player wielded item model
-		player_api.set_wielded_item(player)
+		minetest.player_api.set_wielded_item(player)
 		--update player head position
 		local pitch = -degrees(player:get_look_vertical())
 		local controls = player:get_player_control() --this needs to be dumped into here so it can be used for the head offset in RT
@@ -195,6 +184,7 @@ minetest.register_globalstep(function(dtime)
 			pitch = pitch + 15
 		end
 		player:set_bone_position("Head", vector.new(0,6.3,0), vector.new(pitch,0,0))
+		--player:set_bone_position("Body", vector.new(0,6.3,0), vector.new(0,pitch,0))
 
 		--check if the player has done anything with their keyboard/mouse
 		local meta = player:get_meta() --unfortunately meta has to be indexed here

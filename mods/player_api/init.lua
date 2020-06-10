@@ -1,9 +1,9 @@
--- player/init.lua
+local minetest = minetest
 
 dofile(minetest.get_modpath("player_api") .. "/api.lua")
 
 -- Default player appearance
-player_api.register_model("character.b3d", {
+minetest.player_api.register_model("character.b3d", {
 	animation_speed = 24,
 	textures = {"player.png", "blank_skin.png"},
 	animations = {
@@ -29,15 +29,9 @@ player_api.register_model("character.b3d", {
 
 -- Update appearance when the player joins
 minetest.register_on_joinplayer(function(player)
-	player_api.player_attached[player:get_player_name()] = false
-	player_api.set_model(player, "character.b3d")
-	player:set_local_animation(
-		{x = 0,   y = 79},
-		{x = 168, y = 187},
-		{x = 189, y = 198},
-		{x = 200, y = 219},
-		24
-	)
+	minetest.player_api.player_attached[player:get_player_name()] = false
+	minetest.player_api.set_model(player, "character.b3d")
+	
 	local meta = player:get_meta()
 	meta:set_string("player.old_player_control_table","")
 end)
