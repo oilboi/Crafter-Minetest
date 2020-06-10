@@ -33,10 +33,7 @@ end
 
 --use this to retrieve skin data
 local player_skin_table = {}
-
-skins = {}
-
-skins.get_skin = function(player)
+get_skin = function(player)
     local name = player:get_player_name()
     if player_skin_table[name] then
         return(player_skin_table[name])
@@ -46,7 +43,7 @@ skins.get_skin = function(player)
 end
 
 --use this to set skin data
-skins.set_skin = function(player,skin)
+set_skin = function(player,skin)
     local name = player:get_player_name()
     player_skin_table[name] = skin
 end
@@ -158,7 +155,7 @@ fetch_function = function(name)
                     
                     player:set_properties({textures = {stored_texture, "blank_skin.png"}})
 
-                    skins.set_skin(player,stored_texture)
+                    set_skin(player,stored_texture)
                     
 
                     recalculate_armor(player) --redundancy

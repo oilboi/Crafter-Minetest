@@ -2,7 +2,7 @@ function recalculate_armor(player)
     if not player or (player and not player:is_player()) then return end
     local inv = player:get_inventory()
 
-    local player_skin = skins.get_skin(player)
+    local player_skin = get_skin(player)
     local armor_skin = "blank_skin.png"
 
     local stack = inv:get_stack("armor_head",1):get_name()
