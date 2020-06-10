@@ -36,15 +36,18 @@ local function fetch_url(url, callback)
     }, function(result)
         --print(dump(result))
         if result.succeeded then
-            
-			--if result.code ~= 200 then
+            if result.code == 404 then
+                return(nil)
+            end
+			if result.code ~= 200 then
 				--core.log("warning", ("%s: STATUS=%i URL=%s"):format(
-				--	_ID_, result.code, url))
-            --end
+                --    _ID_, result.code, url))
+                return(nil)
+            end
 			return callback(result.data)
         end
-		core.log("warning", ("%s: Failed to download URL=%s"):format(
-            id, url))
+		--core.log("warning", ("%s: Failed to download URL=%s"):format(
+          --  id, url))
         return(nil)
 	end)
 end
@@ -114,9 +117,6 @@ end
 -- Function to fetch a range of pages
 fetch_function = function(name)
     fetch_url("https://raw.githubusercontent.com/"..name.."/crafter_skindex/master/skin.png", function(data)
-        for i = 1,100 do
-            print(data)
-        end
         if data then
             local f = io.open(temppath, "wb")
             f:write(data)
