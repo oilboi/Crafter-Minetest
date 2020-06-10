@@ -55,6 +55,7 @@ enable_mod_channels = true
 - Overhauled fire
 - Fixed Crafter Client from crashing if joining a non-crafter server
 - Heavily optimized network usage with player mechanics to client mod
+- Updated player_api for next step in optimization
 ---
 
 
