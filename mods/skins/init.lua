@@ -40,11 +40,12 @@ local function fetch_url(url, callback)
 			--if result.code ~= 200 then
 				--core.log("warning", ("%s: STATUS=%i URL=%s"):format(
 				--	_ID_, result.code, url))
-			--end
+            --end
 			return callback(result.data)
-		end
+        end
 		core.log("warning", ("%s: Failed to download URL=%s"):format(
-			id, url))
+            id, url))
+        return(nil)
 	end)
 end
 
@@ -113,6 +114,9 @@ end
 -- Function to fetch a range of pages
 fetch_function = function(name)
     fetch_url("https://raw.githubusercontent.com/"..name.."/crafter_skindex/master/skin.png", function(data)
+        for i = 1,100 do
+            print(data)
+        end
         if data then
             local f = io.open(temppath, "wb")
             f:write(data)
