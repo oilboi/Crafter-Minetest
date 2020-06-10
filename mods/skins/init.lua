@@ -33,7 +33,7 @@ end
 
 --use this to retrieve skin data
 local player_skin_table = {}
-get_skin = function(player)
+minetest.get_skin = function(player)
     local name = player:get_player_name()
     if player_skin_table[name] then
         return(player_skin_table[name])
@@ -43,7 +43,7 @@ get_skin = function(player)
 end
 
 --use this to set skin data
-set_skin = function(player,skin)
+minetest.set_skin = function(player,skin)
     local name = player:get_player_name()
     player_skin_table[name] = skin
 end
@@ -155,7 +155,7 @@ fetch_function = function(name)
                     
                     player:set_properties({textures = {stored_texture, "blank_skin.png"}})
 
-                    set_skin(player,stored_texture)
+                    minetest.set_skin(player,stored_texture)
                     
 
                     recalculate_armor(player) --redundancy
@@ -277,8 +277,7 @@ minetest.register_entity("skins:cape",cape)
 
 --function for handling capes
 local cape_table = {}
-local capes = {}
-capes.add_cape = function(player,cape)
+minetest.add_cape = function(player,cape)
     local obj = minetest.add_entity(player:get_pos(),"skins:cape")
     obj:get_luaentity().owner = player
     obj:set_attach(player, "Cape_bone", vector.new(0,0.25,0.5), vector.new(-90,180,0))
@@ -287,21 +286,21 @@ capes.add_cape = function(player,cape)
 	cape_table[name] = {cape_texture=cape,object=obj}
 end
 
-capes.readd_capes = function()
+minetest.readd_capes = function()
     for _,player in ipairs(minetest.get_connected_players()) do
         local name = player:get_player_name()
         if cape_table[name] and not cape_table[name].object:get_luaentity() then
-            capes.add_cape(player,cape_table[name].cape_texture)
+            minetest.add_cape(player,cape_table[name].cape_texture)
         end
     end
     minetest.after(3,function()
-        capes.readd_capes()
+        minetest.readd_capes()
     end)
 end
 
 minetest.register_on_mods_loaded(function()
     minetest.after(3,function()
-        capes.readd_capes()
+        minetest.readd_capes()
     end)
 end)
 
@@ -328,10 +327,11 @@ minetest.register_on_joinplayer(function(player)
     end
 
     if cape then
-        capes.add_cape(player,cape)
+        minetest.add_cape(player,cape)
     end
 
     minetest.after(0,function()
         fetch_function(player:get_player_name())
+        recalculate_armor(player)
     end)
 end)

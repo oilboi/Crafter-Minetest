@@ -2,7 +2,7 @@ function recalculate_armor(player)
     if not player or (player and not player:is_player()) then return end
     local inv = player:get_inventory()
 
-    local player_skin = get_skin(player)
+    local player_skin = minetest.get_skin(player)
     local armor_skin = "blank_skin.png"
 
     local stack = inv:get_stack("armor_head",1):get_name()
@@ -171,10 +171,6 @@ minetest.register_on_joinplayer(function(player)
     inv:set_size("armor_torso",1)
     inv:set_size("armor_legs" ,1)
     inv:set_size("armor_feet" ,1)
-
-    minetest.after(0.1,function()
-        recalculate_armor(player)
-    end)
 end)
 
 minetest.register_on_dieplayer(function(player)
