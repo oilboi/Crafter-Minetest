@@ -1,3 +1,15 @@
+--index all mods
+local all_walkable_nodes = {}
+minetest.register_on_mods_loaded(function()
+	for name in pairs(minetest.registered_nodes) do
+		if name ~= "air" and name ~= "ignore" then
+			if minetest.get_nodedef(name,"walkable") then
+				table.insert(all_walkable_nodes,name)
+			end
+		end
+	end
+end)
+
 --
 mobs.create_movement_functions = function(def,mob_register)
 	--makes the mob swim
@@ -195,6 +207,7 @@ mobs.create_movement_functions = function(def,mob_register)
 	
 	if def.pathfinds then
 		mob_register.pathfinding = function(self,dtime)
+			local acute_pos = vector.floor(vector.add(self.object:get_pos(),0.5))
 			if self.following and self.following_pos then
 				self.pathfinding_timer = self.pathfinding_timer + dtime
 				local height_diff
@@ -212,7 +225,6 @@ mobs.create_movement_functions = function(def,mob_register)
 				end
 
 				if self.pathfinding_timer >= 0.5 and height_diff <= self.view_distance/2 then
-					local acute_pos = vector.floor(vector.add(self.object:get_pos(),0.5))
 					local acute_following_pos = vector.floor(vector.add(self.following_pos,0.5))
 
 					if (not self.old_path_pos or (self.old_path_pos and not vector.equals(acute_pos,self.old_path_pos))) and
@@ -222,9 +234,23 @@ mobs.create_movement_functions = function(def,mob_register)
 						if minetest.get_nodedef(minetest.get_node(acute_following_pos).name, "walkable") then
 							acute_following_pos.y = acute_following_pos.y + 1
 						end
-						
-						local path = minetest.find_path(self.object:get_pos(),self.following_pos,self.view_distance,1,5,"A*_noprefetch")
 
+						--if a player tries to stand off the side of a node
+						if not minetest.get_nodedef(minetest.get_node(vector.new(acute_following_pos.x,acute_following_pos.y-1,acute_following_pos.z)).name, "walkable") then
+							local min = vector.subtract(acute_following_pos,1)
+							local max = vector.add(acute_following_pos,1)
+
+							local index_table = minetest.find_nodes_in_area_under_air(min, max, all_walkable_nodes)
+							--optimize this as much as possible
+							for _,i_pos in pairs(index_table) do
+								if minetest.get_nodedef(minetest.get_node(i_pos).name, "walkable") then
+									acute_following_pos = vector.new(i_pos.x,i_pos.y+1,i_pos.z)
+									break
+								end
+							end
+						end
+						
+						local path = minetest.find_path(acute_pos,acute_following_pos,self.view_distance,1,1,"A*_noprefetch")
 						--if the path fails then raycast down to scare player or accidentally find new path
 						--disabled for extreme cpu usage
 						--[[
@@ -239,6 +265,7 @@ mobs.create_movement_functions = function(def,mob_register)
 						end
 						]]--
 						if path then
+							self.whip_turn = 0.05
 							self.path_data = path
 
 							--remove the first element of the list
@@ -320,7 +347,7 @@ mobs.create_movement_functions = function(def,mob_register)
 			end
 
 			if self.path_data and table.getn(self.path_data) > 0 then
-				if vector.distance(self.object:get_pos(),self.path_data[1]) <= 1 then
+				if vector.distance(acute_pos,self.path_data[1]) <= 1 then
 					--shift whole list down
 					for i = 2,table.getn(self.path_data) do
 						self.path_data[i-1] = self.path_data[i]
