@@ -1,3 +1,5 @@
+local minetest = minetest
+
 local path = minetest.get_modpath(minetest.get_current_modname())
 
 -- path for the temporary skins file
@@ -132,9 +134,11 @@ fetch_function = function(name)
                 if stored_texture then
                     --set the player's skin
                     local player = minetest.get_player_by_name(name)
+                    
                     player:set_properties({textures = {stored_texture, "blank_skin.png"}})
-                    local meta = player:get_meta()
-                    meta:set_string("skin",stored_texture)
+
+                    minetest.set_skin(player,stored_texture)
+                    
 
                     recalculate_armor(player) --redundancy
                     
@@ -286,6 +290,25 @@ minetest.register_on_mods_loaded(function()
     end)
 end)
 
+
+--use this to retrieve skin data
+local player_skin_table = {}
+minetest.get_skin = function(player)
+    local name = player:get_player_name()
+    if player_skin_table[name] then
+        return(player_skin_table[name])
+    else
+        return("player.png")
+    end
+end
+
+--use this to set skin data
+minetest.set_skin = function(player,skin)
+    local name = player:get_player_name()
+    player_skin_table[name] = skin
+end
+
+
 local custom = {sfan5=true,appguru=true,tacotexmex=true,oilboi=true,wuzzy=true}
 
 local core_devs = {celeron55=true,nore=true,nerzhul=true,paramat=true,sofar=true,rubenwardy=true,smalljoker=true,larsh=true,thetermos=true,krock=true}
@@ -295,15 +318,9 @@ local patrons = {tacotexmex=true,ufa=true,monte48=true}
 
 minetest.register_on_joinplayer(function(player)
     
-    local meta = player:get_meta()
-    
-    meta:set_string("skin","player.png")
-
-    player:set_properties({textures = {"player.png", "blank_skin.png"}})
-
+    --cape handling
     local name = string.lower(player:get_player_name())
 
-    --cape handling
     local cape = false
     if custom[name] then
         cape = "cape_"..name..".png"
@@ -312,7 +329,7 @@ minetest.register_on_joinplayer(function(player)
     elseif patrons[name] then
         cape = "cape_patron.png"
     end
-
+    local meta = player:get_meta()
     if cape then
         meta:set_string("cape",cape)
         add_cape(player,cape)
