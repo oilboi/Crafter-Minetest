@@ -367,6 +367,10 @@ minetest.register_entity(":__builtin:item", {
 		end
 
 		local pos = self.object:get_pos()
+		--stop crashing if this ever fails
+		if not pos then
+			return
+		end
 		local node = minetest.get_node_or_nil({
 			x = pos.x,
 			y = pos.y + self.object:get_properties().collisionbox[2] - 0.05,
