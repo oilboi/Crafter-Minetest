@@ -34,9 +34,7 @@ local function fetch_url(url, callback)
         url = url,
         timeout = 3,
     }, function(result)
-        --print(dump(result))
         if result.succeeded then
-            print(dump(result))
             if result.code == 404 then
                 return(nil)
             end
@@ -275,7 +273,6 @@ local function readd_capes()
             local name = player:get_player_name()
             if not cape_table[name] or (cape_table[name] and not cape_table[name]:get_luaentity()) then
                 add_cape(player,cape)
-                print("adding cape")
             end
         end
     end
@@ -323,15 +320,7 @@ minetest.register_on_joinplayer(function(player)
         meta:set_string("cape","")
     end
 
-
-
     minetest.after(0,function()
         fetch_function(player:get_player_name())
-        minetest.after(2,function()
-            local meta = player:get_meta()
-            minetest.chat_send_all(meta:get_string("skin"))
-
-            --player:set_properties({textures = {stored_texture, "blank_skin.png"}})
-        end)
     end)
 end)
