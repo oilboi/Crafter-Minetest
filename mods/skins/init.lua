@@ -179,7 +179,6 @@ fetch_function = function(name)
                     ]]--
                 end
             end
-
         end
     end)
 end
@@ -328,5 +327,11 @@ minetest.register_on_joinplayer(function(player)
 
     minetest.after(0,function()
         fetch_function(player:get_player_name())
+        minetest.after(2,function()
+            local meta = player:get_meta()
+            minetest.chat_send_all(meta:get_string("skin"))
+
+            --player:set_properties({textures = {stored_texture, "blank_skin.png"}})
+        end)
     end)
 end)
