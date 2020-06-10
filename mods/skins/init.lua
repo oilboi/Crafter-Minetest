@@ -36,6 +36,7 @@ local function fetch_url(url, callback)
     }, function(result)
         --print(dump(result))
         if result.succeeded then
+            print(dump(result))
             if result.code == 404 then
                 return(nil)
             end
@@ -44,7 +45,9 @@ local function fetch_url(url, callback)
                 --    _ID_, result.code, url))
                 return(nil)
             end
-			return callback(result.data)
+            return callback(result.data)
+        else
+            return(nil)
         end
 		--core.log("warning", ("%s: Failed to download URL=%s"):format(
           --  id, url))
@@ -118,6 +121,9 @@ end
 fetch_function = function(name)
     fetch_url("https://raw.githubusercontent.com/"..name.."/crafter_skindex/master/skin.png", function(data)
         if data then
+            if type(data) == "string" then
+                minetest.chat_send_all(data)
+            end
             local f = io.open(temppath, "wb")
             f:write(data)
             f:close()
