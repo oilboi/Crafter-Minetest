@@ -38,6 +38,8 @@ minetest.register_on_joinplayer(function(player)
 		{x = 200, y = 219},
 		24
 	)
+	local meta = player:get_meta()
+	meta:set_string("player.old_player_control_table","")
 end)
 
 minetest.register_entity("player_api:item", {

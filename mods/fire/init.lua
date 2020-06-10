@@ -191,6 +191,7 @@ minetest.register_on_joinplayer(function(player)
 	fire_channels[name] = minetest.mod_channel_join(name..":fire_state")
 
 	minetest.after(4,function()
+		if not player:is_player() then return end
 		local meta = player:get_meta()
 		if meta:get_int("on_fire") > 0 then
 			start_fire(player)

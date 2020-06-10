@@ -161,7 +161,6 @@ minetest.register_on_leaveplayer(function(player)
 	player_model[name] = nil
 	player_anim[name] = nil
 	player_textures[name] = nil
-	meta:set_string("player.old_player_control_table","")
 end)
 
 -- Localize for better performance.
