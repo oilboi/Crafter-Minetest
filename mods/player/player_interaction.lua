@@ -1,3 +1,5 @@
+local minetest,armor_class,math = minetest,armor_class,math
+
 --hurt sound and disable fall damage group handling
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
 	if reason.type == "fall" then

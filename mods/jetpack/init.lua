@@ -1,3 +1,5 @@
+local minetest,armor_class,math = minetest,armor_class,math
+
 minetest.register_tool("jetpack:jetpack",{
     description = "Jetpack",
 
