@@ -152,7 +152,6 @@ mobs.create_movement_functions = function(def,mob_register)
 			--swim
 			self.swim(self,dtime)
 			
-			--print(self.timer)
 			--direction state change
 			if self.timer <= 0 and not self.following == true then
 				--print("changing direction")
