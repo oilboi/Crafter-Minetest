@@ -25,8 +25,8 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 
         		if new_stack == "" then					
 					minetest.sound_play("armor_break",{to_player=player:get_player_name(),gain=1,pitch=math.random(80,100)/100})
-					recalculate_armor(player)
-					set_armor_gui(player)
+					armor_class.recalculate_armor(player)
+					armor_class.set_armor_gui(player)
 					--do particles too
 				elseif minetest.get_item_group(new_stack,"boots") > 0 then 
 					local pos = player:get_pos()
@@ -134,7 +134,7 @@ minetest.register_on_dieplayer(function(player, reason)
 	end
 
 
-	recalculate_armor(player)
+	armor_class.recalculate_armor(player)
 end)
 
 
@@ -274,9 +274,9 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 			dir.y = 7
 		end
 
-		local hp_modifier = math.ceil(calculate_armor_absorbtion(player)/3)
+		local hp_modifier = math.ceil(armor_class.calculate_armor_absorbtion(player)/3)
 		--print("hp_modifier:",hp_modifier)
-		damage_armor(player,math.abs(hurt))
+		armor_class.damage_armor(player,math.abs(hurt))
 
 		--print("hurt:",hurt,"|","hp_modifier:",hp_modifier)
 		local modify_output = (hurt == 0)
