@@ -8,7 +8,6 @@ weather_intake:send_all("")
 weather_nodes_channel:send_all("")
 
 local weather_max = 2
-
 local mod_storage = minetest.get_mod_storage()
 
 weather_type = mod_storage:get_int("weather_type")
