@@ -17,6 +17,7 @@
 enable_client_modding = true
 csm_restriction_flags = 0
 enable_mod_channels = true
+secure.http_mods = skins
 ```
 
 
