@@ -1,3 +1,4 @@
+local vector,minetest,math = vector,minetest,math
 --
 mobs.create_data_handling_functions = function(def,mob_register)
 	mob_register.get_staticdata = function(self)

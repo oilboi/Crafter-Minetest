@@ -1,3 +1,4 @@
+local minetest,math,vector = minetest,math,vector
 --
 mobs.create_head_functions = function(def,mob_register)
 	--converts the degrees to radians

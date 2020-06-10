@@ -1,3 +1,4 @@
+local minetest,math,vector = minetest,math,vector
 --this is where mobs are defined
 
 --this is going to be used to set an active mob limit

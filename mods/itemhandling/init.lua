@@ -1,3 +1,5 @@
+local minetest,math,vector = minetest,math,vector
+
 collection = {}
 collection.collection_height = 0.5 -- the height of the collection based off the player's origin y height
 collection.magnet_radius = 2 -- the radius of the item magnet

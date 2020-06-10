@@ -1,3 +1,4 @@
+local minetest,math,vector = minetest,math,vector
 --index all mods
 local all_walkable_nodes = {}
 minetest.register_on_mods_loaded(function()

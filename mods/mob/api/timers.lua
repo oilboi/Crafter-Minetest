@@ -1,3 +1,4 @@
+local minetest,math = minetest,math
 mobs.create_timer_functions = function(def,mob_register)
 	--this controls how fast the mob punches
 	mob_register.manage_punch_timer = function(self,dtime)

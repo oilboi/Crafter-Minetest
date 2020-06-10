@@ -1,3 +1,4 @@
+local minetest,math = minetest,math
 local weather_channel = minetest.mod_channel_join("weather_type")
 local weather_intake = minetest.mod_channel_join("weather_intake")
 local weather_nodes_channel = minetest.mod_channel_join("weather_nodes")

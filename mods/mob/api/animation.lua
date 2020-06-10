@@ -1,3 +1,4 @@
+local math,vector = math,vector
 -- 
 mobs.create_animation_functions = function(def,mob_register)
 	if def.movement_type ~= "jump" then

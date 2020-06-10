@@ -1,3 +1,5 @@
+local minetest,math,vector = minetest,math,vector
+
 minetest.hud_replace_builtin("health",{
     hud_elem_type = "statbar",
     position = {x = 0.5, y = 1},

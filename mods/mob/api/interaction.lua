@@ -1,3 +1,4 @@
+local minetest,math,vector = minetest,math,vector
 --
 mobs.create_interaction_functions = function(def,mob_register)
 	--the sword wear mechanic

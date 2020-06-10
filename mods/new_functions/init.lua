@@ -1,3 +1,5 @@
+local minetest,math,vector = minetest,math,vector
+
 local get_group = minetest.get_item_group
 local registered_nodes
 local get_node = minetest.get_node

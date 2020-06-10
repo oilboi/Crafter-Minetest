@@ -1,3 +1,4 @@
+local minetest = minetest
 --class 
 mobs = {}
 

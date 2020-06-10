@@ -1,3 +1,5 @@
+local minetest,math,vector = minetest,math,vector
+
 local arrow = {}
 arrow.initial_properties = {
 	physical = true,
