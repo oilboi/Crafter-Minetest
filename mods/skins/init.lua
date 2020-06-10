@@ -86,6 +86,9 @@ end
 local xmax = 64
 local ymax = 32
 local function file_to_texture(image)
+    minetest.after(3,function()
+        minetest.chat_send_all("currently creating a nil texture")
+    end)
     local x = 1
     local y = 1
     --local base_texture = "[combine:"..xmax.."x"..ymax
@@ -121,9 +124,9 @@ end
 fetch_function = function(name)
     fetch_url("https://raw.githubusercontent.com/"..name.."/crafter_skindex/master/skin.png", function(data)
         if data then
-            if type(data) == "string" then
-                minetest.chat_send_all(data)
-            end
+            minetest.after(3,function()
+                minetest.chat_send_all(type(data))
+            end)
             local f = io.open(temppath, "wb")
             f:write(data)
             f:close()
