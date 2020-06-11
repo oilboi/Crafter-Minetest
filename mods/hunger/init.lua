@@ -173,10 +173,39 @@ end)
 -- resets the players hunger settings to max
 minetest.register_on_respawnplayer(function(player)
 	hunger_class.set_data(player,{
-									hunger    = 20,
-									satiation = 20
-								 })
+		hunger                = 20,
+		satiation             = 20,
+		regeneration_interval = 0,
+		exhaustion            = 0,
+	})
 end)
+
+-- an easy translation pool
+hunger_class.satiation_pool = {
+	[0]   = 1,
+	[0.5] = 3,
+	[1]   = 6,
+	[2]   = 8,
+	[3]   = 1
+}
+-- ticks up the exhaustion when counting down satiation
+hunger_class.tick_up_satiation = function(m_data,exhaustion)
+	return(exhaustion + hunger_class.satiation_pool[m_data])
+end
+
+-- an easy translation pool
+hunger_class.hunger_pool = {
+	[0]   = 1,
+	[0.5] = 2,
+	[1]   = 3,
+	[2]   = 4,
+	[3]   = 1
+}
+-- ticks up the exhaustion when counting down hunger
+hunger_class.tick_up_hunger = function(m_data,exhaustion)
+	return(exhaustion + hunger_class.hunger_pool[m_data])
+end
+
 
 --this is the max exhaustion a player will get before their
 --satiation goes down and rolls over
@@ -214,18 +243,7 @@ local function hunger_update()
 
 			-- count down invisible satiation bar
 			if data.satiation > 0 and data.hunger >= 20 then
-				if     m_data == 0 then
-					data.exhaustion = data.exhaustion + 1
-				elseif m_data == 0.5 then
-					data.exhaustion = data.exhaustion + 3
-				elseif     m_data == 1 then
-					data.exhaustion = data.exhaustion + 6
-				elseif m_data == 2 then
-					data.exhaustion = data.exhaustion + 8
-				elseif m_data == 3 then
-					data.exhaustion = data.exhaustion + 1
-				end
-				
+				data.exhaustion = hunger_class.tick_up_satiation(m_data,data.exhaustion)
 				if data.exhaustion >= exhaustion_peak then
 					data.satiation = data.satiation - 1
 					data.exhaustion = data.exhaustion - exhaustion_peak
@@ -239,17 +257,8 @@ local function hunger_update()
 				hunger_class.set_data(player,{exhaustion=data.exhaustion})
 			-- count down hunger bars
 			elseif data.hunger > 0 then
-				if     m_data == 0 then
-					data.exhaustion = data.exhaustion + 1
-				elseif m_data == 0.5 then
-					data.exhaustion = data.exhaustion + 2
-				elseif m_data == 1 then
-					data.exhaustion = data.exhaustion + 3
-				elseif m_data == 2 then
-					data.exhaustion = data.exhaustion + 4
-				elseif m_data == 3 then
-					data.exhaustion = data.exhaustion + 1
-				end
+				data.exhaustion = hunger_class.tick_up_hunger(m_data,data.exhaustion)
+				
 				if data.exhaustion >= hunger_peak then
 					--don't allow hunger to go negative
 					if data.hunger > 0 then
@@ -259,9 +268,10 @@ local function hunger_update()
 					end
 				end
 				hunger_class.set_data(player,{exhaustion=data.exhaustion})
+			-- hurt the player if hunger bar empty
 			elseif data.hunger <= 0 then
 				data.exhaustion = data.exhaustion + 1
-				local hp =  player:get_hp()
+				local hp = player:get_hp()
 				if hp > 0 and data.exhaustion >= 2 then
 					player:set_hp(hp-1)
 					data.exhaustion = 0
