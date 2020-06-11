@@ -4,7 +4,7 @@ local movement_class        = {} -- controls all data of the movement
 local player_movement_data  = {} -- used to calculate player movement
 local player_state_channels = {} -- holds every player's channel
 movement_pointer            = {} -- allows other mods to index local data
-
+movement_class.get_group    = minetest.get_item_group
 -- creates volitile data for the game to use
 movement_class.create_movement_variables = function(player)
 	local name = player:get_player_name()
@@ -145,10 +145,22 @@ minetest.register_globalstep(function(dtime)
 		end
 		local data   = movement_class.get_data(player)
 		
+		local move_data = environment_pointer.get_data(player,{"legs","head"})
+		local in_water = false
+		if move_data then
+			move_data = move_data.legs
+			in_water = movement_class.get_group(move_data,"water") > 0
+			if not in_water then
+				move_data = move_data.head
+				in_water = movement_class.get_group(move_data,"water") > 0
+			end
+		end
+
+
 		if data.state ~= data.old_state or 
-		((data.state == 1 or data.state == 2) and hunger and hunger <= 6) then
+		((data.state == 1 or data.state == 2) and ((hunger and hunger <= 6) or in_water)) then
 			-- running fov modifier
-			if hunger and hunger > 6 and (data.state == 1 or data.state == 2) then
+			if hunger and hunger > 6 and (data.state == 1 or data.state == 2) and not in_water then
 				player:set_fov(1.25, true, 0.15)
 				if data.state == 2 then
 					player:set_physics_override({speed=1.75})
@@ -160,7 +172,7 @@ minetest.register_globalstep(function(dtime)
 				player:set_fov(1, true,0.15)
 				player:set_physics_override({speed=1})
 				movement_class.send_running_cancellation(player,data.state==3) --preserve network data
-			elseif (data.state == 1 or data.state == 2) and hunger and hunger <= 6 then
+			elseif (data.state == 1 or data.state == 2) and ((hunger and hunger <= 6) or in_water) then
 				player:set_fov(1, true,0.15)
 				player:set_physics_override({speed=1})
 				movement_class.set_data(player,{state=0})
