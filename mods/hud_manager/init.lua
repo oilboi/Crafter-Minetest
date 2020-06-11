@@ -47,3 +47,13 @@ hud_manager.change_hud = function(data)
         data.player:hud_change(player_huds[name][data.hud_name], data.element, data.data)
     end
 end
+
+-- gets if hud exists
+hud_manager.hud_exists = function(player,hud_name)
+    local name = player:get_player_name()
+    if player_huds[name] and player_huds[name][hud_name] then
+        return(true)
+    else
+        return(false)
+    end
+end

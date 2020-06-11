@@ -1,4 +1,4 @@
-local minetest,vector = minetest,vector
+local minetest,vector,hud_manager = minetest,vector,hud_manager
 
 local mod_storage        = minetest.get_mod_storage()
 
@@ -26,12 +26,45 @@ drowning_class.set_data = function(player,data)
 	end
 
 	if data.breath then
-		hud_manager.change_hud({
-			player    =  player ,
-			hud_name  = "breath",
-			element   = "number",
-			data      =  data.breath
-		})
+
+		if data.breath > 20 then
+			if hud_manager.hud_exists(player,"breath_bg") then
+				hud_manager.remove_hud(player,"breath_bg")
+			end
+			if hud_manager.hud_exists(player,"breath") then
+				hud_manager.remove_hud(player,"breath")
+			end
+		else
+			if not hud_manager.hud_exists(player,"breath_bg") then
+				hud_manager.add_hud(player,"breath_bg",{
+					hud_elem_type = "statbar",
+					position = {x = 0.5, y = 1},
+					text = "bubble_bg.png",
+					number = 20,
+					direction = 1,
+					size = {x = 24, y = 24},
+					offset = {x = 24*10, y= -(48 + 52 + 39)},
+				})
+			end
+			if not hud_manager.hud_exists(player,"breath") then
+				hud_manager.add_hud(player,"breath",{
+					hud_elem_type = "statbar",
+					position = {x = 0.5, y = 1},
+					text = "bubble.png",
+					number = data.breath,
+					direction = 1,
+					size = {x = 24, y = 24},
+					offset = {x = 24*10, y= -(48 + 52 + 39)},
+				})
+			end
+
+			hud_manager.change_hud({
+				player    =  player ,
+				hud_name  = "breath",
+				element   = "number",
+				data      =  data.breath
+			})
+		end
 	end
 end
 
@@ -168,25 +201,6 @@ minetest.register_on_joinplayer(function(player)
 	drowning_class.set_data(player,data)
 
 	player:hud_set_flags({breathbar=false})
-
-	hud_manager.add_hud(player,"breath_bg",{
-		hud_elem_type = "statbar",
-		position = {x = 0.5, y = 1},
-		text = "bubble_bg.png",
-		number = 20,
-		direction = 1,
-		size = {x = 24, y = 24},
-		offset = {x = 24*10, y= -(48 + 24 + 39)},
-	})
-	hud_manager.add_hud(player,"breath",{
-		hud_elem_type = "statbar",
-		position = {x = 0.5, y = 1},
-		text = "bubble.png",
-		number = data.breath,
-		direction = 1,
-		size = {x = 24, y = 24},
-		offset = {x = 24*10, y= -(48 + 24 + 39)},
-	})
 end)
 
 -- saves specific users data for when they relog
@@ -279,7 +293,7 @@ drowning_class.handle_breath = function(dtime)
 
 			drowning_class.ticker = drowning_class.ticker + dtime		
 
-			if drowning_class.breath < 20 and drowning_class.ticker >= 0.25 then
+			if drowning_class.breath < 21 and drowning_class.ticker >= 0.25 then
 				
 				drowning_class.breath = drowning_class.breath + 2
 				
@@ -288,7 +302,7 @@ drowning_class.handle_breath = function(dtime)
 					drowning      = 0,
 					breath_ticker = 0,
 				})
-			elseif drowning_class.breath < 20 then
+			elseif drowning_class.breath < 21 then
 				drowning_class.set_data(player,{breath_ticker = drowning_class.ticker})
 			else
 				drowning_class.set_data(player,{breath_ticker = 0})

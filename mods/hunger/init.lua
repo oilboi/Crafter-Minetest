@@ -194,7 +194,7 @@ minetest.register_on_joinplayer(function(player)
 		number        = 20,
 		direction     = 1,
 		size          = {x = 24, y = 24},
-		offset        = {x = 24*10, y= -(48 + 50 + 39)},
+		offset        = {x = 24*10, y= -(48 + 24 + 39)},
 	})
 	hud_manager.add_hud(player,"hunger",{
 		hud_elem_type = "statbar",
@@ -203,7 +203,7 @@ minetest.register_on_joinplayer(function(player)
 		number        = data.hunger,
 		direction     = 1,
 		size          = {x = 24, y = 24},
-		offset        = {x = 24*10, y= -(48 + 50 + 39)},
+		offset        = {x = 24*10, y= -(48 + 24 + 39)},
 	})
 end)
 
