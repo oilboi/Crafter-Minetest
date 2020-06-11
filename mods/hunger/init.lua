@@ -4,6 +4,7 @@ local player_hunger_data = {} -- array to hold hunger data
 local hunger_class       = {}
 hunger_pointer           = {} -- allow other mods to access local data
 
+
 -- creates volitile data for the game to use
 hunger_class.set_data = function(player,data)
 	local name = player:get_player_name()
@@ -290,26 +291,33 @@ local function hunger_update()
 				hunger_class.set_data(player,{exhaustion=data.exhaustion})
 			end
 			
-			--[[
+			
 			local hp = player:get_hp()
+			local drowning = drowning_pointer.get_data(player,{"drowning"})
+			if drowning then
+				drowning = drowning.drowning
+			end
 			--make regeneration happen every second
-			if meta:get_int("drowning") == 0 and meta:get_int("on_fire") == 0 and hunger >= 20 and hp < 20 then
-				local regeneration_interval = meta:get_int("regeneration_interval")
+			if drowning == 0 and data.hunger >= 20 and hp < 20 then --  meta:get_int("on_fire") == 0 
 				--print(regeneration_interval,"--------------------------")
-				regeneration_interval = regeneration_interval + 1
-				if regeneration_interval >= 2 then
+				data.regeneration_interval = data.regeneration_interval + 1
+				if data.regeneration_interval >= 2 then
 					player:set_hp(hp+1)
-					exhaustion = exhaustion + 32
-					meta:set_int("exhaustion", exhaustion)
-					meta:set_int("satiation", satiation)
-					regeneration_interval = 0
+					data.exhaustion = data.exhaustion + 32
+					data.regeneration_interval = 0
+					
+					hunger_class.set_data(player,{
+						regeneration_interval = data.regeneration_interval,
+						exhaustion            = data.exhaustion           ,
+						satiation             = data.satiation            ,
+					})
+				else
+					hunger_class.set_data(player,{regeneration_interval=data.regeneration_interval})
 				end
-				meta:set_int("regeneration_interval",regeneration_interval)
 			--reset the regen interval
 			else
-				meta:set_int("regeneration_interval",0)
+				hunger_class.set_data(player,{regeneration_interval=0})
 			end
-			]]--
 		end
 	end
 	
