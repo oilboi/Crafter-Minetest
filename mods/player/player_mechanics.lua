@@ -148,11 +148,11 @@ minetest.register_globalstep(function(dtime)
 		local move_data = environment_pointer.get_data(player,{"legs","head"})
 		local in_water = false
 		if move_data then
-			move_data = move_data.legs
-			in_water = movement_class.get_group(move_data,"water") > 0
+			local move_data2 = move_data.legs
+			in_water = movement_class.get_group(move_data2,"water") > 0
 			if not in_water then
-				move_data = move_data.head
-				in_water = movement_class.get_group(move_data,"water") > 0
+				move_data2 = move_data.head
+				in_water = movement_class.get_group(move_data2,"water") > 0
 			end
 		end
 
