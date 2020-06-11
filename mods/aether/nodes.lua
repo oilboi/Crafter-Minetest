@@ -1,3 +1,5 @@
+local minetest = minetest
+
 local tool = {"main:woodpick","main:stonepick","main:ironpick","main:goldpick","main:diamondpick"}
 
 local path = minetest.get_modpath("nether")

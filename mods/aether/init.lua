@@ -1,3 +1,5 @@
+local minetest,math,vector = minetest,math,vector
+
 local aether_channels = {}
 
 minetest.register_on_joinplayer(function(player)

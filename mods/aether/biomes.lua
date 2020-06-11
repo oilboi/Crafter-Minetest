@@ -1,3 +1,5 @@
+local minetest,math = minetest,math
+
 
 minetest.register_biome({
 	name = "aether",
@@ -39,43 +41,34 @@ local np_terrain = {
 -- Set singlenode mapgen (air nodes only).
 -- Disable the engine lighting calculation since that will be done for a
 -- mapchunk of air nodes and will be incorrect after we place nodes.
-
 --minetest.set_mapgen_params({mgname = "singlenode", flags = "nolight"})
-
-
 -- Get the content IDs for the nodes used.
 
 local c_dirt = minetest.get_content_id("aether:dirt")
 local c_stone = minetest.get_content_id("aether:stone")
 local c_air = minetest.get_content_id("air")
 local c_grass = minetest.get_content_id("aether:grass")
-
-
 -- Initialize noise object to nil. It will be created once only during the
 -- generation of the first mapchunk, to minimise memory use.
-
 local nobj_terrain = nil
-
-
 -- Localise noise buffer table outside the loop, to be re-used for all
 -- mapchunks, therefore minimising memory use.
-
 local nvals_terrain = {}
-
-
 -- Localise data buffer table outside the loop, to be re-used for all
 -- mapchunks, therefore minimising memory use.
 
 local data = {}
-
 local n_pos = {}
-
 local node2 = ""
-
 local vi = {}
-
 local content_id = minetest.get_name_from_content_id
-
+local sidelen = {}
+local permapdims3d = {}
+local nobj_terrain = {}
+local vm, emin, emax = {},{},{}
+local area = {}
+local ni = 1
+local density_noise = {}
 -- On generated function.
 
 -- 'minp' and 'maxp' are the minimum and maximum positions of the mapchunk that
@@ -91,9 +84,9 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	-- Noise stuff.
 
 	-- Side length of mapchunk.
-	local sidelen = maxp.x - minp.x + 1
+	sidelen = maxp.x - minp.x + 1
 	-- Required dimensions of the 3D noise perlin map.
-	local permapdims3d = {x = sidelen, y = sidelen, z = sidelen}
+	permapdims3d = {x = sidelen, y = sidelen, z = sidelen}
 	-- Create the perlin map noise object once only, during the generation of
 	-- the first mapchunk when 'nobj_terrain' is 'nil'.
 	nobj_terrain = minetest.get_perlin_map(np_terrain, permapdims3d) --nobj_terrain or 
@@ -101,14 +94,14 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	-- minimum point being 'minp'.
 	-- Set the buffer parameter to use and reuse 'nvals_terrain' for this.
 	nobj_terrain:get_3d_map_flat(minp, nvals_terrain)
-
+	ni = 1
 	-- Voxelmanip stuff.
 
 	-- Load the voxelmanip with the result of engine mapgen. Since 'singlenode'
 	-- mapgen is used this will be a mapchunk of air nodes.
-	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
+	vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
 	-- 'area' is used later to get the voxelmanip indexes for positions.
-	local area = VoxelArea:new{MinEdge = emin, MaxEdge = emax}
+	area = VoxelArea:new{MinEdge = emin, MaxEdge = emax}
 	-- Get the content ID data from the voxelmanip in the form of a flat array.
 	-- Set the buffer parameter to use and reuse 'data' for this.
 	vm:get_data(data)
@@ -116,7 +109,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	-- Generation loop.
 
 	-- Noise index for the flat array of noise values.
-	local ni = 1
 	-- Process the content IDs in 'data'.
 	-- The most useful order is a ZYX loop because:
 	-- 1. This matches the order of the 3D noise flat array.
@@ -132,7 +124,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 			-- Consider a 'solidness' value for each node,
 			-- let's call it 'density', where
 			-- density = density noise + density gradient.
-			local density_noise = nvals_terrain[ni]
+			density_noise = nvals_terrain[ni]
 			-- Density gradient is a value that is 0 at water level (y = 1)
 			-- and falls in value with increasing y. This is necessary to
 			-- create a 'world surface' with only solid nodes deep underground
