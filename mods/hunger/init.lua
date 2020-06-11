@@ -51,10 +51,10 @@ hunger_class.load_data = function(player)
 	local name = player:get_player_name()
 	if mod_storage:get_int(name.."h_save") > 0 then
 		return({
-				hunger     = mod_storage:get_int(name.."hunger"               ),
-				satiation  = mod_storage:get_int(name.."satiation"            ),
-				exhaustion = mod_storage:get_int(name.."regeneration_interval"),
-				exhaustion = mod_storage:get_int(name.."exhaustion"           )
+				hunger                = mod_storage:get_int(name.."hunger"               ),
+				satiation             = mod_storage:get_int(name.."satiation"            ),
+				exhaustion            = mod_storage:get_int(name.."exhaustion"           ),
+				regeneration_interval = mod_storage:get_int(name.."regeneration_interval")
 			  })
 	else
 		return({
@@ -68,20 +68,19 @@ end
 
 -- saves data to be utilized on next login
 hunger_class.save_data = function(player)
-	local name = player
-	if type(player) ~= "string" then
+	local name
+	if type(player) ~= "string" and player:is_player() then
 		name = player:get_player_name()
+	elseif type(player) == "string" then
+		name = player
 	end
-	if player_hunger_data[name]           and
-	   player_hunger_data[name].satiation and
-	   player_hunger_data[name].hunger    then
-			mod_storage:set_int(name.."hunger"                , player_hunger_data[name].hunger               )
-			mod_storage:set_int(name.."satiation"             , player_hunger_data[name].satiation            )
-			mod_storage:set_int(name.."exhaustion"            , player_hunger_data[name].exhaustion           )
-			mod_storage:set_int(name.."regeneration_interval" , player_hunger_data[name].regeneration_interval)
-			mod_storage:set_int(name.."h_save"                , 1                                             )
-	   player_hunger_data[name] = nil
+	if player_hunger_data[name] then
+		for index,integer in pairs(player_hunger_data[name]) do
+			mod_storage:set_int(name..index,integer)
+		end
 	end
+
+	player_hunger_data[name] = nil
 end
 
 -- is used for shutdowns to save all data
