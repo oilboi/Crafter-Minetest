@@ -17,11 +17,11 @@ hunger_class.set_data = function(player,data)
 
 	if data.hunger then
 		hud_manager.change_hud({
-								player    =  player ,
-								hud_name  = "hunger",
-								element   = "number",
-								data      =  data.hunger
-							})
+			player    =  player ,
+			hud_name  = "hunger",
+			element   = "number",
+			data      =  data.hunger
+		})
 	end
 end
 
@@ -90,6 +90,31 @@ hunger_class.save_all = function()
 	end
 end
 
+-- an easy translation pool
+hunger_class.satiation_pool = {
+	[0]   = 1,
+	[0.5] = 3,
+	[1]   = 6,
+	[2]   = 8,
+	[3]   = 1
+}
+-- ticks up the exhaustion when counting down satiation
+hunger_class.tick_up_satiation = function(m_data,exhaustion)
+	return(exhaustion + hunger_class.satiation_pool[m_data])
+end
+
+-- an easy translation pool
+hunger_class.hunger_pool = {
+	[0]   = 1,
+	[0.5] = 2,
+	[1]   = 3,
+	[2]   = 4,
+	[3]   = 1
+}
+-- ticks up the exhaustion when counting down hunger
+hunger_class.tick_up_hunger = function(m_data,exhaustion)
+	return(exhaustion + hunger_class.hunger_pool[m_data])
+end
 
 -- allows other mods to set hunger data
 hunger_pointer.set_data = function(player,data)
@@ -104,11 +129,11 @@ hunger_pointer.set_data = function(player,data)
 
 	if data.hunger then
 		hud_manager.change_hud({
-								player    =  player ,
-								hud_name  = "hunger",
-								element   = "number",
-								data      =  data.hunger
-							})
+			player    =  player ,
+			hud_name  = "hunger",
+			element   = "number",
+			data      =  data.hunger
+		})
 	end
 end
 
@@ -180,31 +205,6 @@ minetest.register_on_respawnplayer(function(player)
 	})
 end)
 
--- an easy translation pool
-hunger_class.satiation_pool = {
-	[0]   = 1,
-	[0.5] = 3,
-	[1]   = 6,
-	[2]   = 8,
-	[3]   = 1
-}
--- ticks up the exhaustion when counting down satiation
-hunger_class.tick_up_satiation = function(m_data,exhaustion)
-	return(exhaustion + hunger_class.satiation_pool[m_data])
-end
-
--- an easy translation pool
-hunger_class.hunger_pool = {
-	[0]   = 1,
-	[0.5] = 2,
-	[1]   = 3,
-	[2]   = 4,
-	[3]   = 1
-}
--- ticks up the exhaustion when counting down hunger
-hunger_class.tick_up_hunger = function(m_data,exhaustion)
-	return(exhaustion + hunger_class.hunger_pool[m_data])
-end
 
 
 --this is the max exhaustion a player will get before their
