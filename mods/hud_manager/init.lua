@@ -3,12 +3,6 @@ local minetest = minetest
 local player_huds = {} -- the list of players hud lists (3d array)
 hud_manager = {}       -- hud manager class
 
--- create a player specific list
-minetest.register_on_joinplayer(function(player)
-    local name = player:get_player_name()
-    player_huds[name] = {}
-end)
-
 -- terminate the player's list on leave
 minetest.register_on_leaveplayer(function(player)
     local name = player:get_player_name()
@@ -26,7 +20,14 @@ hud_manager.add_hud = function(player,hud_name,def)
 		direction     = def.direction,
 		size          = def.size,
 		offset        = def.offset,
-	})
+    })
+    -- create new 3d array here
+    -- depends.txt is not needed
+    -- with it here
+    if not player_huds[name] then
+        player_huds[name] = {}
+    end
+
     player_huds[name][hud_name] = local_hud
 end
 
@@ -40,9 +41,9 @@ hud_manager.remove_hud = function(player,hud_name)
 end
 
 -- change element of hud
-hud_manager.change_hud = function(player,hud_name,element,data)
-    local name = player:get_player_name()
-    if player_huds[name] and player_huds[name][hud_name] then
-        player:hud_change(player_huds[name][hud_name], element, data)
+hud_manager.change_hud = function(data)
+    local name = data.player:get_player_name()
+    if player_huds[name] and player_huds[name][data.hud_name] then
+        data.player:hud_change(player_huds[name][data.hud_name], data.element, data.data)
     end
 end

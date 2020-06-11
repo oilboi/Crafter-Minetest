@@ -1,51 +1,182 @@
-minetest.register_on_joinplayer(function(player)
-	local meta = player:get_meta()
-	player:hud_add({
-		hud_elem_type = "statbar",
-		position = {x = 0.5, y = 1},
-		text = "hunger_icon_bg.png",
-		number = 20,
-		direction = 1,
-		size = {x = 24, y = 24},
-		offset = {x = 24*10, y= -(48 + 50 + 39)},
-	})
-	local hunger_bar = player:hud_add({
-		hud_elem_type = "statbar",
-		position = {x = 0.5, y = 1},
-		text = "hunger_icon.png",
-		number = meta:get_int("hunger"),
-		direction = 1,
-		size = {x = 24, y = 24},
-		offset = {x = 24*10, y= -(48 + 50 + 39)},
-	})
-	meta:set_int("hunger_bar", hunger_bar)
-end)
+local minetest           = minetest
+local mod_storage        = minetest.get_mod_storage()
+local player_hunger_data = {} -- array to hold hunger data
+local hunger_class       = {}
+hunger_pointer           = {} -- allow other mods to access local data
 
-
-minetest.register_on_newplayer(function(player)
-	local meta = player:get_meta()
-	--give players new hunger when they join
-	if meta:get_int("hunger") == 0 then
-		meta:set_int("hunger", 20)
-		meta:set_int("satiation", 5)
-		meta:set_int("exhaustion_tick", 0)
+-- creates volitile data for the game to use
+hunger_class.set_data = function(player,data)
+	local name = player:get_player_name()
+	if not player_hunger_data[name] then
+		player_hunger_data[name] = {}
 	end
-	
+
+	for index,i_data in pairs(data) do
+		player_hunger_data[name][index] = i_data
+	end
+
+	if data.hunger then
+		hud_manager.change_hud({
+								player    =  player ,
+								hud_name  = "hunger",
+								element   = "number",
+								data      =  data.hunger
+							})
+	end
+end
+
+-- indexes hunger data and returns it
+hunger_class.get_data = function(player,requested_data)
+	local name = player:get_player_name()
+	if player_hunger_data[name] then
+		local data_list = {}
+		local count     = 0
+		for index,i_data in pairs(requested_data) do
+			if player_hunger_data[name][i_data] then
+				data_list[i_data] = player_hunger_data[name][i_data]
+				count = count + 1
+			end
+		end
+		if count > 0 then
+			return(data_list)
+		else
+			return(nil)
+		end
+	end
+	return(nil)
+end
+
+-- loads data from mod storage
+hunger_class.load_data = function(player)
+	local name = player:get_player_name()
+	if mod_storage:get_int(name.."h_save") > 0 then
+		return({
+				hunger     = mod_storage:get_int(name.."hunger"               ),
+				satiation  = mod_storage:get_int(name.."satiation"            ),
+				exhaustion = mod_storage:get_int(name.."regeneration_interval"),
+				exhaustion = mod_storage:get_int(name.."exhaustion"           )
+			  })
+	else
+		return({
+				hunger                = 20,
+				satiation             = 20,
+				regeneration_interval = 0,
+				exhaustion            = 0
+			  })
+	end
+end
+
+-- saves data to be utilized on next login
+hunger_class.save_data = function(player)
+	local name = player
+	if type(player) ~= "string" then
+		name = player:get_player_name()
+	end
+	if player_hunger_data[name]           and
+	   player_hunger_data[name].satiation and
+	   player_hunger_data[name].hunger    then
+			mod_storage:set_int(name.."hunger"                , player_hunger_data[name].hunger               )
+			mod_storage:set_int(name.."satiation"             , player_hunger_data[name].satiation            )
+			mod_storage:set_int(name.."exhaustion"            , player_hunger_data[name].exhaustion           )
+			mod_storage:set_int(name.."regeneration_interval" , player_hunger_data[name].regeneration_interval)
+			mod_storage:set_int(name.."h_save"                , 1                                             )
+	   player_hunger_data[name] = nil
+	end
+end
+
+-- is used for shutdowns to save all data
+hunger_class.save_all = function()
+	for name,data in pairs(player_hunger_data) do
+		hunger_class.save_data(name)
+	end
+end
+
+
+-- allows other mods to set hunger data
+hunger_pointer.set_data = function(player,data)
+	local name = player:get_player_name()
+	if not player_hunger_data[name] then
+		player_hunger_data[name] = {}
+	end
+
+	for index,i_data in pairs(data) do
+		player_hunger_data[name][index] = i_data
+	end
+
+	if data.hunger then
+		hud_manager.change_hud({
+								player    =  player ,
+								hud_name  = "hunger",
+								element   = "number",
+								data      =  data.hunger
+							})
+	end
+end
+
+-- allows other mods to index hunger data
+hunger_pointer.get_data = function(player,requested_data)
+	local name = player:get_player_name()
+	if player_hunger_data[name] then
+		local data_list = {}
+		local count     = 0
+		for index,i_data in pairs(requested_data) do
+			if player_hunger_data[name][i_data] then
+				data_list[i_data] = player_hunger_data[name][i_data]
+				count = count + 1
+			end
+		end
+		if count > 0 then
+			return(data_list)
+		else
+			return(nil)
+		end
+	end
+	return(nil)
+end
+
+-- saves specific users data for when they relog
+minetest.register_on_leaveplayer(function(player)
+	hunger_class.save_data(player)
 end)
 
+-- save all data to mod storage on shutdown
+minetest.register_on_shutdown(function()
+	hunger_class.save_all()
+end)
+
+-- create new data for hunger per player
+minetest.register_on_joinplayer(function(player)
+	local name        = player:get_player_name()
+	local data        = hunger_class.load_data(player)
+
+	hunger_class.set_data(player,data)
+
+	hud_manager.add_hud(player,"hunger_bg",{
+		hud_elem_type = "statbar",
+		position      = {x = 0.5, y = 1},
+		text          = "hunger_icon_bg.png",
+		number        = 20,
+		direction     = 1,
+		size          = {x = 24, y = 24},
+		offset        = {x = 24*10, y= -(48 + 50 + 39)},
+	})
+	hud_manager.add_hud(player,"hunger",{
+		hud_elem_type = "statbar",
+		position      = {x = 0.5, y = 1},
+		text          = "hunger_icon.png",
+		number        = data.hunger,
+		direction     = 1,
+		size          = {x = 24, y = 24},
+		offset        = {x = 24*10, y= -(48 + 50 + 39)},
+	})
+end)
+
+-- resets the players hunger settings to max
 minetest.register_on_respawnplayer(function(player)
-	local meta = player:get_meta()
-	meta:set_int("hunger", 20)
-	meta:set_int("satiation", 5)
-	meta:set_int("exhaustion_tick", 0)
-	meta:set_int("dead", 0)
-	local hunger_bar = meta:get_int("hunger_bar")
-	player:hud_change(hunger_bar, "number", 20)
-end)
-
-minetest.register_on_dieplayer(function(player)
-	local meta = player:get_meta()
-	meta:set_int("dead", 1)
+	hunger_class.set_data(player,{
+									hunger    = 20,
+									satiation = 20
+								 })
 end)
 
 --this is the max exhaustion a player will get before their
@@ -59,103 +190,87 @@ local hunger_peak = 64
 
 local function hunger_update()
 	for _,player in ipairs(minetest.get_connected_players()) do
-	
-		--get the metas
-		local meta = player:get_meta()
-		
 		--do not regen player's health if dead - this will be reused for 1up apples
-		if meta:get_int("dead") == 0 then --and meta:get_int("regeneration")
+		if player:get_hp() > 0 then
 		
-			--internal variables
-			local satiation = meta:get_int("satiation")
-			local hunger = meta:get_int("hunger")
-			local exhaustion_tick = meta:get_int("exhaustion_tick")
-
-			--movement states
-			local movement_state =  meta:get_string("player.player_movement_state")
-			local running = (movement_state == "1")
-			local bunny_hopping = (movement_state == "2")
-			local sneaking = (movement_state == "3")
-			local standing = false
-			local walking = false
+			local data = hunger_class.get_data(player,{
+				"hunger","satiation","exhaustion","regeneration_interval"
+			})
 			
-			--we must seperate these two values because I forgot to
-			--write in a seperate clientside state for walking/standing
-			if movement_state == "0" then
+			--movement state
+			local m_data = movement_pointer.get_data(player,{"state"})
+			if m_data then
+				m_data = m_data.state
+			end
+			
+			--we must seperate these two values
+			if m_data == 0 then
 				local input = player:get_player_control()
 				if input.jump or input.right or input.left or input.down or input.up then
-					walking = true
-				else
-					standing = true
+					m_data = 0.5
 				end
 			end
 			
-			--we count up the exhaustion of the player moving around
-			--based on their states
-			if satiation > 0 and hunger >= 20 then
-				if running then
-					exhaustion_tick = exhaustion_tick + 6
-				elseif bunny_hopping then
-					exhaustion_tick = exhaustion_tick + 8
-				elseif sneaking then
-					exhaustion_tick = exhaustion_tick + 1
-					
-				elseif walking then
-					exhaustion_tick = exhaustion_tick + 3
-				elseif standing then
-					exhaustion_tick = exhaustion_tick + 1
+			-- count up the exhaustion of the player moving around
+
+			-- count down invisible satiation bar
+			if data.satiation > 0 and data.hunger >= 20 then
+				if     m_data == 0 then
+					data.exhaustion = data.exhaustion + 1
+				elseif m_data == 0.5 then
+					data.exhaustion = data.exhaustion + 3
+				elseif     m_data == 1 then
+					data.exhaustion = data.exhaustion + 6
+				elseif m_data == 2 then
+					data.exhaustion = data.exhaustion + 8
+				elseif m_data == 3 then
+					data.exhaustion = data.exhaustion + 1
 				end
 				
-				
-				if exhaustion_tick >= exhaustion_peak then
-					satiation = satiation - 1
-					exhaustion_tick = exhaustion_tick - exhaustion_peak
+				if data.exhaustion >= exhaustion_peak then
+					data.satiation = data.satiation - 1
+					data.exhaustion = data.exhaustion - exhaustion_peak
 					
 					--reset this to use for the hunger tick
-					if satiation == 0 then
-						exhaustion_tick = 0
+					if data.satiation == 0 then
+						data.exhaustion = 0
 					end
-					
-					meta:set_int("satiation", satiation)
+					hunger_class.set_data(player,{satiation=data.satiation})
 				end
-				
-				meta:set_int("exhaustion_tick", exhaustion_tick)
-			elseif hunger > 0 then
-				--this is copied again because this is for future tuning
-				if running then
-					exhaustion_tick = exhaustion_tick + 3
-				elseif bunny_hopping then
-					exhaustion_tick = exhaustion_tick + 4
-				elseif sneaking then
-					exhaustion_tick = exhaustion_tick + 1
-				elseif walking then
-					exhaustion_tick = exhaustion_tick + 2
-				elseif standing then
-					exhaustion_tick = exhaustion_tick + 1
+				hunger_class.set_data(player,{exhaustion=data.exhaustion})
+			-- count down hunger bars
+			elseif data.hunger > 0 then
+				if     m_data == 0 then
+					data.exhaustion = data.exhaustion + 1
+				elseif m_data == 0.5 then
+					data.exhaustion = data.exhaustion + 2
+				elseif m_data == 1 then
+					data.exhaustion = data.exhaustion + 3
+				elseif m_data == 2 then
+					data.exhaustion = data.exhaustion + 4
+				elseif m_data == 3 then
+					data.exhaustion = data.exhaustion + 1
 				end
-				if exhaustion_tick >= hunger_peak then
+				if data.exhaustion >= hunger_peak then
 					--don't allow hunger to go negative
-					if hunger > 0 then
-						exhaustion_tick = 0
-						hunger = hunger - 1
-						meta:set_int("hunger", hunger)
-						local hunger_bar = meta:get_int("hunger_bar")
-						player:hud_change(hunger_bar, "number", hunger)
+					if data.hunger > 0 then
+						data.exhaustion = 0
+						data.hunger = data.hunger - 1
+						hunger_class.set_data(player,{hunger=data.hunger})
 					end
 				end
-				meta:set_int("exhaustion_tick", exhaustion_tick)
-			elseif hunger <= 0 then
-				exhaustion_tick = exhaustion_tick + 1
-				
+				hunger_class.set_data(player,{exhaustion=data.exhaustion})
+			elseif data.hunger <= 0 then
+				data.exhaustion = data.exhaustion + 1
 				local hp =  player:get_hp()
-				if hp > 0 and exhaustion_tick >= 2 then
+				if hp > 0 and data.exhaustion >= 2 then
 					player:set_hp(hp-1)
-					exhaustion_tick = 0
+					data.exhaustion = 0
 				end
-				meta:set_int("exhaustion_tick", exhaustion_tick)
+				hunger_class.set_data(player,{exhaustion=data.exhaustion})
 			end
 			
-			
+			--[[
 			local hp = player:get_hp()
 			--make regeneration happen every second
 			if meta:get_int("drowning") == 0 and meta:get_int("on_fire") == 0 and hunger >= 20 and hp < 20 then
@@ -164,8 +279,8 @@ local function hunger_update()
 				regeneration_interval = regeneration_interval + 1
 				if regeneration_interval >= 2 then
 					player:set_hp(hp+1)
-					exhaustion_tick = exhaustion_tick + 32
-					meta:set_int("exhaustion_tick", exhaustion_tick)
+					exhaustion = exhaustion + 32
+					meta:set_int("exhaustion", exhaustion)
 					meta:set_int("satiation", satiation)
 					regeneration_interval = 0
 				end
@@ -174,8 +289,7 @@ local function hunger_update()
 			else
 				meta:set_int("regeneration_interval",0)
 			end
-			
-			--print("satiation:",satiation,"exhaustion_tick:",exhaustion_tick)
+			]]--
 		end
 	end
 	
@@ -193,10 +307,9 @@ end)
 --take away hunger and satiation randomly while mining
 minetest.register_on_dignode(function(pos, oldnode, digger)
 	if digger and digger:is_player() then
-		local meta = digger:get_meta()
-		local exhaustion_tick = meta:get_int("exhaustion_tick")
-		exhaustion_tick = exhaustion_tick + math.random(0,2)
-		meta:set_int("exhaustion_tick", exhaustion_tick)
+		local data = hunger_class.get_data(digger,{"exhaustion"})
+		data.exhaustion = data.exhaustion + math.random(0,2)
+		hunger_class.set_data(digger,{exhaustion=data.exhaustion})
 	end
 end)
 
@@ -229,7 +342,7 @@ function minetest.eat_food(player,item)
 		player_satiation =  satiation
 	end
 	
-	meta:set_int("exhaustion_tick", 0)
+	meta:set_int("exhaustion", 0)
 	meta:set_int("hunger", player_hunger)
 	meta:set_int("satiation", player_satiation)
 	local hunger_bar = meta:get_int("hunger_bar")
@@ -239,7 +352,6 @@ function minetest.eat_food(player,item)
 	player:set_wielded_item(stack)
 end
 
-
 function minetest.register_food(name,def)
 	minetest.register_craftitem(":"..name, {
 		description = def.description,
@@ -248,16 +360,11 @@ function minetest.register_food(name,def)
 	})
 
 	minetest.register_node(":"..name.."node", {
-		description = "NIL",
 		tiles = {def.texture},
-		groups = {},
-		drop = "",
 		drawtype = "allfaces",
-		on_construct = function(pos)
-			minetest.remove_node(pos)
-		end,
 	})
 end
+
 
 minetest.register_chatcommand("hungry", {
 	params = "<mob>",
@@ -265,11 +372,11 @@ minetest.register_chatcommand("hungry", {
 	privs = {server = true},
 	func = function(name)
 		local player = minetest.get_player_by_name(name)
-		local meta = player:get_meta()
-		meta:set_int("exhaustion_tick", 0)
-		meta:set_int("hunger", 1)
-		meta:set_int("satiation", 0)
-		local hunger_bar = meta:get_int("hunger_bar")
-		player:hud_change(hunger_bar, "number", 1)
+		hunger_class.set_data(player,{
+			exhaustion = 0,
+			hunger     = 1,
+			satiation  = 0
+		})
+
 	end
 })

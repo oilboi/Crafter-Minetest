@@ -1,73 +1,169 @@
-local player_state_channels = {}
+local minetest,math,vector = minetest,math,vector
 
-minetest.register_on_modchannel_message(function(channel_name, sender, message)
-	local channel_decyphered = channel_name:gsub(sender,"")
-	if sender ~= "" and channel_decyphered == ":player_movement_state" then
-		local player = minetest.get_player_by_name(sender)
-		local meta = player:get_meta()
-		meta:set_string("player.player_movement_state", message)
-	end
-end)
+local movement_class        = {} -- controls all data of the movement
+local player_movement_data  = {} -- used to calculate player movement
+local player_state_channels = {} -- holds every player's channel
+movement_pointer            = {} -- allows other mods to index local data
 
-local send_running_cancellation = function(player,sneaking)
+-- creates volitile data for the game to use
+movement_class.create_movement_variables = function(player)
 	local name = player:get_player_name()
-	player_state_channels[name]:send_all(minetest.serialize({stop_running=true,state=sneaking}))
+	if not player_movement_data[name] then
+		player_movement_data[name] = {
+			state     = 0,
+			old_state = 0
+		}
+	end
 end
 
+-- sets data for the game to use
+movement_class.set_data = function(player,data)
+	local name = player:get_player_name()
+	if player_movement_data[name] then
+		for index,i_data in pairs(data) do
+			if player_movement_data[name][index] then
+				player_movement_data[name][index] = i_data
+			end
+		end
+	else
+		movement_class.create_movement_variables(player)
+	end
+end
+
+-- retrieves data for the game to use
+movement_class.get_data = function(player)
+	local name = player:get_player_name()
+	if player_movement_data[name] then
+		return({
+			state     = player_movement_data[name].state,
+			old_state = player_movement_data[name].old_state
+		})
+	end
+end
+
+-- creates specific channels for players
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
 	player_state_channels[name] = minetest.mod_channel_join(name..":player_movement_state")
-	player:set_physics_override({jump=1.25,gravity=1.25})
-	local meta = player:get_meta()
-	meta:set_string("player.player_movement_state", "0")
-	meta:set_string("player.old_player_movement_state", "0")
+	player:set_physics_override({
+			jump   = 1.25,
+			gravity= 1.25
+	})
+
+	movement_class.create_movement_variables(player)
 end)
 
+-- resets the player's state on death
 minetest.register_on_dieplayer(function(player)
-	local meta = player:get_meta()
-	meta:set_string("player.player_movement_state", "0")
-	send_running_cancellation(player,sneaking)
+	movement_class.set_data(player,{
+		state = 0
+	})
+	movement_class.send_running_cancellation(player,false)
 end)
 
+-- tells the client to stop sending running/bunnyhop data
+movement_class.send_running_cancellation = function(player,sneaking)
+	local name = player:get_player_name()
+	player_state_channels[name]:send_all(
+		minetest.serialize({
+			stop_running=true,
+			state=sneaking
+		}
+	))
+end
+
+-- intercept incoming data messages
+minetest.register_on_modchannel_message(function(channel_name, sender, message)
+	local channel_decyphered = channel_name:gsub(sender,"")
+	if sender ~= "" and channel_decyphered == ":player_movement_state" then
+		local new_state = tonumber(message)
+		if type(new_state) == "number" then
+			local player = minetest.get_player_by_name(sender)
+			movement_class.set_data(player,{
+				state = new_state
+			})
+		end
+	end
+end)
+
+-- allows other mods to set data for the game to use
+movement_pointer.set_data = function(player,data)
+	local name = player:get_player_name()
+	if player_movement_data[name] then
+		for index,i_data in pairs(data) do
+			if player_movement_data[name][index] then
+				player_movement_data[name][index] = i_data
+			end
+		end
+	else
+		movement_class.create_movement_variables(player)
+	end
+end
+
+-- allows other mods to retrieve data for the game to use
+movement_pointer.get_data = function(player,requested_data)
+	local name = player:get_player_name()
+	if player_movement_data[name] then
+		local data_list = {}
+		local count     = 0
+		for index,i_data in pairs(requested_data) do
+			if player_movement_data[name][i_data] then
+				data_list[i_data] = player_movement_data[name][i_data]
+				count = count + 1
+			end
+		end
+		if count > 0 then
+			return(data_list)
+		else
+			return(nil)
+		end
+	end
+	return(nil)
+end
+
+
+-- loops through player states/eating mechanics
 minetest.register_globalstep(function(dtime)
 	for _,player in ipairs(minetest.get_connected_players()) do
-		local meta = player:get_meta()
-		local hunger = meta:get_int("hunger")
-		local state = meta:get_string("player.player_movement_state")
-		local old_state = meta:get_string("player.old_player_movement_state")
+		local hunger = hunger_pointer.get_data(player,{"hunger"})
+		if hunger then
+			hunger   = hunger.hunger
+		end
+		local data   = movement_class.get_data(player)
 		
-		if state ~= old_state or ((state == "1" or state == "2") and hunger <= 6) then
-			local running = (state == "1")
-			local bunny_hopping = (state == "2")
-			local sneaking = (state == "3")
-
-			--running FOV modifier
-			if hunger > 6 and (running or bunny_hopping) then
-				player:set_fov(1.25, true,0.15)
-				
-				if bunny_hopping == true then
-					--player:set_fov(1.45, true,0.15)
+		if data.state ~= data.old_state or 
+		((data.state == 1 or data.state == 2) and hunger and hunger <= 6) then
+			-- running fov modifier
+			if hunger and hunger > 6 and (data.state == 1 or data.state == 2) then
+				player:set_fov(1.25, true, 0.15)
+				if data.state == 2 then
 					player:set_physics_override({speed=1.75})
-				else
-					--player:set_fov(1.25, true,0.15)
+				elseif data.state == 1 then
 					player:set_physics_override({speed=1.5})
 				end
-			elseif not (running or bunny_hopping) and (old_state == "1" or old_state == "2")  then
+			elseif (data.state ~= 1 and data.state ~= 2) and 
+			(data.old_state == 1 or data.old_state == 2)  then
 				player:set_fov(1, true,0.15)
 				player:set_physics_override({speed=1})
-				send_running_cancellation(player,sneaking) --preserve network data
+				movement_class.send_running_cancellation(player,data.state==3) --preserve network data
+			elseif (data.state == 1 or data.state == 2) and hunger and hunger <= 6 then
+				player:set_fov(1, true,0.15)
+				player:set_physics_override({speed=1})
+				movement_class.set_data(player,{state=0})
+				movement_class.send_running_cancellation(player,false) --preserve network data
 			end
 
 			--sneaking
-			if sneaking then
-				--player:set_fov(0.8, true,0.1)
+			if data.state == 3 and data.old_state ~= 3 then
 				player:set_eye_offset({x=0,y=-1,z=0},{x=0,y=-1,z=0})
-			else
+			elseif data.old_state == 3 and data.state ~= 3 then
 				player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
 			end
-		end
 
-		meta:set_string("player.old_player_movement_state", state)
+			movement_class.set_data(player,{
+				old_state = data.state
+			})
+		end
 		
 		--eating
 		if player:get_player_control().RMB then
@@ -157,6 +253,5 @@ minetest.register_globalstep(function(dtime)
 			meta:set_float("eating", 0)
 			meta:set_float("eating_timer", 0)
 		end
-		
 	end
 end)
