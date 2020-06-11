@@ -2,6 +2,8 @@ local minetest,math,vector,table = minetest,math,vector,table
 
 local environment_class            = {} -- environment class
 
+environment_pointer                = {} -- allows other mods to index
+
 local player_environment           = {} -- stores environment data per player
 
 environment_class.registered_nodes = {} -- stored registered nodes into local table
@@ -263,7 +265,6 @@ environment_class.handle_player_suffocation = function(player,dtime)
 
 	if data then
 		data = data.head
-		print(environment_class.registered_nodes[data].drawtype)
 		if minetest.get_nodedef(data, "drawtype") == "normal" then
 			environment_class.handle_suffocation_hurt(player,1,dtime)
 		else
@@ -325,113 +326,46 @@ index_class.index_players_surroundings = function(dtime)
 	end
 end
 
+
+-- creates volitile player environment data for the game to use
+environment_pointer.set_data = function(player,data)
+	local name = player:get_player_name()
+	if not player_environment[name] then
+		player_environment[name] = {}
+	end
+
+	for index,i_data in pairs(data) do
+		player_environment[name][index] = i_data
+	end
+end
+
+-- indexes player environment data and returns it
+environment_pointer.get_data = function(player,requested_data)
+	local name = player:get_player_name()
+	if player_environment[name] then
+		local data_list = {}
+		local count     = 0
+		for index,i_data in pairs(requested_data) do
+			if player_environment[name][i_data] then
+				data_list[i_data] = player_environment[name][i_data]
+				count = count + 1
+			end
+		end
+		if count > 0 then
+			return(data_list)
+		else
+			return(nil)
+		end
+	end
+	return(nil)
+end
+
+-- insert all indexing data into main loop
 minetest.register_globalstep(function(dtime)
 	index_class.index_players_surroundings(dtime)
 end)
 
---[[
---completely destroy the breath bar
-minetest.hud_replace_builtin("breath",{
-	hud_elem_type = "statbar",
-	position = {x = 0.5, y = 1},
-	text = "nothing.png",
-	number = 50000,
-	direction = 0,
-	size = {x = 24, y = 24},
-	offset = {x = 25, y= -(48 + 24 + 16)},
-})
-
-minetest.register_on_joinplayer(function(player)
-	player:hud_set_flags({breathbar=false})
-	
-	local meta = player:get_meta()
-	--give players new breath when they join
-	meta:set_int("breath", 10)
-	player:hud_add({
-		hud_elem_type = "statbar",
-		position = {x = 0.5, y = 1},
-		text = "bubble_bg.png",
-		number = 20,
-		direction = 1,
-		size = {x = 24, y = 24},
-		offset = {x = 24*10, y= -(48 + 24 + 39)},
-	})
-	local bubble_id = player:hud_add({
-		hud_elem_type = "statbar",
-		position = {x = 0.5, y = 1},
-		text = "bubble.png",
-		number = 20,
-		direction = 1,
-		size = {x = 24, y = 24},
-		offset = {x = 24*10, y= -(48 + 24 + 39)},
-	})
-	meta:set_int("breathbar", bubble_id)
-end)
-
-minetest.register_on_respawnplayer(function(player)
-	local meta = player:get_meta()
-	meta:set_int("breath", 10)
-	meta:set_int("drowning", 0)
-	meta:set_int("breath_ticker", 0)
-	player:hud_change(meta:get_int("breathbar"), "number", 20)
-end)
-
---begin custom breathbar
-local name
-local indexer
---handle the breath bar
-local function fix_breath_hack()
-	for _,player in ipairs(minetest.get_connected_players()) do
-		player:set_breath(50000)
-		name = player:get_player_name()
-		if environment[name] then
-			indexer = environment[name].head
-			local meta = player:get_meta()
-			local breath = meta:get_int("breath")
-			local breathbar = meta:get_int("breathbar")
-			
-			if indexer == "main:water" or indexer == "main:waterflow" then
-				local ticker = meta:get_int("breath_ticker")
-			
-				ticker = ticker + 1
-				if ticker > 5 then ticker = 0 end
-
-				meta:set_int("breath_ticker", ticker)
-							
-				if breath > 0 and ticker >= 5 then
-					breath = breath - 1
-					meta:set_int("breath", breath)
-					player:hud_change(breathbar, "number", breath*2)
-					meta:set_int("drowning", 0)
-				elseif breath <= 0 and ticker >= 5 then
-					local hp =  player:get_hp()
-					meta:set_int("drowning", 1)
-					if hp > 0 then
-						player:set_hp(hp-2)
-						player:add_player_velocity(vector.new(0,-15,0))
-					end
-				end
-			elseif breath < 10 then --reset the bar
-				breath = breath + 1
-				meta:set_int("breath", breath)
-				meta:set_int("drowning", 0)
-				meta:set_int("breath_ticker", 0)
-				player:hud_change(breathbar, "number", breath*2)
-			end
-		end
-	end
-	
-	minetest.after(0.25, function()
-		fix_breath_hack()
-	end)
-end
-minetest.register_on_mods_loaded(function()
-	minetest.after(0,function()
-		fix_breath_hack()
-	end)
-end)
-]]--
-
+-- a custom helper function
 function minetest.get_nodedef(nodename, fieldname)
 	if not minetest.registered_nodes[nodename] then
 		return nil
@@ -439,6 +373,7 @@ function minetest.get_nodedef(nodename, fieldname)
 	return minetest.registered_nodes[nodename][fieldname]
 end
 
+-- a custom helper function
 function minetest.get_itemdef(itemname, fieldname)
 	if not minetest.registered_items[itemname] then
 		return nil

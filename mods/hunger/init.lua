@@ -46,6 +46,14 @@ hunger_class.get_data = function(player,requested_data)
 	return(nil)
 end
 
+-- removes hunger data
+hunger_class.terminate = function(player)
+	local name = player:get_player_name()
+	if player_hunger_data[name] then
+		player_hunger_data[name] = nil
+	end
+end
+
 -- loads data from mod storage
 hunger_class.load_data = function(player)
 	local name = player:get_player_name()
@@ -79,6 +87,8 @@ hunger_class.save_data = function(player)
 			mod_storage:set_int(name..index,integer)
 		end
 	end
+
+	mod_storage:set_int(name.."h_save", 1)
 
 	player_hunger_data[name] = nil
 end
@@ -161,6 +171,7 @@ end
 -- saves specific users data for when they relog
 minetest.register_on_leaveplayer(function(player)
 	hunger_class.save_data(player)
+	hunger_class.terminate(player)
 end)
 
 -- save all data to mod storage on shutdown

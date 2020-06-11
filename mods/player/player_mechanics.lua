@@ -41,6 +41,14 @@ movement_class.get_data = function(player)
 	end
 end
 
+-- removes movement data
+movement_class.terminate = function(player)
+	local name = player:get_player_name()
+	if player_movement_data[name] then
+		player_movement_data[name] = nil
+	end
+end
+
 -- creates specific channels for players
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
@@ -59,6 +67,12 @@ minetest.register_on_dieplayer(function(player)
 		state = 0
 	})
 	movement_class.send_running_cancellation(player,false)
+end)
+
+
+-- delete data on player leaving
+minetest.register_on_leaveplayer(function(player)
+	movement_class.terminate(player)
 end)
 
 -- tells the client to stop sending running/bunnyhop data
