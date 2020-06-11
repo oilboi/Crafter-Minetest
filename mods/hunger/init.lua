@@ -386,6 +386,5 @@ minetest.register_chatcommand("hungry", {
 			hunger     = 1,
 			satiation  = 0
 		})
-
 	end
 })
