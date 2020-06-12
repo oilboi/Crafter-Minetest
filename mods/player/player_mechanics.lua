@@ -165,18 +165,20 @@ minetest.register_globalstep(function(dtime)
 			end
 		end
 		
-		if (not in_water.at_all ~= data.was_in_water) or data.state ~= data.old_state or ((data.state == 1 or data.state == 2) and hunger and hunger <= 6) then
-
+		if (in_water.at_all ~= data.was_in_water) or (data.state ~= data.old_state) or ((data.state == 1 or data.state == 2) and hunger and hunger <= 6) then
 			if not in_water.at_all and data.was_in_water then
 				player:set_physics_override({
 					sneak   = true,
 				})
 				player_pointer.force_update(player)
+				player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
 			elseif in_water.at_all and not data.was_in_water then
 				player:set_physics_override({
 					sneak   = false,
 				})
+
 				player_pointer.force_update(player)
+				player:set_eye_offset({x=0,y=-6,z=0},{x=0,y=-6,z=5.9})
 			end
 
 			-- running/swimming fov modifier
@@ -203,11 +205,10 @@ minetest.register_globalstep(function(dtime)
 
 			--sneaking
 			if data.state == 3 and in_water.at_all then
-				player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
 				movement_class.send_running_cancellation(player,false)
-			elseif data.state == 3 and data.old_state ~= 3 then
+			elseif not in_water.at_all and data.state == 3 and data.old_state ~= 3 then
 				player:set_eye_offset({x=0,y=-1,z=0},{x=0,y=-1,z=0})
-			elseif data.old_state == 3 and data.state ~= 3 then
+			elseif not in_water.at_all and data.old_state == 3 and data.state ~= 3 then
 				player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
 			end
 
@@ -226,8 +227,8 @@ minetest.register_globalstep(function(dtime)
 			end
 
 			movement_class.set_data(player,{
-				old_state    = 0,
-				was_in_water = true
+				old_state    = data.state,
+				was_in_water = in_water.at_all
 			})
 		end
 		
