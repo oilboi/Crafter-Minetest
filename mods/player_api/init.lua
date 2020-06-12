@@ -42,17 +42,10 @@ api.player = {
 
 	animations           = {
 		stand            = { x = 5  , y = 5   },
-
-		die              = { x = 5  , y = 5   },
-		
 		lay              = { x = 162, y = 162 },
-		
 		walk             = { x = 168, y = 187 },
-		
 		mine             = { x = 189, y = 198 },
-
 		walk_mine        = { x = 200, y = 219 },
-
 		sit              = { x = 81 , y = 160 },
 		sneak            = { x = 60 , y = 60  },
 		sneak_mine_stand = { x = 20 , y = 30  },
@@ -60,13 +53,15 @@ api.player = {
 		sneak_mine_walk  = { x = 40 , y = 59  },
 		swim             = { x = 221, y = 241 },
 		swim_still       = { x = 226, y = 226 },
+		die              = { x = 242, y = 253 },
+
 						   },
 
 	current_animation    = "stand",
 	swimming             = false,
 	collisionbox         = {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
 	old_controls         = {},
-	stepheight           = 1.5  ,
+	stepheight           = 0.6  ,
 	eye_height           = 1.47 ,
 	attached             = false,
 	wield_item           = nil  ,
@@ -226,7 +221,7 @@ player_pointer.set_textures = function(player,textures)
 end
 
 -- easy way to set animation
-api.set_animation = function(player, animation_name, speed)
+api.set_animation = function(player, animation_name, speed, loop)
 	api.current_animation = api.get_data(player,{"current_animation"})
 	if api.current_animation then
 		api.current_animation = api.current_animation.current_animation
@@ -241,9 +236,11 @@ api.set_animation = function(player, animation_name, speed)
 		api.animations = api.animations.animations
 	end
 
+	print(loop)
+
 	api.animations = api.animations[animation_name]
 	
-	player:set_animation(api.animations, speed, 0)
+	player:set_animation(api.animations, speed, 0, loop)
 
 	api.set_data(player,{
 		current_animation = animation_name
@@ -261,6 +258,14 @@ player_pointer.force_update = function(player)
 		force_update = true
 	})
 end
+
+-- force updates the player
+api.create_force_update = function(player)
+	api.set_data(player,{
+		force_update = true
+	})
+end
+
 
 -- toggles nametag visibility
 api.show_nametag = function(player,boolean)
@@ -461,8 +466,10 @@ api.do_animations = function(player)
 	api.update = api.control_check(player,api.control_table)
 	api.pitch_look(player,api.control_table.sneak)
 
-	if api.update then
+	if api.update and player:get_hp() > 0 then
 		api.control_translation(player,api.control_table)
+	elseif player:get_hp() <= 0 then
+		api.set_animation(player,"die",40,false)
 	end
 end
 
@@ -474,6 +481,9 @@ minetest.register_on_joinplayer(function(player)
 	api.set_all_properties(player)
 end)
 
+minetest.register_on_respawnplayer(function(player)
+	api.create_force_update(player)
+end)
 
 -- inject into global loop
 minetest.register_globalstep(function()
