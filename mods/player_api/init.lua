@@ -28,6 +28,7 @@ api.mouse             = nil
 api.translated        = nil
 api.swimming          = nil
 api.force_update      = nil
+api.pi                = math.pi
 api.get_connected     = minetest.get_connected_players
 -- player physical data constant
 api.player = {
@@ -146,12 +147,12 @@ api.update_wield_item = function(player)
 	
 	api.item = api.get_data(player,{"wield_item"})
 	if api.item then
-		api.item = api.item.item
+		api.item = api.item.wield_item
 	end
 
 	api.item_string = player:get_wielded_item():get_name()
 
-	if api.item or (api.item and not api.item:get_luaentity()) then
+	if not api.item or (api.item and not api.item:get_luaentity()) then
 		
 		api.object = minetest.add_entity(player:get_pos(),"player_api:item")
 
@@ -291,7 +292,7 @@ end)
 
 -- converts yaw to degrees
 api.degrees = function(yaw)
-	return(yaw*180.0/math.pi)
+	return(yaw*180.0/api.pi)
 end
 
 -- controls head bone
@@ -463,7 +464,7 @@ api.do_animations = function(player)
 	api.control_table = player:get_player_control()
 	api.update = api.control_check(player,api.control_table)
 	api.pitch_look(player,api.control_table.sneak)
-
+	api.update_wield_item(player)
 	if api.update and player:get_hp() > 0 then
 		api.control_translation(player,api.control_table)
 	elseif player:get_hp() <= 0 then
