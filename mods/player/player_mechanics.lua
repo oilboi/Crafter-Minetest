@@ -5,13 +5,15 @@ local player_movement_data  = {} -- used to calculate player movement
 local player_state_channels = {} -- holds every player's channel
 movement_pointer            = {} -- allows other mods to index local data
 movement_class.get_group    = minetest.get_item_group
+movement_class.input_data   = nil
 -- creates volitile data for the game to use
 movement_class.create_movement_variables = function(player)
 	local name = player:get_player_name()
 	if not player_movement_data[name] then
 		player_movement_data[name] = {
-			state     = 0,
-			old_state = 0
+			state        = 0    ,
+			old_state    = 0    ,
+			was_in_water = false,
 		}
 	end
 end
@@ -21,7 +23,7 @@ movement_class.set_data = function(player,data)
 	local name = player:get_player_name()
 	if player_movement_data[name] then
 		for index,i_data in pairs(data) do
-			if player_movement_data[name][index] then
+			if player_movement_data[name][index] ~= nil then
 				player_movement_data[name][index] = i_data
 			end
 		end
@@ -35,8 +37,9 @@ movement_class.get_data = function(player)
 	local name = player:get_player_name()
 	if player_movement_data[name] then
 		return({
-			state     = player_movement_data[name].state,
-			old_state = player_movement_data[name].old_state
+			state        = player_movement_data[name].state       ,
+			old_state    = player_movement_data[name].old_state   ,
+			was_in_water = player_movement_data[name].was_in_water,
 		})
 	end
 end
@@ -62,9 +65,10 @@ minetest.register_on_joinplayer(function(player)
 end)
 
 -- resets the player's state on death
-minetest.register_on_dieplayer(function(player)
+minetest.register_on_respawnplayer(function(player)
 	movement_class.set_data(player,{
-		state = 0
+		state        = 0    ,
+		was_in_water = false,
 	})
 	movement_class.send_running_cancellation(player,false)
 end)
@@ -99,6 +103,11 @@ minetest.register_on_modchannel_message(function(channel_name, sender, message)
 		end
 	end
 end)
+
+-- used for swimming controls
+movement_class.input_swimming = ({
+	up    = true,
+})
 
 -- allows other mods to set data for the game to use
 movement_pointer.set_data = function(player,data)
@@ -145,63 +154,99 @@ minetest.register_globalstep(function(dtime)
 		end
 		local data   = movement_class.get_data(player)
 		
-		local move_data = environment_pointer.get_data(player,{"legs","head"})
-		local in_water = false
-		if move_data then
-			local move_data2 = move_data.legs
-			in_water = movement_class.get_group(move_data2,"water") > 0
-			if not in_water then
-				move_data2 = move_data.head
-				in_water = movement_class.get_group(move_data2,"water") > 0
+		-- water movement data
+		local env_data = environment_pointer.get_data(player,{"legs","head"})
+		local in_water = {at_all=false,head=false,legs=false}		
+		if env_data then
+			in_water.legs = movement_class.get_group(env_data.legs,"water") > 0
+			in_water.head = movement_class.get_group(env_data.head,"water") > 0
+			if in_water.legs or in_water.head then
+				in_water.at_all = true
 			end
 		end
 
+		print(data.state)
 
-		if data.state ~= data.old_state or 
-		((data.state == 1 or data.state == 2) and ((hunger and hunger <= 6) or in_water)) then
-			-- running fov modifier
-			if hunger and hunger > 6 and (data.state == 1 or data.state == 2) and not in_water then
+		if (not in_water.at_all ~= data.was_in_water) or data.state ~= data.old_state or ((data.state == 1 or data.state == 2) and hunger and hunger <= 6) then
+
+			if not in_water.at_all and data.was_in_water then
+				player:set_physics_override({
+					sneak   = true,
+				})
+			elseif in_water.at_all and not data.was_in_water then
+				player:set_physics_override({
+					sneak   = false,
+				})
+			end
+
+			-- running/swimming fov modifier
+			if hunger and hunger > 6 and (data.state == 1 or data.state == 2) then
 				player:set_fov(1.25, true, 0.15)
 				if data.state == 2 then
 					player:set_physics_override({speed=1.75})
 				elseif data.state == 1 then
 					player:set_physics_override({speed=1.5})
 				end
-			elseif (data.state ~= 1 and data.state ~= 2) and 
-			(data.old_state == 1 or data.old_state == 2)  then
+			elseif (not in_water.at_all and data.state ~= 1 and data.state ~= 2 and (data.old_state == 1 or data.old_state == 2)) or 
+			(in_water.at_all and data.state ~= 1 and data.state ~= 2 and data.state ~= 3 and (data.old_state == 1 or data.old_state == 2 or data.old_state == 3))then
+
 				player:set_fov(1, true,0.15)
 				player:set_physics_override({speed=1})
+
 				movement_class.send_running_cancellation(player,data.state==3) --preserve network data
-			elseif (data.state == 1 or data.state == 2) and ((hunger and hunger <= 6) or in_water) then
+				
+			elseif (data.state == 1 or data.state == 2) and (hunger and hunger <= 6) then
 				player:set_fov(1, true,0.15)
-				player:set_physics_override({speed=1})
-				movement_class.set_data(player,{state=0})
+				player:set_physics_override({speed=1})				
 				movement_class.send_running_cancellation(player,false) --preserve network data
 			end
 
 			--sneaking
-			if data.state == 3 and data.old_state ~= 3 then
+			if data.state == 3 and in_water.at_all then
+				player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
+				movement_class.send_running_cancellation(player,false)
+			elseif data.state == 3 and data.old_state ~= 3 then
 				player:set_eye_offset({x=0,y=-1,z=0},{x=0,y=-1,z=0})
 			elseif data.old_state == 3 and data.state ~= 3 then
 				player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
 			end
 
 			movement_class.set_data(player,{
-				old_state = data.state
+				old_state    = data.state,
+				was_in_water = in_water.at_all
+			})
+		
+		-- water movement
+		elseif in_water.at_all then
+			--print(data.was_in_water)
+			--print("gravity: ", player:get_physics_override().gravity)
+
+			if not data.was_in_water then
+				player:set_physics_override({
+					sneak   = false ,
+				})
+				player:set_velocity(vector.new(0,0,0))
+			end
+
+
+
+
+			movement_class.set_data(player,{
+				old_state    = 0,
+				was_in_water = true
 			})
 		end
 		
 		--eating
 		if player:get_player_control().RMB then
-		
-			local item = player:get_wielded_item():get_name()
-			local satiation = minetest.get_item_group(item, "satiation")
-			local hunger = minetest.get_item_group(item, "hunger")
-			
+
 			local meta = player:get_meta()
 			if meta:get_int("hunger") == 20 then
 				return 
 			end
+			local item = player:get_wielded_item():get_name()
+			local satiation = minetest.get_item_group(item, "satiation")
+			local hunger = minetest.get_item_group(item, "hunger")
 			
 			if hunger > 0 and satiation > 0  then				
 				local eating = meta:get_float("eating")
