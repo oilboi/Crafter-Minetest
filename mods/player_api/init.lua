@@ -71,6 +71,7 @@ api.player = {
 	attached             = false,
 	wield_item           = nil  ,
 }
+
 -- allows other mods to register models
 player_pointer.register_model = function(name, def)
 	models[name] = def
@@ -98,13 +99,6 @@ api.set_data = function(player,data)
 	for index,i_data in api.pairs(data) do
 		player_pool[api.name][index] = i_data
 	end
-
-	--if data.animation then
-		-- update player animation
-	--end
-	--if data.texture then
-		-- update player texture
-	--end
 end
 
 -- allows other mods to modify the player
