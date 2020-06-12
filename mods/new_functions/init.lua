@@ -320,7 +320,9 @@ index_class.index_players_surroundings = function(dtime)
 		index_class.pos.y             = index_class.pos.y + 0.6
 		index_class.data_table.legs   = index_class.get_node(index_class.pos).name
 
-		if not index_class.swimming then
+		if index_class.swimming then
+			index_class.pos.y             = index_class.pos.y + 0.35
+		else
 			index_class.pos.y             = index_class.pos.y + 0.940
 		end
 		index_class.data_table.head   = index_class.get_node(index_class.pos).name
