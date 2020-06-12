@@ -265,7 +265,6 @@ drowning_class.handle_breath = function(dtime)
 
 				if hp > 0 then
 					player:set_hp(hp-2)
-					player:add_player_velocity(vector.new(0,-15,0))
 				end
 			end
 

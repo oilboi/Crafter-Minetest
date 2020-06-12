@@ -236,8 +236,6 @@ api.set_animation = function(player, animation_name, speed, loop)
 		api.animations = api.animations.animations
 	end
 
-	print(loop)
-
 	api.animations = api.animations[animation_name]
 	
 	player:set_animation(api.animations, speed, 0, loop)
