@@ -99,12 +99,26 @@ api.set_data = function(player,data)
 		player_pool[api.name][index] = i_data
 	end
 
-	if data.animation then
+	--if data.animation then
 		-- update player animation
-	end
-	if data.texture then
+	--end
+	--if data.texture then
 		-- update player texture
+	--end
+end
+
+-- allows other mods to modify the player
+player_pointer.set_data = function(player,data)
+	api.name = player:get_player_name()
+	if not player_pool[api.name] then
+		player_pool[api.name] = {}
 	end
+
+	for index,i_data in api.pairs(data) do
+		player_pool[api.name][index] = i_data
+	end
+
+	player:set_properties(data)
 end
 
 -- removes data
@@ -285,8 +299,15 @@ end
 
 -- controls head bone
 api.pitch_look = function(player,sneak)
+	api.state = movement_pointer.get_data(player,{"swimming"})
+	if api.state then
+		api.state = api.state.swimming
+	end
+
 	api.pitch = api.degrees(player:get_look_vertical()) * -1
-	if sneak then
+	if api.swimming then
+		api.pitch = api.pitch + 90
+	elseif sneak then
 		api.pitch = api.pitch + 15
 	end
 	player:set_bone_position("Head", vector.new(0,6.3,0), vector.new(api.pitch,0,0))
