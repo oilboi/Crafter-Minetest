@@ -407,6 +407,8 @@ minetest.register_decoration({
 	place_on = "main:grass",
 	sidelen = 16,
 	fill_ratio = 0.5,
+	param2 = 0,
+	param2_max = 179,
 	--biomes = {"grassland"},
 	decoration = "farming:grass",
 	height = 1,
