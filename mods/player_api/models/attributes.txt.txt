@@ -2,12 +2,15 @@ Thanks to Verticen for reworking the player model to make the player model look 
 https://github.com/Verticen/Minetest-Character-with-Armor
 
 stujones11 (CC BY-SA 3.0):
-  character.b3d
-  character.blend -- Both derived from a model by MirceaKitsune (CC BY-SA 3.0)
+  player.b3d
+  player.b3d -- Both derived from a model by MirceaKitsune (CC BY-SA 3.0)
 
 An0n3m0us (CC BY-SA 3.0):
-  character.b3d
-  character.blend -- Player animation improvement
+  player.b3d
+  player.b3d -- Player animation improvement
 
 Jordach (CC BY-SA 3.0):
-  character.png
+  player.b3d
+
+Oil_boi (I dunno by sa 49.1)
+ Swim stuff

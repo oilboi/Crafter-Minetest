@@ -14,6 +14,7 @@ movement_class.create_movement_variables = function(player)
 			state        = 0    ,
 			old_state    = 0    ,
 			was_in_water = false,
+			swimming     = false,
 		}
 	end
 end
@@ -40,6 +41,7 @@ movement_class.get_data = function(player)
 			state        = player_movement_data[name].state       ,
 			old_state    = player_movement_data[name].old_state   ,
 			was_in_water = player_movement_data[name].was_in_water,
+			swimming     = player_movement_data[name].swimming    ,
 		})
 	end
 end
@@ -104,17 +106,12 @@ minetest.register_on_modchannel_message(function(channel_name, sender, message)
 	end
 end)
 
--- used for swimming controls
-movement_class.input_swimming = ({
-	up    = true,
-})
-
 -- allows other mods to set data for the game to use
 movement_pointer.set_data = function(player,data)
 	local name = player:get_player_name()
 	if player_movement_data[name] then
 		for index,i_data in pairs(data) do
-			if player_movement_data[name][index] then
+			if player_movement_data[name][index] ~= nil then
 				player_movement_data[name][index] = i_data
 			end
 		end
@@ -130,7 +127,7 @@ movement_pointer.get_data = function(player,requested_data)
 		local data_list = {}
 		local count     = 0
 		for index,i_data in pairs(requested_data) do
-			if player_movement_data[name][i_data] then
+			if player_movement_data[name][i_data] ~= nil then
 				data_list[i_data] = player_movement_data[name][i_data]
 				count = count + 1
 			end
@@ -162,21 +159,24 @@ minetest.register_globalstep(function(dtime)
 			in_water.head = movement_class.get_group(env_data.head,"water") > 0
 			if in_water.legs or in_water.head then
 				in_water.at_all = true
+				movement_class.set_data(player,{swimming=true})
+			else
+				movement_class.set_data(player,{swimming=false})
 			end
 		end
-
-		print(data.state)
-
+		
 		if (not in_water.at_all ~= data.was_in_water) or data.state ~= data.old_state or ((data.state == 1 or data.state == 2) and hunger and hunger <= 6) then
 
 			if not in_water.at_all and data.was_in_water then
 				player:set_physics_override({
 					sneak   = true,
 				})
+				player_pointer.force_update(player)
 			elseif in_water.at_all and not data.was_in_water then
 				player:set_physics_override({
 					sneak   = false,
 				})
+				player_pointer.force_update(player)
 			end
 
 			-- running/swimming fov modifier
@@ -218,18 +218,12 @@ minetest.register_globalstep(function(dtime)
 		
 		-- water movement
 		elseif in_water.at_all then
-			--print(data.was_in_water)
-			--print("gravity: ", player:get_physics_override().gravity)
-
 			if not data.was_in_water then
 				player:set_physics_override({
 					sneak   = false ,
 				})
 				player:set_velocity(vector.new(0,0,0))
 			end
-
-
-
 
 			movement_class.set_data(player,{
 				old_state    = 0,
