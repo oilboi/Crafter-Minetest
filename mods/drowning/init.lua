@@ -195,7 +195,6 @@ minetest.hud_replace_builtin("breath",{
 	size = {x = 0, y = 0},
 	offset = {x = 0, y= 0},
 })
-
 minetest.register_on_joinplayer(function(player)
 	local data = drowning_class.load_data(player)
 	drowning_class.set_data(player,data)
@@ -226,7 +225,6 @@ end)
 --handle the breath bar
 drowning_class.handle_breath = function(dtime)
 	for _,player in ipairs(minetest.get_connected_players()) do
-		player:set_breath(50000)
 		local name = player:get_player_name()
 
 		local data = environment_pointer.get_data(player,{"head"})
