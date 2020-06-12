@@ -172,6 +172,9 @@ minetest.register_globalstep(function(dtime)
 				})
 				player_pointer.force_update(player)
 				player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
+				player_pointer.set_data(player,{
+					collisionbox = {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
+				})
 			elseif in_water.at_all and not data.was_in_water then
 				player:set_physics_override({
 					sneak   = false,
@@ -179,6 +182,9 @@ minetest.register_globalstep(function(dtime)
 
 				player_pointer.force_update(player)
 				player:set_eye_offset({x=0,y=-6,z=0},{x=0,y=-6,z=5.9})
+				player_pointer.set_data(player,{
+					collisionbox = {-0.3, 0.5, -0.3, 0.3, 1.2, 0.3},
+				})
 			end
 
 			-- running/swimming fov modifier

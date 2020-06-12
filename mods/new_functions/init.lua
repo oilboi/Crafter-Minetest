@@ -299,12 +299,19 @@ local index_class        = {}
 index_class.pos          = nil
 index_class.data_table   = nil
 index_class.get_node     = minetest.get_node
+index_class.swimming     = nil
 
 -- creates data at specific points of the player
 index_class.index_players_surroundings = function(dtime)
 	for _,player in ipairs(minetest.get_connected_players()) do
 		index_class.pos = player:get_pos()
 		
+		index_class.swimming = movement_pointer.get_data(player,{"swimming"})
+
+		if index_class.swimming then
+			index_class.swimming = index_class.swimming.swimming
+		end
+
 		index_class.data_table = {}
 
 		index_class.pos.y             = index_class.pos.y - 0.1
@@ -313,7 +320,9 @@ index_class.index_players_surroundings = function(dtime)
 		index_class.pos.y             = index_class.pos.y + 0.6
 		index_class.data_table.legs   = index_class.get_node(index_class.pos).name
 
-		index_class.pos.y             = index_class.pos.y + 0.940
+		if not index_class.swimming then
+			index_class.pos.y             = index_class.pos.y + 0.940
+		end
 		index_class.data_table.head   = index_class.get_node(index_class.pos).name
 
 		environment_class.set_data(player,index_class.data_table)
