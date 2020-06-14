@@ -1,11 +1,11 @@
-local minetest,math,skins = minetest,math,skins
+local minetest,math,skins_pointer = minetest,math,skins_pointer
 armor_class = {} --the armor class
 
 function armor_class.recalculate_armor(player)
     if not player or (player and not player:is_player()) then return end
     local inv = player:get_inventory()
 
-    local player_skin = skins.get_skin(player)
+    local player_skin = skins_pointer.get_skin(player)
     local armor_skin = "blank_skin.png"
 
     local stack = inv:get_stack("armor_head",1):get_name()
