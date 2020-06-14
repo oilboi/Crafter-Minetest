@@ -340,6 +340,7 @@ cape_handler.add_cape = function(player)
     end
 end
 
+-- looping check to see if cape deleted
 cape_handler.readd_capes = function()
     for name,def in cape_handler.pairs(cape_table) do
         cape_handler.player = minetest.get_player_by_name(name)
