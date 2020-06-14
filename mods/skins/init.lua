@@ -336,7 +336,7 @@ cape_handler.add_cape = function(player)
         cape_handler.lua_entity.owner = player
         cape_handler.lua_entity.texture_type = cape_handler.temp_cape
         cape_handler.object:set_attach(player, "Cape_bone", vector.new(0,0,0), vector.new(0,0,0))
-        cape_table[player:get_player_name()] = {cape_texture=cape_handler.temp_cape,object=cape_handler.object}
+        cape_table[player:get_player_name()] = {object=cape_handler.object}
     end
 end
 
@@ -345,7 +345,7 @@ cape_handler.readd_capes = function()
     for name,def in cape_handler.pairs(cape_table) do
         cape_handler.player = minetest.get_player_by_name(name)
         if cape_handler.player and cape_table[name] and not cape_table[name].object:get_luaentity() then
-            cape_handler.add_cape(cape_handler.player,def.cape_texture)
+            cape_handler.add_cape(cape_handler.player)
         elseif not cape_handler.player then
             cape_table[name] = nil
         end
