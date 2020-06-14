@@ -238,7 +238,7 @@ mobs.register_mob(
 	 collide_with_objects = false,
 	 collisionbox = {-0.37, 0, -0.37, 0.37, 1.75, 0.37},
 	 visual = "mesh",
-	 visual_size = {x = 3, y = 3},
+	 visual_size = {x = 9, y = 9},
 	 mesh = "snowman.b3d",
 	 textures = {
 		"snowman.png","snowman.png","snowman.png","snowman.png","snowman.png","snowman.png",
@@ -248,15 +248,16 @@ mobs.register_mob(
 
 
 	 -----
-	 --head_bone = "Bone",
+	 head_bone = "head",
 	 debug_head_pos = false,
-	 head_directional_offset = 0, --used in vector.multiply(minetest.yaw_to_dir(body_yaw),head_offset)
-	 head_height_offset = 1.625, --added to the base y position
+	 rotational_correction = math.pi/2,
+	 head_directional_offset = 0.01, --used in vector.multiply(minetest.yaw_to_dir(body_yaw),head_offset)
+	 head_height_offset = 1.65, --added to the base y position
 	 --use this to correct the head position initially because it becomes severly offset - look at your blender model to get this perfect
-	 head_position_correction = vector.new(0,4.6,0),
+	 head_position_correction = vector.new(0,0.6,0),
 	 --this is used to tell the game the orientation of the bone (swaps x to and y, then z and y)
 	 head_coord = "vertical",
-	 --rotational_correction = math.pi/2,
+	 flip_pitch = true,
 	 -----
 	 
 	 is_visible = true,
