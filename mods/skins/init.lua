@@ -98,7 +98,7 @@ fetch_function = function(name)
             -- set the player's skin
             skins.player = skins.get_player(name)
             
-            assert(minetest.dynamic_add_media(skins.new_temp_path))
+            minetest.dynamic_add_media(skins.new_temp_path)
             
             skins.file = "skin_"..name..".png" -- reuse the data
 
@@ -123,6 +123,7 @@ capes.body_yaw          = nil
 capes.cape_yaw          = nil
 capes.cape_pitch        = nil
 capes.goal              = nil
+capes.owner             = nil
 
 capes.pi                = math.pi
 capes.half_pi           = capes.pi/2
@@ -134,6 +135,7 @@ capes.direction         = vector.direction
 capes.floor             = math.floor
 capes.abs               = math.abs
 capes.pairs             = pairs
+capes.is_player         = minetest.is_player
 
 -- simple degrees calculation
 capes.degrees = function(yaw)
@@ -253,8 +255,9 @@ cape_object.on_step = function(self,dtime)
     capes.old_pos           = self.old_pos
     capes.current_animation = capes.object:get_animation() -- if fails assign other values to nil
     capes.current_animation = capes.current_animation.x
+    capes.owner             = self.owner
 
-    if capes.old_pos then
+    if capes.is_player(capes.owner) and capes.old_pos then
         --do not allow cape to flutter if player is moving backwards
         capes.cape_yaw = capes.cape_yaw_calculation(capes.pos,capes.old_pos)
         capes.body_yaw = self.owner:get_look_horizontal()
@@ -266,6 +269,8 @@ cape_object.on_step = function(self,dtime)
         end
 
         capes.cape_smoothing(capes.object,capes.current_animation,capes.goal)
+    elseif not capes.is_player(capes.owner) then
+        self.object:remove()
     end
 
     self.old_pos = capes.pos
@@ -345,7 +350,6 @@ cape_handler.readd_capes = function()
     for name,def in cape_handler.pairs(cape_table) do
         cape_handler.player = minetest.get_player_by_name(name)
         if cape_handler.player and cape_table[name] and not cape_table[name]:get_luaentity() then
-            print("adding cape")
             cape_handler.add_cape(cape_handler.player)
         elseif not cape_handler.player then
             cape_table[name] = nil
