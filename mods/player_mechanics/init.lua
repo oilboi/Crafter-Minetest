@@ -1,4 +1,5 @@
-local path = minetest.get_modpath("player")
+local path = minetest.get_modpath("player_mechanics")
 dofile(path.."/version_info.lua")
 dofile(path.."/player_interaction.lua")
 dofile(path.."/player_mechanics.lua")
+dofile(path.."/eating_mechanics.lua")

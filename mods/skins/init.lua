@@ -1,10 +1,5 @@
 local minetest,math,io,vector,table,pairs = minetest,math,io,vector,table,pairs
 
--- don't waste cpu
-if minetest.is_singleplayer() then
-    return
-end
-
 local http = minetest.request_http_api()
 local id = "Lua Skins Updater"
 
