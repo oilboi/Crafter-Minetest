@@ -126,7 +126,6 @@ capes.goal              = nil
 capes.owner             = nil
 
 capes.pi                = math.pi
-capes.half_pi           = capes.pi/2
 
 capes.dir_to_yaw        = minetest.dir_to_yaw
 capes.new_vector        = vector.new
