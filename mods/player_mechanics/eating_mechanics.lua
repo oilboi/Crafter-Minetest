@@ -25,6 +25,7 @@ food_class.add_vector    = vector.add
 food_class.multiply      = vector.multiply
 food_class.random        = math.random
 food_class.add_ps        = minetest.add_particlespawner
+
 food_class.particle_constant = {
     amount = 12,
     time = 0.01,
@@ -45,9 +46,9 @@ food_class.particle_constant = {
 
 -- creates volitile data for the game to use
 food_class.create_data = function(player)
-	local name = player:get_player_name()
-	if not food_control_pool[name] then
-		food_control_pool[name] = {
+	food_class.name = player:get_player_name()
+	if not food_control_pool[food_class.name] then
+		food_control_pool[food_class.name] = {
 			eating_step  = 0,
 			eating_timer = 0,
 		}
@@ -56,11 +57,11 @@ end
 
 -- sets data for the game to use
 food_class.set_data = function(player,data)
-	local name = player:get_player_name()
-	if food_control_pool[name] then
-		for index,i_data in pairs(data) do
-			if food_control_pool[name][index] ~= nil then
-				food_control_pool[name][index] = i_data
+	food_class.name = player:get_player_name()
+	if food_control_pool[food_class.name] then
+		for index,i_data in food_class.pairs(data) do
+			if food_control_pool[food_class.name][index] ~= nil then
+				food_control_pool[food_class.name][index] = i_data
 			end
 		end
 	else
@@ -70,20 +71,20 @@ end
 
 -- retrieves data for the game to use
 food_class.get_data = function(player)
-	local name = player:get_player_name()
-	if food_control_pool[name] then
+	food_class.name = player:get_player_name()
+	if food_control_pool[food_class.name] then
 		return({
-			eating_step  = food_control_pool[name].eating_step ,
-			eating_timer = food_control_pool[name].eating_timer,
+			eating_step  = food_control_pool[food_class.name].eating_step ,
+			eating_timer = food_control_pool[food_class.name].eating_timer,
 		})
 	end
 end
 
 -- removes movement data
 food_class.terminate = function(player)
-	local name = player:get_player_name()
-	if food_control_pool[name] then
-		food_control_pool[name] = nil
+	food_class.name = player:get_player_name()
+	if food_control_pool[food_class.name] then
+		food_control_pool[food_class.name] = nil
 	end
 end
 
@@ -133,7 +134,7 @@ food_class.finish_eating = function(player,timer)
         hunger_pointer.eat_food(player,food_class.item)
         food_class.play("eat_finish", {
             object = food_class.local_player,
-            gain = 0.1                      ,
+            gain = 0.025                      ,
             pitch = food_class.random(60,85)/100}
         )
         return(0)
