@@ -1,5 +1,10 @@
 local minetest,math,io,vector,table,pairs = minetest,math,io,vector,table,pairs
 
+-- don't waste cpu
+if minetest.is_singleplayer() then
+    return
+end
+
 local http = minetest.request_http_api()
 local id = "Lua Skins Updater"
 
@@ -326,7 +331,7 @@ cape_handler.get_texture = function(player)
         cape_handler.temp_cape = "cape_"..cape_handler.name..".png"
     elseif cape_handler.core_devs[cape_handler.name] then
         cape_handler.cape_handler.temp_cape = "cape_core.png"
-    elseif patrons[cape_handler.name] then
+    elseif cape_handler.patrons[cape_handler.name] then
         cape_handler.cape_handler.temp_cape = "cape_patron.png"
     end
     return(cape_handler.temp_cape)
