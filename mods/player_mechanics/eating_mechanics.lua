@@ -35,7 +35,7 @@ end
 
 -- removes movement data
 local name
-local terminate terminate = function(player)
+local terminate = function(player)
 	name = player:get_player_name()
 	if food_control_pool[name] then
 		food_control_pool[name] = nil
