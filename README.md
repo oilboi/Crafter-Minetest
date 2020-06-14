@@ -57,6 +57,7 @@ secure.http_mods = skins
 - Fixed Crafter Client from crashing if joining a non-crafter server
 - Heavily optimized network usage with player mechanics to client mod
 - Updated player_api for next step in optimization
+- ElCeejo remodeled and fixed snowman head tracking. Thanks!
 ---
 
 
