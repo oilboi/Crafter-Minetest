@@ -284,7 +284,8 @@ mobs.register_mob(
 	 die_sound = "wool",
 	 
 	 
-	 hostile = true,
+	 hostile = false,
+	 attacked_hostile = true,
 	 attack_type = "projectile",
 	 projectile_type = "weather:snowball",
 	 projectile_timer_cooldown = 1,
