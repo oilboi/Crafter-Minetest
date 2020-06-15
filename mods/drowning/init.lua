@@ -1,187 +1,89 @@
 local minetest,vector,hud_manager = minetest,vector,hud_manager
 
-local mod_storage        = minetest.get_mod_storage()
+local mod_storage = minetest.get_mod_storage()
+local pool = {}
 
-local drowning_class     = {}
-
-drowning_class.get_group = minetest.get_item_group
-
-local player_drowning    = {}
-
-drowning_class.tick      = nil
-
-drowning_class.breath    = nil
-
-drowning_pointer         = {} -- allows other mods to access data
-
--- creates volitile data for the game to use
-drowning_class.set_data = function(player,data)
-	local name = player:get_player_name()
-	if not player_drowning[name] then
-		player_drowning[name] = {}
-	end
-
-	for index,i_data in pairs(data) do
-		player_drowning[name][index] = i_data
-	end
-
-	if data.breath then
-
-		if data.breath > 20 then
-			if hud_manager.hud_exists(player,"breath_bg") then
-				hud_manager.remove_hud(player,"breath_bg")
-			end
-			if hud_manager.hud_exists(player,"breath") then
-				hud_manager.remove_hud(player,"breath")
-			end
-		else
-			if not hud_manager.hud_exists(player,"breath_bg") then
-				hud_manager.add_hud(player,"breath_bg",{
-					hud_elem_type = "statbar",
-					position = {x = 0.5, y = 1},
-					text = "bubble_bg.png",
-					number = 20,
-					direction = 1,
-					size = {x = 24, y = 24},
-					offset = {x = 24*10, y= -(48 + 52 + 39)},
-				})
-			end
-			if not hud_manager.hud_exists(player,"breath") then
-				hud_manager.add_hud(player,"breath",{
-					hud_elem_type = "statbar",
-					position = {x = 0.5, y = 1},
-					text = "bubble.png",
-					number = data.breath,
-					direction = 1,
-					size = {x = 24, y = 24},
-					offset = {x = 24*10, y= -(48 + 52 + 39)},
-				})
-			end
-
-			hud_manager.change_hud({
-				player    =  player ,
-				hud_name  = "breath",
-				element   = "number",
-				data      =  data.breath
+-- updates bubble bar
+local update_breath_bar = function(player,breath)
+	if breath > 20 then
+		if hud_manager.hud_exists(player,"breath_bg") then
+			hud_manager.remove_hud(player,"breath_bg")
+		end
+		if hud_manager.hud_exists(player,"breath") then
+			hud_manager.remove_hud(player,"breath")
+		end
+	else
+		if not hud_manager.hud_exists(player,"breath_bg") then
+			hud_manager.add_hud(player,"breath_bg",{
+				hud_elem_type = "statbar",
+				position = {x = 0.5, y = 1},
+				text = "bubble_bg.png",
+				number = 20,
+				direction = 1,
+				size = {x = 24, y = 24},
+				offset = {x = 24*10, y= -(48 + 52 + 39)},
 			})
 		end
-	end
-end
-
--- indexes drowning data and returns it
-drowning_class.get_data = function(player,requested_data)
-	local name = player:get_player_name()
-	if player_drowning[name] then
-		local data_list = {}
-		local count     = 0
-		for index,i_data in pairs(requested_data) do
-			if player_drowning[name][i_data] then
-				data_list[i_data] = player_drowning[name][i_data]
-				count = count + 1
-			end
+		if not hud_manager.hud_exists(player,"breath") then
+			hud_manager.add_hud(player,"breath",{
+				hud_elem_type = "statbar",
+				position = {x = 0.5, y = 1},
+				text = "bubble.png",
+				number = breath,
+				direction = 1,
+				size = {x = 24, y = 24},
+				offset = {x = 24*10, y= -(48 + 52 + 39)},
+			})
 		end
-		if count > 0 then
-			return(data_list)
-		else
-			return(nil)
-		end
-	end
-	return(nil)
-end
 
--- removes data
-drowning_class.terminate = function(player)
-	local name = player:get_player_name()
-	if player_drowning[name] then
-		player_drowning[name] = nil
-	end
-end
-
--- loads data from mod storage
-drowning_class.load_data = function(player)
-	local name = player:get_player_name()
-	if mod_storage:get_int(name.."d_save") > 0 then
-		return({
-				breath        = mod_storage:get_float(name.."breath"       ),
-				breath_ticker = mod_storage:get_float(name.."breath_ticker"),
-				drowning      = mod_storage:get_float(name.."drowning"     ),
-			  })
-	else
-		return({
-				breath        = 20,
-				breath_ticker = 0 ,
-				drowning      = 0 ,
-			  })
-	end
-end
-
--- saves data to be utilized on next login
-drowning_class.save_data = function(player)
-	local name
-	if type(player) ~= "string" and player:is_player() then
-		name = player:get_player_name()
-	elseif type(player) == "string" then
-		name = player
-	end
-	if player_drowning[name] then
-		for index,integer in pairs(player_drowning[name]) do
-			mod_storage:set_float(name..index,integer)
-		end
-	end
-
-	mod_storage:set_int(name.."d_save", 1)
-
-	player_drowning[name] = nil
-end
-
--- is used for shutdowns to save all data
-drowning_class.save_all = function()
-	for name,data in pairs(player_drowning) do
-		drowning_class.save_data(name)
-	end
-end
-
-
--- creates volitile data for the game to use
-drowning_pointer.set_data = function(player,data)
-	local name = player:get_player_name()
-	if not player_drowning[name] then
-		player_drowning[name] = {}
-	end
-
-	for index,i_data in pairs(data) do
-		player_drowning[name][index] = i_data
-	end
-
-	if data.breath then
 		hud_manager.change_hud({
 			player    =  player ,
 			hud_name  = "breath",
 			element   = "number",
-			data      =  data.breath
+			data      =  breath
 		})
 	end
 end
 
--- indexes drowning data and returns it
-drowning_pointer.get_data = function(player,requested_data)
-	local name = player:get_player_name()
-	if player_drowning[name] then
-		local data_list = {}
-		local count     = 0
-		for index,i_data in pairs(requested_data) do
-			if player_drowning[name][i_data] then
-				data_list[i_data] = player_drowning[name][i_data]
-				count = count + 1
-			end
-		end
-		if count > 0 then
-			return(data_list)
-		else
-			return(nil)
-		end
+-- loads data from mod storage
+local name
+local temp_pool
+local load_data = function(player)
+	name = player:get_player_name()
+	pool[name] = {}
+	temp_pool = pool[name]
+	if mod_storage:get_int(name.."d_save") > 0 then
+		temp_pool.breath   = mod_storage:get_float(name.."breath"       )
+		temp_pool.ticker   = mod_storage:get_float(name.."breath_ticker")
+		temp_pool.drowning = mod_storage:get_float(name.."drowning"     )
+	else
+		temp_pool.breath        = 21
+		temp_pool.ticker = 0 
+		temp_pool.drowning      = 0 
 	end
-	return(nil)
+end
+
+-- saves data to be utilized on next login
+local temp_pool
+local save_data = function(name)
+	if type(player) ~= "string" and player:is_player() then
+		name = name:get_player_name()
+	end
+	temp_pool = pool[name]
+
+	mod_storage:set_float(name.."breath",        temp_pool.breath)
+	mod_storage:set_float(name.."breath_ticker", temp_pool.ticker)
+	mod_storage:set_float(name.."breath",        temp_pool.drowning)
+	mod_storage:set_int(name.."d_save", 1)
+
+	pool[name] = nil
+end
+
+-- is used for shutdowns to save all data
+local save_all = function()
+	for name,_ in pairs(pool) do
+		save_data(name)
+	end
 end
 
 
@@ -195,120 +97,100 @@ minetest.hud_replace_builtin("breath",{
 	size = {x = 0, y = 0},
 	offset = {x = 0, y= 0},
 })
-minetest.register_on_joinplayer(function(player)
-	local data = drowning_class.load_data(player)
-	drowning_class.set_data(player,data)
 
+minetest.register_on_joinplayer(function(player)
+	load_data(player)
 	player:hud_set_flags({breathbar=false})
 end)
 
 -- saves specific users data for when they relog
 minetest.register_on_leaveplayer(function(player)
-	drowning_class.save_data(player)
-	drowning_class.terminate(player)
+	save_data(player)
 end)
 
 -- save all data to mod storage on shutdown
 minetest.register_on_shutdown(function()
-	drowning_class.save_all()
+	save_all()
 end)
 
+local name
+is_player_drowning = function(player)
+	name = player:get_player_name()
+	return(pool[name].drowning)
+end
+
 -- reset the player's data
+local name
+local temp_pool
 minetest.register_on_respawnplayer(function(player)
-	drowning_class.set_data(player,{
-		breath        = 20,
-		breath_ticker = 0 ,
-		drowning      = 0 ,
-	})
+	name = player:get_player_name()
+	temp_pool = pool[name]
+	temp_pool.breath   = 21
+	temp_pool.ticker   = 0
+	temp_pool.drowning = 0
+	update_breath_bar(player,temp_pool.breath)
 end)
 
 --handle the breath bar
-drowning_class.handle_breath = function(dtime)
-	for _,player in ipairs(minetest.get_connected_players()) do
-		local name = player:get_player_name()
+local name
+local temp_pool
+local head
+local hp
+local handle_breath = function(player,dtime)
+	name = player:get_player_name()
+	head = get_player_head_env(player)
+	temp_pool = pool[name]
+	hp = player:get_hp()
+	if hp <= 0 then
+		return
+	end
+	if minetest.get_item_group(head, "drowning") > 0 then
 
-		local data = environment_pointer.get_data(player,{"head"})
+		temp_pool.ticker = temp_pool.ticker + dtime
 		
-		if data then
-			data = data.head
+		if temp_pool.breath > 0 and temp_pool.ticker >= 1.3 then
+
+			if temp_pool.breath == 21 then
+				temp_pool.breath = 20
+			end	
+			temp_pool.breath = temp_pool.breath - 2
+
+			temp_pool.drowning = 0
+
+			update_breath_bar(player,temp_pool.breath)
+		elseif temp_pool.breath <= 0 and temp_pool.ticker >= 1.3 then
+
+			temp_pool.drowning = 1
+
+			if hp > 0 then
+				player:set_hp( hp - 2 )
+			end
 		end
 
-		if drowning_class.get_group(data, "drowning") > 0 then
+		if temp_pool.ticker >= 1.3 then
+			temp_pool.ticker = 0
+		end
+
+	else
+
+		temp_pool.ticker = temp_pool.ticker + dtime		
+
+		if temp_pool.breath < 21 and temp_pool.ticker >= 0.25 then
 			
-			drowning_class.ticker = drowning_class.get_data(player,{"breath_ticker"})
-
-			drowning_class.breath = drowning_class.get_data(player,{"breath"})
-				
-			if drowning_class.breath then
-				drowning_class.breath = drowning_class.breath.breath
-			end
-
-			if drowning_class.ticker then
-				drowning_class.ticker = drowning_class.ticker.breath_ticker
-			end
-
-			drowning_class.ticker = drowning_class.ticker + dtime
+			temp_pool.breath = temp_pool.breath + 2
 			
-			if drowning_class.breath > 0 and drowning_class.ticker >= 1.3 then
-
-				drowning_class.breath = drowning_class.breath - 2
-
-				drowning_class.set_data(player,{breath = drowning_class.breath})
-				
-				drowning_class.set_data(player,{drowning = 0})
-
-			elseif drowning_class.breath <= 0 and drowning_class.ticker >= 1.3 then
-									
-				drowning_class.set_data(player,{drowning=1})
-
-				local hp =  player:get_hp()
-
-				if hp > 0 then
-					player:set_hp(hp-2)
-				end
-			end
-
-			if drowning_class.ticker >= 1.3 then
-				drowning_class.ticker = 0
-			end
-
-			drowning_class.set_data(player,{breath_ticker = drowning_class.ticker})
+			temp_pool.drowning      = 0
 			
-		else
+			temp_pool.ticker = 0
 
-			drowning_class.breath = drowning_class.get_data(player,{"breath"})
-			
-			drowning_class.ticker = drowning_class.get_data(player,{"breath_ticker"})
-
-			if drowning_class.ticker then
-				drowning_class.ticker = drowning_class.ticker.breath_ticker
-			end
-
-			if drowning_class.breath then
-				drowning_class.breath = drowning_class.breath.breath
-			end
-
-			drowning_class.ticker = drowning_class.ticker + dtime		
-
-			if drowning_class.breath < 21 and drowning_class.ticker >= 0.25 then
-				
-				drowning_class.breath = drowning_class.breath + 2
-				
-				drowning_class.set_data(player,{
-					breath        = drowning_class.breath,
-					drowning      = 0,
-					breath_ticker = 0,
-				})
-			elseif drowning_class.breath < 21 then
-				drowning_class.set_data(player,{breath_ticker = drowning_class.ticker})
-			else
-				drowning_class.set_data(player,{breath_ticker = 0})
-			end
+			update_breath_bar(player,temp_pool.breath)
 		end
 	end
 end
 
 -- inject into main loop
 minetest.register_globalstep(function(dtime)
-	drowning_class.handle_breath(dtime)
+	for _,player in ipairs(minetest.get_connected_players()) do
+		handle_breath(player,dtime)
+	end
 end)

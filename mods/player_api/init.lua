@@ -1,37 +1,8 @@
-local minetest,math   = minetest,math
-local api             = {} -- api class
-local wield           = {} -- wield item class
-local player_pool     = {} -- holds data about the players
-player_pointer        = {} -- allows other mods to modify player attributes
-api.registered_models = {}
-api.animation_blend   = 0
-api.pairs             = pairs
-api.ipairs            = ipairs
-api.name              = nil
-api.item              = nil
-api.item_string       = nil
-api.object            = nil
-api.object_string     = nil
-api.entity            = nil
-api.data_index        = nil
-api.current_animation = nil
-api.animations        = nil
-api.opacity           = nil
-api.pitch             = nil
-api.control_table     = nil
-api.controls          = nil
-api.old_controls      = nil
-api.update            = nil
-api.player_data       = nil
-api.state             = nil
-api.mouse             = nil
-api.translated        = nil
-api.swimming          = nil
-api.force_update      = nil
-api.pi                = math.pi
-api.get_connected     = minetest.get_connected_players
+local minetest,math = minetest,math
+local pool = {}
+
 -- player physical data constant
-api.player = {
+local player_constant = {
 	visual               = "mesh"       ,
 	mesh                 = "player.b3d" ,
 	animation_speed      = 24           ,
@@ -40,24 +11,6 @@ api.player = {
 							"player.png"    ,
 							"blank_skin.png",
 						   },
-
-	animations           = {
-		stand            = { x = 5  , y = 5   },
-		lay              = { x = 162, y = 162 },
-		walk             = { x = 168, y = 187 },
-		mine             = { x = 189, y = 198 },
-		walk_mine        = { x = 200, y = 219 },
-		sit              = { x = 81 , y = 160 },
-		sneak            = { x = 60 , y = 60  },
-		sneak_mine_stand = { x = 20 , y = 30  },
-		sneak_walk       = { x = 60 , y = 80  },
-		sneak_mine_walk  = { x = 40 , y = 59  },
-		swim             = { x = 221, y = 241 },
-		swim_still       = { x = 226, y = 226 },
-		die              = { x = 242, y = 253 },
-
-						   },
-
 	current_animation    = "stand",
 	swimming             = false,
 	collisionbox         = {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
@@ -68,285 +21,207 @@ api.player = {
 	wield_item           = nil  ,
 }
 
--- allows other mods to register models
-player_pointer.register_model = function(name, def)
-	models[name] = def
-end
-
--- creates default data for players
-api.create_data = function(player)
-	api.name = player:get_player_name()
-	if not player_pool[api.name] then
-		player_pool[api.name] = {}
-	end
-
-	for key,data in api.pairs(api.player) do
-		player_pool[api.name][key] = data
-	end	
-end
-
--- creates volitile data for the game to use
-api.set_data = function(player,data)
-	api.name = player:get_player_name()
-	if not player_pool[api.name] then
-		player_pool[api.name] = {}
-	end
-
-	for index,i_data in api.pairs(data) do
-		player_pool[api.name][index] = i_data
-	end
-end
-
--- allows other mods to modify the player
-player_pointer.set_data = function(player,data)
-	api.name = player:get_player_name()
-	if not player_pool[api.name] then
-		player_pool[api.name] = {}
-	end
-
-	for index,i_data in api.pairs(data) do
-		player_pool[api.name][index] = i_data
-	end
-
-	player:set_properties(data)
-end
-
--- removes data
-api.terminate = function(player)
-	api.name = player:get_player_name()
-	if player_pool[name] then
-		player_pool[name] = nil
-	end
-end
-
--- indexes and returns data
-api.get_data = function(player,requested_data)
-	api.name = player:get_player_name()
-	if player_pool[api.name] then
-		local data_list = {}
-		local count     = 0
-		for index,i_data in api.pairs(requested_data) do
-			if player_pool[api.name][i_data] then
-				data_list[i_data] = player_pool[api.name][i_data]
-				count = count + 1
-			end
-		end
-		if count > 0 then
-			return(data_list)
-		else
-			return(nil)
-		end
-	end
-	return(nil)
-end
-
-
 -- set player wield item
-api.update_wield_item = function(player)
-	api.name = player:get_player_name()
-	
-	api.item = api.get_data(player,{"wield_item"})
-	if api.item then
-		api.item = api.item.wield_item
-	end
+local name
+local temp_pool
+local item
+local object
+local entity
+local object_string
+local update_wield_item = function(player)
+	name = player:get_player_name()
+	temp_pool = pool[name]
 
-	api.item_string = player:get_wielded_item():get_name()
+	object = temp_pool.wield_item
 
-	if not api.item or (api.item and not api.item:get_luaentity()) then
+	item = player:get_wielded_item():get_name()
+
+	if not object or (object and not object:get_luaentity()) then
 		
-		api.object = minetest.add_entity(player:get_pos(),"player_api:item")
+		object = minetest.add_entity(player:get_pos(),"player_api:item")
 
-		api.entity = api.object:get_luaentity()
+		entity = object:get_luaentity()
 
-		if api.entity then
+		if entity then
 
-			api.entity:set_item(api.item_string)
+			entity.set_item(entity,item)
 			
-			api.entity.wielder = api.name
+			entity.wielder = name
 			
-			api.object:set_attach(player, "Right_Hand", vector.new(0,0,0), vector.new(0,0,0))
+			object:set_attach(player, "Right_Hand", vector.new(0,0,0), vector.new(0,0,0))
 			
-			api.set_data(player,{
-				wield_item = api.object
-			})
+			temp_pool.wield_item = object
 		end
-		return
+
+		return -- catch it
 	end
 	
-	api.entity = api.item:get_luaentity()
-
-	api.object_string = api.entity.itemstring
-
-	if api.entity and api.object_string ~= api.item_string then
-		api.entity.itemstring = player_wield_item
-		api.entity:set_item(player_wield_item)
-	end
-end
-
-
--- easier way to index animation
-api.get_animation = function(player)
-	api.data_index = api.get_data(player,{"current_animation"})
-	if api.data_index and api.data_index.current_animation then
-		return(api.data_index.current_animation)
-	else
-		return(nil)
+	entity = object:get_luaentity()
+	object_string = entity.itemstring
+	
+	if object_string ~= item then
+		entity.itemstring = item
+		entity.set_item(entity,item)
 	end
 end
 
 -- easy way to allocate new players
-api.set_all_properties = function(player)
-	api.player_data = api.get_data(player,{
-		"visual",
-		"mesh",
-		"textures",
-		"collisionbox",
-		"eye_height",
-		"stepheight",
-		"visual_size"
-	})
-	player:set_properties(api.player_data)
+local data
+local name
+local temp_pool
+
+local set_all_properties = function(player)
+	name = player:get_player_name()
+	pool[name] = {}
+	temp_pool = pool[name]
+	data = {}
+
+	temp_pool.visual       = player_constant.visual
+	temp_pool.mesh         = player_constant.mesh
+	temp_pool.textures     = player_constant.textures
+	temp_pool.collisionbox = player_constant.collisionbox
+	temp_pool.eye_height   = player_constant.eye_height
+	temp_pool.stepheight   = player_constant.stepheight
+	temp_pool.visual_size  = player_constant.visual_size
+
+	player:set_properties(temp_pool)
 end
 
 -- easy way to set textures
-api.set_textures = function(player, textures)
-	api.set_data(player,{
-		texture = textures,
-	})
+local set_textures = function(player, textures)
 	player:set_properties({textures = textures})
 end
 
--- easy way for other mods to set textures
-player_pointer.set_textures = function(player,textures)
-	api.set_textures(player,textures)
-end
+
+local animation_list = {
+	stand            = { x = 5  , y = 5   },
+	lay              = { x = 162, y = 162 },
+	walk             = { x = 168, y = 187 },
+	mine             = { x = 189, y = 198 },
+	walk_mine        = { x = 200, y = 219 },
+	sit              = { x = 81 , y = 160 },
+	sneak            = { x = 60 , y = 60  },
+	sneak_mine_stand = { x = 20 , y = 30  },
+	sneak_walk       = { x = 60 , y = 80  },
+	sneak_mine_walk  = { x = 40 , y = 59  },
+	swim             = { x = 221, y = 241 },
+	swim_still       = { x = 226, y = 226 },
+	die              = { x = 242, y = 253 },
+}
 
 -- easy way to set animation
-api.set_animation = function(player, animation_name, speed, loop)
-	api.current_animation = api.get_data(player,{"current_animation"})
-	if api.current_animation then
-		api.current_animation = api.current_animation.current_animation
-	end
+local name
+local temp_pool
+local current_animation
 
-	if api.current_animation == animation_name then
+local set_animation = function(player, animation_name, speed, loop)
+	name = player:get_player_name()
+	temp_pool = pool[name]
+	current_animation = temp_pool.animation
+
+	if current_animation == animation_name then
 		return
 	end
-
-	api.animations = api.get_data(player,{"animations"})
-	if api.animations then
-		api.animations = api.animations.animations
-	end
-
-	api.animations = api.animations[animation_name]
-	
-	player:set_animation(api.animations, speed, 0, loop)
-
-	api.set_data(player,{
-		current_animation = animation_name
-	})
-end
-
--- allows other mods to set player animation
-player_pointer.set_animation = function(player,animation_name,speed)
-	api.set_animation(player,animation_name,speed)
+	temp_pool.animation = animation_name
+	player:set_animation(animation_list[animation_name], speed, 0, loop)
 end
 
 -- allows mods to force update animation
-player_pointer.force_update = function(player)
-	api.set_data(player,{
-		force_update = true
-	})
+local name
+force_update_animation = function(player)
+	name = player:get_player_name()
+	pool[name].force_update = true
 end
 
 -- force updates the player
-api.create_force_update = function(player)
-	api.set_data(player,{
-		force_update = true
-	})
+local name
+local create_force_update = function(player)
+	name = player:get_player_name()
+	pool[name].force_update = true
 end
 
 
 -- toggles nametag visibility
-api.show_nametag = function(player,boolean)
+local opacity
+local show_nametag = function(player,boolean)
 	if boolean then
-		api.opacity = 255
+		opacity = 255
 	else
-		api.opacity = 0
+		opacity = 0
 	end
 	
 	player:set_nametag_attributes({
 		color = {
 			r = 255,
 			b = 255,
-			a = api.opacity,
+			a = opacity,
 			g = 255
 		}
 	})
 end
 
 -- remove all player data
+local name
 minetest.register_on_leaveplayer(function(player)
-	api.terminate(player)
+	name = player:get_player_name()
+	pool[name] = nil
 end)
 
 
 -- converts yaw to degrees
-api.degrees = function(yaw)
-	return(yaw*180.0/api.pi)
+local degrees = function(yaw)
+	return(yaw*180.0/math.pi)
 end
 
 -- controls head bone
-api.pitch_look = function(player,sneak)
-	api.state = movement_pointer.get_data(player,{"swimming"})
-	if api.state then
-		api.state = api.state.swimming
+local state
+local swimming
+local pitch
+local pitch_look = function(player,sneak)
+	state = get_player_state(player)
+	swimming = is_player_swimming(player)
+	pitch = degrees(player:get_look_vertical()) * -1
+	if swimming then
+		pitch = pitch + 90
+	elseif sneak then
+		pitch = pitch + 15
 	end
 
-	api.pitch = api.degrees(player:get_look_vertical()) * -1
-	if api.swimming then
-		api.pitch = api.pitch + 90
-	elseif sneak then
-		api.pitch = api.pitch + 15
-	end
-	player:set_bone_position("Head", vector.new(0,6.3,0), vector.new(api.pitch,0,0))
+	player:set_bone_position("Head", vector.new(0,6.3,0), vector.new(pitch,0,0))
 end
 
 -- checks if the player has done anything with their keyboard/mouse
-api.control_check = function(player,control_table)
-	api.old_controls  = api.get_data(player,{"old_controls"})
-	if api.old_controls then
-		api.old_controls = api.old_controls.old_controls
-	end
+local name
+local temp_pool
+local old_control
 
-	api.force_update = api.get_data(player,{"force_update"})
-	if api.force_update then
-		api.force_update = api.force_update.force_update
-	end
+local control_check = function(player,control_table)
+	name = player:get_player_name()
+	temp_pool = pool[name]
 
-	if api.force_update then
-		api.set_data(player,{
-			old_controls = control_table,
-			force_update = nil          ,
-		})
+	if not temp_pool.old_controls then
+		temp_pool.old_controls = control_table
 		return(true)
 	end
 
-	for i,k in api.pairs(api.old_controls) do
+	if temp_pool.force_update then
+		temp_pool.old_controls = control_table
+		return(true)
+	end
+
+	for i,k in pairs(temp_pool.old_controls) do
 		if control_table[i] ~= k then
-			api.set_data(player,{
-				old_controls = control_table
-			})
+			temp_pool.old_controls = control_table
 			return(true)
 		end
 	end
-	api.set_data(player,{
-		old_controls = control_table
-	})
+
+	temp_pool.old_controls = control_table
 	return(false)
 end
 
 -- movement to animation translations
-api.translation_table = {
+local translation_table = {
 	["walk"] = {
 		["keys"]    = { -- required keys
 			up      = true,
@@ -409,66 +284,73 @@ api.translation_table = {
 }
 
 -- translate input and combine with state
-api.control_translation = function(player,control)
-	api.state = movement_pointer.get_data(player,{"state","swimming"})
+local name
+local temp_pool
+local state
+local swimming
+local mouse
 
-	if api.state then
-		api.swimming = api.state.swimming
-		api.state    = api.state.state
-	end
+local control_translation = function(player,control)
+	name = player:get_player_name()
+	temp_pool = pool[name]
 
-	api.mouse = (control.LMB or control.RMB)
+	state = get_player_state(player)
+	swimming = is_player_swimming(player)
 
-	if api.swimming then
-		for k,i in api.pairs(control) do
-			if i and api.translation_table.swim.keys[k] then
-				api.translated = api.translation_table.swim.states[true]
-				api.set_animation(player, api.translated.animation, api.translated.speed)
+	mouse = (control.LMB or control.RMB)
+
+	if swimming then
+		for k,i in pairs(control) do
+			if i and translation_table.swim.keys[k] then
+				translated = translation_table.swim.states[true]
+				set_animation(player, translated.animation, translated.speed)
 				return
 			end
 		end
-		api.translated = api.translation_table.swim.states[false]
-		api.set_animation(player, api.translated.animation, api.translated.speed)
+		translated = translation_table.swim.states[false]
+		set_animation(player, translated.animation, translated.speed)
 		return
 	else
 		if control.sneak then
-			for k,i in api.pairs(control) do
-				if i and api.translation_table.sneak.keys[k] then
-					api.translated = api.translation_table.sneak.states[true][api.mouse]
-					api.set_animation(player, api.translated.animation, api.translated.speed)
+			for k,i in pairs(control) do
+				if i and translation_table.sneak.keys[k] then
+					translated = translation_table.sneak.states[true][mouse]
+					set_animation(player, translated.animation, translated.speed)
 					return
 				end
 			end
-			api.translated = api.translation_table.sneak.states[false][api.mouse]
-			api.set_animation(player, api.translated.animation, api.translated.speed)
+			translated = translation_table.sneak.states[false][mouse]
+			set_animation(player, translated.animation, translated.speed)
 			return
 		else
-			for k,i in api.pairs(control) do
-				if i and api.translation_table.walk.keys[k] then
-					api.translated = api.translation_table.walk.states[api.mouse][api.state]
-					if api.translated then
-						api.set_animation(player, api.translated.animation, api.translated.speed)
+			for k,i in pairs(control) do
+				if i and translation_table.walk.keys[k] then
+					translated = translation_table.walk.states[mouse][state]
+					if translated then
+						set_animation(player, translated.animation, translated.speed)
 						return
 					end
 				end
 			end
 		end
 
-		api.translated = api.translation_table.stand[api.mouse]
-		api.set_animation(player, api.translated.animation, api.translated.speed)
+		translated = translation_table.stand[mouse]
+		set_animation(player, translated.animation, translated.speed)
 	end
 end
 
 -- translates player movement to animation
-api.do_animations = function(player)
-	api.control_table = player:get_player_control()
-	api.update = api.control_check(player,api.control_table)
-	api.pitch_look(player,api.control_table.sneak)
-	api.update_wield_item(player)
-	if api.update and player:get_hp() > 0 then
-		api.control_translation(player,api.control_table)
+local control_table
+local update
+local do_animations = function(player)
+	control_table = player:get_player_control()
+	update = control_check(player,control_table)
+	pitch_look(player,control_table.sneak)
+	update_wield_item(player)
+	if update and player:get_hp() > 0 then
+		control_translation(player,control_table)
 	elseif player:get_hp() <= 0 then
-		api.set_animation(player,"die",40,false)
+		set_animation(player,"die",40,false)
 	end
 end
 
@@ -476,18 +358,17 @@ end
 
 -- Update appearance when the player joins
 minetest.register_on_joinplayer(function(player)
-	api.create_data(player)
-	api.set_all_properties(player)
+	set_all_properties(player)
 end)
 
 minetest.register_on_respawnplayer(function(player)
-	api.create_force_update(player)
+	create_force_update(player)
 end)
 
 -- inject into global loop
 minetest.register_globalstep(function()
-	for _,player in api.ipairs(api.get_connected()) do
-		api.do_animations(player)
+	for _,player in ipairs(minetest.get_connected_players()) do
+		do_animations(player)
 	end
 end)
 
