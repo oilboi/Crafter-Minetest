@@ -94,7 +94,7 @@ local finish_eating = function(player,timer)
     if timer >= 1 then
         item = player:get_wielded_item()
 
-        hunger_pointer.eat_food(player,item)
+        player_eat_food(player,item)
 
         minetest.sound_play("eat_finish", {
             object = player,
