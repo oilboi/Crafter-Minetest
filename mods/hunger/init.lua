@@ -27,9 +27,9 @@ end
 -- saves data to be utilized on next login
 local name
 local temp_pool
-local save_data = function(player)
-	if type(player) ~= "string" and player:is_player() then
-		name = player:get_player_name()
+local save_data = function(name)
+	if type(name) ~= "string" and name:is_player() then
+		name = name:get_player_name()
 	end
 	temp_pool = pool[name]
 	
@@ -40,7 +40,7 @@ local save_data = function(player)
 
 	mod_storage:set_int(name.."h_save",1)
 
-	player_hunger_data[name] = nil
+	pool[name] = nil
 end
 
 

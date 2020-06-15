@@ -66,7 +66,7 @@ end
 -- saves data to be utilized on next login
 local temp_pool
 local save_data = function(name)
-	if type(player) ~= "string" and player:is_player() then
+	if type(name) ~= "string" and name:is_player() then
 		name = name:get_player_name()
 	end
 	temp_pool = pool[name]

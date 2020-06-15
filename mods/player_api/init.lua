@@ -289,7 +289,7 @@ local temp_pool
 local state
 local swimming
 local mouse
-
+local translated
 local control_translation = function(player,control)
 	name = player:get_player_name()
 	temp_pool = pool[name]
