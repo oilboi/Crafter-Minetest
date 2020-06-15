@@ -81,7 +81,7 @@ end
 local name
 get_player_hunger = function(player)
 	name = player:get_player_name()
-	return(20)
+	return(pool[name].hunger)
 end
 
 
@@ -130,6 +130,12 @@ minetest.register_on_respawnplayer(function(player)
 	temp_pool.satiation             = 20
 	temp_pool.regeneration_interval = 0
 	temp_pool.exhaustion            = 0
+	hud_manager.change_hud({
+		player    =  player ,
+		hud_name  = "hunger",
+		element   = "number",
+		data      =  temp_pool.hunger
+	})
 end)
 
 
@@ -293,6 +299,13 @@ player_eat_food = function(player,item)
 	temp_pool.satiation = temp_pool.satiation + satiation
 	
 	take_food(player)
+
+	hud_manager.change_hud({
+		player    =  player ,
+		hud_name  = "hunger",
+		element   = "number",
+		data      =  temp_pool.hunger
+	})
 end
 
 -- easily allows mods to register food
@@ -319,5 +332,11 @@ minetest.register_chatcommand("hungry", {
 		temp_pool.exhaustion = 0
 		temp_pool.hunger     = 1
 		temp_pool.satiation  = 0
+		hud_manager.change_hud({
+			player    =  minetest.get_player_by_name(name) ,
+			hud_name  = "hunger",
+			element   = "number",
+			data      =  temp_pool.hunger
+		})
 	end
 })
