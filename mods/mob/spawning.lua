@@ -68,6 +68,7 @@ local mobs
 local spawner
 local mob_spawning
 local light_level
+local mob_pos
 local function spawn_mobs(player)
 	pos = player:get_pos()
 
@@ -90,7 +91,7 @@ local function spawn_mobs(player)
 	
 	--print(dump(spawner))
 	if table.getn(spawner) > 0 then
-		local mob_pos = spawner[1]
+		mob_pos = spawner[1]
 		mob_pos.y = mob_pos.y + 1
 		--aether spawning
 		if mob_pos.y >= 21000 then
