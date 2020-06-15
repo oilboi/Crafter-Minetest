@@ -36,8 +36,7 @@ end)
 -- delete data on player leaving
 local name
 minetest.register_on_leaveplayer(function(player)
-	name = minetest.get_player_name()
-	
+	name = player:get_player_name()
 	pool[name] = nil
 end)
 

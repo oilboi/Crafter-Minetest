@@ -431,7 +431,7 @@ minetest.register_entity("player_api:item", {
 	end,
 
 	on_step = function(self, dtime)
-		if not self.wielder then
+		if not self.wielder or (self.wielder and not minetest.get_player_by_name(self.wielder)) then
 			self.object:remove()
 		end
 	end,
