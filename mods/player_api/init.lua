@@ -83,7 +83,7 @@ local set_all_properties = function(player)
 	temp_pool.eye_height   = player_constant.eye_height
 	temp_pool.stepheight   = player_constant.stepheight
 	temp_pool.visual_size  = player_constant.visual_size
-
+	temp_pool.attached     = false
 	player:set_properties(temp_pool)
 end
 
@@ -139,6 +139,18 @@ local create_force_update = function(player)
 	name = player:get_player_name()
 	pool[name].force_update = true
 end
+
+-- allows other mods to set animations per player
+set_player_animation = function(player,animation,speed,loop)
+	set_animation(player, animation, speed, loop)
+end
+
+local name
+player_is_attached = function(player,truth)
+	name = player:get_player_name()
+	pool[name].attached = truth
+end
+
 
 
 -- toggles nametag visibility
@@ -342,15 +354,22 @@ end
 -- translates player movement to animation
 local control_table
 local update
+local name
+local temp_pool
 local do_animations = function(player)
+	name = player:get_player_name()
+	temp_pool = pool[name]
+
 	control_table = player:get_player_control()
-	update = control_check(player,control_table)
 	pitch_look(player,control_table.sneak)
-	update_wield_item(player)
-	if update and player:get_hp() > 0 then
-		control_translation(player,control_table)
-	elseif player:get_hp() <= 0 then
+	if player:get_hp() <= 0 then
 		set_animation(player,"die",40,false)
+	elseif not temp_pool.attached then
+		update = control_check(player,control_table)
+		update_wield_item(player)
+		if update and player:get_hp() > 0 then
+			control_translation(player,control_table)
+		end
 	end
 end
 

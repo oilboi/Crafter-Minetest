@@ -56,19 +56,16 @@ minetest.register_entity("boat:boat", {
 			clicker:move_to(pos)
 			clicker:add_player_velocity(vector.new(0,11,0))
 			self.rider = nil
+			
+			player_is_attached(clicker,false)
+			force_update_animation(clicker)
+
 		elseif not self.rider then
 			self.rider = player_name
-			clicker:set_attach(self.object, "", {x=0, y=-4.5, z=0}, {x=0, y=0, z=0})
-			minetest.after(0.2, function()
-				player_api.set_animation(clicker, "sit" , 30)
-			end)
-			--player:set_eye_offset({x=0, y=-4, z=0},{x=0, y=-4, z=0})
-			--carts:manage_attachment(clicker, self.object)
-
-			-- player_api does not update the animation
-			-- when the player is attached, reset to default animation
+			clicker:set_attach(self.object, "", {x=0, y=2, z=0}, {x=0, y=0, z=0})
 			
-			--player_api.set_animation(clicker, "stand")
+			set_player_animation(clicker,"sit",0)
+			player_is_attached(clicker,true)
 		end
 	end,
 	--check if the boat is stuck on land
@@ -327,19 +324,16 @@ minetest.register_entity("boat:iron_boat", {
 			clicker:move_to(pos)
 			clicker:add_player_velocity(vector.new(0,11,0))
 			self.rider = nil
+			
+			player_is_attached(clicker,false)
+			force_update_animation(clicker)
+
 		elseif not self.rider then
 			self.rider = player_name
-			clicker:set_attach(self.object, "", {x=0, y=-4.5, z=0}, {x=0, y=0, z=0})
-			minetest.after(0.2, function()
-				player_api.set_animation(clicker, "sit" , 30)
-			end)
-			--player:set_eye_offset({x=0, y=-4, z=0},{x=0, y=-4, z=0})
-			--carts:manage_attachment(clicker, self.object)
-
-			-- player_api does not update the animation
-			-- when the player is attached, reset to default animation
+			clicker:set_attach(self.object, "", {x=0, y=2, z=0}, {x=0, y=0, z=0})
 			
-			--player_api.set_animation(clicker, "stand")
+			set_player_animation(clicker,"sit",0)
+			player_is_attached(clicker,true)
 		end
 	end,
 	--check if the boat is stuck on land
