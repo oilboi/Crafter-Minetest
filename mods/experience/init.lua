@@ -1,7 +1,6 @@
 local minetest,math,vector,os = minetest,math,vector,os
 local mod_storage = minetest.get_mod_storage()
 local pool = {}
-local experience_bar_max = 36
 
 -- loads data from mod storage
 local name
@@ -225,6 +224,25 @@ end)
 local name
 local temp_pool
 local collector
+local pos
+local pos2
+local direction
+local distance
+local player_velocity
+local goal
+local currentvel
+local acceleration
+local multiplier
+local velocity
+local node
+local vel
+local def
+local is_moving
+local is_slippery
+local slippery
+local slip_factor
+local size
+local data
 minetest.register_entity("experience:orb", {
 	initial_properties = {
 		hp_max = 1,
@@ -271,7 +289,7 @@ minetest.register_entity("experience:orb", {
 
 	on_activate = function(self, staticdata, dtime_s)
 		if string.sub(staticdata, 1, string.len("return")) == "return" then
-			local data = minetest.deserialize(staticdata)
+			data = minetest.deserialize(staticdata)
 			if data and type(data) == "table" then
 				self.age = (data.age or 0) + dtime_s
 				self.collection_timer = data.collection_timer
@@ -280,20 +298,18 @@ minetest.register_entity("experience:orb", {
 				self.collected = data.collected
 				self.delete_timer = data.delete_timer
 				self.collector = data.collector
-				--print("restored timer: "..self.collection_timer)
 			end
 		else
-
-			local x=math.random(-2,2)*math.random()
-			local y=math.random(2,5)
-			local z=math.random(-2,2)*math.random()
-			self.object:set_velocity(vector.new(x,y,z))
-		     -- print(self.collection_timer)
+			self.object:set_velocity(vector.new(
+				math.random(-2,2)*math.random(),
+				math.random(2,5),
+				math.random(-2,2)*math.random()
+			))
 		end
 		self.object:set_armor_groups({immortal = 1})
 		self.object:set_velocity({x = 0, y = 2, z = 0})
 		self.object:set_acceleration({x = 0, y = -9.81, z = 0})
-        local size = math.random(20,36)/100
+        size = math.random(20,36)/100
         self.object:set_properties({
 			visual_size = {x = size, y = size},
 			glow = 14,
@@ -332,34 +348,33 @@ minetest.register_entity("experience:orb", {
 				self.object:set_acceleration(vector.new(0,0,0))
 				self.disable_physics(self)
 				--get the variables
-				local pos = self.object:get_pos()
-				local pos2 = collector:get_pos()
+				pos = self.object:get_pos()
+				pos2 = collector:get_pos()
 				
-                local player_velocity = collector:get_player_velocity()
+                player_velocity = collector:get_player_velocity()
                                             
 				pos2.y = pos2.y + self.collection_height
 								
-				local direction = vector.direction(pos,pos2)
-				local distance = vector.distance(pos2,pos)
-                local multiplier = distance
+				direction = vector.direction(pos,pos2)
+				distance = vector.distance(pos2,pos)
+				multiplier = distance
                 if multiplier < 1 then
                     multiplier = 1
                 end
-				local goal = vector.multiply(direction,multiplier)
-                local currentvel = self.object:get_velocity()
-				local acceleration
+				goal = vector.multiply(direction,multiplier)
+                currentvel = self.object:get_velocity()
 
 				if distance > 1 then
-                    local multiplier = 20 - distance
-                    local velocity = vector.multiply(direction,multiplier)
-                    local goal = velocity--vector.add(player_velocity,velocity)
+                    multiplier = 20 - distance
+                    velocity = vector.multiply(direction,multiplier)
+                    goal = velocity
 					acceleration = vector.new(goal.x-currentvel.x,goal.y-currentvel.y,goal.z-currentvel.z)
 					self.object:add_velocity(vector.add(acceleration,player_velocity))
 				elseif distance > 0.9 and temp_pool.buffer > 0 then
 					temp_pool.buffer = temp_pool.buffer - dtime
-					local multiplier = 20 - distance
-					local velocity = vector.multiply(direction,multiplier)
-					local goal = vector.multiply(minetest.yaw_to_dir(minetest.dir_to_yaw(vector.direction(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z)))+math.pi/2),10)
+					multiplier = 20 - distance
+					velocity = vector.multiply(direction,multiplier)
+					goal = vector.multiply(minetest.yaw_to_dir(minetest.dir_to_yaw(vector.direction(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z)))+math.pi/2),10)
 					goal = vector.add(player_velocity,goal)
 					acceleration = vector.new(goal.x-currentvel.x,goal.y-currentvel.y,goal.z-currentvel.z)
 					self.object:add_velocity(acceleration)
@@ -376,6 +391,7 @@ minetest.register_entity("experience:orb", {
 			end
 		end
 		
+		
 		--allow entity to be collected after timer
 		if self.collectable == false and self.collection_timer >= self.collection_timer_goal then
 			self.collectable = true
@@ -389,12 +405,12 @@ minetest.register_entity("experience:orb", {
 			return
 		end
 
-		local pos = self.object:get_pos()
-		local node
+		pos = self.object:get_pos()
+
 		if pos then
 			node = minetest.get_node_or_nil({
 				x = pos.x,
-				y = pos.y + self.object:get_properties().collisionbox[2] - 0.05,
+				y = pos.y -0.25,
 				z = pos.z
 			})
 		else
@@ -407,86 +423,23 @@ minetest.register_entity("experience:orb", {
 			return
 		end
 
-		local is_stuck = false
-		local snode = minetest.get_node_or_nil(pos)
-		if snode then
-			local sdef = minetest.registered_nodes[snode.name] or {}
-			is_stuck = (sdef.walkable == nil or sdef.walkable == true)
-				and (sdef.collision_box == nil or sdef.collision_box.type == "regular")
-				and (sdef.node_box == nil or sdef.node_box.type == "regular")
-		end
-
-		-- Push item out when stuck inside solid node
-		if is_stuck then
-			local shootdir
-			local order = {
-				{x=1, y=0, z=0}, {x=-1, y=0, z= 0},
-				{x=0, y=0, z=1}, {x= 0, y=0, z=-1},
-			}
-
-			-- Check which one of the 4 sides is free
-			for o = 1, #order do
-				local cnode = minetest.get_node(vector.add(pos, order[o])).name
-				local cdef = minetest.registered_nodes[cnode] or {}
-				if cnode ~= "ignore" and cdef.walkable == false then
-					shootdir = order[o]
-					break
-				end
-			end
-			-- If none of the 4 sides is free, check upwards
-			if not shootdir then
-				shootdir = {x=0, y=1, z=0}
-				local cnode = minetest.get_node(vector.add(pos, shootdir)).name
-				if cnode == "ignore" then
-					shootdir = nil -- Do not push into ignore
-				end
-			end
-
-			if shootdir then
-				-- Set new item moving speed accordingly
-				local newv = vector.multiply(shootdir, 3)
-				self:disable_physics()
-				self.object:set_velocity(newv)
-
-				self.force_out = newv
-				self.force_out_start = vector.round(pos)
-				return
-			end
-		elseif self.force_out then
-			-- This code runs after the entity got a push from the above code.
-			-- It makes sure the entity is entirely outside the solid node
-			local c = self.object:get_properties().collisionbox
-			local s = self.force_out_start
-			local f = self.force_out
-			local ok = (f.x > 0 and pos.x + c[1] > s.x + 0.5) or
-				(f.y > 0 and pos.y + c[2] > s.y + 0.5) or
-				(f.z > 0 and pos.z + c[3] > s.z + 0.5) or
-				(f.x < 0 and pos.x + c[4] < s.x - 0.5) or
-				(f.z < 0 and pos.z + c[6] < s.z - 0.5)
-			if ok then
-				-- Item was successfully forced out
-				self.force_out = nil
-				self:enable_physics()
-			end
-		end
-
 		if not self.physical_state then
 			return -- Don't do anything
 		end
 
 		-- Slide on slippery nodes
-		local vel = self.object:get_velocity()
-		local def = node and minetest.registered_nodes[node.name]
-		local is_moving = (def and not def.walkable) or
+		vel = self.object:get_velocity()
+		def = node and minetest.registered_nodes[node.name]
+		is_moving = (def and not def.walkable) or
 			vel.x ~= 0 or vel.y ~= 0 or vel.z ~= 0
-		local is_slippery = false
+		is_slippery = false
 
 		if def and def.walkable then
-			local slippery = minetest.get_item_group(node.name, "slippery")
+			slippery = minetest.get_item_group(node.name, "slippery")
 			is_slippery = slippery ~= 0
 			if is_slippery and (math.abs(vel.x) > 0.2 or math.abs(vel.z) > 0.2) then
 				-- Horizontal deceleration
-				local slip_factor = 4.0 / (slippery + 4)
+				slip_factor = 4.0 / (slippery + 4)
 				self.object:set_acceleration({
 					x = -vel.x * slip_factor,
 					y = 0,
