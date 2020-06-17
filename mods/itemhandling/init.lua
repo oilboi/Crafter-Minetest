@@ -1,4 +1,4 @@
-local minetest,math,vector = minetest,math,vector
+local minetest,math,vector,pairs,ItemStack = minetest,math,vector,pairs,ItemStack
 
 local path = minetest.get_modpath("itemhandling")
 dofile(path.."/magnet.lua")
@@ -148,20 +148,36 @@ function minetest.item_drop(itemstack, dropper, pos)
 end
 
 
-
+local stack
+local itemname
+local def
 
 minetest.register_entity(":__builtin:item", {
 	initial_properties = {
 		hp_max = 1,
+
 		physical = true,
+
 		collide_with_objects = false,
-		collisionbox = {-0.3, -0.3, -0.3, 0.3, 0.3, 0.3},
+
+		collisionbox = {-0.21, -0.21, -0.21, 0.21, 0.21, 0.21},
+
+		selectionbox = {-0.21, -0.21, -0.21, 0.21, 0.21, 0.21},
+
+		automatic_rotate = 1.5,
+
 		visual = "wielditem",
-		visual_size = {x = 0.4, y = 0.4},
+
+		visual_size = {x = 0.21, y = 0.21},
+
 		textures = {""},
+
 		spritediv = {x = 1, y = 1},
+
 		initial_sprite_basepos = {x = 0, y = 0},
-		is_visible = false,
+
+		is_visible = true,
+
 		pointable = false,
 	},
 
@@ -182,36 +198,21 @@ minetest.register_entity(":__builtin:item", {
 	delete_timer = 0,
 
 	set_item = function(self, item)
-		local stack = ItemStack(item or self.itemstring)
+		stack = ItemStack(item or self.itemstring)
 		self.itemstring = stack:to_string()
 		if self.itemstring == "" then
 			-- item not yet known
 			return
 		end
 
-		-- Backwards compatibility: old clients use the texture
-		-- to get the type of the item
-		local itemname = stack:is_known() and stack:get_name() or "unknown"
+		itemname = stack:is_known() and stack:get_name() or "unknown"
 
-		local max_count = stack:get_stack_max()
-		local count = math.min(stack:get_count(), max_count)
-
-		local size = 0.21
-		local coll_height = size * 0.75
-		local def = minetest.registered_nodes[itemname]
-		local glow = def and def.light_source
+		def = minetest.registered_nodes[itemname]
 
 		self.object:set_properties({
-			is_visible = true,
-			visual = "wielditem",
 			textures = {itemname},
-			visual_size = {x = size, y = size},
-			collisionbox = {-size, -0.21, -size,
-				size, coll_height, size},
-			selectionbox = {-size, -size, -size, size, size, size},
-			automatic_rotate = math.pi * 0.5 * 0.2 / size,
 			wield_item = self.itemstring,
-			glow = glow,
+			glow = def and def.light_source,
 		})
 
 	end,
