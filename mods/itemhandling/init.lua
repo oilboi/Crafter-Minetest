@@ -8,20 +8,25 @@ local creative_mode = minetest.settings:get_bool("creative_mode")
 
 --handle node drops
 --survival
+local meta
+local careful
+local fortune
+local autorepair
+local count
+local name
+local object
 if not creative_mode then
 	function minetest.handle_node_drops(pos, drops, digger)
-		local meta = digger:get_wielded_item():get_meta()
-		local slippery =  meta:get_int("slippery")
-		local careful = meta:get_int("careful")
-		local fortune = meta:get_int("fortune") + 1
-		local autorepair = meta:get_int("autorepair")
-		local spiky = meta:get_int("spiky")
-		if careful > 0 then
-			drops = {minetest.get_node(pos).name}
-		end
+		meta = digger:get_wielded_item():get_meta()
+		--careful = meta:get_int("careful")
+		fortune = 1--meta:get_int("fortune") + 1
+		autorepair = meta:get_int("autorepair")
+		--if careful > 0 then
+		--	drops = {minetest.get_node(pos).name}
+		--end
 		for i = 1,fortune do
 			for _,item in ipairs(drops) do
-				local count, name
+
 				if type(item) == "string" then
 					count = 1
 					name = item
@@ -30,12 +35,13 @@ if not creative_mode then
 					name = item:get_name()
 				end
 				for i=1,count do
-					local obj = minetest.add_item(pos, name)
-					if obj ~= nil then
-						local x=math.random(-2,2)*math.random()
-						local y=math.random(2,5)
-						local z=math.random(-2,2)*math.random()
-						obj:set_velocity({x=x, y=y, z=z})
+					object = minetest.add_item(pos, name)
+					if object ~= nil then
+						object:set_velocity({
+							x=math.random(-2,2)*math.random(), 
+							y=math.random(2,5), 
+							z=math.random(-2,2)*math.random()
+						})
 					end
 				end
 			end
@@ -44,124 +50,104 @@ if not creative_mode then
 	            minetest.throw_experience(pos, experience_amount)
 	        end
 		end
-		--make the player drop their "slippery" item
-		if slippery > 0 and math.random(0,1000) < slippery then
-			minetest.item_drop(digger:get_wielded_item(), digger, digger:get_pos())
-			digger:set_wielded_item("")
-		end
-		
 		--auto repair the item
 		if autorepair > 0 and math.random(0,1000) < autorepair then
 			local itemstack = digger:get_wielded_item()
 			itemstack:add_wear(autorepair*-100)
 			digger:set_wielded_item(itemstack)
 		end
-		
-		--hurt the player randomly
-		if spiky > 0 and math.random(0,1000) < spiky then
-			digger:set_hp(digger:get_hp()-spiky)
-		end
 	end
 --creative
 else
 	function minetest.handle_node_drops(pos, drops, digger)
 	end
-    minetest.register_on_dignode(function(pos, oldnode, digger)
-		if digger and digger:is_player() then
-			local inv = digger:get_inventory()
-			if inv and not inv:contains_item("main", oldnode) and inv:room_for_item("main", oldnode) then
-				inv:add_item("main", oldnode)
-			end
-		end
+	minetest.register_on_dignode(function(pos, oldnode, digger)
+		
+		--if digger and digger:is_player() then
+		--	local inv = digger:get_inventory()
+		--	if inv and not inv:contains_item("main", oldnode) and inv:room_for_item("main", oldnode) then
+		--		inv:add_item("main", oldnode)
+		--	end
+		--end
 	end)
 	minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack, pointed_thing)
 		return(itemstack:get_name())
 	end)
 end
 
--- Minetest: builtin/item_entity.lua
-
-function minetest.spawn_item(pos, item)
-	-- Take item in any format
-	local stack = ItemStack(item)
-	local obj = minetest.add_entity(pos, "__builtin:item")
-	-- Don't use obj if it couldn't be added to the map.
-	if obj then
-		obj:get_luaentity():set_item(stack:to_string())
-	end
-	return obj
-end
-
+local stack
+local object
 function minetest.throw_item(pos, item)
 	-- Take item in any format
-	local stack = ItemStack(item)
-	local obj = minetest.add_entity(pos, "__builtin:item")
-	-- Don't use obj if it couldn't be added to the map.
-	if obj then
-		obj:get_luaentity():set_item(stack:to_string())
-		local x=math.random(-2,2)*math.random()
-		local y=math.random(2,5)
-		local z=math.random(-2,2)*math.random()
-		obj:set_velocity({x=x, y=y, z=z})
+	stack = item
+	object = minetest.add_entity(pos, "__builtin:item")	
+	if object then
+		object:get_luaentity():set_item(stack)
+		obj:set_velocity({
+			x=math.random(-2,2)*math.random(), 
+			y=math.random(2,5), 
+			z=math.random(-2,2)*math.random()
+		})
 	end
-	return obj
+	return object
 end
 
-
+local object
 function minetest.throw_experience(pos, amount)
     for i = 1,amount do
-        local obj = minetest.add_entity(pos, "experience:orb")
-        -- Don't use obj if it couldn't be added to the map.
-        if obj then
-            local x=math.random(-2,2)*math.random()
-            local y=math.random(2,5)
-            local z=math.random(-2,2)*math.random()
-            obj:set_velocity({x=x, y=y, z=z})
+        object = minetest.add_entity(pos, "experience:orb")
+        if object then
+            object:set_velocity({
+				x=math.random(-2,2)*math.random(), 
+				y=math.random(2,5), 
+				z=math.random(-2,2)*math.random()
+			})
         end
     end
 	--return obj
 end
 
 --override drops
+local dropper_is_player
+local c_pos
+local count
+local sneak
+local item
+local object
+local dir
 function minetest.item_drop(itemstack, dropper, pos)
-	local dropper_is_player = dropper and dropper:is_player()
-	local p = table.copy(pos)
-	local cnt
+	dropper_is_player = dropper and dropper:is_player()
+	c_pos = table.copy(pos)
 	if dropper_is_player then
-		local sneak = dropper:get_player_control().sneak
-		p.y = p.y + 1.2
+		sneak = dropper:get_player_control().sneak
+		c_pos.y = c_pos.y + 1.2
 		if not sneak then
-			cnt = itemstack:get_count()
+			count = itemstack:get_count()
 		else
-			cnt = 1
+			count = 1
 		end
 	else
-		cnt = itemstack:get_count()
+		count = itemstack:get_count()
 	end
-	local item = itemstack:take_item(cnt)
-	local obj = minetest.add_item(p, item)
-	if obj then
+
+	item = itemstack:take_item(count)
+	object = minetest.add_item(c_pos, item)
+	if object then
 		if dropper_is_player then
-			local dir = dropper:get_look_dir()
+			dir = dropper:get_look_dir()
 			dir.x = dir.x * 2.9
 			dir.y = dir.y * 2.9 + 2
 			dir.z = dir.z * 2.9
 			dir = vector.add(dir,dropper:get_player_velocity())
-			obj:set_velocity(dir)
-			obj:get_luaentity().dropped_by = dropper:get_player_name()
-			obj:get_luaentity().collection_timer = 0
+			object:set_velocity(dir)
+			object:get_luaentity().dropped_by = dropper:get_player_name()
+			object:get_luaentity().collection_timer = 0
 		end
 		return itemstack
 	end
-	-- If we reach this, adding the object to the
-	-- environment failed
 end
 
--- If item_entity_ttl is not set, enity will have default life time
--- Setting it to -1 disables the feature
 
-local time_to_live = tonumber(minetest.settings:get("item_entity_ttl")) or 300
-local gravity = tonumber(minetest.settings:get("movement_gravity")) or 9.81
 
 
 minetest.register_entity(":__builtin:item", {
@@ -194,7 +180,6 @@ minetest.register_entity(":__builtin:item", {
 	try_timer = 0,
 	collected = false,
 	delete_timer = 0,
-	time_to_live = time_to_live,
 
 	set_item = function(self, item)
 		local stack = ItemStack(item or self.itemstring)
@@ -273,7 +258,7 @@ minetest.register_entity(":__builtin:item", {
 		end
 		self.object:set_armor_groups({immortal = 1})
 		self.object:set_velocity({x = 0, y = 2, z = 0})
-		self.object:set_acceleration({x = 0, y = -gravity, z = 0})
+		self.object:set_acceleration({x = 0, y = -9.81, z = 0})
 		self:set_item()
 	end,
 
@@ -282,7 +267,7 @@ minetest.register_entity(":__builtin:item", {
 			self.physical_state = true
 			self.object:set_properties({physical = true})
 			self.object:set_velocity({x=0, y=0, z=0})
-			self.object:set_acceleration({x=0, y=-gravity, z=0})
+			self.object:set_acceleration({x=0, y=-9.81, z=0})
 		end
 	end,
 
@@ -353,7 +338,7 @@ minetest.register_entity(":__builtin:item", {
 		end
 				
 		self.age = self.age + dtime
-		if self.time_to_live > 0 and self.age > self.time_to_live then
+		if self.age > 300 then
 			self.itemstring = ""
 			self.object:remove()
 			return
@@ -526,7 +511,7 @@ minetest.register_entity(":__builtin:item", {
 		self.slippery_state = is_slippery
 		
 		if is_moving then
-			self.object:set_acceleration({x = 0, y = -gravity, z = 0})
+			self.object:set_acceleration({x = 0, y = -9.81, z = 0})
 		else
 			self.object:set_acceleration({x = 0, y = 0, z = 0})
 			self.object:set_velocity({x = 0, y = 0, z = 0})
