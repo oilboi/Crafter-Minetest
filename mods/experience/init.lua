@@ -1,4 +1,4 @@
-local minetest,math,vector = minetest,math,vector
+local minetest,math,vector,os = minetest,math,vector,os
 local mod_storage = minetest.get_mod_storage()
 local pool = {}
 local experience_bar_max = 36
@@ -14,10 +14,12 @@ local load_data = function(player)
 		temp_pool.xp_level = mod_storage:get_int(name.."xp_level")
 		temp_pool.xp_bar   = mod_storage:get_int(name.."xp_bar"  )
 		temp_pool.buffer   = 0
+		temp_pool.last_time= os.clock()
 	else
 		temp_pool.xp_level = 0
 		temp_pool.xp_bar   = 0
 		temp_pool.buffer   = 0
+		temp_pool.last_time= os.clock()
 	end
 end
 
@@ -162,12 +164,18 @@ local function add_experience(player,experience)
 	
 	temp_pool.xp_bar = temp_pool.xp_bar + experience
 	
-    if temp_pool.xp_bar > 36 then
-		--minetest.sound_play("level_up",{gain=0.2,to_player = name})
+	if temp_pool.xp_bar > 36 then
+		if os.clock() - temp_pool.last_time > 0.04 then
+			minetest.sound_play("level_up",{gain=0.2,to_player = name})
+			temp_pool.last_time = os.clock()
+		end
         temp_pool.xp_bar = temp_pool.xp_bar - 36
 		level_up_experience(player)
-    else
-        --minetest.sound_play("experience",{gain=0.1,to_player = name,pitch=math.random(75,99)/100})
+	else
+		if os.clock() - temp_pool.last_time > 0.01 then
+			temp_pool.last_time = os.clock()
+			minetest.sound_play("experience",{gain=0.1,to_player = name,pitch=math.random(75,99)/100})
+		end
 	end
 	hud_manager.change_hud({
 		player   = player,
@@ -176,19 +184,6 @@ local function add_experience(player,experience)
 		data     = temp_pool.xp_bar
 	})
 end
-
---[[
-local function test_experience()
-    for _, player in pairs(minetest.get_connected_players()) do
-        add_experience(player,math.random(1,3)*2)
-    end
-       
-    minetest.after(0.1, function()
-        test_experience()
-    end)
-end
-test_experience()                  
-]]--
 
 --reset player level
 local name
@@ -523,7 +518,7 @@ minetest.register_entity("experience:orb", {
 minetest.register_chatcommand("xp", {
 	params = "nil",
 	description = "Spawn x amount of a mob, used as /spawn 'mob' 10 or /spawn 'mob' for one",
-	privs = {},
+	privs = {server=true},
 	func = function(name)
 		local player = minetest.get_player_by_name(name)
 		local pos = player:get_pos()
