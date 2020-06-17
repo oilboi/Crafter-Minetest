@@ -1,11 +1,5 @@
 local minetest,math,vector = minetest,math,vector
 
-collection = {}
-collection.collection_height = 0.5 -- the height of the collection based off the player's origin y height
-collection.magnet_radius = 2 -- the radius of the item magnet
-collection.allow_lower = false -- false = items below origin y of player will not be collected --true = player will collect all objects in radius --false = minecraft style --true = pilzadam style
-collection.collection_time = 2.5 --the time which the item will be collected
-
 local path = minetest.get_modpath("itemhandling")
 dofile(path.."/magnet.lua")
 
@@ -196,13 +190,10 @@ minetest.register_entity(":__builtin:item", {
 	force_out_start = nil,
 	--Collection Variables
 	collection_timer = 2,
-	collection_timer_goal = collection.collection_time,
-	collection_height = collection.collection_height,
 	collectable = false,
 	try_timer = 0,
 	collected = false,
 	delete_timer = 0,
-	radius = collection.magnet_radius,
 	time_to_live = time_to_live,
 
 	set_item = function(self, item)
@@ -320,17 +311,17 @@ minetest.register_entity(":__builtin:item", {
 				local pos = self.object:get_pos()
 				local pos2 = collector:get_pos()
 				local player_velocity = collector:get_player_velocity()
-				pos2.y = pos2.y + self.collection_height
+				pos2.y = pos2.y + 0.5
 								
 				local direction = vector.normalize(vector.subtract(pos2,pos))
 				local distance = vector.distance(pos2,pos)
 								
 				--remove if too far away
-				if distance > self.radius then
+				if distance > 2 then
 					distance = 0
 				end
 								
-				local multiplier = (self.radius*5) - distance
+				local multiplier = 20 - distance
 				local velocity = vector.multiply(direction,multiplier)
 				
 				local velocity = vector.add(player_velocity,velocity)
@@ -355,7 +346,7 @@ minetest.register_entity(":__builtin:item", {
 		end
 		
 		--allow entity to be collected after timer
-		if self.collectable == false and self.collection_timer >= self.collection_timer_goal then
+		if self.collectable == false and self.collection_timer >= 2.5 then
 			self.collectable = true
 		elseif self.collectable == false then
 			self.collection_timer = self.collection_timer + dtime
