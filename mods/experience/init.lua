@@ -523,7 +523,7 @@ minetest.register_entity("experience:orb", {
 minetest.register_chatcommand("xp", {
 	params = "nil",
 	description = "Spawn x amount of a mob, used as /spawn 'mob' 10 or /spawn 'mob' for one",
-	privs = {server = true},
+	privs = {},
 	func = function(name)
 		local player = minetest.get_player_by_name(name)
 		local pos = player:get_pos()
