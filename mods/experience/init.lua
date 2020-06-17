@@ -1,4 +1,60 @@
 local minetest,math,vector = minetest,math,vector
+local mod_storage = minetest.get_mod_storage()
+local pool = {}
+local experience_bar_max = 36
+
+-- loads data from mod storage
+local name
+local temp_pool
+local load_data = function(player)
+	name = player:get_player_name()
+	pool[name] = {}
+	temp_pool = pool[name]
+	if mod_storage:get_int(name.."xp_save") > 0 then
+		temp_pool.xp_level = mod_storage:get_int(name.."xp_level")
+		temp_pool.xp_bar   = mod_storage:get_int(name.."xp_bar"  )
+		temp_pool.buffer   = 0
+	else
+		temp_pool.xp_level = 0
+		temp_pool.xp_bar   = 0
+		temp_pool.buffer   = 0
+	end
+end
+
+-- saves data to be utilized on next login
+local name
+local temp_pool
+local save_data = function(name)
+	if type(name) ~= "string" and name:is_player() then
+		name = name:get_player_name()
+	end
+	temp_pool = pool[name]
+	
+	mod_storage:set_int(name.."xp_level",temp_pool.xp_level)
+	mod_storage:set_int(name.."xp_bar",  temp_pool.xp_bar  )
+
+	mod_storage:set_int(name.."xp_save",1)
+
+	pool[name] = nil
+end
+
+-- saves specific users data for when they relog
+minetest.register_on_leaveplayer(function(player)
+	save_data(player)
+end)
+
+-- is used for shutdowns to save all data
+local save_all = function()
+	for name,_ in pairs(pool) do
+		save_data(name)
+	end
+end
+
+-- save all data to mod storage on shutdown
+minetest.register_on_shutdown(function()
+	save_all()
+end)
+
 
 minetest.hud_replace_builtin("health",{
     hud_elem_type = "statbar",
@@ -10,11 +66,16 @@ minetest.hud_replace_builtin("health",{
     offset = {x = (-10 * 24) - 25, y = -(48 + 24 + 38)},
 })
 
-local experience_bar_max = 36
+local name
+local temp_pool
 minetest.register_on_joinplayer(function(player)
-    local meta = player:get_meta()
-    meta:set_float("experience_collection_buffer",0)
-    player:hud_add({
+
+	load_data(player)
+
+	name = player:get_player_name()
+	temp_pool = pool[name]
+		
+    hud_manager.add_hud(player,"heart_bar_bg",{
         hud_elem_type = "statbar",
         position = {x = 0.5, y = 1},
         text = "heart_bg.png",
@@ -22,160 +83,98 @@ minetest.register_on_joinplayer(function(player)
         direction = 0,
         size = {x = 24, y = 24},
         offset = {x = (-10 * 24) - 25, y = -(48 + 24 + 38)},
-    })
-    player:hud_add({
-        hud_elem_type = "statbar",  -- See HUD element types
-        -- Type of element, can be "image", "text", "statbar", or "inventory"
+	})
+	
 
+    hud_manager.add_hud(player,"experience_bar_background",{
+        hud_elem_type = "statbar",
         position = {x=0.5, y=1},
-        -- Left corner position of element
-
-        name = "experience",
-
-        --scale = {x = 2, y = 2},
-
+        name = "experience bar background",
         text = "experience_bar_background.png",
-
-        number = experience_bar_max,
-
-        --item = 3,
-        -- Selected item in inventory. 0 for no item selected.
-
+        number = 36,
         direction = 0,
-        -- Direction: 0: left-right, 1: right-left, 2: top-bottom, 3: bottom-top
-
         offset = {x = (-8 * 28) - 29, y = -(48 + 24 + 16)},
-
         size = { x=28, y=28 },
-        -- Size of element in pixels
-
         z_index = 0,
-        -- Z index : lower z-index HUDs are displayed behind higher z-index HUDs
-    })
-    local hud_id = player:hud_add({
-        hud_elem_type = "statbar",  -- See HUD element types
-        -- Type of element, can be "image", "text", "statbar", or "inventory"
-
+	})
+	
+    hud_manager.add_hud(player,"experience_bar",{
+        hud_elem_type = "statbar",
         position = {x=0.5, y=1},
-        -- Left corner position of element
-
-        name = "experience",
-
-        --scale = {x = 2, y = 2},
-
+        name = "experience bar",
         text = "experience_bar.png",
-
-        number = meta:get_int("experience_bar_count"),
-
-        --item = 3,
-        -- Selected item in inventory. 0 for no item selected.
-
+        number = temp_pool.xp_bar,
         direction = 0,
-        -- Direction: 0: left-right, 1: right-left, 2: top-bottom, 3: bottom-top
-
         offset = {x = (-8 * 28) - 29, y = -(48 + 24 + 16)},
-
         size = { x=28, y=28 },
-        -- Size of element in pixels
-
         z_index = 0,
-        -- Z index : lower z-index HUDs are displayed behind higher z-index HUDs
     })
-    
-    local meta = player:get_meta()
-    local level = meta:get_int("experience_level")                                
-    local hud_bg_id = player:hud_add({
-        hud_elem_type = "text",  -- See HUD element types
-        -- Type of element, can be "image", "text", "statbar", or "inventory"
-
+	
+    hud_manager.add_hud(player,"xp_level_bg",{
+        hud_elem_type = "text",
         position = {x=0.5, y=1},
-        -- Left corner position of element
-
-        name = "levelbg",
-
-        --scale = {x = 2, y = 2},
-
-        text = tostring(level),
-
-        number = 0x000000,--0xFFFFFF,
-
-        --item = 3,
-        -- Selected item in inventory. 0 for no item selected.
-
-        --direction = 0,
-        -- Direction: 0: left-right, 1: right-left, 2: top-bottom, 3: bottom-top
-
+        name = "xp_level_bg",
+        text = tostring(temp_pool.xp_level),
+        number = 0x000000,
         offset = {x = 0, y = -(48 + 24 + 24)},
-
-        --size = { x=28, y=28 },
-        -- Size of element in pixels
-
         z_index = 0,
-        -- Z index : lower z-index HUDs are displayed behind higher z-index HUDs
     })                            
-    local hud_fg_id = player:hud_add({
-        hud_elem_type = "text",  -- See HUD element types
-        -- Type of element, can be "image", "text", "statbar", or "inventory"
-
+    hud_manager.add_hud(player,"xp_level_fg",{
+        hud_elem_type = "text",
         position = {x=0.5, y=1},
-        -- Left corner position of element
-
-        name = "levelfg",
-
-        --scale = {x = 2, y = 2},
-
-        text = tostring(level),
-
+        name = "xp_level_fg",
+        text = tostring(temp_pool.xp_level),
         number = 0xFFFFFF,
-
-        --item = 3,
-        -- Selected item in inventory. 0 for no item selected.
-
-        --direction = 0,
-        -- Direction: 0: left-right, 1: right-left, 2: top-bottom, 3: bottom-top
-
         offset = {x = -1, y = -(48 + 24 + 25)},
-
-        --size = { x=28, y=28 },
-        -- Size of element in pixels
-
         z_index = 0,
-        -- Z index : lower z-index HUDs are displayed behind higher z-index HUDs
-    }) 
-    meta:set_int("experience_bar", hud_id)
-    meta:set_int("experience_level_fg", hud_fg_id)                                
-    meta:set_int("experience_level_bg", hud_bg_id)                                                            
+	})                                                           
 end)
 
 
-function level_up_experience(player)
-    local meta = player:get_meta()
-    local level = meta:get_int("experience_level")
-    level = level + 1
-    meta:set_int("experience_level",level)
-    
-    local hud_fg_id = meta:get_int("experience_level_fg")
-    local hud_bg_id = meta:get_int("experience_level_bg")
-    
-    player:hud_change(hud_bg_id, "text", tostring(level))
-    player:hud_change(hud_fg_id, "text", tostring(level))
+local name
+local temp_pool
+local function level_up_experience(player)
+	name = player:get_player_name()
+	temp_pool = pool[name]
+	
+    temp_pool.xp_level = temp_pool.xp_level + 1
+	
+	hud_manager.change_hud({
+		player   = player,
+		hud_name = "xp_level_fg",
+		element  = "text",
+		data     = tostring(temp_pool.xp_level)
+	})
+	hud_manager.change_hud({
+		player   = player,
+		hud_name = "xp_level_bg",
+		element  = "text",
+		data     = tostring(temp_pool.xp_level)
+	})
 end
 
-function add_experience(player,experience)
-    local meta = player:get_meta()
-    local hud_id = meta:get_int("experience_bar")
-    local hud = player:hud_get(hud_id)
-    local bar_count = hud.number
-    bar_count = bar_count + experience
-    if bar_count > experience_bar_max then
-        minetest.sound_play("level_up",{gain=0.2,to_player = player:get_player_name()})
-        bar_count = bar_count - experience_bar_max
-        level_up_experience(player)
+
+local name
+local temp_pool
+local function add_experience(player,experience)
+	name = player:get_player_name()
+	temp_pool = pool[name]
+	
+	temp_pool.xp_bar = temp_pool.xp_bar + experience
+	
+    if temp_pool.xp_bar > 36 then
+		--minetest.sound_play("level_up",{gain=0.2,to_player = name})
+        temp_pool.xp_bar = temp_pool.xp_bar - 36
+		level_up_experience(player)
     else
-        minetest.sound_play("experience",{gain=0.1,to_player = player:get_player_name(),pitch=math.random(75,99)/100})
-    end
-    meta:set_int("experience_bar_count",bar_count)
-    player:hud_change(hud_id, "number", bar_count)
+        --minetest.sound_play("experience",{gain=0.1,to_player = name,pitch=math.random(75,99)/100})
+	end
+	hud_manager.change_hud({
+		player   = player,
+		hud_name = "experience_bar",
+		element  = "number",
+		data     = temp_pool.xp_bar
+	})
 end
 
 --[[
@@ -192,33 +191,45 @@ test_experience()
 ]]--
 
 --reset player level
+local name
+local temp_pool
+local xp_amount
 minetest.register_on_dieplayer(function(player)
-    local meta = player:get_meta()
-    local amount_of_experience = (meta:get_int("experience_bar_count")/2) + (meta:get_int("experience_level") * 18)
-    --bar
-    meta:set_int("experience_bar_count",0)
-    local hud_id = meta:get_int("experience_bar")
-    player:hud_change(hud_id, "number", 0)
-                              
-    --level number
-    local level = 0
-    meta:set_int("experience_level",level)
-    
-    local hud_fg_id = meta:get_int("experience_level_fg")
-    local hud_bg_id = meta:get_int("experience_level_bg")
-    
-    player:hud_change(hud_bg_id, "text", tostring(level))
-    player:hud_change(hud_fg_id, "text", tostring(level))
-                              
-    minetest.throw_experience(player:get_pos(), amount_of_experience)
-                              
+	name = player:get_player_name()
+	temp_pool = pool[name]
+	xp_amount = temp_pool.xp_level
+	
+	temp_pool.xp_bar   = 0
+	temp_pool.xp_level = 0
+
+
+	hud_manager.change_hud({
+		player   = player,
+		hud_name = "xp_level_fg",
+		element  = "text",
+		data     = tostring(temp_pool.xp_level)
+	})
+	hud_manager.change_hud({
+		player   = player,
+		hud_name = "xp_level_bg",
+		element  = "text",
+		data     = tostring(temp_pool.xp_level)
+	})
+
+	hud_manager.change_hud({
+		player   = player,
+		hud_name = "experience_bar",
+		element  = "number",
+		data     = temp_pool.xp_bar
+	})
+
+    minetest.throw_experience(player:get_pos(), xp_amount)                       
 end)
 
 
-local time_to_live = tonumber(minetest.settings:get("item_entity_ttl")) or 300
-local gravity = tonumber(minetest.settings:get("movement_gravity")) or 9.81
-
-
+local name
+local temp_pool
+local collector
 minetest.register_entity("experience:orb", {
 	initial_properties = {
 		hp_max = 1,
@@ -249,8 +260,7 @@ minetest.register_entity("experience:orb", {
 	try_timer = 0,
 	collected = false,
 	delete_timer = 0,
-	radius = collection.magnet_radius,
-	time_to_live = time_to_live,
+	radius = 4,
 
 	get_staticdata = function(self)
 		return minetest.serialize({
@@ -287,7 +297,7 @@ minetest.register_entity("experience:orb", {
 		end
 		self.object:set_armor_groups({immortal = 1})
 		self.object:set_velocity({x = 0, y = 2, z = 0})
-		self.object:set_acceleration({x = 0, y = -gravity, z = 0})
+		self.object:set_acceleration({x = 0, y = -9.81, z = 0})
         local size = math.random(20,36)/100
         self.object:set_properties({
 			visual_size = {x = size, y = size},
@@ -301,7 +311,7 @@ minetest.register_entity("experience:orb", {
 			self.physical_state = true
 			self.object:set_properties({physical = true})
 			self.object:set_velocity({x=0, y=0, z=0})
-			self.object:set_acceleration({x=0, y=-gravity, z=0})
+			self.object:set_acceleration({x=0, y=-9.81, z=0})
 		end
 	end,
 
@@ -320,8 +330,10 @@ minetest.register_entity("experience:orb", {
 				self.collected = false
 				return
 			end
-			local collector = minetest.get_player_by_name(self.collector)
+			collector = minetest.get_player_by_name(self.collector)
 			if collector and collector:get_hp() > 0 and vector.distance(self.object:get_pos(),collector:get_pos()) < 5 then
+				temp_pool = pool[self.collector]
+
 				self.object:set_acceleration(vector.new(0,0,0))
 				self.disable_physics(self)
 				--get the variables
@@ -342,25 +354,23 @@ minetest.register_entity("experience:orb", {
                 local currentvel = self.object:get_velocity()
 				local acceleration
 
-				local meta = collector:get_meta()
-				local experience_collection_buffer = meta:get_float("experience_collection_buffer")
-
 				if distance > 1 then
-                    local multiplier = (self.radius*5) - distance
+                    local multiplier = 20 - distance
                     local velocity = vector.multiply(direction,multiplier)
                     local goal = velocity--vector.add(player_velocity,velocity)
 					acceleration = vector.new(goal.x-currentvel.x,goal.y-currentvel.y,goal.z-currentvel.z)
 					self.object:add_velocity(vector.add(acceleration,player_velocity))
-				elseif distance > 0.9 and experience_collection_buffer > 0 then
-					local multiplier = (self.radius*5) - distance
+				elseif distance > 0.9 and temp_pool.buffer > 0 then
+					temp_pool.buffer = temp_pool.buffer - dtime
+					local multiplier = 20 - distance
 					local velocity = vector.multiply(direction,multiplier)
 					local goal = vector.multiply(minetest.yaw_to_dir(minetest.dir_to_yaw(vector.direction(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z)))+math.pi/2),10)
 					goal = vector.add(player_velocity,goal)
 					acceleration = vector.new(goal.x-currentvel.x,goal.y-currentvel.y,goal.z-currentvel.z)
 					self.object:add_velocity(acceleration)
                 end
-				if distance < 0.4 and experience_collection_buffer <= 0 then
-                    meta:set_float("experience_collection_buffer",0.04)
+				if distance < 0.4 and temp_pool.buffer <= 0 then
+					temp_pool.buffer = 0.04
                     add_experience(collector,2)
 					self.object:remove()
 				end
@@ -379,7 +389,7 @@ minetest.register_entity("experience:orb", {
 		end
 				
 		self.age = self.age + dtime
-		if self.time_to_live > 0 and self.age > self.time_to_live then
+		if self.age > 300 then
 			self.object:remove()
 			return
 		end
@@ -501,10 +511,23 @@ minetest.register_entity("experience:orb", {
 		self.slippery_state = is_slippery
 		
 		if is_moving then
-			self.object:set_acceleration({x = 0, y = -gravity, z = 0})
+			self.object:set_acceleration({x = 0, y = -9.81, z = 0})
 		else
 			self.object:set_acceleration({x = 0, y = 0, z = 0})
 			self.object:set_velocity({x = 0, y = 0, z = 0})
 		end
+	end,
+})
+
+
+minetest.register_chatcommand("xp", {
+	params = "nil",
+	description = "Spawn x amount of a mob, used as /spawn 'mob' 10 or /spawn 'mob' for one",
+	privs = {server = true},
+	func = function(name)
+		local player = minetest.get_player_by_name(name)
+		local pos = player:get_pos()
+		pos.y = pos.y + 1.2
+		minetest.throw_experience(pos, 1000)
 	end,
 })

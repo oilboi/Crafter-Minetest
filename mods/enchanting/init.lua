@@ -96,18 +96,6 @@ minetest.register_node("enchanting:table", {
 	end
 })
 
-minetest.register_chatcommand("xp", {
-	params = "nil",
-	description = "Spawn x amount of a mob, used as /spawn 'mob' 10 or /spawn 'mob' for one",
-	privs = {server = true},
-	func = function(name)
-		local player = minetest.get_player_by_name(name)
-		local pos = player:get_pos()
-		minetest.throw_experience(pos, math.random(200,300))
-	end,
-})
-
-
 minetest.register_craft({
 	output = "enchanting:table",
 	recipe = {
