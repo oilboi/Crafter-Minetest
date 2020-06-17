@@ -266,9 +266,6 @@ minetest.register_entity("experience:orb", {
 	force_out = nil,
 	force_out_start = nil,
 	--Collection Variables
-	collection_timer = 2,
-	collection_timer_goal = collection.collection_time,
-	collection_height = 0.8,
 	collectable = false,
 	try_timer = 0,
 	collected = false,
@@ -278,7 +275,6 @@ minetest.register_entity("experience:orb", {
 	get_staticdata = function(self)
 		return minetest.serialize({
 			age = self.age,
-			collection_timer = self.collection_timer,
 			collectable = self.collectable,
 			try_timer = self.try_timer,
 			collected = self.collected,
@@ -292,7 +288,6 @@ minetest.register_entity("experience:orb", {
 			data = minetest.deserialize(staticdata)
 			if data and type(data) == "table" then
 				self.age = (data.age or 0) + dtime_s
-				self.collection_timer = data.collection_timer
 				self.collectable = data.collectable
 				self.try_timer = data.try_timer
 				self.collected = data.collected
@@ -353,7 +348,7 @@ minetest.register_entity("experience:orb", {
 				
                 player_velocity = collector:get_player_velocity()
                                             
-				pos2.y = pos2.y + self.collection_height
+				pos2.y = pos2.y + 0.8
 								
 				direction = vector.direction(pos,pos2)
 				distance = vector.distance(pos2,pos)
@@ -391,14 +386,7 @@ minetest.register_entity("experience:orb", {
 			end
 		end
 		
-		
-		--allow entity to be collected after timer
-		if self.collectable == false and self.collection_timer >= self.collection_timer_goal then
-			self.collectable = true
-		elseif self.collectable == false then
-			self.collection_timer = self.collection_timer + dtime
-		end
-				
+						
 		self.age = self.age + dtime
 		if self.age > 300 then
 			self.object:remove()
