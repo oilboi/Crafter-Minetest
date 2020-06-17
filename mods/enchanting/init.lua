@@ -9,7 +9,7 @@ autorepair - tool will repair itself randomly
 spiky - the tool will randomly hurt you when used
 sharpness - the tool does more damage
 ]]--
-local enchantment_list = {"swiftness", "durable", "slippery", "careful", "fortune", "autorepair", "spiky", "sharpness", "treecapitator"}
+local enchantment_list = {"swiftness", "durable", "careful", "fortune", "autorepair",  "sharpness"}
 
 local temp_names = {"Monster", "Behemoth", "Ultra", "Wow!", "Oh Em Gee", "The Ultimatum", "Holy Moly!", "Infinity"}
 
