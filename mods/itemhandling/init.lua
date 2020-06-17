@@ -83,7 +83,7 @@ function minetest.throw_item(pos, item)
 	object = minetest.add_entity(pos, "__builtin:item")	
 	if object then
 		object:get_luaentity():set_item(stack)
-		obj:set_velocity({
+		object:set_velocity({
 			x=math.random(-2,2)*math.random(), 
 			y=math.random(2,5), 
 			z=math.random(-2,2)*math.random()
