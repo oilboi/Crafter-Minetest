@@ -47,7 +47,7 @@ for i = 0,13 do
 			end
 		end,
 		on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-			minetest.eat_food(clicker,"cake:cake_item_placeholder")
+			player_eat_food(clicker,"cake:cake_item_placeholder")
 			--clicker:set_hp(clicker:get_hp()+5)
 			if i == 13 then
 		        minetest.sound_play("eat_finish",{pos=pos,gain=0.2,pitch=math.random(90,100)/100})
@@ -94,7 +94,7 @@ for i = 0,13 do
 			timer:start(0.2)
 		end,
 		on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-			minetest.eat_food(clicker,"cake:cake_item_placeholder")
+			player_eat_food(clicker,"cake:cake_item_placeholder")
 			clicker:set_hp(clicker:get_hp()-5)
 		end,
 		on_timer = function(pos, elapsed)
