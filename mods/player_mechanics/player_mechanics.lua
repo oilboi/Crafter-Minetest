@@ -142,6 +142,7 @@ local control_state = function(player)
 			player:set_properties({
 				collisionbox = {-0.3, 0.8, -0.3, 0.3, 1.6, 0.3},
 			})
+			player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
 		end
 
 		-- running/swimming fov modifier
