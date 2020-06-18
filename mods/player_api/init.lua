@@ -362,9 +362,11 @@ local do_animations = function(player)
 
 	control_table = player:get_player_control()
 	pitch_look(player,control_table.sneak)
+
 	if player:get_hp() <= 0 then
 		set_animation(player,"die",40,false)
-	elseif not temp_pool.attached then
+	elseif not temp_pool.attached or not player:get_attach() then
+		temp_pool.attached = false
 		update = control_check(player,control_table)
 		update_wield_item(player)
 		if update and player:get_hp() > 0 then
