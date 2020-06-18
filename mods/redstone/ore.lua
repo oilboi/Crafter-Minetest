@@ -13,7 +13,7 @@ for i = 0,1 do
 			timer:start(math.random(10,50))
 		end
 	else
-		groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1,redstone=1,redstone_torch=1,redstone_power=9}
+		groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1,redstone=1,redstone_torch=1,redstone_power=9,experience=8}
 		on_timer = function(pos, elapsed)
 			minetest.set_node(pos, {name="redstone:ore_0"})
 			redstone.collect_info(pos)
