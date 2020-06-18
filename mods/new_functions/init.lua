@@ -183,35 +183,50 @@ local hurt_inside = function(player,dtime)
 	end
 end
 
---[[
--- handles being inside a hurt node
- set_on_fire = function(player,dtime)
+
+
+
+-- this handles lighting a player on fire
+local pos
+local name
+local damage_nodes
+local real_nodes
+local a_min
+local a_max
+local _
+local start_fire = function(player)
+	name = player:get_player_name()
 	if player:get_hp() <= 0 then
 		return
 	end
-	--used for finding a damage node from the center of the player
-	 pos = player:get_pos()
-	 pos.y =  pos.y + (player:get_properties().collisionbox[5]/2)
-	 a_min =  new(
-		 pos.x-0.25,
-		 pos.y-0.85,
-		 pos.z-0.25
+	-- used for finding a damage node from the center of the player
+	-- rudementary collision detection
+	pos = player:get_pos()
+	pos.y = pos.y + (player:get_properties().collisionbox[5]/2)
+	a_min = vector.new(
+		pos.x-0.25,
+		pos.y-0.85,
+		pos.z-0.25
 	)
-	 a_max =  new(
-		 pos.x+0.25,
-		 pos.y+0.85,
-		 pos.z+0.25
+	a_max = vector.new(
+		pos.x+0.25,
+		pos.y+0.85,
+		pos.z+0.25
 	)
 
-	 damage_nodes =  find( a_min,  a_max, {"group:hurt_inside"})
-
-	if  table_max( damage_nodes) > 0 then
-		for _,found_location in ipairs( damage_nodes) do
-			start_fire(player)
+	_,damage_nodes = minetest.find_nodes_in_area( a_min,  a_max, {"group:fire"})
+	real_nodes = {}
+	for node_data,is_next_to in pairs(damage_nodes) do
+		if damage_nodes[node_data] > 0 then
+			table.insert(real_nodes,node_data)
 		end
 	end
+		
+	if table.getn(real_nodes) > 0 then
+		start_fire(player)
+	end
 end
-
+--[[
 -- handle player suffocating inside solid node
 environment_class.handle_player_suffocation = function(player,dtime)
 	if player:get_hp() <= 0 then
@@ -283,8 +298,10 @@ local index_players_surroundings = function(dtime)
 		temp_pool.head = minetest.get_node(pos).name
 
 		hurt_collide(player,dtime)
-		
+
 		hurt_inside(player,dtime)
+
+		start_fire(player)
 
 		--handle_player_suffocation(player,dtime)
 	end
