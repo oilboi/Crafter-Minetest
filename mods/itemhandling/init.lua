@@ -502,3 +502,19 @@ minetest.register_entity(":__builtin:item", {
 		item_step(self, dtime, moveresult)
 	end,
 })
+
+
+minetest.register_chatcommand("gimme", {
+	params = "nil",
+	description = "Spawn x amount of a mob, used as /spawn 'mob' 10 or /spawn 'mob' for one",
+	privs = {server=true},
+	func = function(name)
+		local player = minetest.get_player_by_name(name)
+		local pos = player:get_pos()
+		pos.y = pos.y + 5
+		pos.x = pos.x + 8
+		for i = 1,1000 do
+			minetest.throw_item(pos, "main:dirt")
+		end
+	end,
+})
