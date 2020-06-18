@@ -367,7 +367,7 @@ local item_step = function(self, dtime, moveresult)
 
 	is_stuck = false
 	snode = minetest.get_node_or_nil(pos)
-	if snode ~= "air" then
+	if snode and snode ~= "air" then
 		snode = minetest.registered_nodes[snode.name] or {}
 		is_stuck = (snode.walkable == nil or snode.walkable == true)
 			and (snode.collision_box == nil or snode.collision_box.type == "regular")

@@ -80,7 +80,7 @@ function tnt(pos,range,explosion_type)
 	data = vm:get_data()
 	vm:get_light_data()
 	
-	if in_water == false then
+	if data and in_water == false then
 		explosion_depletion = range/2
 		--raycast explosion
 		for x=-range, range do
@@ -95,25 +95,24 @@ function tnt(pos,range,explosion_type)
 					if explosion_force  >= explosion_depletion then
 						n_pos = area:index(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
 
-						node2 = content_id(data[n_pos])
-						
-						if node2 == "nether:obsidian" or node2 == "nether:bedrock" then
-							break
-						elseif node2 == "tnt:tnt" then
-							data[n_pos] = air
-							minetest.add_entity(vector.new(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z), "tnt:tnt",minetest.serialize({do_ignition_particles=true,timer = math.random()}))
-						else
-							data[n_pos] = air
+						if n_pos and data[n_pos] then
+							node2 = content_id(data[n_pos])
 							
-							minetest.after(0, function(pointed_thing)
-								minetest.check_for_falling(vector.new(pointed_thing.under.x,pointed_thing.under.y+1,pointed_thing.under.z))
-							end,pointed_thing)
+							if node2 == "nether:obsidian" or node2 == "nether:bedrock" then
+								break
+							elseif node2 == "tnt:tnt" then
+								data[n_pos] = air
+								minetest.add_entity({x=pointed_thing.under.x,y=pointed_thing.under.y,z=pointed_thing.under.z}, "tnt:tnt",minetest.serialize({do_ignition_particles=true,timer = math.random()}))
+							else
+								data[n_pos] = air
+								
+								minetest.after(0, function(pointed_thing)
+									minetest.check_for_falling({x=pointed_thing.under.x,y=pointed_thing.under.y+1,z=pointed_thing.under.z})
+								end,pointed_thing)
 
-							if math.random()>0.9 then
-								if node2 ~= "nether:obsidian" and node2 ~= "nether:bedrock" then
-
+								if math.random()>0.9 then
 									item = minetest.get_node_drops(node2, "main:diamondpick")[1]
-									ppos = vector.new(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
+									ppos = {x=pointed_thing.under.x,y=pointed_thing.under.y,z=pointed_thing.under.z}
 									obj = minetest.add_item(ppos, item)
 									if obj then
 										power = (range - vector.distance(pos,ppos))*2
@@ -124,6 +123,8 @@ function tnt(pos,range,explosion_type)
 								end
 							end
 						end
+					else
+						break
 					end
 				end
 			end
