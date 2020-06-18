@@ -175,7 +175,7 @@ local control_state = function(player)
 		if temp_pool.state == 3 and in_water then
 			send_running_cancellation(player,false)
 		elseif not in_water and temp_pool.state == 3 and temp_pool.old_state ~= 3 then
-			player:set_eye_offset({x=0,y=-1,z=0},{x=0,y=-1,z=0})
+			player:set_eye_offset({x=0,y=-1,z=0},{x=0,y=0,z=0})
 		elseif not in_water and temp_pool.old_state == 3 and temp_pool.state ~= 3 then
 			player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
 		end
