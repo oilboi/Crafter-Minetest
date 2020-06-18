@@ -139,7 +139,7 @@ function tnt(pos,range,explosion_type)
 	end
 	if os.clock() - boom_time >= 0.1 then
 		boom_time = os.clock()
-		minetest.sound_play("tnt_explode", {pos = pos, gain = 1.0, max_hear_distance = range*range}) --hear twice as far away
+		minetest.sound_play("tnt_explode", {pos = pos, gain = 1.0, max_hear_distance = 64}) --hear twice as far away
 	end
 	
 	--throw players and items
@@ -278,7 +278,7 @@ local activation = function(self, staticdata, dtime_s)
 			texture = "smoke.png",
 			attached = self.object,
 		})
-		minetest.sound_play("tnt_ignite", {object = self.object, gain = 1.0, max_hear_distance = self.range*self.range*self.range})
+		minetest.sound_play("tnt_ignite", {object = self.object, gain = 1.0, max_hear_distance = 64})
 	end
 end
 
