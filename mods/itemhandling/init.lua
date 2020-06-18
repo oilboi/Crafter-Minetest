@@ -186,9 +186,10 @@ local get_staticdata = function(self)
 	})
 end
 
+local data
 local on_activate = function(self, staticdata, dtime_s)
 	if string.sub(staticdata, 1, string.len("return")) == "return" then
-		local data = minetest.deserialize(staticdata)
+		data = minetest.deserialize(staticdata)
 		if data and type(data) == "table" then
 			self.itemstring = data.itemstring
 			self.age = (data.age or 0) + dtime_s
