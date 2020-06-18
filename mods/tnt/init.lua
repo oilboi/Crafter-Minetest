@@ -1,5 +1,5 @@
-local minetest,type,vector,math,ipairs = 
-minetest,type,vector,math,ipairs
+local minetest,type,vector,math,ipairs,os = 
+minetest,type,vector,math,ipairs,os
 
 
 local function extreme_tnt(pos,range,explosion_type)
@@ -70,6 +70,7 @@ local hp
 local explosion_force
 local explosion_depletion
 local range_calc
+local boom_time = os.clock()
 function tnt(pos,range,explosion_type)
 	in_node = minetest.get_node(pos).name
 	in_water =  ( in_node == "main:water" or minetest.get_node(pos).name == "main:waterflow")
@@ -111,7 +112,7 @@ function tnt(pos,range,explosion_type)
 								minetest.after(0, function(pointed_thing)
 									minetest.check_for_falling({x=pointed_thing.under.x,y=pointed_thing.under.y+1,z=pointed_thing.under.z})
 								end,pointed_thing)
-								if math.random() > 0.9 + range_calc then
+								if range_calc < 1 and math.random() > 0.9 + range_calc then
 									item = minetest.get_node_drops(node2, "main:diamondpick")[1]
 									ppos = {x=pointed_thing.under.x,y=pointed_thing.under.y,z=pointed_thing.under.z}
 									obj = minetest.add_item(ppos, item)
@@ -136,8 +137,10 @@ function tnt(pos,range,explosion_type)
 		vm:update_liquids()
 		vm:write_to_map()
 	end
-	
-	minetest.sound_play("tnt_explode", {pos = pos, gain = 1.0, max_hear_distance = range*range}) --hear twice as far away
+	if os.clock() - boom_time >= 0.1 then
+		boom_time = os.clock()
+		minetest.sound_play("tnt_explode", {pos = pos, gain = 1.0, max_hear_distance = range*range}) --hear twice as far away
+	end
 	
 	--throw players and items
 	for _,object in ipairs(minetest.get_objects_inside_radius(pos, range)) do
@@ -224,6 +227,68 @@ function tnt(pos,range,explosion_type)
 	})
 end
 
+local pos
+local vel
+local range
+local tnt_boom = function(self,dtime)
+	self.timer = self.timer - dtime
+	if not self.shot or not self.redstone_activated then
+		vel = self.object:getvelocity()
+		vel = vector.multiply(vel,-0.05)
+		self.object:add_velocity(vector.new(vel.x,0,vel.z))
+	end
+	if self.timer <= 0 then
+		if not self.range then
+			self.range = 7
+		end
+		pos = self.object:get_pos()
+		range = self.range
+		self.object:remove()
+		tnt(pos,range)
+	end
+end
+local activation = function(self, staticdata, dtime_s)
+	self.object:set_armor_groups({immortal = 1})
+	self.object:set_velocity({x = math.random(-3,3), y = 3, z = math.random(-3,3)})
+	self.object:set_acceleration({x = 0, y = -9.81, z = 0})
+	if string.sub(staticdata, 1, string.len("return")) == "return" then
+		local data = minetest.deserialize(staticdata)
+		if data and type(data) == "table" then
+			self.range = data.range
+			self.timer = data.timer
+			self.exploded = data.exploded
+		end
+	end
+	if self.timer == self.timer_max then
+		minetest.add_particlespawner({
+			amount = 10,
+			time = 0,
+			minpos = vector.new(0,0.5,0),
+			minpos = vector.new(0,0.5,0),
+			minvel = vector.new(-0.5,1,-0.5),
+			maxvel = vector.new(0.5,5,0.5),
+			minacc = {x=0, y=0, z=0},
+			maxacc = {x=0, y=0, z=0},
+			minexptime = 0.5,
+			maxexptime = 1.0,
+			minsize = 1,
+			maxsize = 2,
+			collisiondetection = false,
+			vertical = false,
+			texture = "smoke.png",
+			attached = self.object,
+		})
+		minetest.sound_play("tnt_ignite", {object = self.object, gain = 1.0, max_hear_distance = self.range*self.range*self.range})
+	end
+end
+
+local static = function(self)
+	return minetest.serialize({
+		range = self.range,
+		timer = self.timer,
+		exploded = self.exploded,	
+	})
+end
 
 minetest.register_entity("tnt:tnt", {
 	initial_properties = {
@@ -244,68 +309,21 @@ minetest.register_entity("tnt:tnt", {
 	timer_max = 5, --this has to be equal to timer
 	range = 7,
 	get_staticdata = function(self)
-		return minetest.serialize({
-			range = self.range,
-			timer = self.timer,
-			exploded = self.exploded,	
-		})
+		return(static(self))
 	end,
 	
 	on_activate = function(self, staticdata, dtime_s)
-		self.object:set_armor_groups({immortal = 1})
-		self.object:set_velocity({x = math.random(-3,3), y = 3, z = math.random(-3,3)})
-		self.object:set_acceleration({x = 0, y = -9.81, z = 0})
-		if string.sub(staticdata, 1, string.len("return")) == "return" then
-			local data = minetest.deserialize(staticdata)
-			if data and type(data) == "table" then
-				self.range = data.range
-				self.timer = data.timer
-				self.exploded = data.exploded
-			end
-		end
-		if self.timer == self.timer_max then
-			minetest.add_particlespawner({
-				amount = 10,
-				time = 0,
-				minpos = vector.new(0,0.5,0),
-				minpos = vector.new(0,0.5,0),
-				minvel = vector.new(-0.5,1,-0.5),
-				maxvel = vector.new(0.5,5,0.5),
-				minacc = {x=0, y=0, z=0},
-				maxacc = {x=0, y=0, z=0},
-				minexptime = 0.5,
-				maxexptime = 1.0,
-				minsize = 1,
-				maxsize = 2,
-				collisiondetection = false,
-				vertical = false,
-				texture = "smoke.png",
-				attached = self.object,
-			})
-			minetest.sound_play("tnt_ignite", {object = self.object, gain = 1.0, max_hear_distance = self.range*self.range*self.range})
-		end
+		activation(self, staticdata, dtime_s)
 	end,
 		
 	on_punch = function(self, puncher, time_from_last_punch, tool_capabilities, dir)
-		local obj = minetest.add_item(self.object:get_pos(), "tnt:tnt")
+		minetest.throw_item(self.object:get_pos(), "tnt:tnt")
 		self.object:remove()
 	end,
 
 	sound_played = false,
 	on_step = function(self, dtime)	
-		self.timer = self.timer - dtime
-		if not self.shot or not self.redstone_activated then
-			local vel = self.object:getvelocity()
-			vel = vector.multiply(vel,-0.05)
-			self.object:add_velocity(vector.new(vel.x,0,vel.z))
-		end
-		if self.timer <= 0 then
-			if not self.range then
-				self.range = 7
-			end
-			tnt(self.object:get_pos(),self.range)
-			self.object:remove()
-		end
+		tnt_boom(self,dtime)
 	end,
 })
 
