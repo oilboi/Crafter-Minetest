@@ -152,7 +152,6 @@ local stack
 local itemname
 local def
 local set_item = function(self, item)
-	print(item)
 	stack = ItemStack(item or self.itemstring)
 	self.itemstring = stack:to_string()
 	if self.itemstring == "" then
@@ -203,7 +202,6 @@ local on_activate = function(self, staticdata, dtime_s)
 			self.collector = data.collector
 		end
 	else
-		print("failing")
 		self.itemstring = staticdata
 	end
 	self.object:set_armor_groups({immortal = 1})
