@@ -39,14 +39,34 @@ end)
 
 -- handle damage when touching node
 -- this is lua collision detection
-pos           = nil
-name          = nil
-damage_nodes  = nil
-a_min         = nil
-a_max         = nil
-damage_amount = nil
-gotten_node   = nil
-tick          = nil
+-- damages players 4 times a second
+local name
+local temp_pool
+local tick
+local handle_touch_hurting = function(player,damage,dtime)
+	name      = player:get_player_name()
+	temp_pool = pool[name]
+	tick      = temp_pool.touch_hurt_ticker
+
+	tick = tick - dtime
+	if tick <= 0 then
+		player:set_hp(player:get_hp()-damage)
+		tick = 0.25
+	end
+	temp_pool.touch_hurt_ticker = tick
+end
+
+
+local pos
+local hurt
+local name
+local damage_nodes
+local real_nodes
+local a_min
+local a_max
+local damage_amount
+local gotten_node
+local _
 local hurt_collide = function(player,dtime)
 	name = player:get_player_name()
 	if player:get_hp() <= 0 then
@@ -68,11 +88,16 @@ local hurt_collide = function(player,dtime)
 	)
 
 	_,damage_nodes = minetest.find_nodes_in_area( a_min,  a_max, {"group:touch_hurt"})
-
+	real_nodes = {}
+	for node_data,is_next_to in pairs(damage_nodes) do
+		if damage_nodes[node_data] > 0 then
+			table.insert(real_nodes,node_data)
+		end
+	end
 	hurt = 0
 	-- find the highest damage node
-	if table.getn(damage_nodes) > 0 then
-		for node,_ in ipairs(damage_nodes) do
+	if table.getn(real_nodes) > 0 then
+		for _,node in ipairs(real_nodes) do
 			damage_amount = minetest.get_item_group(node, "touch_hurt")
 			if damage_amount >  hurt then
 				hurt = damage_amount
@@ -84,24 +109,79 @@ local hurt_collide = function(player,dtime)
 	end
 end
 
+
+
+-- handle damage when inside node
+-- this is lua collision detection
+
 -- damages players 4 times a second
 local name
 local temp_pool
 local tick
-handle_touch_hurting = function(player,damage,dtime)
+local handle_hurt_inside = function(player,damage,dtime)
 	name      = player:get_player_name()
 	temp_pool = pool[name]
-	tick      = temp_pool.touch_hurt_ticker
+	tick      = temp_pool.hurt_inside_ticker
 
 	tick = tick - dtime
-	if  tick <= 0 then
+	if tick <= 0 then
 		player:set_hp(player:get_hp()-damage)
 		tick = 0.25
 	end
-	temp_pool.touch_hurt_ticker = tick
+	temp_pool.hurt_inside_ticker = tick
 end
 
+local pos
+local hurt
+local name
+local damage_nodes
+local real_nodes
+local a_min
+local a_max
+local damage_amount
+local gotten_node
+local _
+local hurt_inside = function(player,dtime)
+	name = player:get_player_name()
+	if player:get_hp() <= 0 then
+		return
+	end
+	-- used for finding a damage node from the center of the player
+	-- rudementary collision detection
+	pos = player:get_pos()
+	pos.y = pos.y + (player:get_properties().collisionbox[5]/2)
+	a_min = vector.new(
+		pos.x-0.25,
+		pos.y-0.85,
+		pos.z-0.25
+	)
+	a_max = vector.new(
+		pos.x+0.25,
+		pos.y+0.85,
+		pos.z+0.25
+	)
 
+	_,damage_nodes = minetest.find_nodes_in_area( a_min,  a_max, {"group:hurt_inside"})
+	real_nodes = {}
+	for node_data,is_next_to in pairs(damage_nodes) do
+		if damage_nodes[node_data] > 0 then
+			table.insert(real_nodes,node_data)
+		end
+	end
+	hurt = 0
+	-- find the highest damage node
+	if table.getn(real_nodes) > 0 then
+		for _,node in ipairs(real_nodes) do
+			damage_amount = minetest.get_item_group(node, "hurt_inside")
+			if damage_amount >  hurt then
+				hurt = damage_amount
+			end
+		end
+		handle_hurt_inside(player,damage_amount,dtime)
+	else
+		pool[name].hurt_inside_ticker = 0
+	end
+end
 
 --[[
 -- handles being inside a hurt node
@@ -179,7 +259,6 @@ local name
 local temp_pool
 local pos
 local swimming
-
 local index_players_surroundings = function(dtime)
 	for _,player in ipairs(minetest.get_connected_players()) do
 		
@@ -203,9 +282,9 @@ local index_players_surroundings = function(dtime)
 		end
 		temp_pool.head = minetest.get_node(pos).name
 
-		--hurt_collide(player,dtime)
-
-		--hurt_inside(player,dtime)
+		hurt_collide(player,dtime)
+		
+		hurt_inside(player,dtime)
 
 		--handle_player_suffocation(player,dtime)
 	end
