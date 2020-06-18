@@ -33,7 +33,11 @@ local function magnet(player)
 				gain = 0.4,
 				pitch = math.random(60,100)/100
 			})
-			pool[name] = pool[name] - 1
+			if pool[name] > 6 then
+				pool[name] = 6
+			else
+				pool[name] = pool[name] - 1
+			end
 		end
 		--radial detection
 		for _,object in ipairs(minetest.get_objects_inside_radius({x=pos.x,y=pos.y+0.5,z=pos.z}, 2)) do
