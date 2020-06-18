@@ -187,8 +187,10 @@ function tnt(pos,range,explosion_type)
 								full_punch_interval=1.5,
 								damage_groups = {damage=math.floor(power)},
 								})
-							object:set_velocity(force)
+						elseif object:get_luaentity().name == "__builtin:item" then
+							object:get_luaentity().poll_timer = 0
 						end
+						object:add_velocity(force)
 					end
 				end
 			end
