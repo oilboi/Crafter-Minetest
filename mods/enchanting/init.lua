@@ -36,14 +36,15 @@ minetest.register_node("enchanting:table", {
 			if not groupcaps then return end
 			
 			local able_enchantments = table.copy(enchantment_list)
-			local player_meta = clicker:get_meta()
-			local player_level = player_meta:get_int("experience_level")
+			
+
+			local player_level = get_player_xp_level(clicker)
 			
 			local enchants_available = math.floor(player_level/5)
 			local max_enchant_level = math.floor(player_level/5)
 			if enchants_available <= 0 then return end
 			if enchants_available > 3 then enchants_available = 3 end
-			
+			local stock_name = minetest.registered_tools[stack:get_name()].name
 			local description = minetest.registered_tools[stack:get_name()].description--temp_names[math.random(1,table.getn(temp_names))]
 			for i = 1,enchants_available do
 				local new_enchant = enchantment_list[math.random(1,table.getn(enchantment_list))]
@@ -73,17 +74,12 @@ minetest.register_node("enchanting:table", {
 				end
 			end
 			
-			meta:set_string("description", description)
+			meta:set_string("description", "Enchanted "..description)
 			meta:set_string("enchanted", "true")
 			meta:set_tool_capabilities(tool_caps)
 			
-			player_meta:set_int("experience_level", player_level)
+			set_player_xp_level(clicker,player_level)
 			
-			local hud_fg_id = player_meta:get_int("experience_level_fg")
-			local hud_bg_id = player_meta:get_int("experience_level_bg")
-			
-			clicker:hud_change(hud_bg_id, "text", tostring(player_level))
-			clicker:hud_change(hud_fg_id, "text", tostring(player_level))
 			
 			--create truly random hex
 			local colorstring = "#"

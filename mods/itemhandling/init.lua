@@ -258,6 +258,7 @@ local vel
 local def
 local slip_factor
 local change
+local slippery
 local item_step = function(self, dtime, moveresult)
 	pos = self.object:get_pos()
 	if not pos then
