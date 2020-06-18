@@ -1,18 +1,9 @@
---here is where tnt is defined
+local minetest,type,vector,math,ipairs = 
+minetest,type,vector,math,ipairs
+
+
 local function extreme_tnt(pos,range,explosion_type)
 	local pos = vector.floor(vector.add(pos,0.5))
-	
-	--kill
-	--[[
-	for _,object in ipairs(minetest.get_objects_inside_radius(pos, range)) do
-		if  object:is_player() then 
-			object:set_hp(-50)
-		elseif object:get_luaentity() and object:get_luaentity().name == "__builtin:item" then
-			object:remove()
-		end
-	end
-	]]--
-	
 	local delay = 0
 	for x=-1,0 do
 	for y=-1,0 do
@@ -46,31 +37,7 @@ local function extreme_tnt(pos,range,explosion_type)
 	
 	minetest.sound_play("tnt_explode", {pos = pos, gain = 1.0, max_hear_distance = range*range*range})
 end
---[[
-minetest.register_globalstep(function(dtime)
-	--collection
-	for _,player in ipairs(minetest.get_connected_players()) do
-		local pos = player:get_pos()
-		pos.y = pos.y + player:get_properties().eye_height
-		local look_dir = player:get_look_dir()
-		look_dir = vector.multiply(look_dir,7)
-		local pos2 = vector.add(pos,look_dir)
-		
-		local ray = minetest.raycast(pos, pos2, false, false)		
-		if ray then
-			print("------------------------------------------------------------")
-			for pointed_thing in ray do
-				print(minetest.get_node(pointed_thing.under).name)
-				--if pointed_thing then
-				--	return({under=pointed_thing.under,above=pointed_thing.above})
-				--end
-			end
-		end
-	end
-end)
-]]--
 --use raycasting to create actual explosion
-local old_node_table
 local n_pos
 local node2
 local ray
@@ -78,63 +45,82 @@ local stop
 local found
 local positional_data
 local pos2 = vector.new(0,0,0)
+local in_node
+local in_water
+local min
+local max
+local vm
+local emin
+local emax
+local area
+local data
+local air = minetest.get_content_id("air")
+local content_id = minetest.get_name_from_content_id
+local distance
+local item
+local ppos
+local obj
+local do_it
+local in_node
+local clear
+local power
+local dir
+local force
+local hp
+local explosion_force
+local explosion_depletion
 function tnt(pos,range,explosion_type)
-	local in_node = minetest.get_node(pos).name
-	local in_water =  ( in_node == "main:water" or minetest.get_node(pos).name == "main:waterflow")
-	local min = vector.add(pos,range)
-	local max = vector.subtract(pos,range)
-	local vm = minetest.get_voxel_manip()	
-	local emin, emax = vm:read_from_map(min,max)
-	local area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
-	local data = vm:get_data()
-	
-	local air
-	if explosion_type ~= nil then
-		air = minetest.get_content_id(explosion_type)
-	else
-		air = minetest.get_content_id("air")
-	end
-	local content_id = minetest.get_name_from_content_id
-	
-	local insert = table.insert
-	
+	in_node = minetest.get_node(pos).name
+	in_water =  ( in_node == "main:water" or minetest.get_node(pos).name == "main:waterflow")
+	min = vector.add(pos,range)
+	max = vector.subtract(pos,range)
+	vm = minetest.get_voxel_manip(min,max)
+	emin, emax = vm:read_from_map(min,max)
+	area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
+	data = vm:get_data()
 	vm:get_light_data()
 	
-	
-	
 	if in_water == false then
+		explosion_depletion = range/2
 		--raycast explosion
 		for x=-range, range do
 		for y=-range, range do
 		for z=-range, range do
-			local distance = vector.distance(pos2, vector.new(x,y,z))
+			distance = vector.distance(pos2, vector.new(x,y,z))
 			if distance <= range and distance >= range-1 then			
 				ray = minetest.raycast(pos, vector.new(pos.x+x,pos.y+y,pos.z+z), false, false)
-				
+				explosion_force = range
 				for pointed_thing in ray do
-					n_pos = area:index(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
-					node2 = content_id(data[n_pos])
-					
-					if node2 == "nether:obsidian" or node2 == "nether:bedrock" then
-						break
-					elseif node2 == "tnt:tnt" then
-						data[n_pos] = air
-						local obj = minetest.add_entity(vector.new(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z), "tnt:tnt",minetest.serialize({do_ignition_particles=true,timer = math.random()}))
-					else
-						data[n_pos] = air
-						minetest.after(0, function(pointed_thing)
-							minetest.check_for_falling(vector.new(pointed_thing.under.x,pointed_thing.under.y+1,pointed_thing.under.z))
-						end,pointed_thing)
-						if math.random()>0.999 then
-							if n ~= "nether:obsidian" and n ~= "nether:bedrock" then
-								local item = minetest.get_node_drops(n, "main:diamondpick")[1]
-								local ppos = vector.new(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
-								local obj = minetest.add_item(ppos, item)
-								if obj then
-									local power = (range - vector.distance(pos,ppos))*2
-									local dir = vector.subtract(ppos,pos)
-									local force = vector.multiply(dir,power)
-									obj:set_velocity(force)
+					explosion_force = explosion_force - math.random()
+					if explosion_force  >= explosion_depletion then
+						n_pos = area:index(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
+
+						node2 = content_id(data[n_pos])
+						
+						if node2 == "nether:obsidian" or node2 == "nether:bedrock" then
+							break
+						elseif node2 == "tnt:tnt" then
+							data[n_pos] = air
+							minetest.add_entity(vector.new(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z), "tnt:tnt",minetest.serialize({do_ignition_particles=true,timer = math.random()}))
+						else
+							data[n_pos] = air
+							
+							minetest.after(0, function(pointed_thing)
+								minetest.check_for_falling(vector.new(pointed_thing.under.x,pointed_thing.under.y+1,pointed_thing.under.z))
+							end,pointed_thing)
+
+							if math.random()>0.9 then
+								if node2 ~= "nether:obsidian" and node2 ~= "nether:bedrock" then
+
+									item = minetest.get_node_drops(node2, "main:diamondpick")[1]
+									ppos = vector.new(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
+									obj = minetest.add_item(ppos, item)
+									if obj then
+										power = (range - vector.distance(pos,ppos))*2
+										dir = vector.subtract(ppos,pos)
+										force = vector.multiply(dir,power)
+										obj:set_velocity(force)
+									end
 								end
 							end
 						end
@@ -154,20 +140,20 @@ function tnt(pos,range,explosion_type)
 	--throw players and items
 	for _,object in ipairs(minetest.get_objects_inside_radius(pos, range)) do
 		if object:is_player() or (object:get_luaentity() and (object:get_luaentity().name == "__builtin:item" or object:get_luaentity().name == "tnt:tnt" or object:get_luaentity().is_mob == true)) then
-			local do_it = true
+			do_it = true
 			if not object:is_player() and object:get_luaentity().name == "tnt:tnt" then
-				local in_node = minetest.get_node(object:get_pos()).name
+				in_node = minetest.get_node(object:get_pos()).name
 				if ( in_node == "main:water" or in_node == "main:waterflow") then
 					do_it = false
 				end
 			end
 			if do_it == true then
-				local ppos = object:get_pos()
+				ppos = object:get_pos()
 				if object:is_player() then
 					ppos.y = ppos.y + 1
 				end
 				ray = minetest.raycast(pos, ppos, false, false)
-				local clear = true
+				clear = true
 				for pointed_thing in ray do
 					n_pos = area:index(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
 					node2 = content_id(data[n_pos])
@@ -176,12 +162,12 @@ function tnt(pos,range,explosion_type)
 					end
 				end
 				if clear == true then
-					local power = (range - vector.distance(pos,ppos))*10
-					local dir = vector.direction(pos,ppos)
-					local force = vector.multiply(dir,power)
+					power = (range - vector.distance(pos,ppos))*10
+					dir = vector.direction(pos,ppos)
+					force = vector.multiply(dir,power)
 					if object:is_player() then
 						--damage the player
-						local hp = object:get_hp()
+						hp = object:get_hp()
 						if hp > 0 then
 							--object:set_hp(hp - math.floor(power*2))
 							object:punch(object, 2, 
@@ -209,14 +195,13 @@ function tnt(pos,range,explosion_type)
 	end
 	
 	--stop client from lagging
-	local particle = range
-	if particle > 15 then
-		particle = 15
+	if range > 15 then
+		range = 15
 	end
 	
 
 	minetest.add_particlespawner({
-		amount = particle*particle,
+		amount = range,
 		time = 0.001,
 		minpos = pos,
 		maxpos = pos,

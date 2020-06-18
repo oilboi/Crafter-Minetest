@@ -1,4 +1,4 @@
-local minetest,math,vector,pairs,ItemStack = minetest,math,vector,pairs,ItemStack
+local minetest,math,vector,pairs,ItemStack,ipairs = minetest,math,vector,pairs,ItemStack,ipairs
 
 local path = minetest.get_modpath("itemhandling")
 dofile(path.."/magnet.lua")

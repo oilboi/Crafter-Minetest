@@ -1,4 +1,4 @@
-local minetest,math,vector,os = minetest,math,vector,os
+local minetest,math,vector,os,pairs = minetest,math,vector,os,pairs
 local mod_storage = minetest.get_mod_storage()
 local pool = {}
 
