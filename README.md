@@ -60,6 +60,7 @@ max_packets_per_iteration = 10096
 - Heavily optimized network usage with player mechanics to client mod
 - Updated player_api for next step in optimization
 - ElCeejo remodeled and fixed snowman head tracking. Thanks!
+- Overhauled everything
 ---
 
 

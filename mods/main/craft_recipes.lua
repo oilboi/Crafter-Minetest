@@ -165,7 +165,7 @@ for id,tool in pairs(tool) do
 end
 
 minetest.register_craft({
-	output = "main:ladder",
+	output = "main:ladder 16",
 	recipe = {
 		{"main:stick","", "main:stick"},
 		{"main:stick","main:stick", "main:stick"},
