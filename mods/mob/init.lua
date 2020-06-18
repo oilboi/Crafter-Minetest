@@ -744,7 +744,7 @@ mobs.register_mob(
 	 hp = 40,
 	 gravity = {x = 0, y = -9.81, z = 0},
 	 movement_type = "walk",
-	 max_speed = 9,
+	 max_speed = 6,
 	 hostile = true,
 	 hostile_cooldown = false,
 	 state = 0,
@@ -783,7 +783,7 @@ mobs.register_mob(
 	 --projectile_type = "tnt:tnt",
 	 
 	 explosion_radius = 6, -- how far away the mob has to be to initialize the explosion
-	 explosion_power = 14, -- how big the explosion is (radius)
+	 explosion_power = 6, -- how big the explosion is (radius)
 	 explosion_time = 3, -- how long it takes for a mob to explode
 	 explosion_blink_timer = 0.1, -- how fast the blinking happens
 	 
