@@ -58,7 +58,7 @@ local update_wield_item = function(player)
 	
 	entity = object:get_luaentity()
 	object_string = entity.itemstring
-	
+
 	if object_string ~= item then
 		entity.itemstring = item
 		entity.set_item(entity,item)
@@ -400,10 +400,6 @@ local def
 local set_item = function(self, item)
 	stack = ItemStack(item or self.itemstring)
 	self.itemstring = stack:to_string()
-	if self.itemstring == "" then
-		-- item not yet known
-		return
-	end
 
 	itemname = stack:is_known() and stack:get_name() or "unknown"
 
