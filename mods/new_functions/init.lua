@@ -13,6 +13,25 @@ get_player_legs_env = function(player)
 	name = player:get_player_name()
 	return(pool[name].legs)
 end
+
+local name
+player_under_check = function(player)
+	name = player:get_player_name()
+	return(pool[name].under)
+end
+
+local name
+player_swim_check = function(player)
+	name = player:get_player_name()
+	return(minetest.get_nodedef(pool[name].swim_check, "walkable") == false)
+end
+
+local name
+player_swim_under_check = function(player)
+	name = player:get_player_name()
+	return(minetest.get_nodedef(pool[name].under, "walkable") == false)
+end
+
 -- create blank list for player environment data
 local name
 local temp_pool
@@ -24,6 +43,7 @@ minetest.register_on_joinplayer(function(player)
 	temp_pool.under  = ""
 	temp_pool.legs   = ""
 	temp_pool.head   = ""
+	temp_pool.swim_check = ""
 	temp_pool.touch_hurt_ticker  = 0
 	temp_pool.hurt_inside_ticker = 0
 end)
@@ -283,19 +303,27 @@ local index_players_surroundings = function(dtime)
 		pos = player:get_pos()
 		swimming = is_player_swimming(player)
 
-
-		pos.y = pos.y - 0.1
-		temp_pool.under = minetest.get_node(pos).name
-
-		pos.y = pos.y + 0.6
-		temp_pool.legs = minetest.get_node(pos).name
-
 		if swimming then
-			pos.y = pos.y + 0.35
+			--this is where the legs would be
+			temp_pool.under = minetest.get_node(pos).name
+
+			--legs and head are in the same position
+			pos.y = pos.y + 1.35
+			temp_pool.legs = minetest.get_node(pos).name
+			temp_pool.head = minetest.get_node(pos).name
+
+			pos.y = pos.y + 0.7
+			temp_pool.swim_check = minetest.get_node(pos).name
 		else
+			pos.y = pos.y - 0.1
+			temp_pool.under = minetest.get_node(pos).name
+
+			pos.y = pos.y + 0.6
+			temp_pool.legs = minetest.get_node(pos).name
+			
 			pos.y = pos.y + 0.940
+			temp_pool.head = minetest.get_node(pos).name
 		end
-		temp_pool.head = minetest.get_node(pos).name
 
 		hurt_collide(player,dtime)
 

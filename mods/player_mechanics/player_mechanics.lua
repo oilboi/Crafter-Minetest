@@ -21,6 +21,7 @@ minetest.register_on_joinplayer(function(player)
 	temp_pool.old_state    = 0
 	temp_pool.was_in_water = false
 	temp_pool.swimming     = false
+	temp_pool.swim_bumped  = false
 end)
 
 -- resets the player's state on death
@@ -29,6 +30,7 @@ minetest.register_on_respawnplayer(function(player)
 	name = player:get_player_name()
 	pool[name].state = 0
 	pool[name].was_in_water = false
+	pool[name].swim_bumped = false
 	send_running_cancellation(player,false)
 end)
 
@@ -87,6 +89,8 @@ local temp_pool
 local head
 local legs
 local in_water
+local swim_unlock
+local swim_bump
 local control_state = function(player)
 	hunger    = get_player_hunger(player)
 	name      = player:get_player_name()
@@ -97,26 +101,33 @@ local control_state = function(player)
 	legs = minetest.get_item_group(get_player_legs_env(player),"water") > 0
 
 	--check if in water
-	if legs or head then
+	if head then
 		in_water = true
 		temp_pool.swimming = true
-	else
-		in_water = false
-		temp_pool.swimming = false
+	elseif temp_pool.swimming == true then
+		swim_unlock = player_swim_under_check(player)
+		swim_bump = player_swim_check(player)
+		if swim_unlock then
+			in_water = false
+			temp_pool.swimming = false
+		elseif swim_bump then
+			if player:get_player_velocity().y <= 0 then
+				player:add_player_velocity(vector.new(0,9,0))
+			end
+		end
 	end
 	
 	if (in_water ~= temp_pool.was_in_water) or 
 	(temp_pool.state ~= temp_pool.old_state) or 
 	((temp_pool.state == 1 or temp_pool.state == 2) and hunger <= 6) then
 
-		if not in_water and temp_pool.was_in_water then
+		if (not in_water and temp_pool.was_in_water) then
 			player:set_physics_override({
 				sneak   = true,
 			})
 
 			force_update_animation(player)
 
-			player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
 			player:set_properties({
 				collisionbox = {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
 			})
@@ -128,9 +139,8 @@ local control_state = function(player)
 
 			force_update_animation(player)
 
-			player:set_eye_offset({x=0,y=-6,z=0},{x=0,y=-6,z=5.9})
 			player:set_properties({
-				collisionbox = {-0.3, 0.5, -0.3, 0.3, 1.2, 0.3},
+				collisionbox = {-0.3, 0.8, -0.3, 0.3, 1.6, 0.3},
 			})
 		end
 
