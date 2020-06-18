@@ -69,30 +69,32 @@ local force
 local hp
 local explosion_force
 local explosion_depletion
+local range_calc
 function tnt(pos,range,explosion_type)
 	in_node = minetest.get_node(pos).name
 	in_water =  ( in_node == "main:water" or minetest.get_node(pos).name == "main:waterflow")
 	min = vector.add(pos,range)
 	max = vector.subtract(pos,range)
 	vm = minetest.get_voxel_manip(min,max)
-	emin, emax = vm:read_from_map(min,max)
-	area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
-	data = vm:get_data()
-	vm:get_light_data()
-	
-	if data and in_water == false then
+		emin, emax = vm:read_from_map(min,max)
+		area = VoxelArea:new{MinEdge=emin, MaxEdge=emax}
+		data = vm:get_data()
+		
+	if in_water == false then
+		vm:get_light_data()
+		range_calc = range/100
 		explosion_depletion = range/2
 		--raycast explosion
 		for x=-range, range do
 		for y=-range, range do
 		for z=-range, range do
 			distance = vector.distance(pos2, vector.new(x,y,z))
-			if distance <= range and distance >= range-1 then			
+			if distance <= range and distance >= range-1 then
 				ray = minetest.raycast(pos, vector.new(pos.x+x,pos.y+y,pos.z+z), false, false)
 				explosion_force = range
 				for pointed_thing in ray do
 					explosion_force = explosion_force - math.random()
-					if explosion_force  >= explosion_depletion then
+					if pointed_thing and explosion_force >= explosion_depletion then
 						n_pos = area:index(pointed_thing.under.x,pointed_thing.under.y,pointed_thing.under.z)
 
 						if n_pos and data[n_pos] then
@@ -105,12 +107,11 @@ function tnt(pos,range,explosion_type)
 								minetest.add_entity({x=pointed_thing.under.x,y=pointed_thing.under.y,z=pointed_thing.under.z}, "tnt:tnt",minetest.serialize({do_ignition_particles=true,timer = math.random()}))
 							else
 								data[n_pos] = air
-								
+
 								minetest.after(0, function(pointed_thing)
 									minetest.check_for_falling({x=pointed_thing.under.x,y=pointed_thing.under.y+1,z=pointed_thing.under.z})
 								end,pointed_thing)
-
-								if math.random()>0.9 then
+								if math.random() > 0.9 + range_calc then
 									item = minetest.get_node_drops(node2, "main:diamondpick")[1]
 									ppos = {x=pointed_thing.under.x,y=pointed_thing.under.y,z=pointed_thing.under.z}
 									obj = minetest.add_item(ppos, item)
@@ -190,7 +191,7 @@ function tnt(pos,range,explosion_type)
 						elseif object:get_luaentity().name == "__builtin:item" then
 							object:get_luaentity().poll_timer = 0
 						end
-						object:add_velocity(force)
+						object:set_velocity(force)
 					end
 				end
 			end
@@ -310,7 +311,7 @@ minetest.register_entity("tnt:tnt", {
 
 
 minetest.register_node("tnt:tnt", {
-    description = "Cobblestone",
+    description = "TNT",
     tiles = {"tnt_top.png", "tnt_bottom.png",
 			"tnt_side.png", "tnt_side.png",
 			"tnt_side.png", "tnt_side.png"},
@@ -318,21 +319,21 @@ minetest.register_node("tnt:tnt", {
     sounds = main.stoneSound(),
     redstone_activation = function(pos)
 		local obj = minetest.add_entity(pos,"tnt:tnt")
-		local range = 7
+		local range = 4
 		obj:get_luaentity().range = range
 		obj:get_luaentity().redstone_activated = true
 		minetest.remove_node(pos)
     end,
     on_punch = function(pos, node, puncher, pointed_thing)
 		local obj = minetest.add_entity(pos,"tnt:tnt")
-		local range = 7
+		local range = 4
 		obj:get_luaentity().range = range
 		minetest.remove_node(pos)
     end,
 })
 
 minetest.register_node("tnt:uranium_tnt", {
-    description = "Cobblestone",
+    description = "Uranium TNT",
     tiles = {"tnt_top.png^[colorize:green:100", "tnt_bottom.png^[colorize:green:100",
 			"tnt_side.png^[colorize:green:100", "tnt_side.png^[colorize:green:100",
 			"tnt_side.png^[colorize:green:100", "tnt_side.png^[colorize:green:100"},
@@ -350,7 +351,7 @@ minetest.register_node("tnt:uranium_tnt", {
 })
 
 minetest.register_node("tnt:uh_oh", {
-    description = "Cobblestone",
+    description = "Uh Oh",
     tiles = {"tnt_top.png", "tnt_bottom.png",
 			"tnt_side.png", "tnt_side.png",
 			"tnt_side.png", "tnt_side.png"},
