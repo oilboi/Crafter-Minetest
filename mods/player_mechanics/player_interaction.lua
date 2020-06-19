@@ -15,6 +15,7 @@ local cancel_fall_damage = function(player)
 	-- used for finding a damage node from the center of the player
 	-- rudementary collision detection
 	pos = player:get_pos()
+	minetest.chat_send_player(name,dump(pos))
 	pos.y = pos.y + (player:get_properties().collisionbox[5]/2)
 	a_min = vector.new(
 		pos.x-0.25,
