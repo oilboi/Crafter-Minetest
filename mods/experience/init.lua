@@ -13,12 +13,12 @@ local load_data = function(player)
 		temp_pool.xp_level = mod_storage:get_int(name.."xp_level")
 		temp_pool.xp_bar   = mod_storage:get_int(name.."xp_bar"  )
 		temp_pool.buffer   = 0
-		temp_pool.last_time= os.clock()
+		temp_pool.last_time= minetest.get_us_time()/1000000
 	else
 		temp_pool.xp_level = 0
 		temp_pool.xp_bar   = 0
 		temp_pool.buffer   = 0
-		temp_pool.last_time= os.clock()
+		temp_pool.last_time= minetest.get_us_time()/1000000
 	end
 end
 
@@ -189,15 +189,15 @@ local function add_experience(player,experience)
 	temp_pool.xp_bar = temp_pool.xp_bar + experience
 	
 	if temp_pool.xp_bar > 36 then
-		if os.clock() - temp_pool.last_time > 0.04 then
+		if minetest.get_us_time()/1000000 - temp_pool.last_time > 0.04 then
 			minetest.sound_play("level_up",{gain=0.2,to_player = name})
-			temp_pool.last_time = os.clock()
+			temp_pool.last_time = minetest.get_us_time()/1000000
 		end
         temp_pool.xp_bar = temp_pool.xp_bar - 36
 		level_up_experience(player)
 	else
-		if os.clock() - temp_pool.last_time > 0.01 then
-			temp_pool.last_time = os.clock()
+		if minetest.get_us_time()/1000000 - temp_pool.last_time > 0.01 then
+			temp_pool.last_time = minetest.get_us_time()/1000000
 			minetest.sound_play("experience",{gain=0.1,to_player = name,pitch=math.random(75,99)/100})
 		end
 	end

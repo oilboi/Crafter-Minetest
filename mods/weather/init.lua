@@ -199,14 +199,14 @@ local function do_snow()
 	if weather_type == 1 then
 		for _,player in ipairs(minetest.get_connected_players()) do
 			--this is debug
-			--local t0 = os.clock()
+			--local t0 = minetest.get_us_time()/1000000
 
 			pos = round_it(player:get_pos())
 			min = subber(pos, snow_radius)
 			max = adder(pos, snow_radius)
 
 			area_index = under_air(min, max, all_nodes)
-			--local node_search_time = math.ceil((os.clock() - t0) * 1000)
+			--local node_search_time = math.ceil((minetest.get_us_time()/1000000 - t0) * 1000)
 
 			spawn_table = {}
 
@@ -310,7 +310,7 @@ local function do_snow()
 
 			--this is debug
 			--[[
-			local chugent = math.ceil((os.clock() - t0) * 1000)
+			local chugent = math.ceil((minetest.get_us_time()/1000000 - t0) * 1000)
 			print("---------------------------------")
 			print("find_nodes_in_area_under_air() time: " .. node_search_time .. " ms")
 			print("New Snow generation time:            " .. chugent .. " ms  [" .. (chugent - node_search_time) .. " ms]")

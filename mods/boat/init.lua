@@ -202,7 +202,7 @@ minetest.register_entity("boat:boat", {
 		local pos = self.object:get_pos()
 		local velocity = self.object:get_velocity()
 		if self.lag_check then
-			local chugent = math.ceil((os.clock() - self.lag_check) * 1000)
+			local chugent = math.ceil(minetest.get_us_time()/1000 - self.lag_check)
 
 			--print("lag = "..chugent.." ms")
 			if chugent > 70 and  self.old_pos and self.old_velocity then
@@ -212,7 +212,7 @@ minetest.register_entity("boat:boat", {
 		end
 		self.old_pos = pos
 		self.old_velocity = vel
-		self.lag_check = os.clock()
+		self.lag_check = minetest.get_us_time()/1000
 	end,
 
 	on_step = function(self, dtime)
@@ -470,7 +470,7 @@ minetest.register_entity("boat:iron_boat", {
 		local pos = self.object:get_pos()
 		local velocity = self.object:get_velocity()
 		if self.lag_check then
-			local chugent = math.ceil((os.clock() - self.lag_check) * 1000)
+			local chugent = math.ceil(minetest.get_us_time()/1000- self.lag_check)
 
 			--print("lag = "..chugent.." ms")
 			if chugent > 70 and  self.old_pos and self.old_velocity then
@@ -480,7 +480,7 @@ minetest.register_entity("boat:iron_boat", {
 		end
 		self.old_pos = pos
 		self.old_velocity = vel
-		self.lag_check = os.clock()
+		self.lag_check = minetest.get_us_time()/1000
 	end,
 
 	on_step = function(self, dtime)

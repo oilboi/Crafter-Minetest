@@ -88,7 +88,7 @@ minetest.register_on_generated(function(minp, maxp, seed)
 		return
 	end
 	-- Start time of mapchunk generation.
-	--local t0 = os.clock()
+	--local t0 = minetest.get_us_time()/1000000
 	
 	-- Noise stuff.
 
@@ -195,6 +195,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	--vm:update_liquids()
 
 	-- Print generation time of this mapchunk.
-	--local chugent = math.ceil((os.clock() - t0) * 1000)
+	--local chugent = math.ceil((minetest.get_us_time()/1000000 - t0) * 1000)
 	--print ("[lvm_example] Mapchunk generation time " .. chugent .. " ms")
 end)

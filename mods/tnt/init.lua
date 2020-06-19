@@ -70,7 +70,7 @@ local hp
 local explosion_force
 local explosion_depletion
 local range_calc
-local boom_time = os.clock()
+local boom_time = minetest.get_us_time()/1000000
 function tnt(pos,range,explosion_type)
 	in_node = minetest.get_node(pos).name
 	in_water =  ( in_node == "main:water" or minetest.get_node(pos).name == "main:waterflow")
@@ -137,8 +137,8 @@ function tnt(pos,range,explosion_type)
 		vm:update_liquids()
 		vm:write_to_map()
 	end
-	if os.clock() - boom_time >= 0.1 then
-		boom_time = os.clock()
+	if minetest.get_us_time()/1000000 - boom_time >= 0.1 then
+		boom_time = minetest.get_us_time()/1000000
 		minetest.sound_play("tnt_explode", {pos = pos, gain = 1.0, max_hear_distance = 64}) --hear twice as far away
 	end
 	
