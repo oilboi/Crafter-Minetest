@@ -232,6 +232,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
 			minetest.show_formspec(name,id, form..tmi_master_inventory["page_"..temp_pool.page]..cheat_button(name))
 			minetest.sound_play("lever", {to_player = name,gain=0.7})
+			player:set_inventory_formspec(base_inv..tmi_master_inventory["page_"..temp_pool.page]..cheat_button(name))
 		else
 			minetest.chat_send_player(name, "Sorry m8, server says I can't let you do that :(")
 			minetest.sound_play("lever", {to_player = name,gain=0.7,pitch=0.7})

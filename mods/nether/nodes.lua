@@ -21,7 +21,7 @@ minetest.register_node("nether:netherrack", {
 			items= {
 				{
 					rarity = 0,
-					tools = {"main:woodpick","main:stonepick","main:ironpick","main:goldpick","main:diamondpick"},
+					tools = {"main:woodpick","main:coalpick","main:stonepick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
 					items = {"nether:netherrack"},
 				},
 				},
@@ -44,24 +44,24 @@ minetest.register_node("nether:glowstone", {
 			max_items = 5,
 			items= {
 				{
-					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					tools = {"main:woodpick","main:coalpick","main:stonepick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
 					items = {"nether:glowstone_dust"},
 				},
 				{
-					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					tools = {"main:woodpick","main:coalpick","main:stonepick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
 					items = {"nether:glowstone_dust"},
 				},
 				{
-					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					tools = {"main:woodpick","main:coalpick","main:stonepick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
 					items = {"nether:glowstone_dust"},
 				},
 				{
-					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					tools = {"main:woodpick","main:coalpick","main:stonepick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
 					items = {"nether:glowstone_dust"},
 				},
 				{
 					rarity = 5,
-					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					tools = {"main:woodpick","main:coalpick","main:stonepick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
 					items = {"nether:glowstone_dust"},
 				},
 			},
@@ -71,7 +71,7 @@ minetest.register_node("nether:glowstone", {
 minetest.register_node("nether:obsidian", {
     description = "Obsidian",
     tiles = {"obsidian.png"},
-    groups = {stone = 5, pathable = 1},
+    groups = {obsidian = 1, pathable = 1},
     --groups = {stone = 1, pathable = 1}, --leave this here for debug
     sounds = main.stoneSound(),
     is_ground_content = false,
