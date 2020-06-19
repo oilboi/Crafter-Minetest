@@ -20,7 +20,7 @@ minetest.register_on_joinplayer(function(player)
 	temp_pool.state        = 0
 	temp_pool.old_state    = 0
 	temp_pool.was_in_water = false
-	temp_pool.swimming     = false
+	--temp_pool.swimming     = false
 	temp_pool.swim_bumped  = false
 end)
 
@@ -30,7 +30,7 @@ minetest.register_on_respawnplayer(function(player)
 	name = player:get_player_name()
 	pool[name].state = 0
 	pool[name].was_in_water = false
-	pool[name].swim_bumped = false
+	--pool[name].swim_bumped = false
 	send_running_cancellation(player,false)
 end)
 
@@ -96,6 +96,7 @@ local control_state = function(player)
 	name      = player:get_player_name()
 	temp_pool = pool[name]
 
+	--[[
 	-- water movement data
 	head = minetest.get_item_group(get_player_head_env(player),"water") > 0
 	legs = minetest.get_item_group(get_player_legs_env(player),"water") > 0
@@ -116,11 +117,12 @@ local control_state = function(player)
 			end
 		end
 	end
-	
-	if (in_water ~= temp_pool.was_in_water) or 
+	]]--
+	if --(in_water ~= temp_pool.was_in_water) or 
 	(temp_pool.state ~= temp_pool.old_state) or 
 	((temp_pool.state == 1 or temp_pool.state == 2) and hunger <= 6) then
 
+		--[[
 		if (not in_water and temp_pool.was_in_water) then
 			player:set_physics_override({
 				sneak   = true,
@@ -144,6 +146,7 @@ local control_state = function(player)
 			})
 			player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
 		end
+		]]--
 
 		-- running/swimming fov modifier
 		if hunger > 6 and (temp_pool.state == 1 or temp_pool.state == 2) then
@@ -155,10 +158,10 @@ local control_state = function(player)
 				player:set_physics_override({speed=1.5})
 			end
 
-		elseif (not in_water and temp_pool.state ~= 1 and temp_pool.state ~= 2 and 
-		(temp_pool.old_state == 1 or temp_pool.old_state == 2)) or 
-		(in_water and temp_pool.state ~= 1 and temp_pool.state ~= 2 and temp_pool.state ~= 3 and 
-		(temp_pool.old_state == 1 or temp_pool.old_state == 2 or temp_pool.old_state == 3))then
+		elseif (temp_pool.state ~= 1 and temp_pool.state ~= 2 and 
+		(temp_pool.old_state == 1 or temp_pool.old_state == 2)) then--or 
+		--(in_water and temp_pool.state ~= 1 and temp_pool.state ~= 2 and temp_pool.state ~= 3 and 
+		--(temp_pool.old_state == 1 or temp_pool.old_state == 2 or temp_pool.old_state == 3))then
 
 			player:set_fov(1, true,0.15)
 			player:set_physics_override({speed=1})
@@ -172,18 +175,19 @@ local control_state = function(player)
 		end
 
 		--sneaking
-		if temp_pool.state == 3 and in_water then
-			send_running_cancellation(player,false)
-		elseif not in_water and temp_pool.state == 3 and temp_pool.old_state ~= 3 then
+		--if temp_pool.state == 3 and in_water then
+		--	send_running_cancellation(player,false)
+		if temp_pool.state == 3 and temp_pool.old_state ~= 3 then
 			player:set_eye_offset({x=0,y=-1,z=0},{x=0,y=0,z=0})
-		elseif not in_water and temp_pool.old_state == 3 and temp_pool.state ~= 3 then
+		elseif temp_pool.old_state == 3 and temp_pool.state ~= 3 then
 			player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
 		end
 
 		temp_pool.old_state    = state
-		temp_pool.was_in_water = in_water
+		--temp_pool.was_in_water = in_water
 	
 	-- water movement
+	--[[]
 	elseif in_water then
 		if not temp_pool.was_in_water then
 			player:set_physics_override({
@@ -192,7 +196,9 @@ local control_state = function(player)
 		end
 		temp_pool.old_state    = temp_pool.old_state
 		temp_pool.was_in_water = in_water
+		]]--
 	end
+
 end
 
 minetest.register_globalstep(function(dtime)
