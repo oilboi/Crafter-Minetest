@@ -106,7 +106,7 @@ local function spawn_mobs(player)
 			light_level = minetest.get_node_light(spawner[1])
 
 			if weather_type == 1 then
-				if light_level < 10 then
+				if light_level < 7 then
 					mob_spawning = snow_dark_spawn_table[math.random(1,table.getn(snow_dark_spawn_table))]
 					--print("Snow Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
 					minetest.add_entity(mob_pos,"mob:"..mob_spawning)
@@ -116,7 +116,7 @@ local function spawn_mobs(player)
 					minetest.add_entity(mob_pos,"mob:"..mob_spawning)
 				end
 			else
-				if light_level < 10 then
+				if light_level < 7 then
 					mob_spawning = dark_spawn_table[math.random(1,table.getn(dark_spawn_table))]
 					--print("Dark Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
 					minetest.add_entity(mob_pos,"mob:"..mob_spawning)
