@@ -34,34 +34,6 @@ local levels = {
 	["ruby"]=7,
 }
 
-minetest.register_chatcommand("ore", {
-	params = "nil",
-	description = "Spawn x amount of a mob, used as /spawn 'mob' 10 or /spawn 'mob' for one",
-	privs = {server=true},
-	func = function(name)
-		local player = minetest.get_player_by_name(name)
-		local pos = player:get_pos()
-		pos.y = pos.y + 1.5
-		for ore,_ in pairs(ores) do
-			minetest.add_item(pos,"main:"..ore.."ore")
-		end
-	end,
-})
-
-minetest.register_chatcommand("tooltime", {
-	params = "nil",
-	description = "Spawn x amount of a mob, used as /spawn 'mob' 10 or /spawn 'mob' for one",
-	privs = {server=true},
-	func = function(name)
-		local player = minetest.get_player_by_name(name)
-		local pos = player:get_pos()
-		pos.y = pos.y + 1.5
-		for _,tool_ in pairs(tool) do
-			minetest.add_item(pos,tool_)
-		end
-	end,
-})
-
 
 local level = 0
 local experience
