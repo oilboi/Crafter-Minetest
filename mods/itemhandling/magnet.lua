@@ -23,8 +23,8 @@ local entity
 local tick = false
 local function magnet(player)
 	--don't magnetize to dead players
+	name = player:get_player_name()
 	if player:get_hp() > 0 then
-		name = player:get_player_name()
 		pos = player:get_pos()
 		inv = player:get_inventory()
 		if tick == true and pool[name] > 0 then
