@@ -1,9 +1,55 @@
-local minetest,armor_class,math = minetest,armor_class,math
+local minetest,armor_class,math,pairs,ipairs = minetest,armor_class,math,pairs,ipairs
+
+local pos
+local name
+local damage_nodes
+local real_nodes
+local a_min
+local a_max
+local _
+local cancel_fall_damage = function(player)
+	name = player:get_player_name()
+	if player:get_hp() <= 0 then
+		return
+	end
+	-- used for finding a damage node from the center of the player
+	-- rudementary collision detection
+	pos = player:get_pos()
+	pos.y = pos.y + (player:get_properties().collisionbox[5]/2)
+	a_min = vector.new(
+		pos.x-0.25,
+		pos.y-0.85,
+		pos.z-0.25
+	)
+	a_max = vector.new(
+		pos.x+0.25,
+		pos.y+0.85,
+		pos.z+0.25
+	)
+	_,saving_nodes = minetest.find_nodes_in_area( a_min,  a_max, {"group:disable_fall_damage"})
+	real_nodes = {}
+	for node_data,_ in pairs(saving_nodes) do
+		if saving_nodes[node_data] > 0 then
+			table.insert(real_nodes,node_data)
+		end
+	end
+	-- find the highest damage node
+	if table.getn(real_nodes) > 0 then
+		return(true)
+	end
+	return(false)
+end
+
+
+
+
+
+
 
 --hurt sound and disable fall damage group handling
 minetest.register_on_player_hpchange(function(player, hp_change, reason)
 	if reason.type == "fall" then
-		if minetest.get_item_group(minetest.get_node(player:get_pos()).name, "disable_fall_damage") > 0 then
+		if cancel_fall_damage(player) then
 			return(0)
 		else
 			--boots absorb fall damage
