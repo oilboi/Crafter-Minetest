@@ -12,13 +12,15 @@ minetest.register_chatcommand("sethome", {
 	description = "Use this to set your home. Can be returned to by setting /home",
 	privs = {},
 	func = function(name)
+		local time = minetest.get_us_time()/1000000
 		local player = minetest.get_player_by_name(name)
 		local pos = player:get_pos()
-		if not pool[name] or pool[name] and os.clock()-pool[name] > home_timeout then
+		if not pool[name] or pool[name] and time-pool[name] > home_timeout then
 			mod_storage:set_string(name.."home", minetest.serialize(pos))
-			pool[name] = os.clock()
+			pool[name] = time
+			minetest.chat_send_player(name, "Home set.")
 		elseif pool[name] then
-			local diff = home_timeout-math.ceil(os.clock()-pool[name])+1
+			local diff = home_timeout-math.ceil(time-pool[name])+1
 			local s = "s"
 			if diff == 1 then
 				s = ""
@@ -34,20 +36,21 @@ minetest.register_chatcommand("home", {
 	description = "Use this to set your home. Can be returned to by setting /home",
 	privs = {},
 	func = function(name)
+		local time = minetest.get_us_time()/1000000
 		local player = minetest.get_player_by_name(name)
 
-		if not pool[name] or pool[name] and os.clock()-pool[name] > home_timeout then
+		if not pool[name] or pool[name] and time-pool[name] > home_timeout then
 
 			local newpos = minetest.deserialize(mod_storage:get_string(name.."home"))
 			
 			if newpos then
 				player:move_to(newpos)
-				pool[name] = os.clock()
+				pool[name] = time
 			else
 				minetest.chat_send_player(name, "No home set.")
 			end
 		elseif pool[name] then
-			local diff = home_timeout-math.ceil(os.clock()-pool[name])+1
+			local diff = home_timeout-math.ceil(time-pool[name])+1
 			local s = "s"
 			if diff == 1 then
 				s = ""
