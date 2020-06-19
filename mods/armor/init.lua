@@ -219,7 +219,7 @@ minetest.register_allow_player_inventory_action(function(player, action, invento
     end
 end)
 
-local materials = {["iron"]=4,["chain"]=6,["gold"]=2,["diamond"]=8} --max 8
+local materials = {["coal"]=1,["lapis"]=2,["iron"]=3,["chain"]=4,["gold"]=2,["diamond"]=5,["emerald"]=6,["sapphire"]=7,["ruby"]=8} --max 8
 local armor_type = {["helmet"]=2,["chestplate"]=4,["leggings"]=3,["boots"]=1} --max 4
 
 local function bool_int(state)

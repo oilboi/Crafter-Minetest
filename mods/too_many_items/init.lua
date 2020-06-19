@@ -201,6 +201,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		end	
 		minetest.show_formspec(name,id, form..tmi_master_inventory["page_"..temp_pool.page]..cheat_button(name))
 		minetest.sound_play("lever", {to_player = name,gain=0.7})
+		player:set_inventory_formspec(base_inv..tmi_master_inventory["page_"..temp_pool.page]..cheat_button(name))
 	--"prev" button
 	elseif fields["toomanyitems.prev"] then
 		temp_pool.page = temp_pool.page - 1
@@ -211,6 +212,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		
 		minetest.show_formspec(name,id, form..tmi_master_inventory["page_"..temp_pool.page]..cheat_button(name))
 		minetest.sound_play("lever", {to_player = name,gain=0.7})
+		player:set_inventory_formspec(base_inv..tmi_master_inventory["page_"..temp_pool.page]..cheat_button(name))
 	elseif fields["toomanyitems.back"] then
 
 		minetest.show_formspec(name,id, form..tmi_master_inventory["page_"..temp_pool.page]..cheat_button(name))
@@ -256,7 +258,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		else
 			craft_inv = create_craft_formspec(item)
 			if craft_inv and craft_inv ~= "" then
-				print(tmi_master_inventory["page_"..temp_pool.page])
 				minetest.show_formspec(name, id, tmi_master_inventory["page_"..temp_pool.page]..craft_inv..cheat_button(name))
 				minetest.sound_play("lever", {to_player = name,gain=0.7})
 			end

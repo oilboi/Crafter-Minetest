@@ -1,7 +1,7 @@
 --Quick definition of tools
 local tool = {"shovel","axe","pick"}
-local material = {"wood","stone","iron","gold","diamond"}
-local sword_durability ={52,131,250,32,1561}
+local material =        {"coal","wood","stone","lapis","iron","gold","diamond","emerald","sapphire","ruby"}
+local sword_durability ={10    ,52    ,131    ,200    ,250    ,32    ,1561    ,2300     ,3000      ,5000  }
 
 for level_id,material in pairs(material) do
 	for id,tool in pairs(tool) do
@@ -30,6 +30,24 @@ for level_id,material in pairs(material) do
 				}
 				damage = 3.5
 				wear = 400
+			elseif material == "coal" then
+				groupcaps2={
+					dirt =  {times={[1]=0.02,[2]=0.02,[3]=1.5,[4]=3,[5]=6},   uses=10, maxlevel=1},
+					snow =  {times={[1]=0.02,[2]=0.02,[3]=1.5,[4]=3,[5]=6},   uses=10, maxlevel=1},
+					grass = {times={[1]=0.025,[2]=0.025,[3]=1.5,[4]=3,[5]=6}, uses=10, maxlevel=1},
+					sand =  {times={[1]=0.02,[2]=0.02,[3]=1.5,[4]=3,[5]=6},   uses=10, maxlevel=1},
+				}
+				damage = 3.5
+				wear = 2000
+			elseif material == "lapis" then
+					groupcaps2={
+						dirt =  {times={[1]=0.17,[2]=0.17,[3]=0.17,[4]=1.5,[5]=4.5}, uses=190, maxlevel=1},
+						snow =  {times={[1]=0.17,[2]=0.17,[3]=0.17,[4]=1.5,[5]=4.5}, uses=190, maxlevel=1},
+						grass = {times={[1]=0.17,[2]=0.17,[3]=0.17,[4]=1.5,[5]=4.5}, uses=190, maxlevel=1},
+						sand =  {times={[1]=0.17,[2]=0.17,[3]=0.17,[4]=1.5,[5]=4.5}, uses=190, maxlevel=1},
+					}
+					damage = 4
+					wear = 350
 			elseif material == "iron" then
 				groupcaps2={
 					dirt =  {times={[1]=0.15,[2]=0.15,[3]=0.15,[4]=1.5,[5]=3}, uses=250, maxlevel=1},
@@ -57,6 +75,33 @@ for level_id,material in pairs(material) do
 				}
 				damage = 5.5
 				wear = 100
+			elseif material == "emerald" then
+				groupcaps2={
+					dirt =  {times={[1]= 0.05,[2]=0.05,[3]=0.05,[4]=0.05,[5]=0.05}, uses=2300, maxlevel=1},
+					snow =  {times={[1]= 0.05,[2]=0.05,[3]=0.05,[4]=0.05,[5]=0.05}, uses=2300, maxlevel=1},
+					grass = {times={[1]= 0.05,[2]=0.05,[3]=0.05,[4]=0.05,[5]=0.05}, uses=2300, maxlevel=1},
+					sand =  {times={[1]= 0.05,[2]=0.05,[3]=0.05,[4]=0.05,[5]=0.05}, uses=2300, maxlevel=1},
+				}
+				damage = 7
+				wear = 50
+			elseif material == "sapphire" then
+				groupcaps2={
+					dirt =  {times={[1]= 0.025,[2]=0.025,[3]=0.025,[4]=0.025,[5]=0.025}, uses=3000, maxlevel=1},
+					snow =  {times={[1]= 0.025,[2]=0.025,[3]=0.025,[4]=0.025,[5]=0.025}, uses=3000, maxlevel=1},
+					grass = {times={[1]= 0.025,[2]=0.025,[3]=0.025,[4]=0.025,[5]=0.025}, uses=3000, maxlevel=1},
+					sand =  {times={[1]= 0.025,[2]=0.025,[3]=0.025,[4]=0.025,[5]=0.025}, uses=3000, maxlevel=1},
+				}
+				damage = 9
+				wear = 25
+			elseif material == "ruby" then
+				groupcaps2={
+					dirt =  {times={[1]= 0.01,[2]=0.01,[3]=0.01,[4]=0.01,[5]=0.01}, uses=5000, maxlevel=1},
+					snow =  {times={[1]= 0.01,[2]=0.01,[3]=0.01,[4]=0.01,[5]=0.01}, uses=5000, maxlevel=1},
+					grass = {times={[1]= 0.01,[2]=0.01,[3]=0.01,[4]=0.01,[5]=0.01}, uses=5000, maxlevel=1},
+					sand =  {times={[1]= 0.01,[2]=0.01,[3]=0.01,[4]=0.01,[5]=0.01}, uses=5000, maxlevel=1},
+				}
+				damage = 12
+				wear = 10
 			end
 		end		
 		--axe
@@ -65,19 +110,31 @@ for level_id,material in pairs(material) do
 				groupcaps2={
 					wood = {times={[1]=1.5,[2]=3,[3]=6,[4]=9,[5]=12}, uses=59, maxlevel=1}
 				}
-				damage = 7
+				damage = 4
 				wear = 500
 			elseif material == "stone" then
 				groupcaps2={
 					wood = {times={[1]=0.75,[2]=0.75,[3]=3,[4]=6,[5]=9}, uses=131, maxlevel=1}
 				}
-				damage=9
+				damage=6
 				wear = 400
+			elseif material == "coal" then
+				groupcaps2={
+					wood = {times={[1]=0.075,[2]=0.075,[3]=3,[4]=6,[5]=9}, uses=10, maxlevel=1}
+				}
+				damage=3
+				wear = 2000
+			elseif material == "lapis" then
+				groupcaps2={
+					wood = {times={[1]=0.6,[2]=0.6,[3]=1,[4]=4,[5]=7}, uses=200, maxlevel=1}
+				}
+				damage=7
+				wear = 350
 			elseif material == "iron" then
 				groupcaps2={
 					wood = {times={[1]=0.5,[2]=0.5,[3]=0.5,[4]=3,[5]=6}, uses=250, maxlevel=1}
 				}
-				damage = 9
+				damage = 8
 				wear = 300
 			elseif material == "gold" then
 				groupcaps2={
@@ -91,6 +148,24 @@ for level_id,material in pairs(material) do
 				}
 				damage = 9
 				wear = 100
+			elseif material == "emerald" then
+				groupcaps2={
+					wood = {times={[1]= 0.2,[2]=0.2,[3]=0.2,[4]=0.2,[5]=1.5}, uses=2300, maxlevel=1}
+				}
+				damage = 12
+				wear = 50
+			elseif material == "sapphire" then
+				groupcaps2={
+					wood = {times={[1]= 0.1,[2]=0.1,[3]=0.1,[4]=0.1,[5]=1}, uses=3000, maxlevel=1}
+				}
+				damage = 14
+				wear = 25
+			elseif material == "ruby" then
+				groupcaps2={
+					wood = {times={[1]= 0.05,[2]=0.05,[3]=0.05,[4]=0.05,[5]=05}, uses=5000, maxlevel=1}
+				}
+				damage = 18
+				wear = 10
 			end
 		end		
 		--pickaxe
@@ -99,44 +174,84 @@ for level_id,material in pairs(material) do
 				groupcaps2={
 					--ore hardness
 					--1 stone, 1 coal, 2 iron, 3 gold, 4 diamond, 5 obsidian
-					stone = {times={[1]=1.15,[2]=16,[3]=32,[4]=64,[5]=128}, uses=59, maxlevel=1},
-					glass = {times={[1]=0.575,[2]=16,[3]=32,[4]=64,[5]=128}, uses=59, maxlevel=1},
-					netherrack = {times={[1]=0.2875,[2]=16,[3]=32,[4]=64,[5]=128}, uses=59, maxlevel=1},
+					stone = {times={[1]=1.15,[2]=16,[3]=32,[4]=64,[5]=128,[6]=512}, uses=59, maxlevel=1},
+					glass = {times={[1]=0.575,[2]=16,[3]=32,[4]=64,[5]=128,[6]=512}, uses=59, maxlevel=1},
+					netherrack = {times={[1]=0.2875,[2]=16,[3]=32,[4]=64,[5]=128,[6]=512}, uses=59, maxlevel=1},
 				}
 				damage = 3
 				wear = 500
 			elseif material == "stone" then
 				groupcaps2={
-					stone = {times={[1]=0.6,[2]=0.6,[3]=32,[4]=64,[5]=128}, uses=131, maxlevel=1},
-					glass = {times={[1]=0.3,[2]=0.3,[3]=32,[4]=64,[5]=128}, uses=131, maxlevel=1},
-					netherrack = {times={[1]=0.15,[2]=0.15,[3]=32,[4]=64,[5]=128}, uses=131, maxlevel=1},
+					stone = {times={[1]=0.6,[2]=0.6,[3]=32,[4]=64,[5]=128,[6]=512}, uses=131, maxlevel=1},
+					glass = {times={[1]=0.3,[2]=0.3,[3]=32,[4]=64,[5]=128,[6]=512}, uses=131, maxlevel=1},
+					netherrack = {times={[1]=0.15,[2]=0.15,[3]=32,[4]=64,[5]=128,[6]=512}, uses=131, maxlevel=1},
+				}
+				damage=4
+				wear = 400
+			elseif material == "coal" then
+				groupcaps2={
+					stone = {times={[1]=0.6,[2]=0.6,[3]=32,[4]=64,[5]=128,[6]=512}, uses=10, maxlevel=1},
+					glass = {times={[1]=0.3,[2]=0.3,[3]=32,[4]=64,[5]=128,[6]=512}, uses=10, maxlevel=1},
+					netherrack = {times={[1]=0.15,[2]=0.15,[3]=32,[4]=64,[5]=128,[6]=512}, uses=10, maxlevel=1},
+				}
+				damage=2
+				wear = 2000
+			elseif material == "lapis" then
+				groupcaps2={
+					stone = {times={[1]=0.5,[2]=0.5,[3]=4,[4]=64,[5]=128,[6]=512},     uses=200, maxlevel=1},
+					glass = {times={[1]=0.25,[2]=0.25,[3]=2.5,[4]=64,[5]=128,[6]=512}, uses=200, maxlevel=1},
+					netherrack = {times={[1]=0.125,[2]=0.125,[3]=3,[4]=64,[5]=128,[6]=512}, uses=200, maxlevel=1},
 				}
 				damage=4
 				wear = 400
 			elseif material == "iron" then
 				groupcaps2={
-					stone = {times={[1]=0.4,[2]=0.4,[3]=0.4,[4]=32,[5]=64}, uses=250, maxlevel=1},
-					glass = {times={[1]=0.2,[2]=0.2,[3]=0.2,[4]=32,[5]=64}, uses=250, maxlevel=1},
-					netherrack = {times={[1]=0.1,[2]=0.1,[3]=0.1,[4]=32,[5]=64}, uses=250, maxlevel=1},
+					stone = {times={[1]=0.4,[2]=0.4,[3]=0.4,[4]=32,[5]=64,[6]=512}, uses=250, maxlevel=1},
+					glass = {times={[1]=0.2,[2]=0.2,[3]=0.2,[4]=32,[5]=64,[6]=512}, uses=250, maxlevel=1},
+					netherrack = {times={[1]=0.1,[2]=0.1,[3]=0.1,[4]=32,[5]=64,[6]=512}, uses=250, maxlevel=1},
 				}
 				damage = 5
 				wear = 300
 			elseif material == "gold" then
 				groupcaps2={
-					stone = {times={[1]=0.2,[2]=0.2,[3]=0.2,[4]=0.2,[5]=32}, uses=32, maxlevel=1},
-					glass = {times={[1]=0.1,[2]=0.1,[3]=0.1,[4]=0.1,[5]=32}, uses=32, maxlevel=1},
-					netherrack = {times={[1]=0.05,[2]=0.05,[3]=0.05,[4]=0.05,[5]=32}, uses=32, maxlevel=1},
+					stone = {times={[1]=0.2,[2]=0.2,[3]=0.2,[4]=32,[5]=32,[6]=512}, uses=32, maxlevel=1},
+					glass = {times={[1]=0.1,[2]=0.1,[3]=0.1,[4]=32,[5]=32,[6]=512}, uses=32, maxlevel=1},
+					netherrack = {times={[1]=0.05,[2]=0.05,[3]=0.05,[4]=0.05,[5]=32,[6]=512}, uses=32, maxlevel=1},
 				}
 				damage = 3
 				wear = 1000
 			elseif material == "diamond" then
 				groupcaps2={
-					stone = {times={[1]= 0.3,[2]=0.3,[3]=0.3,[4]=0.3,[5]=4}, uses=1561, maxlevel=1},
-					glass = {times={[1]= 0.15,[2]=0.15,[3]=0.15,[4]=0.15,[5]=4}, uses=1561, maxlevel=1},
-					netherrack = {times={[1]= 0.075,[2]=0.075,[3]=0.075,[4]=0.075,[5]=4}, uses=1561, maxlevel=1},
+					stone =      {times={[1]= 0.3,[2]=0.3,[3]=0.3,[4]=0.3,[5]=4,[6]=32}, uses=1561, maxlevel=1},
+					glass =      {times={[1]= 0.15,[2]=0.15,[3]=0.15,[4]=0.15,[5]=4,[6]=32}, uses=1561, maxlevel=1},
+					netherrack = {times={[1]= 0.075,[2]=0.075,[3]=0.075,[4]=0.075,[5]=4,[6]=32}, uses=1561, maxlevel=1},
 				}
 				damage = 6
 				wear = 100
+			elseif material == "emerald" then
+				groupcaps2={
+					stone = {times={[1]= 0.15,[2]=0.15,[3]=0.15,[4]=0.15,[5]=0.15,[6]=5},       uses=2300, maxlevel=1},
+					glass = {times={[1]= 0.05,[2]=0.05,[3]=0.05,[4]=0.05,[5]=2,[6]=5},          uses=2300, maxlevel=1},
+					netherrack = {times={[1]= 0.05,[2]=0.05,[3]=0.05,[4]=0.05,[5]=2,[6]=5}, uses=2300, maxlevel=1},
+				}
+				damage = 8
+				wear = 50
+			elseif material == "sapphire" then
+				groupcaps2={
+					stone = {times={[1]= 0.05,[2]=0.05,[3]=0.05,[4]=0.05,[5]=0.05,[6]=1},       uses=3000, maxlevel=1},
+					glass = {times={[1]= 0.025,[2]=0.025,[3]=0.025,[4]=0.025,[5]=1,[6]=1},          uses=3000, maxlevel=1},
+					netherrack = {times={[1]= 0.025,[2]=0.025,[3]=0.025,[4]=0.025,[5]=0.025,[6]=1}, uses=3000, maxlevel=1},
+				}
+				damage = 10
+				wear = 25
+			elseif material == "ruby" then
+				groupcaps2={
+					stone = {times={[1]= 0.025,[2]=0.025,[3]=0.025,[4]=0.025,[5]=0.025,[6]=0.25},       uses=5000, maxlevel=1},
+					glass = {times={[1]= 0.025,[2]=0.025,[3]=0.025,[4]=0.025,[5]=0.025,[6]=0.25},          uses=5000, maxlevel=1},
+					netherrack = {times={[1]= 0.025,[2]=0.025,[3]=0.025,[4]=0.025,[5]=0.025,[6]=0.25}, uses=5000, maxlevel=1},
+				}
+				damage = 16
+				wear = 10
 			end
 		end
 		minetest.register_tool("main:"..material..tool, {
@@ -193,6 +308,12 @@ for level_id,material in pairs(material) do
 	elseif material == "stone" then
 		damage = 5
 		wear = 400
+	elseif material == "coal" then
+		damage = 2
+		wear = 2000
+	elseif material == "lapis" then
+		damage = 5
+		wear = 350
 	elseif material == "iron" then
 		damage = 6
 		wear = 300
@@ -202,6 +323,12 @@ for level_id,material in pairs(material) do
 	elseif material == "diamond" then
 		damage = 7
 		wear = 100
+	elseif material == "emerald" then
+		damage = 9
+		wear = 50
+	elseif material == "sapphire" then
+		damage = 11
+		wear = 25
 	end
 
 	

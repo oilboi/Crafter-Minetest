@@ -1,25 +1,53 @@
 --ore def with required tool
-local ores = {"coal","iron","gold","diamond"}
-local tool = {"main:woodpick","main:stonepick","main:ironpick","main:goldpick","main:diamondpick"}
-for id,ore in pairs(ores) do
-	local tool_required = {}
-	for i = id,5 do
-		table.insert(tool_required, tool[i])
-	end
-	local experience
+local tool = {"main:woodpick","main:coalpick","main:stonepick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"}
+local ores = {
+["coal"]={"main:woodpick","main:coalpick","main:stonepick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
+["iron"]={"main:coalpick","main:stonepick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
+["lapis"]={"main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
+["gold"]={"main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
+["diamond"]={"main:ironpick","main:lapispick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
+["emerald"]={"main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
+["sapphire"]={"main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
+["ruby"]={"main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
+}
+
+local drops ={
+	["coal"]={"main:coal"},
+	["iron"]={"main:ironore"},
+	["lapis"]={"main:lapis"},
+	["gold"]={"main:goldore"},
+	["diamond"]={"main:diamond"},
+	["emerald"]={"main:emerald"},
+	["sapphire"]={"main:sapphire"},
+	["ruby"]={"main:ruby"},
+}
+
+local levels = {
+	["coal"]=1,
+	["iron"]=2,
+	["lapis"]=2,
+	["gold"]=2,
+	["diamond"]=3,
+	["emerald"]=4,
+	["sapphire"]=5,
+	["ruby"]=6,
+}
+
+local level = 0
+local experience
+for ore,tool_required in pairs(ores) do
+	level = levels[ore]
+
 	if ore == "iron" or ore == "gold" then 
 		experience = 0
 	else
-		experience = id
+		experience = level
 	end
-
-	local drops = {"main:"..ore.."ore"}
-	if ore == "diamond" then drops = {"main:diamond"} elseif ore == "coal" then drops = {"main:coal"} end
 	
-	minetest.register_node("main:"..ore.."ore", {
-		description = ore:gsub("^%l", string.upper).." Ore",
-		tiles = {"stone.png^"..ore.."ore.png"},
-		groups = {stone = id, pathable = 1,experience=experience},
+	minetest.register_node("main:"..ore.."block", {
+		description = ore:gsub("^%l", string.upper).." Block",
+		tiles = {ore.."block.png"},
+		groups = {stone = level, pathable = 1},
 		sounds = main.stoneSound(),
 		--light_source = 14,--debugging ore spawn
 		drop = {
@@ -28,7 +56,25 @@ for id,ore in pairs(ores) do
 				{
 					rarity = 0,
 					tools = tool_required,
-					items = drops,
+					items = {"main:"..ore.."ore"},
+				},
+				},
+			},
+		})
+
+	minetest.register_node("main:"..ore.."ore", {
+		description = ore:gsub("^%l", string.upper).." Ore",
+		tiles = {"stone.png^"..ore.."ore.png"},
+		groups = {stone = level, pathable = 1,experience=experience},
+		sounds = main.stoneSound(),
+		--light_source = 14,--debugging ore spawn
+		drop = {
+			max_items = 1,
+			items= {
+				{
+					rarity = 0,
+					tools = tool_required,
+					items = drops[ore],
 				},
 				},
 			},

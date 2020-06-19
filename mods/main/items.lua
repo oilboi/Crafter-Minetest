@@ -55,3 +55,21 @@ minetest.register_craftitem("main:flint", {
 	description = "Flint",
 	inventory_image = "flint.png",
 })
+
+minetest.register_craftitem("main:lapis", {
+	description = "Lapis Lazuli",
+	inventory_image = "lapis.png",
+})
+
+minetest.register_craftitem("main:emerald", {
+	description = "Emerald",
+	inventory_image = "emerald.png",
+})
+minetest.register_craftitem("main:sapphire", {
+	description = "Sapphire",
+	inventory_image = "sapphire.png",
+})
+minetest.register_craftitem("main:ruby", {
+	description = "Ruby",
+	inventory_image = "ruby.png",
+})

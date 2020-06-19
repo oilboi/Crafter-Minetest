@@ -136,6 +136,17 @@ minetest.register_ore({
 
 minetest.register_ore({
 	ore_type	 = "scatter",
+	ore		= "main:lapisore",
+	wherein	  = "main:stone",
+	clust_scarcity = 15 * 15 * 15,
+	clust_num_ores = 3,
+	clust_size     = 2,
+	y_max	    = -128,
+	y_min	    = -10032,
+})
+
+minetest.register_ore({
+	ore_type	 = "scatter",
 	ore		= "main:ironore",
 	wherein	  = "main:stone",
 	clust_scarcity = 12 * 12 * 12,
@@ -250,3 +261,35 @@ minetest.register_ore({
 	y_min	    = -10032,
 })
 
+minetest.register_ore({
+	ore_type	 = "scatter",
+	ore		= "main:emeraldore",
+	wherein	  = "main:stone",
+	clust_scarcity = 17 * 17 * 17,
+	clust_num_ores = 4,
+	clust_size     = 3,
+	y_max	    = -1024,
+	y_min	    = -10032,
+})
+
+minetest.register_ore({
+	ore_type	 = "scatter",
+	ore		= "main:sapphireore",
+	wherein	  = "main:stone",
+	clust_scarcity = 17 * 17 * 17,
+	clust_num_ores = 4,
+	clust_size     = 3,
+	y_max	    = -3096,
+	y_min	    = -10032,
+})
+
+minetest.register_ore({
+	ore_type	 = "scatter",
+	ore		= "main:rubyore",
+	wherein	  = "main:stone",
+	clust_scarcity = 17 * 17 * 17,
+	clust_num_ores = 4,
+	clust_size     = 3,
+	y_max	    = -5012,
+	y_min	    = -10032,
+})

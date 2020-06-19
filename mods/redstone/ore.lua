@@ -30,27 +30,27 @@ for i = 0,1 do
 			items= {
 				{
 					--rarity = 0,
-					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					tools = {"main:coalpick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
 					items = {"redstone:dust"},
 				},
 				{
 					--rarity = 0,
-					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					tools = {"main:coalpick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
 					items = {"redstone:dust"},
 				},
 				{
 					--rarity = 0,
-					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					tools = {"main:coalpick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
 					items = {"redstone:dust"},
 				},
 				{
 					--rarity = 0,
-					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					tools = {"main:coalpick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
 					items = {"redstone:dust"},
 				},
 				{
 					rarity = 5,
-					tools = {"main:ironpick","main:goldpick","main:diamondpick"},
+					tools = {"main:coalpick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
 					items = {"redstone:dust"},
 				},
 			},

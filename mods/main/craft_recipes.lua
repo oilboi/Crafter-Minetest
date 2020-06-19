@@ -1,3 +1,4 @@
+local minetest,pairs = minetest,pairs
 --crafting recipes
 
 --cooking
@@ -115,10 +116,12 @@ minetest.register_craft({
 	}
 })
 
-local tool =     {"wood","stone", "iron","gold","diamond"}--the tool name
-local material = {"wood","cobble","iron","gold","diamond"}--material to craft
+local tool =     {"coal","wood","stone" ,"lapis","iron","gold","diamond","emerald","sapphire","ruby"}--the tool name
+local material = {"coal","wood","cobble","lapis","iron","gold","diamond","emerald","sapphire","ruby"}--material to craft
 
 for id,tool in pairs(tool) do
+
+	
 	minetest.register_craft({
 		output = "main:"..tool.."pick",
 		recipe = {
@@ -197,3 +200,19 @@ minetest.register_craft({
 
 
 
+local raw_material = {"coal","lapis","iron","gold","diamond","emerald","sapphire","ruby"}
+for _,name in pairs(raw_material) do
+	minetest.register_craft({
+		output = "main:"..name.."block",
+		recipe = {
+			{"main:"..name, "main:"..name, "main:"..name},
+			{"main:"..name, "main:"..name, "main:"..name},
+			{"main:"..name, "main:"..name, "main:"..name},
+		}
+	})
+	minetest.register_craft({
+		type = "shapeless",
+		output = "main:"..name.." 9",
+		recipe = {"main:"..name.."block"},
+	})
+end
