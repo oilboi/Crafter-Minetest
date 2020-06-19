@@ -1,19 +1,9 @@
-local vector,minetest,math = vector,minetest,math
+local vector,minetest,math,pairs = vector,minetest,math,pairs
 --
 mobs.create_data_handling_functions = function(def,mob_register)
-	mob_register.get_staticdata = function(self)
-		if self.deactivating == false then
-			global_mob_amount = global_mob_amount + 1
-			--print("Mob Spawned. Current Mobs: "..global_mob_amount)
-		elseif self.deactivating == true then
-			minetest.after(0, function()
-				if not self.object:get_luaentity() then
-					global_mob_amount = global_mob_amount - 1
-					--print("Mob Deactivated. Current Mobs: "..global_mob_amount)
-				end
-			end)
-		end
 
+	--mob_register.get_staticdata = function(self)
+		--[[
 		return minetest.serialize({
 			--range = self.range,
 			hp = self.hp,
@@ -32,13 +22,11 @@ mobs.create_data_handling_functions = function(def,mob_register)
 			c_mob_data = self.c_mob_data,
 			on_fire = self.on_fire,
 		})
-	end
+		]]--
+	--end
 
-
-	mob_register.on_activate = function(self, staticdata, dtime_s)
-		self.object:set_armor_groups({immortal = 1})
-		--self.object:set_velocity({x = math.random(-5,5), y = 5, z = math.random(-5,5)})
-		self.object:set_acceleration(def.gravity)
+	mob_register.on_activate = function(self)--, staticdata, dtime_s)
+		--[[
 		if string.sub(staticdata, 1, string.len("return")) == "return" then
 			local data = minetest.deserialize(staticdata)
 			if data and type(data) == "table" then
@@ -60,8 +48,11 @@ mobs.create_data_handling_functions = function(def,mob_register)
 				self.on_fire = data.on_fire
 			end
 		end
-		
+		]]--
 		--set up mob
+		self.object:set_armor_groups({immortal = 1})
+		--self.object:set_velocity({x = math.random(-5,5), y = 5, z = math.random(-5,5)})
+		self.object:set_acceleration(def.gravity)
 		self.object:set_animation(def.standing_frame, 0, 0, true)
 		self.current_animation = 0
 		self.object:set_hp(self.hp)
@@ -84,9 +75,9 @@ mobs.create_data_handling_functions = function(def,mob_register)
 		end
 
 		--use this to handle the global mob table
-		minetest.after(0,function()
-			self.deactivating = true
-		end)
+		--minetest.after(0,function()
+		--	self.deactivating = true
+		--end)
 	end
 
 	--this is the info on the mob

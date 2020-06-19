@@ -30,6 +30,7 @@ mob_register.initial_properties = {
 	automatic_face_movement_dir = def.automatic_face_movement_dir,
 	automatic_face_movement_max_rotation_per_sec = def.automatic_face_movement_max_rotation_per_sec,
 	makes_footstep_sound = def.makes_footstep_sound,
+	static_save = false,
 }
 
 

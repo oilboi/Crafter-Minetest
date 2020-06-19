@@ -16,7 +16,7 @@ local cancel_fall_damage = function(player)
 	-- rudementary collision detection
 	pos = player:get_pos()
 	minetest.chat_send_player(name,dump(pos))
-	pos.y = pos.y + (player:get_properties().collisionbox[5]/2)
+	pos.y = pos.y
 	a_min = vector.new(
 		pos.x-0.25,
 		pos.y-0.85,

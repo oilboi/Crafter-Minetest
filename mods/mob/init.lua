@@ -1,9 +1,6 @@
 local minetest,math,vector = minetest,math,vector
 --this is where mobs are defined
 
---this is going to be used to set an active mob limit
-global_mob_amount = 0
-
 local path = minetest.get_modpath(minetest.get_current_modname())
 
 dofile(path.."/spawning.lua")

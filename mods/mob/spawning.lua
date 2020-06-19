@@ -3,11 +3,9 @@ local minetest,vector,math,table = minetest,vector,math,table
 --this is where mob spawning is defined
 
 --spawn mob in a square doughnut shaped radius
-local timer = 6
 --the amount of mobs that the game will try to spawn per player
-local spawn_goal_per_player = 5
+local spawn_goal_per_player = 10
 --the amount of mobs that the spawner will cap out at
-local mob_limit = 100
 
 --the height in which the game will search the x and z chosen (NUMBER up, NUMBER down)
 local find_node_height = 32
@@ -131,11 +129,9 @@ local function spawn_mobs(player)
 end
 
 local function per_player_handling()
-	if global_mob_amount < mob_limit then
-		--check through players
-		for _,player in ipairs(minetest.get_connected_players()) do
-			spawn_mobs(player)
-		end
+	--check through players
+	for _,player in ipairs(minetest.get_connected_players()) do
+		spawn_mobs(player)
 	end
 
 	minetest.after(10, function()

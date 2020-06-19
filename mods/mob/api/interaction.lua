@@ -279,8 +279,6 @@ mobs.create_interaction_functions = function(def,mob_register)
 			end
 		end
 			
-		global_mob_amount = global_mob_amount - 1
-		--print("Mobs Died. Current Mobs: "..global_mob_amount)
 		
 		if self.custom_on_death then
 			self.custom_on_death(self)
