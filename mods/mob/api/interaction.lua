@@ -334,7 +334,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 							if player_punch_timer <= 0 then
 								local line_of_sight = minetest.line_of_sight(pos, pos2)
 								if line_of_sight == true then
-									self.punch_timer = 0.25
+									self.punch_timer = 0.5
 									object:punch(self.object, 2, 
 										{
 										full_punch_interval=1.5,
