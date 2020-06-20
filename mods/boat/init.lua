@@ -132,6 +132,7 @@ minetest.register_entity("boat:boat", {
 		
 		--flow normally if floating else don't
 		if node == "main:water" or node =="main:waterflow" then
+			self.object:set_acceleration(vector.new(0,0,0))
 			self.swimming = true
 			local vel = self.object:get_velocity()
 			local goal = 9
@@ -140,12 +141,7 @@ minetest.register_entity("boat:boat", {
 			self.object:add_velocity(acceleration)
 			--self.object:set_acceleration(vector.new(0,0,0))
 		else
-			local vel = self.object:get_velocity()
-			local goal = -9.81
-			local acceleration = vector.new(0,goal-vel.y,0)
-			acceleration = vector.multiply(acceleration, 0.01)
-			self.object:add_velocity(acceleration)
-			--self.object:set_acceleration(vector.new(0,0,0))
+			self.object:set_acceleration(vector.new(0,-10,0))
 		end
 	end,
 	
