@@ -157,7 +157,7 @@ local control_state = function(player)
 				player:set_physics_override({speed=1.5})
 			end
 
-		elseif (temp_pool.state ~= 1 and temp_pool.state ~= 2 and 
+		elseif (not in_water and temp_pool.state ~= 1 and temp_pool.state ~= 2 and 
 		(temp_pool.old_state == 1 or temp_pool.old_state == 2)) or
 		(in_water and temp_pool.state ~= 1 and temp_pool.state ~= 2 and temp_pool.state ~= 3 and 
 		(temp_pool.old_state == 1 or temp_pool.old_state == 2 or temp_pool.old_state == 3))then
@@ -175,10 +175,10 @@ local control_state = function(player)
 
 		--sneaking
 		if temp_pool.state == 3 and in_water then
-			send_running_cancellation(player,false)
-		elseif temp_pool.state == 3 and temp_pool.old_state ~= 3 then
+			--send_running_cancellation(player,false)
+		elseif not in_water and temp_pool.state == 3 and temp_pool.old_state ~= 3 then
 			player:set_eye_offset({x=0,y=-1,z=0},{x=0,y=0,z=0})
-		elseif temp_pool.old_state == 3 and temp_pool.state ~= 3 then
+		elseif not in_water and temp_pool.old_state == 3 and temp_pool.state ~= 3 then
 			player:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
 		end
 
