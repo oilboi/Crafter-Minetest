@@ -12,7 +12,7 @@ local player_constant = {
 							"blank_skin.png",
 						   },
 	current_animation    = "stand",
-	--swimming             = false,
+	swimming             = false,
 	collisionbox         = {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
 	old_controls         = {},
 	stepheight           = 0.6  ,
@@ -187,15 +187,15 @@ end
 
 -- controls head bone
 local state
---local swimming
+local swimming
 local pitch
 local pitch_look = function(player,sneak)
 	state = get_player_state(player)
-	--swimming = is_player_swimming(player)
+	swimming = is_player_swimming(player)
 	pitch = degrees(player:get_look_vertical()) * -1
-	--if swimming then
-		--pitch = pitch + 90
-	if sneak then
+	if swimming then
+		pitch = pitch + 90
+	elseif sneak then
 		pitch = pitch + 15
 	end
 
@@ -307,10 +307,9 @@ local control_translation = function(player,control)
 	temp_pool = pool[name]
 
 	state = get_player_state(player)
-	--swimming = is_player_swimming(player)
+	swimming = is_player_swimming(player)
 
 	mouse = (control.LMB or control.RMB)
-	--[[
 	if swimming then
 		for k,i in pairs(control) do
 			if i and translation_table.swim.keys[k] then
@@ -323,33 +322,32 @@ local control_translation = function(player,control)
 		set_animation(player, translated.animation, translated.speed)
 		return
 	else
-	]]--
-	if control.sneak then
-		for k,i in pairs(control) do
-			if i and translation_table.sneak.keys[k] then
-				translated = translation_table.sneak.states[true][mouse]
-				set_animation(player, translated.animation, translated.speed)
-				return
-			end
-		end
-		translated = translation_table.sneak.states[false][mouse]
-		set_animation(player, translated.animation, translated.speed)
-		return
-	else
-		for k,i in pairs(control) do
-			if i and translation_table.walk.keys[k] then
-				translated = translation_table.walk.states[mouse][state]
-				if translated then
+		if control.sneak then
+			for k,i in pairs(control) do
+				if i and translation_table.sneak.keys[k] then
+					translated = translation_table.sneak.states[true][mouse]
 					set_animation(player, translated.animation, translated.speed)
 					return
 				end
 			end
+			translated = translation_table.sneak.states[false][mouse]
+			set_animation(player, translated.animation, translated.speed)
+			return
+		else
+			for k,i in pairs(control) do
+				if i and translation_table.walk.keys[k] then
+					translated = translation_table.walk.states[mouse][state]
+					if translated then
+						set_animation(player, translated.animation, translated.speed)
+						return
+					end
+				end
+			end
 		end
-	end
 
-	translated = translation_table.stand[mouse]
-	set_animation(player, translated.animation, translated.speed)
-	--end
+		translated = translation_table.stand[mouse]
+		set_animation(player, translated.animation, translated.speed)
+	end
 end
 
 -- translates player movement to animation
