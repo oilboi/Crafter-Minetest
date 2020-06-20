@@ -103,7 +103,7 @@ local function calc_fall_damage(player,hp_change,velocity)
 				minetest.sound_play("hurt", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
 			end
 		else
-			player:set_hp(player:get_hp()-hp_change,{reason="correction"})
+			player:set_hp(player:get_hp()+hp_change,{reason="correction"})
 			minetest.sound_play("hurt", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
 		end
 	end
