@@ -1,3 +1,4 @@
+local minetest,vector = minetest,vector
 
 repeater_set_buffer = function(pos,level)
 	local meta = minetest.get_meta(pos)

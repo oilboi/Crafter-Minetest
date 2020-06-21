@@ -1,3 +1,4 @@
+local minetest,math = minetest,math
 --create on and off redstone ore
 for i = 0,1 do
 	local light_level = i * 9

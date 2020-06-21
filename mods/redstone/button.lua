@@ -1,3 +1,4 @@
+local minetest,table,vector = minetest,table,vector
 --this removes power from node that the button is powering
 local function on_button_destroy(pos)
 	local param2 = minetest.get_node(pos).param2

@@ -1,3 +1,4 @@
+local minetest,vector,pairs = minetest,vector,pairs
 --this is a debug for creating flat planes to test redstone
 local items = {
 "redstone:dust 50",

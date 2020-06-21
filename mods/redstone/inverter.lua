@@ -1,3 +1,4 @@
+local minetest,vector = minetest,vector
 --inverts redstone signal
 minetest.register_node("redstone:inverter_on", {
     description = "Redstone Inverter",

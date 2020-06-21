@@ -1,3 +1,4 @@
+local minetest = minetest
 minetest.register_node("redstone:light_on", {
     description = "Redstone Light",
     tiles = {"redstone_light.png"},

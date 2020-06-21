@@ -1,3 +1,4 @@
+local minetest,ipairs,vector = minetest,ipairs,vector
 for level = 0,9 do
 local subtracter = 0
 if level > 0 then subtracter = 1 end

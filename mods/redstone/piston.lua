@@ -1,3 +1,4 @@
+local minetest,math,ipairs,vector,table = minetest,math,ipairs,vector,table
 --exclude certain mods and nodes from being pushed and pulled to stop glitches
 local excluded_mods = {utility=true,craftingtable=true,buildtest=true,sign=true,bed=true}
 local excluded_nodes = {["redstone:piston_on"]=true,["redstone:sticky_piston_on"]=true,["redstone:actuator"]=true,["redstone:sticky_actuator"]=true}

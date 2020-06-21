@@ -1,3 +1,4 @@
+local minetest = minetest
 --these are all the craft recipes
 minetest.register_craft({
 	output = "redstone:button_off",

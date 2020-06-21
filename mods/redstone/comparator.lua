@@ -1,3 +1,5 @@
+local minetest,vector,math = minetest,vector,math
+
 local function comparator_logic(pos)
 	
 	local old_power = get_powered_state_directional(pos)

@@ -1,3 +1,4 @@
+local minetest,vector = minetest,vector
 --get point where particle spawner is added
 local function get_offset(wdir)
 	local z = 0

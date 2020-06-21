@@ -1,7 +1,11 @@
+local 
+minetest,vector,math,table,pairs
+=
+minetest,vector,math,table,pairs
 --define the class
 redstone = {}
 local r_index = {}
-r_copy = nil
+local r_copy = nil
 
 local path = minetest.get_modpath("redstone")
 dofile(path.."/functions.lua")
@@ -21,13 +25,13 @@ dofile(path.."/space_maker.lua")
 dofile(path.."/pressure_plate.lua")
 
 
-get_old_power = function(pos)
+local get_old_power = function(pos)
 	local meta = minetest.get_meta(pos)
 	local oldpower = meta:get_int("old_power")
 	return(oldpower)
 end
 --set the data for powered states
-get_local_power = function(pos)
+local get_local_power = function(pos)
 	local max_level = 0
 	for x = -1,1 do
 	for y = -1,1 do
@@ -47,12 +51,12 @@ get_local_power = function(pos)
 end
 
 --this is used for a power state comparison
-set_old_power = function(pos,level)
+local set_old_power = function(pos,level)
 	local meta = minetest.get_meta(pos)
 	meta:set_int("old_power",level)
 end
 
-get_powered_state_directional = function(pos)
+local get_powered_state_directional = function(pos)
 	local meta = minetest.get_meta(pos)
 	local node = minetest.get_node(pos)
 	local param2 = node.param2
@@ -97,13 +101,13 @@ end
 
 --collect all nodes that are local to the modified
 --node of redstone dust and store in memory
+local get_node = minetest.get_node 
+local group = minetest.get_item_group
 function redstone.collect_info(pos)
 	--if table.getn(r_index) == 0 then
 		--print("-----------------------")
 		--print("started indexing")
 	--end
-	local get_node = minetest.get_node 
-	local group = minetest.get_item_group
 	
 	local function get_group(i,gotten_group)
 		return(group(get_node(i).name, gotten_group))

@@ -1,3 +1,5 @@
+
+local minetest,vector,math,pairs = minetest,vector,math,pairs
 --create torch versions of the nodes
 for name,def in pairs(minetest.registered_nodes) do
 	if def.drawtype == "normal" and string.match(name, "main:") then
