@@ -97,7 +97,7 @@ minetest.register_node("bed:bed_front", {
     paramtype = "light",
     paramtype2 = "facedir",
     tiles = {"bed_top.png^[transform1","wood.png","bed_side.png","bed_side.png^[transform4","bed_front.png","nothing.png"},
-    groups = {wood = 1, hard = 1, axe = 1, hand = 3, instant=1,bouncy=50,attached_node=1},
+    groups = {wood = 1, hard = 1, axe = 1, hand = 3, instant=1,bouncy=50},
     sounds = main.woodSound({placing=""}),
     drawtype = "nodebox",
     node_box = {
@@ -135,7 +135,7 @@ minetest.register_node("bed:bed_back", {
     paramtype = "light",
     paramtype2 = "facedir",
     tiles = {"bed_top_end.png^[transform1","wood.png","bed_side_end.png","bed_side_end.png^[transform4","nothing.png","bed_end.png"},
-    groups = {wood = 1, hard = 1, axe = 1, hand = 3, instant=1,bouncy=50,attached_node=1},
+    groups = {wood = 1, hard = 1, axe = 1, hand = 3, instant=1,bouncy=50},
     sounds = main.woodSound(),
     drawtype = "nodebox",
     node_placement_prediction = "",
