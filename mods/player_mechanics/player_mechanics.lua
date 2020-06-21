@@ -101,6 +101,8 @@ local control_state = function(player)
 	head = minetest.get_item_group(get_player_head_env(player),"water") > 0
 	legs = minetest.get_item_group(get_player_legs_env(player),"water") > 0
 
+	in_water = temp_pool.swimming
+
 	--check if in water
 	if head then
 		in_water = true
