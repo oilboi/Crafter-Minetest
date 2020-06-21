@@ -1,3 +1,7 @@
+local
+minetest,math,pairs,table
+=
+minetest,math,pairs,table
 --this is a really lazy way to make a door and I'll improve it in the future
 for _,material in pairs({"wood","iron"}) do
 --this is the function that makes the door open and close when rightclicked
