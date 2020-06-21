@@ -1,4 +1,7 @@
-local minetest,armor_class,math,pairs,ipairs = minetest,armor_class,math,pairs,ipairs
+local 
+minetest,armor_class,math,pairs,ipairs
+=
+minetest,armor_class,math,pairs,ipairs
 
 local pos
 local name
@@ -346,4 +349,6 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 	end
 end)
 
-
+minetest.register_on_respawnplayer(function(player)
+	player:add_player_velocity(vector.multiply(player:get_player_velocity(),-1))
+end)
