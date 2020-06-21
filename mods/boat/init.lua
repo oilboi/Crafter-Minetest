@@ -239,11 +239,7 @@ minetest.register_craftitem("boat:boat", {
 			return
 		end
 		
-		if minetest.get_item_group(minetest.get_node(pointed_thing.under).name, "water")>0 then
-			minetest.add_entity(pointed_thing.under, "boat:boat")
-		else
-			return
-		end
+		minetest.add_entity(pointed_thing.above, "boat:boat")
 
 		itemstack:take_item()
 
@@ -491,7 +487,7 @@ minetest.register_entity("boat:iron_boat", {
 })
 
 minetest.register_craftitem("boat:iron_boat", {
-	description = "Iron Boat",
+	description = "Nether Iron Boat",
 	inventory_image = "iron_boatitem.png",
 	wield_image = "iron_boatitem.png",
 	liquids_pointable = true,
@@ -507,11 +503,7 @@ minetest.register_craftitem("boat:iron_boat", {
 			return
 		end
 		
-		if pointed_thing.above.y < -10000 and pointed_thing.above.y > -20000 then
-			minetest.add_entity(pointed_thing.under, "boat:iron_boat")
-		else
-			return
-		end
+		minetest.add_entity(pointed_thing.above, "boat:iron_boat")
 
 		itemstack:take_item()
 
