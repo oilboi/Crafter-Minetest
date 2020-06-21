@@ -344,11 +344,11 @@ minetest.register_node("main:leaves", {
 			items = {"main:dropped_leaves"},
 		},
 		{
-			rarity = 6,
+			rarity = 25,
 			items = {"main:apple"},
 		},
 		{
-			rarity = 10,
+			rarity = 20,
 			items = {"main:sapling"},
 		},
 		},
