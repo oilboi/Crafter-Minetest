@@ -1,12 +1,14 @@
-local minetest,math,skins_pointer = minetest,math,skins_pointer
+local minetest,math = minetest,math
 armor_class = {} --the armor class
 
-function armor_class.recalculate_armor(player)
+function recalculate_armor(player)
     if not player or (player and not player:is_player()) then return end
     local inv = player:get_inventory()
 
-    local player_skin = skins_pointer.get_skin(player)
+    local player_skin = get_skin(player)
     local armor_skin = "blank_skin.png"
+
+    print(dump(player_skin))
 
     local stack = inv:get_stack("armor_head",1):get_name()
     if stack ~= "" and minetest.get_item_group(stack,"helmet") > 0 then
@@ -34,7 +36,7 @@ function armor_class.recalculate_armor(player)
     player:set_properties({textures = {player_skin,armor_skin}})
 end
 
-function armor_class.calculate_armor_absorbtion(player)
+function calculate_armor_absorbtion(player)
     if not player or (player and not player:is_player()) then return end
 
     local inv = player:get_inventory()
@@ -73,17 +75,17 @@ function armor_class.calculate_armor_absorbtion(player)
     return(armor_absorbtion)
 end
 
-function armor_class.set_armor_gui(player)
+function set_armor_gui(player)
     if not player or (player and not player:is_player()) then return end
     local meta  = player:get_meta()
-    local level = armor_class.calculate_armor_absorbtion(player)
+    local level = calculate_armor_absorbtion(player)
     local hud = meta:get_int("armor_bar")
     player:hud_change(hud, "number", level)
 end
 
 
 
-function armor_class.damage_armor(player,damage)
+function damage_armor(player,damage)
     if not player or (player and not player:is_player()) then return end
 
     local inv = player:get_inventory()
@@ -140,8 +142,8 @@ function armor_class.damage_armor(player,damage)
 
     if recalc == true then
         minetest.sound_play("armor_break",{to_player=player:get_player_name(),gain=1,pitch=math.random(80,100)/100})
-        armor_class.recalculate_armor(player)
-        armor_class.set_armor_gui(player)
+        recalculate_armor(player)
+        set_armor_gui(player)
         --do particles too
     end
 end
@@ -162,7 +164,7 @@ minetest.register_on_joinplayer(function(player)
 		hud_elem_type = "statbar",
 		position = {x = 0.5, y = 1},
 		text = "armor_icon.png",
-		number = armor_class.calculate_armor_absorbtion(player),--meta:get_int("hunger"),
+		number = calculate_armor_absorbtion(player),--meta:get_int("hunger"),
 		--direction = 1,
 		size = {x = 24, y = 24},
 		offset = {x = (-10 * 24) - 25, y = -(48 + 50 + 39)},
@@ -177,15 +179,15 @@ minetest.register_on_joinplayer(function(player)
 end)
 
 minetest.register_on_dieplayer(function(player)
-    armor_class.set_armor_gui(player)
+    set_armor_gui(player)
 end)
 
 minetest.register_on_player_inventory_action(function(player, action, inventory, inventory_info)
     if inventory_info.from_list == "armor_head" or inventory_info.from_list == "armor_torso" or inventory_info.from_list == "armor_legs" or inventory_info.from_list == "armor_feet" or
        inventory_info.to_list   == "armor_head" or inventory_info.to_list   == "armor_torso" or inventory_info.to_list   == "armor_legs" or inventory_info.to_list   == "armor_feet" then
         minetest.after(0,function()
-            armor_class.recalculate_armor(player)
-            armor_class.set_armor_gui(player)
+            recalculate_armor(player)
+            set_armor_gui(player)
         end)
     end
 end)

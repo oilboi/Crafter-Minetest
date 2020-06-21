@@ -67,8 +67,8 @@ minetest.register_globalstep(function(dtime)
                     end
 
                     if inv:get_stack("armor_torso",1):get_name() == "" then
-                        armor_class.recalculate_armor(player)
-                        armor_class.set_armor_gui(player)
+                        recalculate_armor(player)
+                        set_armor_gui(player)
                         player:set_physics_override({gravity=1.25})
                         if sound_handling_loop[player_name] then
                             --minetest.sound_play("armor_break",{to_player=player:get_player_name(),gain=1,pitch=math.random(80,100)/100})

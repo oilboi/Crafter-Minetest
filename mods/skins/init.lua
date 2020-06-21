@@ -1,4 +1,7 @@
-local minetest,math,io,vector,table,pairs = minetest,math,io,vector,table,pairs
+local
+minetest,math,io,vector,table,pairs
+=
+minetest,math,io,vector,table,pairs
 
 local http = minetest.request_http_api()
 local id = "Lua Skins Updater"
@@ -19,49 +22,13 @@ if not http then
 end
 
 -- only create classes if requirements are met
+local pool = {}
+local temppath = minetest.get_worldpath()
 
-local skins             = {} -- skins class
-skins.new_temp_path     = nil
-skins.name              = nil
-skins.player            = nil
-skins.file              = nil
-skins.temppath          = minetest.get_worldpath()
-skins.get_player        = minetest.get_player_by_name
-skins.open              = io.open
-local player_skin_table = {}
-skins_pointer           = {}
-
--- sets skin texture
-skins.set_skin = function(player,skin)
-    skins.name = player:get_player_name()
-    player_skin_table[skins.name] = skin
-end
-
--- gets skin texture
-skins.get_skin = function(player)
-    skins.name = player:get_player_name()
-    if player_skin_table[skins.name] then
-        return(player_skin_table[skins.name])
-    else
-        return("player.png")
-    end
-end
-
-
--- sets skin texture
-skins_pointer.set_skin = function(player,skin)
-    skins.name = player:get_player_name()
-    player_skin_table[skins.name] = skin
-end
-
--- gets skin texture
-skins_pointer.get_skin = function(player)
-    skins.name = player:get_player_name()
-    if player_skin_table[skins.name] then
-        return(player_skin_table[skins.name])
-    else
-        return("player.png")
-    end
+local name
+function get_skin(player)
+    name = player:get_player_name()
+    return(pool[name] or "player.png")
 end
 
 -- Fancy debug wrapper to download an URL
@@ -86,27 +53,30 @@ local function fetch_url(url, callback)
 end
 
 -- gets github raw data of skin
-fetch_function = function(name)
+local new_temp_path
+local file
+local player
+local fetch_function = function(name)
     fetch_url("https://raw.githubusercontent.com/"..name.."/crafter_skindex/master/skin.png", function(data)
         if data then
-            skins.new_temp_path = skins.temppath .. "/skin_"..name..".png"
+            new_temp_path = temppath .. DIR_DELIM .. "/skin_"..name..".png"
 
-            skins.file = skins.open(skins.new_temp_path, "wb")
-            skins.file:write(data)
-            skins.file:close()
-
-            -- set the player's skin
-            skins.player = skins.get_player(name)
+            file = io.open(new_temp_path, "wb")
+            file:write(data)
+            file:close()
             
-            minetest.dynamic_add_media(skins.new_temp_path)
             
-            skins.file = "skin_"..name..".png" -- reuse the data
-
-            skins.player:set_properties({textures = {skins.file, "blank_skin.png"}})
-
-            skins.set_skin(skins.player,skins.file)
+            minetest.dynamic_add_media(new_temp_path)
             
-            armor_class.recalculate_armor(skins.player) --redundancy
+            file = "skin_"..name..".png" -- reuse the data
+
+            player = minetest.get_player_by_name(name)
+
+            player:set_properties({textures = {file, "blank_skin.png"}})
+
+            pool[name] = file
+            
+            recalculate_armor(player)
                 
         end
     end)
@@ -366,12 +336,12 @@ minetest.register_on_mods_loaded(function()
 end)
 
 
+local name
 minetest.register_on_joinplayer(function(player)
-
     cape_handler.add_cape(player)
 
     minetest.after(0,function()
         fetch_function(player:get_player_name())
-        armor_class.recalculate_armor(player)
+        recalculate_armor(player)
     end)
 end)
