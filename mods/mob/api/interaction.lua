@@ -8,6 +8,7 @@ local itemstack
 local wear
 --for collision detection
 local pos
+local collision_count
 local collisionbox
 local collision_boundary
 local radius
@@ -330,13 +331,17 @@ mobs.create_interaction_functions = function(def,mob_register)
 		if collisionbox[5] > collision_boundary then
 			radius = collisionbox[5]
 		end
-
+		collision_count = 0
 		for _,object in ipairs(minetest.get_objects_inside_radius(pos, radius*1.25)) do
 			if object ~= self.object and (object:is_player() or object:get_luaentity().mob == true) and
 			--don't collide with rider, rider don't collide with thing
 			(not object:get_attach() or (object:get_attach() and object:get_attach() ~= self.object)) and 
 			(not self.object:get_attach() or (self.object:get_attach() and self.object:get_attach() ~= object)) then
-
+				--stop infinite loop
+				collision_count = collision_count + 1
+				if collision_count > 100 then
+					break
+				end
 				pos2 = object:get_pos()
 				
 				object_collisionbox = object:get_properties().collisionbox

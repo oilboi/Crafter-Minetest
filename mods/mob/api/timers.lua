@@ -1,4 +1,9 @@
-local minetest,math = minetest,math
+local
+minetest,math
+=
+minetest,math
+local pos
+local light
 mobs.create_timer_functions = function(def,mob_register)
 	--this controls how fast the mob punches
 	mob_register.manage_punch_timer = function(self,dtime)
@@ -63,7 +68,7 @@ mobs.create_timer_functions = function(def,mob_register)
 			
 			self.object:set_texture_mod("^[colorize:red:130")
 			
-			local pos = self.object:get_pos()
+			pos = self.object:get_pos()
 			self.object:remove()
 			tnt(pos,self.explosion_power,self.explosion_type)
 		end
@@ -88,8 +93,8 @@ mobs.create_timer_functions = function(def,mob_register)
 			self.friendly_in_daylight_timer = self.friendly_in_daylight_timer + dtime
 			if self.friendly_in_daylight_timer >= 2 then
 				self.friendly_in_daylight_timer = 0
-				local pos = self.object:get_pos()
-				local light = minetest.get_node_light(pos)
+				pos = self.object:get_pos()
+				light = minetest.get_node_light(pos)
 				if pos and light and light >= 13 then --1 greater than torch light
 					if self.following == false then
 						self.hostile = false
