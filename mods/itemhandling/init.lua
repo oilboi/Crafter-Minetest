@@ -260,6 +260,7 @@ local def
 local slip_factor
 local change
 local slippery
+local i_node
 local item_step = function(self, dtime, moveresult)
 	pos = self.object:get_pos()
 	if not pos then
@@ -336,12 +337,15 @@ local item_step = function(self, dtime, moveresult)
 		node = nil
 	end
 	
+
+	i_node = minetest.get_node_or_nil(pos)
+
 	-- Remove nodes in 'ignore' and burns items
-	if node then
-		if node.name == "ignore" then
+	if i_node then
+		if i_node.name == "ignore" then
 			self.object:remove()
 			return
-		elseif node and burn_nodes[node.name] then
+		elseif i_node and burn_nodes[i_node.name] then
 			minetest.add_particlespawner({
 				amount = 6,
 				time = 0.001,
