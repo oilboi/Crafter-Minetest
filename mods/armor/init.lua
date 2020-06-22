@@ -8,8 +8,6 @@ function recalculate_armor(player)
     local player_skin = get_skin(player)
     local armor_skin = "blank_skin.png"
 
-    print(dump(player_skin))
-
     local stack = inv:get_stack("armor_head",1):get_name()
     if stack ~= "" and minetest.get_item_group(stack,"helmet") > 0 then
         local skin_element = minetest.get_itemdef(stack, "wearing_texture")
@@ -77,10 +75,13 @@ end
 
 function set_armor_gui(player)
     if not player or (player and not player:is_player()) then return end
-    local meta  = player:get_meta()
     local level = calculate_armor_absorbtion(player)
-    local hud = meta:get_int("armor_bar")
-    player:hud_change(hud, "number", level)
+    hud_manager.change_hud({
+		player    =  player ,
+		hud_name  = "armor_fg",
+		element   = "number",
+		data      =  level
+	})
 end
 
 
@@ -150,26 +151,22 @@ end
 
 
 minetest.register_on_joinplayer(function(player)
-    local meta = player:get_meta()
-	player:hud_add({
+	hud_manager.add_hud(player,"armor_bg",{
 		hud_elem_type = "statbar",
 		position = {x = 0.5, y = 1},
 		text = "armor_icon_bg.png",
 		number = 20,
-		--direction = 1,
 		size = {x = 24, y = 24},
 		offset = {x = (-10 * 24) - 25, y = -(48 + 50 + 39)},
 	})
-	local armor_bar = player:hud_add({
+	hud_manager.add_hud(player,"armor_fg",{
 		hud_elem_type = "statbar",
 		position = {x = 0.5, y = 1},
 		text = "armor_icon.png",
-		number = calculate_armor_absorbtion(player),--meta:get_int("hunger"),
-		--direction = 1,
+		number = calculate_armor_absorbtion(player),
 		size = {x = 24, y = 24},
 		offset = {x = (-10 * 24) - 25, y = -(48 + 50 + 39)},
 	})
-    meta:set_int("armor_bar", armor_bar)
     
     local inv = player:get_inventory()
     inv:set_size("armor_head" ,1)
