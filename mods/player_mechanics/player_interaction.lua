@@ -1,7 +1,7 @@
 local 
-minetest,armor_class,math,pairs,ipairs
+minetest,math,pairs,ipairs
 =
-minetest,armor_class,math,pairs,ipairs
+minetest,math,pairs,ipairs
 
 local pos
 local name

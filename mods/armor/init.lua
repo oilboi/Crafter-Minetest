@@ -1,5 +1,7 @@
-local minetest,math = minetest,math
-armor_class = {} --the armor class
+local
+minetest,math,pairs
+=
+minetest,math,pairs
 
 function recalculate_armor(player)
     if not player or (player and not player:is_player()) then return end
