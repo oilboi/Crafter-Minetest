@@ -3,8 +3,6 @@ minetest,vector,math,pairs
 =
 minetest,vector,math,pairs
 
-local pool = {}
-
 local name
 local pos
 local node

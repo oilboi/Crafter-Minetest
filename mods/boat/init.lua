@@ -1,3 +1,101 @@
+
+local
+minetest,vector,math,pairs
+=
+minetest,vector,math,pairs
+
+local name
+local pos
+local node
+local node_above
+local goalx
+local goalz
+local currentvel
+local level
+local level2
+local nodename
+local acceleration
+
+local function flow(self)	
+	pos = self.object:get_pos()
+	pos.y = pos.y + self.object:get_properties().collisionbox[2]
+	pos = vector.round(pos)
+	node = minetest.get_node(pos).name
+	node_above = minetest.get_node(vector.new(pos.x,pos.y+1,pos.z)).name
+	goalx = 0
+	goalz = 0
+	found = false
+	if node == "main:waterflow" then
+		currentvel = self.object:get_velocity()
+		level = minetest.get_node_level(pos)
+		for x = -1,1 do
+			for z = -1,1 do
+				if found == false then
+					nodename = minetest.get_node(vector.new(pos.x+x,pos.y,pos.z+z)).name
+					level2 = minetest.get_node_level(vector.new(pos.x+x,pos.y,pos.z+z))
+					if level2 > level and nodename == "main:waterflow" or nodename == "main:water" then
+						goalx = -x
+						goalz = -z
+						--diagonal flow
+						if goalx ~= 0 and goalz ~= 0 then
+							found = true
+						end
+					end
+				end
+			end
+		end
+		--only add velocity if there is one
+		--else this stops the player
+		if goalx ~= 0 and goalz ~= 0 then
+			acceleration = vector.new(goalx-currentvel.x,0,goalz-currentvel.z)
+			self.object:add_velocity(acceleration)
+		elseif goalx ~= 0 or goalz ~= 0 then
+			acceleration = vector.new(goalx-currentvel.x,0,goalz-currentvel.z)
+			self.object:add_velocity(acceleration)
+		end
+	end
+end
+
+local function lavaflow(self)	
+	pos = self.object:get_pos()
+	pos.y = pos.y + self.object:get_properties().collisionbox[2]
+	pos = vector.round(pos)
+	node = minetest.get_node(pos).name
+	node_above = minetest.get_node(vector.new(pos.x,pos.y+1,pos.z)).name
+	goalx = 0
+	goalz = 0
+	found = false
+	if node == "main:lavaflow" then
+		currentvel = self.object:get_velocity()
+		level = minetest.get_node_level(pos)
+		for x = -1,1 do
+			for z = -1,1 do
+				if found == false then
+					nodename = minetest.get_node(vector.new(pos.x+x,pos.y,pos.z+z)).name
+					level2 = minetest.get_node_level(vector.new(pos.x+x,pos.y,pos.z+z))
+					if level2 > level and nodename == "main:lavaflow" or nodename == "main:lava" then
+						goalx = -x
+						goalz = -z
+						--diagonal flow
+						if goalx ~= 0 and goalz ~= 0 then
+							found = true
+						end
+					end
+				end
+			end
+		end
+		--only add velocity if there is one
+		--else this stops the player
+		if goalx ~= 0 and goalz ~= 0 then
+			acceleration = vector.new(goalx-currentvel.x,0,goalz-currentvel.z)
+			self.object:add_velocity(acceleration)
+		elseif goalx ~= 0 or goalz ~= 0 then
+			acceleration = vector.new(goalx-currentvel.x,0,goalz-currentvel.z)
+			self.object:add_velocity(acceleration)
+		end
+	end
+end
+
 --minetest.get_node_level(pos)
 minetest.register_entity("boat:boat", {
 	initial_properties = {
@@ -145,44 +243,6 @@ minetest.register_entity("boat:boat", {
 		end
 	end,
 	
-	--makes boats flow
-	flow = function(self)
-		local pos = self.object:get_pos()
-		pos.y = pos.y - 0.4
-		local node = minetest.get_node(pos).name
-		local node_above = minetest.get_node(vector.new(pos.x,pos.y+1,pos.z)).name
-		local goalx = 0
-		local goalz = 0
-		--print(node_above)
-		if (node == "main:waterflow" or node == "main:water" ) and not self.moving == true and (node_above ~= "main:water" and node_above ~= "main:waterflow") then
-			local currentvel = self.object:get_velocity()
-			local level = minetest.get_node_level(pos)
-			local pos = self.object:get_pos()
-			for x = -1,1 do
-				for y = -1,0 do
-					for z = -1,1 do
-						if (x == 0 and z ~= 0) or (z == 0 and x ~=0) then
-							local nodename = minetest.get_node(vector.new(pos.x+x,pos.y+y,pos.z+z)).name
-							local level2 = minetest.get_node_level(vector.new(pos.x+x,pos.y+y,pos.z+z))
-							if (level2 < level and nodename == "main:waterflow") or (nodename == "main:water" and level2 == 7)  then
-								goalx = x*7
-								goalz = z*7
-								--break
-							end
-						end
-					end
-				end
-			end
-			--only add velocity if there is one
-			--else this stops the boat
-			if goalx ~= 0 or goalz ~= 0 then
-				local acceleration = vector.new(goalx-currentvel.x,0,goalz-currentvel.z)
-				acceleration = vector.multiply(acceleration, 0.01)
-				self.object:add_velocity(acceleration)
-			end
-		end
-	end,
-	
 	
 	--slows the boat down
 	slowdown = function(self)
@@ -216,7 +276,7 @@ minetest.register_entity("boat:boat", {
 		self.push(self)
 		self.drive(self)
 		self.float(self)
-		self.flow(self)
+		flow(self)
 		self.slowdown(self)
 		self.lag_correction(self,dtime)
 	end,
@@ -409,45 +469,6 @@ minetest.register_entity("boat:iron_boat", {
 		end
 	end,
 	
-	--makes boats flow
-	flow = function(self)
-		local pos = self.object:get_pos()
-		pos.y = pos.y - 0.4
-		local node = minetest.get_node(pos).name
-		local node_above = minetest.get_node(vector.new(pos.x,pos.y+1,pos.z)).name
-		local goalx = 0
-		local goalz = 0
-		--print(node_above)
-		if (node == "nether:lavaflow" or node == "nether:lava" ) and not self.moving == true and (node_above ~= "nether:lava" and node_above ~= "nether:lavaflow") then
-			local currentvel = self.object:get_velocity()
-			local level = minetest.get_node_level(pos)
-			local pos = self.object:get_pos()
-			for x = -1,1 do
-				for y = -1,0 do
-					for z = -1,1 do
-						if (x == 0 and z ~= 0) or (z == 0 and x ~=0) then
-							local nodename = minetest.get_node(vector.new(pos.x+x,pos.y+y,pos.z+z)).name
-							local level2 = minetest.get_node_level(vector.new(pos.x+x,pos.y+y,pos.z+z))
-							if (level2 < level and nodename == "main:lavaflow") or (nodename == "main:lava" and level2 == 7)  then
-								goalx = x*7
-								goalz = z*7
-								--break
-							end
-						end
-					end
-				end
-			end
-			--only add velocity if there is one
-			--else this stops the boat
-			if goalx ~= 0 or goalz ~= 0 then
-				local acceleration = vector.new(goalx-currentvel.x,0,goalz-currentvel.z)
-				acceleration = vector.multiply(acceleration, 0.01)
-				self.object:add_velocity(acceleration)
-			end
-		end
-	end,
-	
-	
 	--slows the boat down
 	slowdown = function(self)
 		if not self.moving == true then
@@ -480,7 +501,7 @@ minetest.register_entity("boat:iron_boat", {
 		self.push(self)
 		self.drive(self)
 		self.float(self)
-		self.flow(self)
+		lavaflow(self)
 		self.slowdown(self)
 		self.lag_correction(self,dtime)
 	end,
