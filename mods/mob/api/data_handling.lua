@@ -1,4 +1,7 @@
-local vector,minetest,math,pairs = vector,minetest,math,pairs
+local
+vector,minetest,math,pairs
+=
+vector,minetest,math,pairs
 --
 mobs.create_data_handling_functions = function(def,mob_register)
 
