@@ -347,9 +347,15 @@ end)
 
 --this sets random weather
 local initial_run = true
+local new_weather
 local function randomize_weather()
 	if not initial_run then
-		weather_type = math.random(0,weather_max)
+		new_weather = math.random(0,weather_max)
+		if new_weather ~= weather_type or not weather_type then
+			weather_type = new_weather
+		else
+			weather_type = 0
+		end
 		mod_storage:set_int("weather_type", weather_type)
 	else
 		initial_run = false
@@ -358,7 +364,7 @@ local function randomize_weather()
 	function_send_weather_type()
 	update_player_sky()
 
-	minetest.after((math.random(5,7)+math.random())*60, function()
+	minetest.after((math.random(15,20)+math.random())*60, function()
 		randomize_weather()
 	end)
 end
