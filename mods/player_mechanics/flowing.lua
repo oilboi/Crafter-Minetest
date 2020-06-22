@@ -47,10 +47,10 @@ local function flow(player)
         --only add velocity if there is one
         --else this stops the player
         if goalx ~= 0 and goalz ~= 0 then
-            acceleration = vector.new(goalx/1.5,0,goalz/1.5)
+            acceleration = vector.new(goalx/2.25,0,goalz/2.25)
             player:add_player_velocity(acceleration)
         elseif goalx ~= 0 or goalz ~= 0 then
-            acceleration = vector.new(goalx,0,goalz)
+            acceleration = vector.new(goalx/1.5,0,goalz/1.5)
             player:add_player_velocity(acceleration)
         end
     end
