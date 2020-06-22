@@ -116,8 +116,6 @@ mobs.create_movement_functions = function(def,mob_register)
 			goal = vector.multiply(self.direction,self.speed)
 			acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
 			if self.whip_turn then
-				acceleration = vector.multiply(acceleration, 0.5)
-
 				self.whip_turn = self.whip_turn - dtime
 				if self.whip_turn <= 0 then
 					self.whip_turn = nil
