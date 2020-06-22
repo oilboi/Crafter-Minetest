@@ -345,7 +345,6 @@ minetest.register_node("utility:furnace", {
 	allow_metadata_inventory_put = allow_metadata_inventory_put,
 	allow_metadata_inventory_move = allow_metadata_inventory_move,
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
-	on_metadata_inventory_take = on_metadata_inventory_take,
 })
 
 minetest.register_node("utility:furnace_active", {
@@ -379,7 +378,6 @@ minetest.register_node("utility:furnace_active", {
 	allow_metadata_inventory_put = allow_metadata_inventory_put,
 	allow_metadata_inventory_move = allow_metadata_inventory_move,
 	allow_metadata_inventory_take = allow_metadata_inventory_take,
-	on_metadata_inventory_take = on_metadata_inventory_take,
 	on_destruct = function(pos)
 		destroy_furnace(pos)
 	end,
