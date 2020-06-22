@@ -58,7 +58,7 @@ for ore,tool_required in pairs(ores) do
 				{
 					rarity = 0,
 					tools = tool_required,
-					items = {"main:"..ore.."ore"},
+					items = {"main:"..ore.."block"},
 				},
 				},
 			},
