@@ -267,7 +267,7 @@ minetest.register_entity("boat:boat", {
 			end
 		end
 		self.old_pos = pos
-		self.old_velocity = vel
+		self.old_velocity = velocity
 		self.lag_check = minetest.get_us_time()/1000000
 	end,
 
@@ -492,7 +492,7 @@ minetest.register_entity("boat:iron_boat", {
 			end
 		end
 		self.old_pos = pos
-		self.old_velocity = vel
+		self.old_velocity = velocity
 		self.lag_check = minetest.get_us_time()/1000000
 	end,
 
