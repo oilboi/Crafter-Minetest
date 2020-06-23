@@ -40,6 +40,8 @@ local meta
 local player_punch_timer
 local line_of_sight
 local obj
+local sound_max
+local sound_min
 mobs.create_interaction_functions = function(def,mob_register)
 	--the pig will look for and at players
 	mob_register.look_around = function(self,dtime)
@@ -268,7 +270,11 @@ mobs.create_interaction_functions = function(def,mob_register)
 				self.do_critical_particles(pos)
 				minetest.sound_play("critical", {object=self.object, gain = 0.1, max_hear_distance = 10,pitch = math.random(80,100)/100})
 			end
-			minetest.sound_play(self.hurt_sound, {object=self.object, gain = 1.0, max_hear_distance = 10,pitch = math.random(100,140)/100})
+
+			sound_min = self.sound_pitch_mod_min or 100
+			sound_max = self.sound_pitch_mod_max or 140
+
+			minetest.sound_play(self.hurt_sound, {object=self.object, gain = 1.0, max_hear_distance = 10,pitch = math.random(sound_min,sound_max)/100})
 			
 			self.hp = hp
 			
@@ -311,7 +317,12 @@ mobs.create_interaction_functions = function(def,mob_register)
 				self.do_critical_particles(pos)
 				minetest.sound_play("critical", {object=self.object, gain = 0.1, max_hear_distance = 10,pitch = math.random(80,100)/100})
 			end
-			minetest.sound_play(self.die_sound, {object=self.object, gain = 1.0, max_hear_distance = 10,pitch = math.random(80,100)/100})
+
+			sound_min = self.sound_pitch_mod_min_die or 80
+			sound_max = self.sound_pitch_mod_max_die or 100
+
+			minetest.sound_play(self.die_sound, {object=self.object, gain = 1.0, max_hear_distance = 10,pitch = math.random(sound_min,sound_max)/100})
+
 			self.add_sword_wear(self, puncher, time_from_last_punch, tool_capabilities, dir)
 		end
 	end

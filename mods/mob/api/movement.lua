@@ -381,7 +381,7 @@ mobs.create_movement_functions = function(def,mob_register)
 						self.path_data[i-1] = self.path_data[i]
 					end
 					self.path_data[table.getn(self.path_data)] = nil
-					self.whip_turn = 0.05
+					self.whip_turn = 0.01
 					--if table.getn(self.path_data) == 0 then
 					--	self.path_data = nil
 					--end

@@ -411,7 +411,7 @@ mobs.register_mob(
 	gravity = {x = 0, y = -9.81, z = 0},
 	movement_type = "jump",
 	make_jump_noise = true,
-	max_speed = 5,
+	max_speed = 4,
 	hostile = true,
 	state = 0,
 	view_distance = 20,
@@ -458,7 +458,7 @@ mobs.register_mob(
 	gravity = {x = 0, y = -9.81, z = 0},
 	movement_type = "jump",
 	make_jump_noise = true,
-	max_speed = 5,
+	max_speed = 4,
 	hostile = true,
 	state = 0,
 	view_distance = 20,
@@ -505,7 +505,7 @@ mobs.register_mob(
 	gravity = {x = 0, y = -9.81, z = 0},
 	movement_type = "jump",
 	make_jump_noise = true,
-	max_speed = 5,
+	max_speed = 4,
 	hostile = true,
 	state = 0,
 	view_distance = 20,
@@ -583,6 +583,74 @@ mobs.register_mob(
 
 ]]--
 
+
+mobs.register_mob(
+	{
+	 mobname = "zombie",
+	 physical = true,
+	 collide_with_objects = false,
+	 collisionbox = {-0.37,0, -0.37, 0.37, 1.7, 0.37},
+	 visual = "mesh",
+	 visual_size = {x = 3.2, y = 3.2},
+	 mesh = "zombie.b3d",
+	 textures = {
+		"zombie.png"
+	},
+	 is_visible = true,
+	 pointable = true,
+	 automatic_face_movement_max_rotation_per_sec = 300,
+	 makes_footstep_sound = false,
+	 hp = 27,
+	 gravity = {x = 0, y = -9.81, z = 0},
+	 movement_type = "walk",
+	 max_speed = 3,
+	 hostile = true,
+	 hostile_cooldown = false,
+	 state = 0,
+	 view_distance = 32,
+	 item_drop = "mob:cooked_porkchop",
+	  
+	 standing_frame = {x=0,y=0},
+	 moving_frame = {x=0,y=40},
+	 animation_multiplier = 20,
+	 ----
+	 pathfinds = true,
+	 
+	 --these are used to anchor a point to the head position
+	 -----
+	 automatic_face_movement_dir = 0,
+	 head_bone = "Head",
+	 debug_head_pos = false,
+	 --this always has to be slightly positive
+	 head_directional_offset = 0.01,
+	 head_height_offset = 1.55, --added to the base y position
+	 --use this to correct the head position initially because it becomes severly offset - look at your blender model to get this perfect
+	 head_position_correction = vector.new(0,2.4,0),
+	 head_coord = "vertical",
+	 -----
+	  
+	 
+	 death_rotation = "x",
+	 
+	 hurt_sound = "hurt",
+	 die_sound = "hurt",
+	 sound_pitch_mod_min = 60,
+	 sound_pitch_mod_max = 80,
+	 sound_pitch_mod_min_die = 50,
+	 sound_pitch_mod_max_die = 70,
+	 attack_type = "punch",
+	 attack_damage = 3,
+	 
+	 die_in_light = true,
+	 --die_in_light_level = 12,
+	 fire_table = {
+		visual_size = vector.new(1/4,2/3,1/4),
+		position = vector.new(0,3.3,0),
+	}
+	}
+)
+
+
 mobs.register_mob(
 	{
 	 mobname = "creeper",
@@ -602,7 +670,7 @@ mobs.register_mob(
 	 hp = 27,
 	 gravity = {x = 0, y = -9.81, z = 0},
 	 movement_type = "walk",
-	 max_speed = 5.5,
+	 max_speed = 4,
 	 hostile = true,
 	 hostile_cooldown = false,
 	 state = 0,
@@ -670,7 +738,7 @@ mobs.register_mob(
 	 hp = 27,
 	 gravity = {x = 0, y = -9.81, z = 0},
 	 movement_type = "walk",
-	 max_speed = 5.5,
+	 max_speed = 4,
 	 hostile = true,
 	 hostile_cooldown = false,
 	 state = 0,
@@ -848,7 +916,7 @@ mobs.register_mob(
 	 hp = 30,
 	 gravity = {x = 0, y = -9.81, z = 0},
 	 movement_type = "walk",
-	 max_speed = 6,
+	 max_speed = 4,
 	 state = 0,
 	 view_distance = 32,
 	 
@@ -938,7 +1006,7 @@ mobs.register_mob(
 	 hp = 30,
 	 gravity = {x = 0, y = -9.81, z = 0},
 	 movement_type = "walk",
-	 max_speed = 6,
+	 max_speed = 4,
 	 state = 0,
 	 view_distance = 32,
 	 
