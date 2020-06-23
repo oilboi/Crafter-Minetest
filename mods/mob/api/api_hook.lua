@@ -16,6 +16,8 @@ mobs.register_mob = function(def)
 
 local mob_register = {}
 
+register_mob_spawner(def.mobname,def.textures,def.mesh)
+
 ------------------------------------------------
 mob_register.initial_properties = {
 	physical = def.physical,
