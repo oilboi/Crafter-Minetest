@@ -64,7 +64,7 @@ function register_mob_spawner(mobname,texture,mesh)
             end
 
             local mobcount = 0
-            for _,object in ipairs(minetest.get_objects_inside_radius(pos, 5)) do
+            for _,object in ipairs(minetest.get_objects_inside_radius(pos, 10)) do
                 if not object:is_player() and object:get_luaentity().mobname then
                     mobcount = mobcount + 1
                     if mobcount > 5 then
