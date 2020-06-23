@@ -32,7 +32,6 @@ function register_mob_spawner(mobname,texture,mesh)
     })
 
     table.insert(mob_spawners,"mob_spawners:"..mobname)
-    print(dump(mob_spawners))
 
     minetest.register_lbm({
         name = ":mob_spawners:"..mobname,
@@ -97,7 +96,12 @@ function register_mob_spawner(mobname,texture,mesh)
         static_save = false,
         automatic_rotate = 3
     }
-
+    spawner_entity.on_activate = function()
+        --do nothing
+    end
+    spawner_entity.on_step = function()
+        --do nothing
+    end
     minetest.register_entity(":mob_spawners:"..mobname, spawner_entity)
 end
 

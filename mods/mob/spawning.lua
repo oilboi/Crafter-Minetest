@@ -50,9 +50,7 @@ local get_mobs_in_radius = function(pos)
 	object_list = minetest.get_objects_inside_radius(pos, outer)
 	for _,object in ipairs(object_list) do
 		if not object:is_player() then
-			entity = object:get_luaentity()
-
-			if entity.is_mob then
+			if object:get_luaentity().mobname then
 				counter = counter + 1
 			end
 		end
@@ -69,13 +67,13 @@ local light_level
 local mob_pos
 local function spawn_mobs(player)
 	pos = player:get_pos()
-
 	mobs = get_mobs_in_radius(pos)
-
 	if mobs > spawn_goal_per_player then
 		return
 	end
 
+	for i = 1,math.random(2,5) do
+	
 	pos = position_calculation(pos)
 
 	spawner = {}
@@ -89,8 +87,10 @@ local function spawn_mobs(player)
 	
 	--print(dump(spawner))
 	if table.getn(spawner) > 0 then
-		mob_pos = spawner[1]
+		mob_pos = spawner[math.random(1,table.getn(spawner))]
 		mob_pos.y = mob_pos.y + 1
+		--print("spawning", dump(mob_pos))
+
 		--aether spawning
 		if mob_pos.y >= 21000 then
 			mob_spawning = aether_spawn_table[math.random(1,table.getn(aether_spawn_table))]
@@ -101,7 +101,7 @@ local function spawn_mobs(player)
 			--print("Nether Spawning "..mob_spawning.." at: "..minetest.pos_to_string(mob_pos))
 			minetest.add_entity(mob_pos,"mob:"..mob_spawning)
 		else
-			light_level = minetest.get_node_light(spawner[1])
+			light_level = minetest.get_node_light(mob_pos)
 
 			if weather_type == 1 then
 				if light_level < 7 then
@@ -125,6 +125,7 @@ local function spawn_mobs(player)
 				end
 			end
 		end
+	end
 	end
 end
 
