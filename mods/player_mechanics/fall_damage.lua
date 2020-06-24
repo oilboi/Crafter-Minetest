@@ -56,7 +56,7 @@ local function calc_fall_damage(player,hp_change)
 
 			absorption = minetest.get_item_group(name,"armor_level")*2
 			--print("absorbtion:",absorption)
-			local wear_level = ((9-minetest.get_item_group(name,"armor_level"))*8)*(5-minetest.get_item_group(name,"armor_type"))*math.abs(fall_damage)
+			local wear_level = ((9-minetest.get_item_group(name,"armor_level"))*8)*(5-minetest.get_item_group(name,"armor_type"))*math.abs(hp_change)
 			
 			stack:add_wear(wear_level)
 			
