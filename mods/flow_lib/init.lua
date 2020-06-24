@@ -1,58 +1,87 @@
-
+--this is from https://github.com/HybridDog/builtin_item/blob/e6dfd9dce86503b3cbd1474257eca5f6f6ca71c2/init.lua#L50
 local
 minetest,vector,math,pairs
 =
 minetest,vector,math,pairs
---
-local name
-local pos
-local node
-local node_above
-local goalx
-local goalz
-local currentvel
-local level
-local level2
-local nodename
-local acceleration
 
-function flow(self)
-	pos = self.object:get_pos()
-	pos.y = pos.y + self.object:get_properties().collisionbox[2]
-	pos = vector.round(pos)
-	node = minetest.get_node(pos).name
-	node_above = minetest.get_node(vector.new(pos.x,pos.y+1,pos.z)).name
-	goalx = 0
-	goalz = 0
-	found = false
-	if node == "main:waterflow" then
-		currentvel = self.object:get_velocity()
-		level = minetest.get_node_level(pos)
-		for x = -1,1 do
-			for z = -1,1 do
-				if found == false then
-					nodename = minetest.get_node(vector.new(pos.x+x,pos.y,pos.z+z)).name
-					level2 = minetest.get_node_level(vector.new(pos.x+x,pos.y,pos.z+z))
-					if level2 > level and nodename == "main:waterflow" or nodename == "main:water" then
-						goalx = -x
-						goalz = -z
-						--diagonal flow
-						if goalx ~= 0 and goalz ~= 0 then
-							found = true
-						end
-					end
-				end
-			end
-		end
-		--only add velocity if there is one
-		--else this stops the player
-		if goalx ~= 0 and goalz ~= 0 then
-			acceleration = vector.new(goalx/3,0,goalz/3)
-			self.object:add_velocity(acceleration)
-		elseif goalx ~= 0 or goalz ~= 0 then
-			acceleration = vector.new(goalx/2.25,0,goalz/2.25)
-			self.object:add_velocity(acceleration)
+local tab
+local n
+local function get_nodes(pos)
+	tab,n = {},1
+	for i = -1,1,2 do
+		for _,p in pairs({
+			{x=pos.x+i, y=pos.y, z=pos.z},
+			{x=pos.x, y=pos.y, z=pos.z+i}
+		}) do
+			tab[n] = {p, minetest.get_node(p)}
+			n = n+1
 		end
 	end
+	return tab
 end
---
+
+
+local data
+local param2
+local nd
+local par2
+local name
+local tmp
+local c_node
+local function get_flowing_dir(pos)
+	c_node = minetest.get_node(pos).name
+	if c_node ~= "main:waterflow" and c_node ~= "main:water" then
+		print("return initial")
+		return nil
+	end
+	data = get_nodes(pos)
+	param2 = minetest.get_node(pos).param2
+	if param2 > 7 then
+		print("return 0")
+		return nil
+	end
+	if c_node == "main:water" then
+		for _,i in pairs(data) do
+			nd = i[2]
+			name = nd.name
+			par2 = nd.param2
+			if name == "main:waterflow" and par2 == 7 then
+				return(vector.subtract(i[1],pos))
+			end
+		end
+	end
+	for _,i in pairs(data) do
+		nd = i[2]
+		name = nd.name
+		par2 = nd.param2
+		if name == "main:waterflow" and par2 < param2 then
+			print("return 1")
+			return(vector.subtract(i[1],pos))
+		end
+	end
+	for _,i in pairs(data) do
+		nd = i[2]
+		name = nd.name
+		par2 = nd.param2
+		if name == "main:waterflow" and par2 >= 11 then
+			print("return 2")
+			return(vector.subtract(i[1],pos))
+		end
+	end
+	for _,i in pairs(data) do
+		nd = i[2]
+		name = nd.name
+		par2 = nd.param2
+		tmp = minetest.registered_nodes[name]
+		if tmp and not tmp.walkable and name ~= "main:waterflow" and name ~= "main:water" then
+			print("return 3")
+			return(vector.subtract(i[1],pos))
+		end
+	end
+
+	return nil
+end
+
+function flow(self,pos)
+	return(get_flowing_dir(pos))
+end

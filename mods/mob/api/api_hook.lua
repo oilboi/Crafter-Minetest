@@ -177,7 +177,6 @@ mob_register.on_step = function(self, dtime,moveresult)
 		self.custom_function_begin(self,dtime)
 	end
 	
-	flow(self)
 	self.collision_detection(self)
 	if self.fall_damage then
 		self.fall_damage(self)

@@ -231,12 +231,23 @@ minetest.register_entity("boat:boat", {
 		self.lag_check = minetest.get_us_time()/1000000
 	end,
 
+	flow = function(self)
+		local flow_dir = flow(self,self.object:get_pos())
+		if flow_dir then
+			flow_dir = vector.multiply(flow_dir,10)
+			local vel = self.object:get_velocity()
+			local acceleration = vector.new(flow_dir.x-vel.x,flow_dir.y-vel.y,flow_dir.z-vel.z)
+			acceleration = vector.multiply(acceleration, 0.01)
+			self.object:add_velocity(acceleration)
+		end
+	end,
+
 	on_step = function(self, dtime)
 		self.check_if_on_land(self)
 		self.push(self)
 		self.drive(self)
 		self.float(self)
-		flow(self)
+		self.flow(self)
 		self.slowdown(self)
 		self.lag_correction(self,dtime)
 	end,

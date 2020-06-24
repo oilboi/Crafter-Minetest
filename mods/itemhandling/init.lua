@@ -418,7 +418,7 @@ local item_step = function(self, dtime, moveresult)
 		end
 	end
 
-	flow(self)
+	flow(self,pos)
 
 	change = false
 	-- Slide on slippery nodes
