@@ -232,7 +232,7 @@ minetest.register_entity("boat:boat", {
 	end,
 
 	flow = function(self)
-		local flow_dir = flow(self,self.object:get_pos())
+		local flow_dir = flow(self.object:get_pos())
 		if flow_dir then
 			flow_dir = vector.multiply(flow_dir,10)
 			local vel = self.object:get_velocity()

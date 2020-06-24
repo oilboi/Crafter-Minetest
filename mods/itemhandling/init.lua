@@ -261,6 +261,7 @@ local slip_factor
 local change
 local slippery
 local i_node
+local flow_dir
 local item_step = function(self, dtime, moveresult)
 	pos = self.object:get_pos()
 	if not pos then
@@ -418,7 +419,17 @@ local item_step = function(self, dtime, moveresult)
 		end
 	end
 
-	flow(self,pos)
+
+	flow_dir = flow(pos)
+	
+	if flow_dir then
+		flow_dir = vector.multiply(flow_dir,10)
+		local vel = self.object:get_velocity()
+		local acceleration = vector.new(flow_dir.x-vel.x,flow_dir.y-vel.y,flow_dir.z-vel.z)
+		acceleration = vector.multiply(acceleration, 0.01)
+		self.object:add_velocity(acceleration)
+		return
+	end
 
 	change = false
 	-- Slide on slippery nodes
