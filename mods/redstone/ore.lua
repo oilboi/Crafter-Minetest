@@ -71,7 +71,7 @@ for i = 0,1 do
 			light_source = 7,
 			after_destruct = function(pos, oldnode)
 				if math.random() > 0.95 then
-					minetest.sound_play("tnt_ignite")
+					minetest.sound_play("tnt_ignite",{pos=pos,max_hear_distance=64})
 					minetest.after(1.5, function(pos)
 						tnt(pos,5)
 					end,pos)
