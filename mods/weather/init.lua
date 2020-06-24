@@ -550,7 +550,7 @@ snowball.on_step = function(self, dtime)
 
 	if (self.oldvel and ((vel.x == 0 and self.oldvel.x ~= 0) or (vel.y == 0 and self.oldvel.y ~= 0) or (vel.z == 0 and self.oldvel.z ~= 0))) or hit == true then
 		--snowballs explode in the nether
-		if pos.y <= -10000 and pos.y >= -20000 then
+		if pos.y <= -10033 and pos.y >= -20000 then
 			self.object:remove()
 			tnt(pos,4)
 		else
