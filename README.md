@@ -275,3 +275,5 @@ if object:is_player() and object:get_player_name() ~= self.rider then
       - object:add_player_velocity(acceleration)
 end
 ```
+
+If you want to support the project: https://www.patreon.com/oil_boi
