@@ -77,6 +77,6 @@ local function get_flowing_dir(pos)
 	return nil
 end
 
-function flow(self,pos)
+function flow(pos)
 	return(get_flowing_dir(pos))
 end
