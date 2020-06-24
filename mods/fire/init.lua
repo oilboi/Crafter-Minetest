@@ -224,7 +224,7 @@ function start_fire(object)
 	elseif object and object:get_luaentity() then
 		if not object:get_luaentity().fire_entity or
 	object:get_luaentity().fire_entity and not object:get_luaentity().fire_entity:get_luaentity() then
-			--object:get_luaentity().on_fire = true
+			object:get_luaentity().on_fire = true
 
 			fire_obj = minetest.add_entity(object:get_pos(),"fire:fire")
 			fire_obj:get_luaentity().owner = object

@@ -47,15 +47,11 @@ mobs.create_interaction_functions = function(def,mob_register)
 	mob_register.look_around = function(self,dtime)
 		pos = self.object:get_pos()
 		
-		if self.die_in_light and self.die_in_light_level and self.die_in_light == true then
+		if self.die_in_light then
 			light_level = minetest.get_node_light(pos)
 			if light_level then
-				if (self.die_in_light == true and light_level > self.die_in_light_level) then
-					self.object:punch(self.object, 2, 
-						{
-						full_punch_interval=1.5,
-						damage_groups = {damage=2},
-					})
+				if self.die_in_light == true and light_level >= 14 then
+					start_fire(self.object)
 				end
 			end
 		end
@@ -392,15 +388,10 @@ mobs.create_interaction_functions = function(def,mob_register)
 						object:add_player_velocity(vel2)
 						if self.on_fire then
 							start_fire(object)
-						--else
-						--	local meta = object:get_meta()
-						--	if meta:get_int("on_fire") > 0 then
-						--		start_fire(self.object)
-						--	end
 						end
 					else
 						object:add_velocity(vel2)
-						if self.on_fire and not object:get_luaentity().on_fire then
+						if self.on_fire then
 							start_fire(object)
 						end
 					end

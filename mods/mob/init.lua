@@ -420,6 +420,7 @@ mobs.register_mob(
 	die_sound = "slime_die",
 	attack_type = "punch",
 	attack_damage = 6,
+	die_in_light = true,
 	custom_on_death = function(self)
 		local pos = self.object:get_pos()
 		for i = 1,4 do
@@ -467,6 +468,7 @@ mobs.register_mob(
 	die_sound = "slime_die",
 	attack_damage = 2,
 	attack_type = "punch",
+	die_in_light = true,
 	custom_on_death = function(self)
 		local pos = self.object:get_pos()
 		pos.y = pos.y + 0.2
@@ -515,6 +517,7 @@ mobs.register_mob(
 	attack_damage = 1,
 	attack_type = "punch",
 	item_drop = "mob:slimeball",
+	die_in_light = true,
 	fire_table = {
 		visual_size = vector.new(1/5.8,1/3.3,1/5.8),
 		position = vector.new(0,1.5,0),
@@ -577,7 +580,6 @@ mobs.register_mob(
 	 explosion_time = 5, -- how long it takes for a mob to explode
 	 
 	 die_in_light = true,
-	 die_in_light_level = 12,
 	}
 )
 
@@ -642,7 +644,7 @@ mobs.register_mob(
 	 attack_damage = 3,
 	 
 	 die_in_light = true,
-	 --die_in_light_level = 12,
+
 	 fire_table = {
 		visual_size = vector.new(1/4,2/3,1/4),
 		position = vector.new(0,3.3,0),
@@ -711,7 +713,6 @@ mobs.register_mob(
 	 explosion_time = 3, -- how long it takes for a mob to explode
 	 
 	 die_in_light = false,
-	 --die_in_light_level = 12,
 	 fire_table = {
 		visual_size = vector.new(1/4,2/3,1/4),
 		position = vector.new(0,3.3,0),
@@ -781,7 +782,6 @@ mobs.register_mob(
 	 explosion_time = 3, -- how long it takes for a mob to explode
 	 
 	 die_in_light = false,
-	 --die_in_light_level = 12,
 	 fire_table = {
 		visual_size = vector.new(1/4,2/3,1/4),
 		position = vector.new(0,3.3,0),
@@ -853,7 +853,6 @@ mobs.register_mob(
 	 explosion_blink_timer = 0.1, -- how fast the blinking happens
 	 
 	 die_in_light = false,
-	 --die_in_light_level = 12,
 	 fire_table = {
 		visual_size = vector.new(1/4,2/3,1/4),
 		position = vector.new(0,3.3,0),
