@@ -81,6 +81,31 @@ for ore,tool_required in pairs(ores) do
 				},
 			},
 		})
+	minetest.register_node(":nether:"..ore.."ore", {
+		description = "Nether "..ore:gsub("^%l", string.upper).." Ore",
+		tiles = {"netherrack.png^"..ore.."ore.png"},
+		groups = {netherrack = level, pathable = 1, experience = experience},
+		sounds = main.stoneSound(),
+		light_source = 7,
+		drop = {
+			max_items = 1,
+			items= {
+				{
+					rarity = 0,
+					tools = tool_required,
+					items = drops[ore],
+				},
+				},
+			},
+		after_destruct = function(pos, oldnode)
+			if math.random() > 0.95 then
+				minetest.sound_play("tnt_ignite")
+				minetest.after(1.5, function(pos)
+					tnt(pos,5)
+				end,pos)
+			end
+		end,
+	})
 end
 
 minetest.register_node("main:stone", {

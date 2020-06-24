@@ -14,7 +14,7 @@ for i = 0,1 do
 			timer:start(math.random(10,50))
 		end
 	else
-		groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1,redstone=1,redstone_torch=1,redstone_power=9,experience=8}
+		groups = {stone = 2, hard = 1, pickaxe = 1, hand = 4,pathable = 1,redstone=1,redstone_torch=1,redstone_power=9,experience=8}
 		on_timer = function(pos, elapsed)
 			minetest.set_node(pos, {name="redstone:ore_0"})
 			redstone.collect_info(pos)
@@ -62,6 +62,53 @@ for i = 0,1 do
 			redstone.collect_info(pos)
 		end,
 	})
+	if i == 0 then
+		minetest.register_node(":nether:redstone_ore", {
+			description = "Nether Redstone Ore",
+			tiles = {"netherrack.png^redstone_ore.png"},
+			groups = {netherrack = 2, hard = 1, pickaxe = 1, hand = 4,pathable = 1},
+			sounds = main.stoneSound(),
+			light_source = 7,
+			after_destruct = function(pos, oldnode)
+				if math.random() > 0.95 then
+					minetest.sound_play("tnt_ignite")
+					minetest.after(1.5, function(pos)
+						tnt(pos,5)
+					end,pos)
+				end
+			end,
+			drop = {
+				max_items = 5,
+				items= {
+					{
+						--rarity = 0,
+						tools = {"main:coalpick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
+						items = {"redstone:dust"},
+					},
+					{
+						--rarity = 0,
+						tools = {"main:coalpick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
+						items = {"redstone:dust"},
+					},
+					{
+						--rarity = 0,
+						tools = {"main:coalpick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
+						items = {"redstone:dust"},
+					},
+					{
+						--rarity = 0,
+						tools = {"main:coalpick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
+						items = {"redstone:dust"},
+					},
+					{
+						rarity = 5,
+						tools = {"main:coalpick","main:ironpick","main:lapispick","main:goldpick","main:diamondpick","main:emeraldpick","main:sapphirepick","main:rubypick"},
+						items = {"redstone:dust"},
+					},
+				},
+			},
+		})
+	end
 end
 --redstone ore
 minetest.register_ore({
