@@ -31,13 +31,11 @@ local c_node
 local function get_flowing_dir(pos)
 	c_node = minetest.get_node(pos).name
 	if c_node ~= "main:waterflow" and c_node ~= "main:water" then
-		print("return initial")
 		return nil
 	end
 	data = get_nodes(pos)
 	param2 = minetest.get_node(pos).param2
 	if param2 > 7 then
-		print("return 0")
 		return nil
 	end
 	if c_node == "main:water" then
@@ -55,7 +53,6 @@ local function get_flowing_dir(pos)
 		name = nd.name
 		par2 = nd.param2
 		if name == "main:waterflow" and par2 < param2 then
-			print("return 1")
 			return(vector.subtract(i[1],pos))
 		end
 	end
@@ -64,7 +61,6 @@ local function get_flowing_dir(pos)
 		name = nd.name
 		par2 = nd.param2
 		if name == "main:waterflow" and par2 >= 11 then
-			print("return 2")
 			return(vector.subtract(i[1],pos))
 		end
 	end
@@ -74,7 +70,6 @@ local function get_flowing_dir(pos)
 		par2 = nd.param2
 		tmp = minetest.registered_nodes[name]
 		if tmp and not tmp.walkable and name ~= "main:waterflow" and name ~= "main:water" then
-			print("return 3")
 			return(vector.subtract(i[1],pos))
 		end
 	end
