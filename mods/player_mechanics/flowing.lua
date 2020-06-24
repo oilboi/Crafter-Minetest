@@ -1,68 +1,58 @@
+
 local
 minetest,vector,math,pairs
 =
 minetest,vector,math,pairs
 
-local name
-local pos
-local node
-local node_above
-local goalx
-local goalz
-local currentvel
-local level
-local level2
-local nodename
-local acceleration
-found = false
-local function flow(player)
-    name = player:get_player_name()
-    pos = player:get_pos()
-    pos.y = pos.y + player:get_properties().collisionbox[2]
-    pos = vector.round(pos)
-    node = minetest.get_node(pos).name
-    node_above = minetest.get_node(vector.new(pos.x,pos.y+1,pos.z)).name
-    goalx = 0
-    goalz = 0
-    found = false
-    if node == "main:waterflow" then
-        currentvel = player:get_player_velocity()
-        level = minetest.get_node_level(pos)
-        for x = -1,1 do
-            for z = -1,1 do
-                if found == false then
-                    nodename = minetest.get_node(vector.new(pos.x+x,pos.y,pos.z+z)).name
-                    level2 = minetest.get_node_level(vector.new(pos.x+x,pos.y,pos.z+z))
-                    if level2 > level and nodename == "main:waterflow" or nodename == "main:water" then
-                        goalx = -x
-                        goalz = -z
-                        --diagonal flow
-                        if goalx ~= 0 and goalz ~= 0 then
-                            found = true
-                        end
-                    end
-                end
-            end
-        end
-        --only add velocity if there is one
-        --else this stops the player
-        if goalx ~= 0 and goalz ~= 0 then
-            acceleration = vector.new(goalx/3,0,goalz/3)
-            player:add_player_velocity(acceleration)
-        elseif goalx ~= 0 or goalz ~= 0 then
-            acceleration = vector.new(goalx/2.25,0,goalz/2.25)
-            player:add_player_velocity(acceleration)
-        end
-    end
-end
+local pool = {}
 
 local legs
 local flowing
 minetest.register_globalstep(function()
     for _,player in ipairs(minetest.get_connected_players()) do
-        legs = minetest.get_item_group(get_player_legs_env(player),"water") > 0
-        if legs then
-            flow(player)
+        local flow_dir = flow(player:get_pos())
+        local name = player:get_player_name()
+        if flow_dir then
+            --buffer continuation
+            if pool[name] then
+                local c_flow = pool[name]
+                local vel = player:get_player_velocity()
+                local acceleration
+                if c_flow.x ~= 0 then
+                    acceleration = vector.new(c_flow.x,0,0)
+                elseif c_flow.z ~= 0 then
+                    acceleration = vector.new(0,0,c_flow.z)
+                end
+                acceleration = vector.multiply(acceleration, 0.075)
+                player:add_player_velocity(acceleration)
+
+                local newvel = player:get_player_velocity()
+
+                if newvel.x ~= 0 or newvel.z ~= 0 then
+                    return
+                else
+                    pool[name] = nil
+                end
+            else
+                flow_dir = vector.multiply(flow_dir,10)
+                local vel = player:get_player_velocity()
+                local acceleration
+                if flow_dir.x ~= 0 then
+                    acceleration = vector.new(flow_dir.x,0,0)
+                elseif flow_dir.z ~= 0 then
+                    acceleration = vector.new(0,0,flow_dir.z)
+                end
+                acceleration = vector.multiply(acceleration, 0.075)
+                player:add_player_velocity(acceleration)
+                pool[name] = flow_dir 
+            end
+        else
+            pool[name] = nil
         end
     end
 end)
+
+
+--coal armor stops fire from hurting you
+--do fire stuff
+--fix water flow with players
