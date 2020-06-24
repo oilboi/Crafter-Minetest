@@ -114,6 +114,7 @@ local name
 local new_vel
 local old_vel
 local damage_calc
+local pos
 minetest.register_globalstep(function(dtime)
 	for _,player in ipairs(minetest.get_connected_players()) do
 		name = player:get_player_name()
@@ -121,7 +122,12 @@ minetest.register_globalstep(function(dtime)
 		if old_vel then
 			new_vel = player:get_player_velocity().y
 			if old_vel < -15 and new_vel >= -0.5 then
-				calc_fall_damage(player,math.ceil(old_vel+14))
+				--don't do fall damage on unloaded areas
+				pos = player:get_pos()
+				pos.y = pos.y - 1
+				if minetest.get_node_or_nil(pos) then
+					calc_fall_damage(player,math.ceil(old_vel+14))
+				end
 			end
 		end
 		pool[name] = player:get_player_velocity().y
