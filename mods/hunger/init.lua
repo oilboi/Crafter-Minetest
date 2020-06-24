@@ -221,7 +221,7 @@ hunger_update = function()
 			drowning = is_player_drowning(player)		
 
 			--make regeneration happen every second
-			if drowning == 0 and temp_pool.hunger >= 20 and hp < 20 then --  meta:get_int("on_fire") == 0 
+			if not is_player_on_fire(player) and drowning == 0 and temp_pool.hunger >= 20 and hp < 20 then --  meta:get_int("on_fire") == 0 
 
 				temp_pool.regeneration_interval = temp_pool.regeneration_interval + 1
 

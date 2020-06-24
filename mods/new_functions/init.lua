@@ -246,6 +246,47 @@ local start_fire = function(player)
 		start_fire(player)
 	end
 end
+
+-- this handles extinguishing a fire
+local pos
+local name
+local relief_nodes
+local real_nodes
+local a_min
+local a_max
+local _
+local extinguish = function(player)
+	name = player:get_player_name()
+	if player:get_hp() <= 0 then
+		return
+	end
+	-- used for finding a damage node from the center of the player
+	-- rudementary collision detection
+	pos = player:get_pos()
+	pos.y = pos.y + (player:get_properties().collisionbox[5]/2)
+	a_min = vector.new(
+		pos.x-0.25,
+		pos.y-0.85,
+		pos.z-0.25
+	)
+	a_max = vector.new(
+		pos.x+0.25,
+		pos.y+0.85,
+		pos.z+0.25
+	)
+
+	_,relief_nodes = minetest.find_nodes_in_area( a_min,  a_max, {"group:extinguish"})
+	real_nodes = {}
+	for node_data,is_next_to in pairs(relief_nodes) do
+		if relief_nodes[node_data] > 0 then
+			table.insert(real_nodes,node_data)
+		end
+	end
+		
+	if table.getn(real_nodes) > 0 then
+		put_fire_out(player)
+	end
+end
 --[[
 -- handle player suffocating inside solid node
 environment_class.handle_player_suffocation = function(player,dtime)
@@ -331,6 +372,9 @@ local index_players_surroundings = function(dtime)
 
 		start_fire(player)
 
+		if is_player_on_fire(player) then
+			extinguish(player)
+		end
 		--handle_player_suffocation(player,dtime)
 	end
 end

@@ -54,5 +54,3 @@ end)
 
 
 --coal armor stops fire from hurting you
---do fire stuff
---fix water flow with players
