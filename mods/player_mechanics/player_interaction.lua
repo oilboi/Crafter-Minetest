@@ -114,6 +114,7 @@ minetest.register_on_placenode(function(pos, newnode, placer, oldnode, itemstack
 		minetest.sound_play(placing.name, {
 			  pos = pos,
 			  gain = placing.gain,
+			  max_hear_distance = 32,
 			  --pitch = math.random(60,100)/100
 		})
 	end
