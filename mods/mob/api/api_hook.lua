@@ -193,6 +193,7 @@ mob_register.on_step = function(self, dtime,moveresult)
 
 		self.move(self,dtime,moveresult)
 		
+		self.flow(self)
 		--self.debug_nametag(self,dtime)
 
 		self.manage_hurt_color_timer(self,dtime)

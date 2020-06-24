@@ -43,6 +43,18 @@ local obj
 local sound_max
 local sound_min
 mobs.create_interaction_functions = function(def,mob_register)
+
+	mob_register.flow = function(self)
+		local flow_dir = flow(self.object:get_pos())
+		if flow_dir then
+			flow_dir = vector.multiply(flow_dir,10)
+			local vel = self.object:get_velocity()
+			local acceleration = vector.new(flow_dir.x-vel.x,flow_dir.y-vel.y,flow_dir.z-vel.z)
+			acceleration = vector.multiply(acceleration, 0.01)
+			self.object:add_velocity(acceleration)
+		end
+	end
+
 	--the pig will look for and at players
 	mob_register.look_around = function(self,dtime)
 		pos = self.object:get_pos()
