@@ -102,18 +102,9 @@ minetest.register_entity(":__builtin:falling_node", {
 			-- If it's not air or liquid, remove node and replace it with
 			-- it's drops
 			if n2.name ~= "air" and (not nd or nd.liquidtype == "none") then
-				minetest.remove_node(np)
-				if nd and nd.buildable_to == false then
-					-- Add dropped items
-					local drops = minetest.get_node_drops(n2, "")
-					for _, dropped_item in pairs(drops) do
-						minetest.add_item(np, dropped_item)
-					end
-				end
-				-- Run script hook
-				for _, callback in pairs(minetest.registered_on_dignodes) do
-					callback(np, n2)
-				end
+				minetest.throw_item(np, self.node)
+				self.object:remove()
+				return
 			end
 			-- Create node and remove entity
 			local def = minetest.registered_nodes[self.node.name]
@@ -131,6 +122,7 @@ minetest.register_entity(":__builtin:falling_node", {
 			minetest.check_for_falling(np)
 			return
 		end
+
 		local vel = self.object:get_velocity()
 		if vector.equals(vel, {x = 0, y = 0, z = 0}) then
 			local npos = self.object:get_pos()
