@@ -5,7 +5,7 @@ minetest,math,pairs,ipairs,table
 
 local pos
 local name
-local damage_nodes
+local saving_nodes
 local real_nodes
 local a_min
 local a_max
