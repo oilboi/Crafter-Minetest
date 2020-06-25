@@ -47,19 +47,19 @@ local np_terrain = {
 --minetest.set_mapgen_params({mgname = "singlenode", flags = "nolight"})
 -- Get the content IDs for the nodes used.
 
-local nobj_terrain
-local n_pos
-local node2
-local vi
-local sidelen
-local permapdims3d
-local nobj_terrain
-local vm
-local emin
-local emax
-local area
-local ni
-local density_noise
+local nobj_terrain = nil
+local n_pos = {}
+local node2 = ""
+local vi = {}
+local sidelen = {}
+local permapdims3d  = {}
+local nobj_terrain = {}
+local vm = {}
+local emin = {}
+local emax = {}
+local area = {}
+local ni = 1
+local density_noise  = {}
 
 local nvals_terrain = {}
 local data = {}
@@ -84,7 +84,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 
 	-- Start time of mapchunk generation.
 	--local t0 = minetest.get_us_time()/1000000
-	ni = 1
 
 	sidelen = maxp.x - minp.x + 1
 
@@ -93,6 +92,8 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	nobj_terrain = get_map(np_terrain, permapdims3d)
 
 	nobj_terrain:get_3d_map_flat(minp, nvals_terrain)
+
+	ni = 1
 
 	vm, emin, emax = get_mapgen_object("voxelmanip")
 

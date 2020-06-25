@@ -29,6 +29,7 @@ local inv
 local stack
 local count
 local obj
+local name
 minetest.register_on_dieplayer(function(player, reason)
 	pos = player:get_pos()
 	inv = player:get_inventory()
