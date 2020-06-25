@@ -1,3 +1,7 @@
+local
+minetest,vector,table,pairs,type
+=
+minetest,vector,table,pairs,type
 --
 -- Falling entity ("rewrite"")
 --
