@@ -42,7 +42,6 @@ local wake_up = function(player)
 end
 
 local function global_sleep_check()
-	minetest.send_all("looping")
 	--cancel the extra loops
 	if minetest.get_us_time()/1000000 - time_since_last_check < 0.5 then
 		return
