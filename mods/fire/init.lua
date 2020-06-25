@@ -187,14 +187,6 @@ local name
 minetest.register_on_joinplayer(function(player)
 	name = player:get_player_name()
 	fire_channels[name] = minetest.mod_channel_join(name..":fire_state")
-
-	minetest.after(4,function()
-		if not player:is_player() then return end
-		local meta = player:get_meta()
-		if meta:get_int("on_fire") > 0 then
-			start_fire(player)
-		end
-	end)
 end)
 
 local name
@@ -261,7 +253,7 @@ function put_fire_out(object)
 		object:get_luaentity().on_fire = false
 		object:get_luaentity().fire_entity = nil
 		
-		minetest.sound_play("fire_extinguish", {object=object,gain=0.3,pitch=math.random(80,100)/100})
+		--minetest.sound_play("fire_extinguish", {object=object,gain=0.3,pitch=math.random(80,100)/100})
 	end
 end
 
