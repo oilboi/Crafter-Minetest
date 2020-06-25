@@ -1,10 +1,19 @@
 local
-minetest,vector,table,pairs,type
+minetest,vector,table,pairs,type,math
 =
-minetest,vector,table,pairs,type
+minetest,vector,table,pairs,type,math
 --
 -- Falling entity ("rewrite"")
 --
+
+local param_translation = {
+	[0] = 0,
+	[3] = math.pi/2,
+	[2] = math.pi,
+	[1] = math.pi*1.5,
+}
+
+
 
 minetest.register_entity(":__builtin:falling_node", {
 	initial_properties = {
@@ -34,10 +43,16 @@ minetest.register_entity(":__builtin:falling_node", {
 			end
 		end
 		self.meta = meta
+
+
 		self.object:set_properties({
 			is_visible = true,
 			textures = {node.name},
 		})
+
+		if node.param2 then
+			self.object:set_rotation(vector.new(0,param_translation[node.param2],0))
+		end
 	end,
 
 	get_staticdata = function(self)
