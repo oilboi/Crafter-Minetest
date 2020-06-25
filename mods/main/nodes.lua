@@ -265,6 +265,12 @@ minetest.register_node("main:gravel", {
 	}},
 })
 
+local acceptable_soil = {
+	["main:dirt"] = true,
+	["main:grass"] = true,
+	["aether:dirt"] = true,
+	["aether:grass"] = true,
+}
 minetest.register_node("main:tree", {
     description = "Tree",
     tiles = {"treeCore.png","treeCore.png","treeOut.png","treeOut.png","treeOut.png","treeOut.png"},
@@ -330,7 +336,7 @@ minetest.register_node("main:tree", {
 					})
 					
 					local name2 = minetest.get_node(vector.new(pos.x,pos.y+y-1,pos.z)).name
-					if name2 == "main:dirt" or name2 == "main:grass" then
+					if acceptable_soil[name2] then
 						minetest.add_node(vector.new(pos.x,pos.y+y,pos.z),{name="main:sapling"})
 					end
 				end
