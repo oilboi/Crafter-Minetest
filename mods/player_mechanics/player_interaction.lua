@@ -10,7 +10,6 @@ minetest.register_on_player_hpchange(function(player, hp_change, reason)
 		--fall damage is handled on another globalstep calc
 		return(0)
 	elseif hp_change < 0 and reason.reason ~= "correction" then
-		print("playing 3")
 		minetest.sound_play("hurt", {object=player, gain = 1.0, max_hear_distance = 60,pitch = math.random(80,100)/100})
 	end
 	return(hp_change)
@@ -240,4 +239,11 @@ end)
 
 minetest.register_on_respawnplayer(function(player)
 	player:add_player_velocity(vector.multiply(player:get_player_velocity(),-1))
+	player:get_inventory():set_list("main", {})
+	player:get_inventory():set_list("craft", {})
+    player:get_inventory():set_list("craftpreview", {})
+    player:get_inventory():set_list("armor_head", {})
+    player:get_inventory():set_list("armor_torso", {})
+    player:get_inventory():set_list("armor_legs", {})
+    player:get_inventory():set_list("armor_feet", {})
 end)
