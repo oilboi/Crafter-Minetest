@@ -445,12 +445,6 @@ minetest.register_craftitem("redstone:dust", {
 	end,
 })
 
-minetest.register_craft({
-	type = "shapeless",
-	output = "redstone:dust",
-	recipe = {"redstone:dust"},
-})
-
 --8 power levels 8 being the highest
 local color = 0
 for i = 0,8 do
