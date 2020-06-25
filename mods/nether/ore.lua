@@ -65,7 +65,7 @@ minetest.register_ore({
 
 minetest.register_ore({
 	ore_type	 = "scatter",
-	ore		= "nether:emeralddore",
+	ore		= "nether:emeraldore",
 	wherein	  = "nether:netherrack",
 	clust_scarcity = 15 * 15 * 15,
 	clust_num_ores = 5,
