@@ -44,7 +44,7 @@ end
 local function global_sleep_check()
 	minetest.chat_send_all(tostring(minetest.get_us_time()/1000000 - time_since_last_check))
 	--cancel the extra loops
-	if minetest.get_us_time()/1000000 - time_since_last_check < 0.5 then
+	if minetest.get_us_time()/1000000 - time_since_last_check < 0.4 then
 		return
 	end
 	time_since_last_check = minetest.get_us_time()/1000000
