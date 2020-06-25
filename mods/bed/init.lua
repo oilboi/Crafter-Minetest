@@ -110,7 +110,7 @@ local do_sleep = function(player,pos,dir)
 
 	local time = minetest.get_timeofday() * 24000
 	name = player:get_player_name()
-	minetest.chat_send_all(time)
+	minetest.chat_send_all(tostring(time))
 	if time < time_night.begin and time > time_night.ending then
 		minetest.chat_send_player(name, "You can only sleep at night")
 		return
