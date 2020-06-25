@@ -36,7 +36,6 @@ local data_item_amount
 --for look around
 local light_level
 local player_found
-local meta
 local player_punch_timer
 local line_of_sight
 local obj
@@ -123,9 +122,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 					--punch the player
 					if self.attack_type == "punch" then
 						if distance < 2.5 and self.punch_timer <= 0 and object:get_hp() > 0 then
-							meta = object:get_meta()
-							player_punch_timer = meta:get_float("player_punch_timer")
-							if player_punch_timer <= 0 then
+							if player_can_be_punched(object) then
 								line_of_sight = minetest.line_of_sight(pos, pos2)
 								if line_of_sight == true then
 									self.punch_timer = 0.5
