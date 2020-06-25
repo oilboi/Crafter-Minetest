@@ -610,7 +610,7 @@ mobs.register_mob(
 	 mobname = "zombie",
 	 physical = true,
 	 collide_with_objects = false,
-	 collisionbox = {-0.37,0, -0.37, 0.37, 1.7, 0.37},
+	 collisionbox = {-0.23,0, -0.23, 0.23, 1.7, 0.23},
 	 visual = "mesh",
 	 visual_size = {x = 3.2, y = 3.2},
 	 mesh = "zombie.b3d",
