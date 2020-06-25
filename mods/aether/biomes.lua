@@ -47,33 +47,31 @@ local np_terrain = {
 --minetest.set_mapgen_params({mgname = "singlenode", flags = "nolight"})
 -- Get the content IDs for the nodes used.
 
+local nobj_terrain
+local n_pos
+local node2
+local vi
+local sidelen
+local permapdims3d
+local nobj_terrain
+local vm
+local emin
+local emax
+local area
+local ni
+local density_noise
+
+local nvals_terrain = {}
+local data = {}
+
+local content_id = minetest.get_name_from_content_id
+local get_map = minetest.get_perlin_map
+local get_mapgen_object = minetest.get_mapgen_object
+
 local c_dirt = minetest.get_content_id("aether:dirt")
 local c_stone = minetest.get_content_id("aether:stone")
 local c_air = minetest.get_content_id("air")
 local c_grass = minetest.get_content_id("aether:grass")
--- Initialize noise object to nil. It will be created once only during the
--- generation of the first mapchunk, to minimise memory use.
-local nobj_terrain = nil
--- Localise noise buffer table outside the loop, to be re-used for all
--- mapchunks, therefore minimising memory use.
-local nvals_terrain = {}
--- Localise data buffer table outside the loop, to be re-used for all
--- mapchunks, therefore minimising memory use.
-
-local data = {}
-local n_pos = {}
-local node2 = ""
-local vi = {}
-local content_id = minetest.get_name_from_content_id
-local sidelen = {}
-local permapdims3d = {}
-local nobj_terrain = {}
-local vm, emin, emax = {},{},{}
-local area = {}
-local ni = 1
-local density_noise = {}
-local get_map = minetest.get_perlin_map
-local get_mapgen_object = minetest.get_mapgen_object
 -- On generated function.
 
 -- 'minp' and 'maxp' are the minimum and maximum positions of the mapchunk that
@@ -83,10 +81,11 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	if minp.y < 21000 then
 		return
 	end
+
 	-- Start time of mapchunk generation.
 	--local t0 = minetest.get_us_time()/1000000
-	
-	-- Noise stuff.
+	ni = 1
+
 	sidelen = maxp.x - minp.x + 1
 
 	permapdims3d = {x = sidelen, y = sidelen, z = sidelen}
@@ -94,7 +93,6 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	nobj_terrain = get_map(np_terrain, permapdims3d)
 
 	nobj_terrain:get_3d_map_flat(minp, nvals_terrain)
-	ni = 1
 
 	vm, emin, emax = get_mapgen_object("voxelmanip")
 
