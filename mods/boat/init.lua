@@ -141,14 +141,19 @@ minetest.register_entity("boat:boat", {
 	
 	--players drive the baot
 	drive = function(self)
-		if self.rider and not self.on_land == true then
+		if self.rider then
 			local rider = minetest.get_player_by_name(self.rider)
 			local move = rider:get_player_control().up
 			self.moving = nil
 			if move then
+				
 				local currentvel = self.object:get_velocity()
 				local goal = rider:get_look_dir()
-				goal = vector.multiply(goal,20)
+				if self.on_land == true then
+					goal = vector.multiply(goal,1)
+				else
+					goal = vector.multiply(goal,20)
+				end
 				local acceleration = vector.new(goal.x-currentvel.x,0,goal.z-currentvel.z)
 				acceleration = vector.multiply(acceleration, 0.01)
 				self.object:add_velocity(acceleration)
