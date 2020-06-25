@@ -260,6 +260,7 @@ function put_fire_out(object)
 		end
 		object:get_luaentity().on_fire = false
 		object:get_luaentity().fire_entity = nil
+		
 		minetest.sound_play("fire_extinguish", {object=object,gain=0.3,pitch=math.random(80,100)/100})
 	end
 end

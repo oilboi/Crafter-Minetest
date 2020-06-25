@@ -42,6 +42,9 @@ local line_of_sight
 local obj
 local sound_max
 local sound_min
+local head_pos
+local light
+local fire_it_up
 mobs.create_interaction_functions = function(def,mob_register)
 
 	mob_register.flow = function(self)
@@ -60,14 +63,41 @@ mobs.create_interaction_functions = function(def,mob_register)
 		pos = self.object:get_pos()
 		
 		if self.die_in_light then
-			light_level = minetest.get_node_light(pos)
-			if light_level then
-				if self.die_in_light == true and light_level >= 14 then
-					start_fire(self.object)
+			fire_it_up = false
+			if minetest.get_item_group(minetest.get_node(pos).name, "extinguish") > 0 then
+				fire_it_up = false
+			else
+				head_pos = table.copy(pos)
+				head_pos.y = head_pos.y + self.object:get_properties().collisionbox[5]
+				light = minetest.get_node_light(head_pos, 0.5)				
+				if light and light == 15 then
+					if weather_type == 2 then
+						fire_it_up = false
+					else
+						fire_it_up = true
+					end
+				end
+			end
+			if fire_it_up then
+				start_fire(self.object)
+			end
+		end
+
+		if self.on_fire then
+			if minetest.get_item_group(minetest.get_node(pos).name, "extinguish") > 0 then
+				put_fire_out(self.object)
+			else
+				head_pos = table.copy(pos)
+				head_pos.y = head_pos.y + self.object:get_properties().collisionbox[5]
+				light = minetest.get_node_light(head_pos, 0.5)
+				if light and light == 15 then
+					if weather_type == 2 then
+						put_fire_out(self.object)
+					end
 				end
 			end
 		end
-		
+
 		--STARE O_O
 		--and follow!
 		self.following = false
@@ -107,6 +137,9 @@ mobs.create_interaction_functions = function(def,mob_register)
 									--light the player on fire
 									if self.on_fire then
 										start_fire(object)
+									end
+									if is_player_on_fire(object) then
+										start_fire(self.object)
 									end
 								end
 							end
@@ -401,10 +434,16 @@ mobs.create_interaction_functions = function(def,mob_register)
 						if self.on_fire then
 							start_fire(object)
 						end
+						if is_player_on_fire(object) then
+							start_fire(self.object)
+						end
 					else
 						object:add_velocity(vel2)
 						if self.on_fire then
 							start_fire(object)
+						end
+						if object:get_luaentity().on_fire then
+							start_fire(self.object)
 						end
 					end
 				end

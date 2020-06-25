@@ -214,14 +214,27 @@ local real_nodes
 local a_min
 local a_max
 local _
+local light
+local head_pos
 local start_fire = function(player)
 	name = player:get_player_name()
 	if player:get_hp() <= 0 then
 		return
 	end
+
+	pos = player:get_pos()
+	
+	if weather_type == 2 then
+		head_pos = table.copy(pos)
+		head_pos.y = head_pos.y + player:get_properties().collisionbox[5]
+		light = minetest.get_node_light(head_pos, 0.5)
+		if light and light == 15 then
+			return
+		end
+	end
+
 	-- used for finding a damage node from the center of the player
 	-- rudementary collision detection
-	pos = player:get_pos()
 	pos.y = pos.y + (player:get_properties().collisionbox[5]/2)
 	a_min = vector.new(
 		pos.x-0.25,
@@ -255,14 +268,25 @@ local real_nodes
 local a_min
 local a_max
 local _
+local light
+local head_pos
 local extinguish = function(player)
 	name = player:get_player_name()
 	if player:get_hp() <= 0 then
 		return
 	end
+	pos = player:get_pos()
+	if weather_type == 2 then
+		head_pos = table.copy(pos)
+		head_pos.y = head_pos.y + player:get_properties().collisionbox[5]
+		light = minetest.get_node_light(head_pos, 0.5)
+		if light and light == 15 then
+			put_fire_out(player)
+			return
+		end
+	end
 	-- used for finding a damage node from the center of the player
 	-- rudementary collision detection
-	pos = player:get_pos()
 	pos.y = pos.y + (player:get_properties().collisionbox[5]/2)
 	a_min = vector.new(
 		pos.x-0.25,
