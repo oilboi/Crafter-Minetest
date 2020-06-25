@@ -228,6 +228,17 @@ mobs.register_mob(
 	}
 )
 
+
+local acceptable_drawtypes = {
+	["normal"] = true,
+	["glasslike"] = true,
+	["glasslike_framed"] = true,
+	["glasslike_framed_optional"] = true,
+	["allfaces"] = true,
+	["allfaces_optional"] = true,
+}
+local node
+local def
 mobs.register_mob(
 	{
 	 mobname = "snowman",
@@ -290,10 +301,18 @@ mobs.register_mob(
 	 custom_function = function(self,dtime,moveresult)
 		if moveresult and moveresult.touching_ground then
 			local pos = vector.floor(vector.add(self.object:get_pos(),0.5))
-
 			if self.custom_old_pos and not vector.equals(pos,self.custom_old_pos) then
-				if minetest.get_nodedef(minetest.get_node(pos).name,"buildable_to") == true and minetest.get_nodedef(minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name,"buildable_to") == false then
-					minetest.set_node(pos,{name="weather:snow"})
+				node = minetest.get_node(pos).name
+				if node == "air" then
+					node = minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name
+					def = minetest.registered_nodes[node]
+
+					drawtype = acceptable_drawtypes[def.drawtype]
+					walkable = def.walkable
+					liquid = (def.liquidtype ~= "none")
+					if not liquid and walkable and drawtype and node ~= "main:ice" then
+						minetest.set_node(pos,{name="weather:snow"})
+					end
 				end
 			end
 			self.custom_old_pos = pos
