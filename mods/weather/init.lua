@@ -124,7 +124,8 @@ local get_light = minetest.get_node_light
 local g_node = minetest.get_node
 local node_name
 local def
-local buildable
+--local buildable
+local drawtype
 local walkable
 local liquid
 local r_nodes = minetest.registered_nodes
@@ -148,6 +149,14 @@ local relative_z
 local under_air_count
 local x, y, z
 
+local acceptable_drawtypes = {
+	["normal"] = true,
+	["glasslike"] = true,
+	["glasslike_framed"] = true,
+	["glasslike_framed_optional"] = true,
+	["allfaces"] = true,
+	["allfaces_optional"] = true,
+}
 --this is debug
 --local average = {}
 
@@ -269,27 +278,29 @@ local function do_snow()
 							if lightlevel >= 14 then
 								-- daylight is above or near this node, so snow can fall on it
 
-								--make it so buildable to nodes get replaced
 								node_name = g_node(n_vec(x,y,z)).name
 								def = r_nodes[node_name]
-								buildable = def.buildable_to
+								--buildable = def.buildable_to
+
+								drawtype = acceptable_drawtypes[def.drawtype]
+
 								walkable = def.walkable
 								liquid = (def.liquidtype ~= "none")
 
-								if not liquid then
-									if buildable then
-										if node_name ~= "weather:snow" then
-											inserter(bulk_list, n_vec(x,y,z))
-										else
-											catchup_steps = catchup_steps + 1 -- we've already snowed on this spot
-										end
-									elseif walkable then
+								if not liquid and walkable and drawtype and node_name ~= "main:ice" then
+									--if buildable then
+									--	if node_name ~= "weather:snow" then
+									--		inserter(bulk_list, n_vec(x,y,z))
+									--	else
+									--		catchup_steps = catchup_steps + 1 -- we've already snowed on this spot
+									--	end
+									--elseif walkable then
 										if g_node(n_vec(x,y+1,z)).name ~= "weather:snow" then
 											inserter(bulk_list, n_vec(x,y+1,z))
 										else
 											catchup_steps = catchup_steps + 1 -- we've already snowed on this spot
 										end
-									end
+									--end
 								elseif node_name == "main:water" then
 									inserter(ice_list, n_vec(x,y,z))
 								end
