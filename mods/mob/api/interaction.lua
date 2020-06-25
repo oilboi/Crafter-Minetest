@@ -68,7 +68,7 @@ mobs.create_interaction_functions = function(def,mob_register)
 			else
 				head_pos = table.copy(pos)
 				head_pos.y = head_pos.y + self.object:get_properties().collisionbox[5]
-				light = minetest.get_node_light(head_pos, 0.5)				
+				light = minetest.get_node_light(head_pos)
 				if light and light == 15 then
 					if weather_type == 2 then
 						fire_it_up = false
