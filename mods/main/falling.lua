@@ -102,7 +102,14 @@ minetest.register_entity(":__builtin:falling_node", {
 			-- If it's not air or liquid, remove node and replace it with
 			-- it's drops
 			if n2.name ~= "air" and (not nd or nd.liquidtype == "none") then
-				minetest.throw_item(np, self.node)
+				local drops = minetest.get_node_drops(self.node.name, "")
+				if drops and table.getn(drops) > 0 then
+					for _,droppy in pairs(drops) do
+						minetest.throw_item(np,droppy)
+					end
+				else
+					minetest.throw_item(np,self.node)
+				end
 				self.object:remove()
 				return
 			end
