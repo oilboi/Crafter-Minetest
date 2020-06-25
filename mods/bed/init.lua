@@ -43,7 +43,7 @@ end
 
 local function global_sleep_check()
 	sleep_loop = true
-	minetest.chat_send_all("sleep looping"..tostring(math.random()))
+	--minetest.chat_send_all("sleep looping"..tostring(math.random()))
 	local sleep_table = {}
 
 	for _,player in ipairs(minetest.get_connected_players()) do
