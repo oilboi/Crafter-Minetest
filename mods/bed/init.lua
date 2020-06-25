@@ -87,7 +87,7 @@ local function global_sleep_check()
 	end
 
 	if bed_count > 0 then
-		minetest.after(0.5,function()
+		minetest.after(0.55,function()
 			global_sleep_check()
 		end)
 	end
