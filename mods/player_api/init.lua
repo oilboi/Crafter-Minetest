@@ -84,6 +84,7 @@ local set_all_properties = function(player)
 	temp_pool.stepheight   = player_constant.stepheight
 	temp_pool.visual_size  = player_constant.visual_size
 	temp_pool.attached     = false
+	temp_pool.sleeping     = false
 	player:set_properties(temp_pool)
 end
 
@@ -151,6 +152,17 @@ player_is_attached = function(player,truth)
 	pool[name].attached = truth
 end
 
+local name
+player_is_sleeping = function(player,truth)
+	name = player:get_player_name()
+	pool[name].sleeping = truth
+end
+
+local name
+get_if_player_sleeping = function(player)
+	name = player:get_player_name()
+	return(pool[name].sleeping)
+end
 
 
 -- toggles nametag visibility
@@ -364,7 +376,7 @@ local do_animations = function(player)
 
 	if player:get_hp() <= 0 then
 		set_animation(player,"die",40,false)
-	elseif not temp_pool.attached or not player:get_attach() then
+	elseif not temp_pool.sleeping and (not temp_pool.attached or not player:get_attach()) then
 		temp_pool.attached = false
 		update = control_check(player,control_table)
 		update_wield_item(player)

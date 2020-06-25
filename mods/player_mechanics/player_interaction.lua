@@ -267,7 +267,9 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 		elseif modify_output then
 			hurt = 0
 		end
+
 		player:add_player_velocity(dir)
+
 		player:set_hp(hp-hurt)
 	end
 end)
