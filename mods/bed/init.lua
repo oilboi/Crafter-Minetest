@@ -26,7 +26,7 @@ minetest.register_on_modchannel_message(function(channel_name, sender, message)
 	local channel_decyphered = channel_name:gsub(sender,"")
 	if channel_decyphered == ":sleep_channel" then
 		if pool[sender] then
-			pool[sender].sleeping = true
+			pool[sender].sleeping = "true"
 		end
 	end
 end)
@@ -42,6 +42,7 @@ local wake_up = function(player)
 end
 
 local function global_sleep_check()
+	minetest.send_all("looping")
 	--cancel the extra loops
 	if minetest.get_us_time()/1000000 - time_since_last_check < 0.5 then
 		return
@@ -49,6 +50,7 @@ local function global_sleep_check()
 	time_since_last_check = minetest.get_us_time()/1000000
 
 	local sleep_table = {}
+
 	for _,player in ipairs(minetest.get_connected_players()) do
 		local name = player:get_player_name()
 		sleep_table[name] = true
