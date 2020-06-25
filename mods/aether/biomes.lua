@@ -1,4 +1,7 @@
-local minetest,math = minetest,math
+local 
+minetest,math
+=
+minetest,math
 
 
 minetest.register_biome({
@@ -69,12 +72,14 @@ local vm, emin, emax = {},{},{}
 local area = {}
 local ni = 1
 local density_noise = {}
+local get_map = minetest.get_perlin_map
+local get_mapgen_object = minetest.get_mapgen_object
 -- On generated function.
 
 -- 'minp' and 'maxp' are the minimum and maximum positions of the mapchunk that
 -- define the 3D volume.
 minetest.register_on_generated(function(minp, maxp, seed)
-	--nether starts at -10033 y
+	--aether starts at 21000
 	if minp.y < 21000 then
 		return
 	end
@@ -82,61 +87,29 @@ minetest.register_on_generated(function(minp, maxp, seed)
 	--local t0 = minetest.get_us_time()/1000000
 	
 	-- Noise stuff.
-
-	-- Side length of mapchunk.
 	sidelen = maxp.x - minp.x + 1
-	-- Required dimensions of the 3D noise perlin map.
+
 	permapdims3d = {x = sidelen, y = sidelen, z = sidelen}
-	-- Create the perlin map noise object once only, during the generation of
-	-- the first mapchunk when 'nobj_terrain' is 'nil'.
-	nobj_terrain = minetest.get_perlin_map(np_terrain, permapdims3d) --nobj_terrain or 
-	-- Create a flat array of noise values from the perlin map, with the
-	-- minimum point being 'minp'.
-	-- Set the buffer parameter to use and reuse 'nvals_terrain' for this.
+
+	nobj_terrain = get_map(np_terrain, permapdims3d)
+
 	nobj_terrain:get_3d_map_flat(minp, nvals_terrain)
 	ni = 1
-	-- Voxelmanip stuff.
 
-	-- Load the voxelmanip with the result of engine mapgen. Since 'singlenode'
-	-- mapgen is used this will be a mapchunk of air nodes.
-	vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
-	-- 'area' is used later to get the voxelmanip indexes for positions.
+	vm, emin, emax = get_mapgen_object("voxelmanip")
+
 	area = VoxelArea:new{MinEdge = emin, MaxEdge = emax}
-	-- Get the content ID data from the voxelmanip in the form of a flat array.
-	-- Set the buffer parameter to use and reuse 'data' for this.
+
 	vm:get_data(data)
 
-	-- Generation loop.
-
-	-- Noise index for the flat array of noise values.
-	-- Process the content IDs in 'data'.
-	-- The most useful order is a ZYX loop because:
-	-- 1. This matches the order of the 3D noise flat array.
-	-- 2. This allows a simple +1 incrementing of the voxelmanip index along x
-	-- rows.
-	-- rows.
 	for z = minp.z, maxp.z do
 	for y = minp.y, maxp.y do
-		-- Voxelmanip index for the flat array of content IDs.
-		-- Initialise to first node in this x row.
+
 		vi = area:index(minp.x, y, z)
 		for x = minp.x, maxp.x do
-			-- Consider a 'solidness' value for each node,
-			-- let's call it 'density', where
-			-- density = density noise + density gradient.
+
 			density_noise = nvals_terrain[ni]
-			-- Density gradient is a value that is 0 at water level (y = 1)
-			-- and falls in value with increasing y. This is necessary to
-			-- create a 'world surface' with only solid nodes deep underground
-			-- and only air high above water level.
-			-- Here '128' determines the typical maximum height of the terrain.
-			
-			
-			--print(density_noise, density_gradient)
-			-- Place solid nodes when 'density' > 0.
-			--if density_noise + density_gradient > 0 then
-			
-			--print(density_noise + density_gradient)
+
 			if density_noise > 0.1 then
 				data[vi] = c_dirt
 			else
@@ -147,37 +120,19 @@ minetest.register_on_generated(function(minp, maxp, seed)
 					data[n_pos] = c_grass
 				end
 			end
-			-- Otherwise if at or below water level place water.
-			--elseif y == -10033 then
-				--data[vi] = c_bedrock
-			--elseif y <= 1 then
-			--	data[vi] = c_water
-			--elseif y > -15000 then
-			--	data[vi] = c_air
-			--else
-				--data[vi] = c_lava
-			--end
-			
-			-- Increment noise index.
+
 			ni = ni + 1
-			-- Increment voxelmanip index along x row.
-			-- The voxelmanip index increases by 1 when
-			-- moving by 1 node in the +x direction.
+
 			vi = vi + 1
 		end
 	end
 	end
 
-	-- After processing, write content ID data back to the voxelmanip.
-	
+
 	vm:set_data(data)
-	-- Calculate lighting for what has been created.
-	--vm:calc_lighting()
+
 	vm:set_lighting({day=15,night=0}, minp, maxp)
-	--minetest.generate_ores(vm)
-	
-	--minetest.generate_decorations(vm)
-	-- Write what has been created to the world.
+
 	vm:write_to_map()
 		
 		
