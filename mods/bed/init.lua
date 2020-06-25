@@ -1,8 +1,8 @@
 local mod_storage = minetest.get_mod_storage()
 local time_night = {begin = 19000, ending = 5500}
 local sleep_channel = {}
-local time_since_last_check = (minetest.get_us_time()/1000000)-0.5 --minus half a second
 local pool = {}
+local sleep_loop = false
 
 
 minetest.register_on_joinplayer(function(player)
@@ -42,13 +42,8 @@ local wake_up = function(player)
 end
 
 local function global_sleep_check()
-	minetest.chat_send_all(tostring(minetest.get_us_time()/1000000 - time_since_last_check))
-	--cancel the extra loops
-	if minetest.get_us_time()/1000000 - time_since_last_check < 0.4 then
-		return
-	end
-	time_since_last_check = minetest.get_us_time()/1000000
-
+	sleep_loop = true
+	minetest.chat_send_all("sleep looping"..tostring(math.random()))
 	local sleep_table = {}
 
 	for _,player in ipairs(minetest.get_connected_players()) do
@@ -83,15 +78,25 @@ local function global_sleep_check()
 		for _,player in ipairs(minetest.get_connected_players()) do
 			wake_up(player)
 		end
+		sleep_loop = false
 		return
 	end
 
-	if bed_count > 0 then
-		minetest.after(0.55,function()
-			global_sleep_check()
-		end)
+	if bed_count == 0 then
+		sleep_loop = false
 	end
 end
+
+local global_step_timer = 0
+minetest.register_globalstep(function(dtime)
+	if sleep_loop then
+		global_step_timer = global_step_timer + dtime
+		if global_step_timer > 0.25 then
+			global_step_timer = 0
+			global_sleep_check()
+		end
+	end
+end)
 
 -- delete data on player leaving
 local name
@@ -136,7 +141,7 @@ local do_sleep = function(player,pos,dir)
 
 		csm_send_player_to_sleep(player)
 
-		global_sleep_check()
+		sleep_loop = true
 	else
 		minetest.chat_send_player(name, "You can only sleep at night")
 	end
