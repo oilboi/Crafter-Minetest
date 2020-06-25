@@ -71,6 +71,12 @@ local explosion_force
 local explosion_depletion
 local range_calc
 local boom_time = minetest.get_us_time()/1000000
+local digging_nodes = {
+	["utility:chest_open"] = true,
+	["utility:chest"] = true,
+	["utility:furnace_active"] = true,
+	["utility:furnace"] = true,
+}
 function tnt(pos,range,explosion_type)
 	in_node = minetest.get_node(pos).name
 	in_water =  ( in_node == "main:water" or minetest.get_node(pos).name == "main:waterflow")
@@ -103,6 +109,9 @@ function tnt(pos,range,explosion_type)
 							
 							if node2 == "nether:obsidian" or node2 == "nether:bedrock" then
 								break
+							elseif digging_nodes[node2] then
+								minetest.dig_node({x=pointed_thing.under.x,y=pointed_thing.under.y,z=pointed_thing.under.z})
+								data[n_pos] = air
 							elseif node2 == "tnt:tnt" then
 								data[n_pos] = air
 								minetest.add_entity({x=pointed_thing.under.x,y=pointed_thing.under.y,z=pointed_thing.under.z}, "tnt:tnt",minetest.serialize({do_ignition_particles=true,timer = math.random()}))
