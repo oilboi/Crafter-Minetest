@@ -26,7 +26,7 @@ minetest.register_on_modchannel_message(function(channel_name, sender, message)
 	local channel_decyphered = channel_name:gsub(sender,"")
 	if channel_decyphered == ":sleep_channel" then
 		if pool[sender] then
-			pool[sender].sleeping = "true"
+			pool[sender].sleeping = true
 		end
 	end
 end)
