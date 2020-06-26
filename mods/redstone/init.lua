@@ -12,6 +12,7 @@ local content_id      = minetest.get_name_from_content_id
 local get_content_id  = minetest.get_content_id
 local get_voxel_manip = minetest.get_voxel_manip
 local after           = minetest.after
+local set_node        = minetest.set_node
 local registered_nodes
 minetest.register_on_mods_loaded(function()
 	registered_nodes  = minetest.registered_nodes
@@ -273,7 +274,7 @@ function redstone.calculate()
 				--print(get_node(new_vec(x,y,z)).name)
 				if index and index.dust and index.level ~= check_table[x][y][z] then
 					--count = count + 1
-					minetest.set_node(new_vec(x,y,z),{name="redstone:dust_"..index.level})
+					set_node(new_vec(x,y,z),{name="redstone:dust_"..index.level})
 				end
 			end
 		end
