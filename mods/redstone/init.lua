@@ -27,10 +27,19 @@ local add_vec         = vector.add
 local sub_vec         = vector.subtract
 local vector_distance = vector.distance
 
+--this is written out manually so that
+--math.abs is not needed
 local order = {
 	{x=1, y=0, z=0}, {x=-1, y=0, z= 0},
-	{x=0, y=1, z=0}, {x= 0, y=-1, z=0},
 	{x=0, y=0, z=1}, {x= 0, y=0, z=-1},
+
+	{x=0, y=1, z=0}, {x= 0, y=-1, z=0},
+
+	{x=1, y=1, z=0}, {x=-1, y=1, z= 0},
+	{x=0, y=1, z=1}, {x= 0, y=1, z=-1},
+
+	{x=1, y=-1, z=0}, {x=-1, y=-1, z= 0},
+	{x=0, y=-1, z=1}, {x= 0, y=-1, z=-1},
 }
 
 -- redstone class
@@ -222,7 +231,7 @@ function redstone.collect_info(pos)
 	end
 	localredstone.injector(pos,pos)
 	localredstone.collector(pos,pos)
-	
+
 	redstone_algorithm()
 end
 
