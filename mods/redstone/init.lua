@@ -112,8 +112,9 @@ end
 --node of redstone dust and store in memory
 local localredstone = {}
 local node
-localredstone.injector = function(i)
+localredstone.injector = function(i,origin)
 	node = get_node(i).name
+
 	if node == "air" then
 		return
 	end
@@ -124,16 +125,27 @@ localredstone.injector = function(i)
 		end
 	end
 
-	--index dust
-	if get_item_group(node,"redstone_dust") > 0 then
-		--add data to both maps
-		if not r_index[i.x] then r_index[i.x] = {} end
-		if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-		r_index[i.x][i.y][i.z] = {dust = true,level = 0}
-		--the data to the 3d array must be written to memory before this is executed
-		--or a stack overflow occurs!!!
-		localredstone.collector(i)
+	if vector_distance(i,origin) > 9 then
 		return
+	end
+
+	--index
+	if get_item_group(node,"redstone_dust") > 0 then
+		if vector_distance(i,origin) < 8 then
+			--add data to both maps
+			if not r_index[i.x] then r_index[i.x] = {} end
+			if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
+			r_index[i.x][i.y][i.z] = {dust = true,level = 0}
+			--the data to the 3d array must be written to memory before this is executed
+			--or a stack overflow occurs
+			localredstone.collector(i,origin)
+			return
+		else
+			if not r_index[i.x] then r_index[i.x] = {} end
+			if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
+			r_index[i.x][i.y][i.z] = {torch = true,power=get_item_group(node,"redstone_power")}
+			return
+		end
 	end
 	--index power sources
 	if get_item_group(node,"redstone_torch") > 0 then
@@ -177,22 +189,30 @@ localredstone.injector = function(i)
 	end
 end
 
-localredstone.collector = function(pos)
+local newpos
+localredstone.collector = function(pos,origin)
 	for x = -1,1 do
 	for y = -1,1 do
 	for z = -1,1 do
 		if abs(x)+abs(z) == 1 then
-			localredstone.injector(add_vec(pos,new_vec(x,y,z)))
+			newpos = add_vec(pos,new_vec(x,y,z))
+			localredstone.injector(newpos,origin)
 		end
 	end
 	end
 	end
+
 end
 
 
 function redstone.collect_info(pos)
-	localredstone.injector(pos)
-	localredstone.collector(pos)
+	if r_index[pos.x] and r_index[pos.x][pos.y] then
+		if r_index[pos.x][pos.y][pos.z] then
+			return
+		end
+	end
+	localredstone.injector(pos,pos)
+	localredstone.collector(pos,pos)
 end
 
 
@@ -304,7 +324,7 @@ local function redstone_pathfinder(source,source_level,direction)
 				passed_on_level = source_level - 1
 				if passed_on_level > 0 then
 					r_index[i.x][i.y][i.z].level = passed_on_level
-					redstone_pathfinder(i,passed_on_level,nil,origin)
+					redstone_pathfinder(i,passed_on_level,nil)
 				end
 			end
 		end
