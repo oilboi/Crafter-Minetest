@@ -110,12 +110,15 @@ end
 
 --collect all nodes that are local to the modified
 --node of redstone dust and store in memory
-local localredstone = {}
-local node
-localredstone.injector = function(i,origin)
-	node = get_node(i).name
+local function get_group(i,gotten_group)
+	return(get_item_group(get_node(i).name, gotten_group))
+end
 
-	if node == "air" then
+
+local localredstone = {}
+
+localredstone.injector = function(i)
+	if get_node(i).name == "air" then
 		return
 	end
 
@@ -125,45 +128,34 @@ localredstone.injector = function(i,origin)
 		end
 	end
 
-	if vector_distance(i,origin) > 9 then
-		return
-	end
-
-	--index
-	if get_item_group(node,"redstone_dust") > 0 then
-		if vector_distance(i,origin) < 8 then
-			--add data to both maps
-			if not r_index[i.x] then r_index[i.x] = {} end
-			if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-			r_index[i.x][i.y][i.z] = {dust = true,level = 0}
-			--the data to the 3d array must be written to memory before this is executed
-			--or a stack overflow occurs
-			localredstone.collector(i,origin)
-			return
-		else
-			if not r_index[i.x] then r_index[i.x] = {} end
-			if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-			r_index[i.x][i.y][i.z] = {torch = true,power=get_item_group(node,"redstone_power")}
-			return
-		end
-	end
-	--index power sources
-	if get_item_group(node,"redstone_torch") > 0 then
+	--index dust
+	if get_group(i,"redstone_dust") > 0 then
+		--add data to both maps
 		if not r_index[i.x] then r_index[i.x] = {} end
 		if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-		r_index[i.x][i.y][i.z] = {torch = true,power=get_item_group(node,"redstone_power")}
+		r_index[i.x][i.y][i.z] = {dust = true,level = 0}
+		--the data to the 3d array must be written to memory before this is executed
+		--or a stack overflow occurs!!!
+		localredstone.collector(i)
+		return
+	end
+	--index power sources
+	if get_group(i,"redstone_torch") > 0 then
+		if not r_index[i.x] then r_index[i.x] = {} end
+		if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
+		r_index[i.x][i.y][i.z] = {torch = true,power=get_group(i,"redstone_power")}
 	end	
 	--index directional power sources (Like repeaters/comparators)
 	--only outputs forwards
-	if get_item_group(node,"torch_directional") > 0 then
+	if get_group(i,"torch_directional") > 0 then
 		if not r_index[i.x] then r_index[i.x] = {} end
 		if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-		r_index[i.x][i.y][i.z] = {torch_directional = true, dir = get_node(i).param2 , power = get_item_group(node,"redstone_power")}
+		r_index[i.x][i.y][i.z] = {torch_directional = true, dir = get_node(i).param2 , power = get_group(i,"redstone_power")}
 	end
 	
 	--index directional activators (Like repeaters/comparators)
 	--only accepts input from the back
-	if get_item_group(node,"redstone_activation_directional") > 0 then
+	if get_group(i,"redstone_activation_directional") > 0 then
 		--print("indexing directional")
 		if not a_index[i.x] then a_index[i.x] = {} end
 		if not a_index[i.x][i.y] then a_index[i.x][i.y] = {} end
@@ -174,7 +166,7 @@ localredstone.injector = function(i,origin)
 	end
 	
 	--index objects that activate
-	if get_item_group(node,"redstone_activation") > 0 then
+	if get_group(i,"redstone_activation") > 0 then
 		if not a_index[i.x] then a_index[i.x] = {} end
 		if not a_index[i.x][i.y] then a_index[i.x][i.y] = {} end
 		if not a_index[i.x][i.y][i.z] then a_index[i.x][i.y][i.z] = {} end
@@ -189,30 +181,22 @@ localredstone.injector = function(i,origin)
 	end
 end
 
-local newpos
-localredstone.collector = function(pos,origin)
+localredstone.collector = function(pos)
 	for x = -1,1 do
 	for y = -1,1 do
 	for z = -1,1 do
 		if abs(x)+abs(z) == 1 then
-			newpos = add_vec(pos,new_vec(x,y,z))
-			localredstone.injector(newpos,origin)
+			localredstone.injector(add_vec(pos,new_vec(x,y,z)))
 		end
 	end
 	end
 	end
-
 end
 
 
 function redstone.collect_info(pos)
-	if r_index[pos.x] and r_index[pos.x][pos.y] then
-		if r_index[pos.x][pos.y][pos.z] then
-			return
-		end
-	end
-	localredstone.injector(pos,pos)
-	localredstone.collector(pos,pos)
+	localredstone.injector(pos)
+	localredstone.collector(pos)
 end
 
 
@@ -324,7 +308,7 @@ local function redstone_pathfinder(source,source_level,direction)
 				passed_on_level = source_level - 1
 				if passed_on_level > 0 then
 					r_index[i.x][i.y][i.z].level = passed_on_level
-					redstone_pathfinder(i,passed_on_level,nil)
+					redstone_pathfinder(i,passed_on_level,nil,origin)
 				end
 			end
 		end
