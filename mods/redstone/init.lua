@@ -237,20 +237,11 @@ end
 
 
 --make all power sources push power out
-local x_min
-local x_max
-local y_min
-local y_max
-local z_min
-local z_max
-local initial_check
-
-
 local pos
 local node
 local power
 function redstone.calculate()
-	speed_test = minetest.get_us_time()/1000000
+	--speed_test = minetest.get_us_time()/1000000
 
 	--pathfind through memory map	
 	for x,index_x in pairs(r_index) do
@@ -268,26 +259,26 @@ function redstone.calculate()
 		end
 	end
 	
-	print("total torch calc time:"..minetest.get_us_time()/1000000-speed_test)
+	--print("total torch calc time:"..minetest.get_us_time()/1000000-speed_test)
 
 
 
 	--reassemble the table into a position list minetest can understand
 	--run through and set dust
-	local count = 0
+	--local count = 0
 
 	for x,datax in pairs(r_index) do
 		for y,datay in pairs(datax) do
 			for z,index in pairs(datay) do
 				--print(get_node(new_vec(x,y,z)).name)
 				if index and index.dust and index.level ~= check_table[x][y][z] then
-					count = count + 1
+					--count = count + 1
 					minetest.set_node(new_vec(x,y,z),{name="redstone:dust_"..index.level})
 				end
 			end
 		end
 	end
-	print("set "..count.." nodes")
+	--print("set "..count.." nodes")
 
 	for x,datax in pairs(a_index) do
 		for y,datay in pairs(datax) do
@@ -305,6 +296,7 @@ function redstone.calculate()
 				--non directional activators
 				else
 					power = get_local_power(new_vec(x,y,z))
+					--print(power)
 					if power then
 						if power > 0 then
 							redstone_activate(new_vec(x,y,z),power)

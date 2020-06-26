@@ -19,7 +19,7 @@ minetest.register_node("redstone:button_off", {
 			},
 		},
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		minetest.set_node(pos, {name="redstone:button_on",param2=node.param2})
+		minetest.swap_node(pos, {name="redstone:button_on",param2=node.param2})
 
 		minetest.sound_play("lever", {pos=pos})
 		local timer = minetest.get_node_timer(pos)
@@ -67,7 +67,7 @@ minetest.register_node("redstone:button_on", {
 		minetest.sound_play("lever", {pos=pos,pitch=0.8})
 
 		local node = minetest.get_node(pos)
-		minetest.set_node(pos, {name="redstone:button_off",param2=node.param2})
+		minetest.swap_node(pos, {name="redstone:button_off",param2=node.param2})
 
 		local dir = minetest.wallmounted_to_dir(node.param2)
 		pos = vector.add(dir,pos)

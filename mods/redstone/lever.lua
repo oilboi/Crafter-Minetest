@@ -22,7 +22,7 @@ minetest.register_node("redstone:lever_off", {
 			},
 		},
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		minetest.set_node(pos, {name="redstone:lever_on",param2=node.param2})
+		minetest.swap_node(pos, {name="redstone:lever_on",param2=node.param2})
 		minetest.sound_play("lever", {pos=pos})
 
 		local dir = minetest.wallmounted_to_dir(node.param2)
@@ -66,7 +66,7 @@ minetest.register_node("redstone:lever_on", {
 			},
 		},
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		minetest.set_node(pos, {name="redstone:lever_off",param2=node.param2})
+		minetest.swap_node(pos, {name="redstone:lever_off",param2=node.param2})
 
 		minetest.sound_play("lever", {pos=pos})
 
