@@ -2,43 +2,61 @@ local
 minetest,math,pairs,table
 =
 minetest,math,pairs,table
---this is a really lazy way to make a door and I'll improve it in the future
+
+local get_item_group = minetest.get_item_group
+local get_node       = minetest.get_node
+local set_node       = minetest.set_node
+local play_sound     = minetest.sound_play
+local t_copy         = table.copy
+
+
+local node
+local name
+local opened
+local closed
+local closed
+local top
+local bottom
+local param2
+local pos2
+
+
 for _,material in pairs({"wood","iron"}) do
 --this is the function that makes the door open and close when rightclicked
 local door_rightclick = function(pos)
-	local node = minetest.get_node(pos)
-	local name = node.name
-	local opened = minetest.get_item_group(name, "door_open")
-	local closed = minetest.get_item_group(name, "door_closed")
-	local closed = minetest.get_item_group(name, "door_closed")
-	local top = minetest.get_item_group(name, "top")
-	local bottom = minetest.get_item_group(name, "bottom")
-	local param2 = node.param2
-	local pos2 = table.copy(pos)
+	node = get_node(pos)
+	name = node.name
+	opened = get_item_group(name, "door_open")
+	closed = get_item_group(name, "door_closed")
+	closed = get_item_group(name, "door_closed")
+	top = get_item_group(name, "top")
+	bottom = get_item_group(name, "bottom")
+	param2 = node.param2
+	pos2 = t_copy(pos)
 	
 	--close the door
 	if opened > 0 then
-		minetest.sound_play("door_close", {pos=pos,pitch=math.random(80,100)/100})
+		play_sound("door_close", {pos=pos,pitch=math.random(80,100)/100})
 		if top > 0 then
 			pos2.y = pos2.y - 1
-			minetest.set_node(pos,{name="door:top_"..material.."_closed",param2=param2})
-			minetest.set_node(pos2,{name="door:bottom_"..material.."_closed",param2=param2})
+			set_node(pos,{name="door:top_"..material.."_closed",param2=param2})
+			set_node(pos2,{name="door:bottom_"..material.."_closed",param2=param2})
 		elseif bottom > 0 then
 			pos2.y = pos2.y + 1
-			minetest.set_node(pos,{name="door:bottom_"..material.."_closed",param2=param2})
-			minetest.set_node(pos2,{name="door:top_"..material.."_closed",param2=param2})
+			set_node(pos,{name="door:bottom_"..material.."_closed",param2=param2})
+			set_node(pos2,{name="door:top_"..material.."_closed",param2=param2})
 		end
 	--open the door
 	elseif closed > 0 then
-		minetest.sound_play("door_open", {pos=pos,pitch=math.random(80,100)/100})
+		play_sound("door_open", {pos=pos,pitch=math.random(80,100)/100})
 		if top > 0 then
 			pos2.y = pos2.y - 1
-			minetest.set_node(pos,{name="door:top_"..material.."_open",param2=param2})
-			minetest.set_node(pos2,{name="door:bottom_"..material.."_open",param2=param2})
+			set_node(pos,{name="door:top_"..material.."_open",param2=param2})
+			set_node(pos2,{name="door:bottom_"..material.."_open",param2=param2})
 		elseif bottom > 0 then
 			pos2.y = pos2.y + 1
-			minetest.set_node(pos,{name="door:bottom_"..material.."_open",param2=param2})
-			minetest.set_node(pos2,{name="door:top_"..material.."_open",param2=param2})
+			set_node(pos,{name="door:bottom_"..material.."_open",param2=param2})
+			set_node(pos2,{name="door:top_"..material.."_open",param2=param2})
 		end
 	end
 end
@@ -142,12 +160,12 @@ for _,door in pairs({"top","bottom"}) do
 				redstone_deactivation = redstone_deactivation,
 				on_rightclick = on_rightclick,
 				after_place_node = function(pos, placer, itemstack, pointed_thing)
-					local node = minetest.get_node(pos)
+					local node = get_node(pos)
 					local param2 = node.param2
-					local pos2 = table.copy(pos)
+					local pos2 = t_copy(pos)
 					pos2.y = pos2.y + 1
-					if minetest.get_node(pos2).name == "air" then
-						minetest.set_node(pos2,{name="door:top_"..material.."_closed",param2=param2})
+					if get_node(pos2).name == "air" then
+						set_node(pos2,{name="door:top_"..material.."_closed",param2=param2})
 					else
 						minetest.remove_node(pos)
 						itemstack:add_item(ItemStack("door:bottom_"..material.."_closed"))
