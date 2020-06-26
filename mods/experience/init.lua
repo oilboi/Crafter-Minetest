@@ -1,7 +1,42 @@
-local minetest,math,vector,os,pairs = minetest,math,vector,os,pairs
-local mod_storage = minetest.get_mod_storage()
-local pool = {}
+local
+minetest,math,vector,os,pairs,type
+=
+minetest,math,vector,os,pairs,type
 
+local mod_storage = minetest.get_mod_storage()
+
+-- minetest library
+local get_node_or_nil    = minetest.get_node_or_nil
+local get_time           = minetest.get_us_time
+local get_player_by_name = minetest.get_player_by_name
+local yaw_to_dir         = minetest.yaw_to_dir
+local dir_to_yaw         = minetest.dir_to_yaw
+local get_item_group     = minetest.get_item_group
+local serialize          = minetest.serialize
+local deserialize        = minetest.deserialize
+local play_sound         = minetest.sound_play
+local registered_nodes
+minetest.register_on_mods_loaded(function()
+	registered_nodes = minetest.registered_nodes
+end)
+
+-- vector library
+local new_vec       = vector.new
+local vec_distance  = vector.distance
+local add_vec       = vector.add
+local multiply_vec  = vector.multiply
+local vec_direction = vector.direction
+
+-- math library
+local pi     = math.pi
+local random = math.random
+local abs    = math.abs
+
+-- string library
+local s_sub  = string.sub
+local s_len  = string.len
+
+local pool = {}
 -- loads data from mod storage
 local name
 local temp_pool
@@ -13,12 +48,12 @@ local load_data = function(player)
 		temp_pool.xp_level = mod_storage:get_int(name.."xp_level")
 		temp_pool.xp_bar   = mod_storage:get_int(name.."xp_bar"  )
 		temp_pool.buffer   = 0
-		temp_pool.last_time= minetest.get_us_time()/1000000
+		temp_pool.last_time= get_time()/1000000
 	else
 		temp_pool.xp_level = 0
 		temp_pool.xp_bar   = 0
 		temp_pool.buffer   = 0
-		temp_pool.last_time= minetest.get_us_time()/1000000
+		temp_pool.last_time= get_time()/1000000
 	end
 end
 
@@ -189,16 +224,16 @@ local function add_experience(player,experience)
 	temp_pool.xp_bar = temp_pool.xp_bar + experience
 	
 	if temp_pool.xp_bar > 36 then
-		if minetest.get_us_time()/1000000 - temp_pool.last_time > 0.04 then
-			minetest.sound_play("level_up",{gain=0.2,to_player = name})
-			temp_pool.last_time = minetest.get_us_time()/1000000
+		if get_time()/1000000 - temp_pool.last_time > 0.04 then
+			play_sound("level_up",{gain=0.2,to_player = name})
+			temp_pool.last_time = get_time()/1000000
 		end
         temp_pool.xp_bar = temp_pool.xp_bar - 36
 		level_up_experience(player)
 	else
-		if minetest.get_us_time()/1000000 - temp_pool.last_time > 0.01 then
-			temp_pool.last_time = minetest.get_us_time()/1000000
-			minetest.sound_play("experience",{gain=0.1,to_player = name,pitch=math.random(75,99)/100})
+		if get_time()/1000000 - temp_pool.last_time > 0.01 then
+			temp_pool.last_time = get_time()/1000000
+			play_sound("experience",{gain=0.1,to_player = name,pitch=random(75,99)/100})
 		end
 	end
 	hud_manager.change_hud({
@@ -268,6 +303,131 @@ local slippery
 local slip_factor
 local size
 local data
+local function xp_step(self, dtime)
+	--if item set to be collected then only execute go to player
+	if self.collected == true then
+		if not self.collector then
+			self.collected = false
+			return
+		end
+		collector = get_player_by_name(self.collector)
+		if collector and collector:get_hp() > 0 and vec_distance(self.object:get_pos(),collector:get_pos()) < 5 then
+			temp_pool = pool[self.collector]
+
+			self.object:set_acceleration(new_vec(0,0,0))
+			self.disable_physics(self)
+			--get the variables
+			pos = self.object:get_pos()
+			pos2 = collector:get_pos()
+			
+			player_velocity = collector:get_player_velocity()
+										
+			pos2.y = pos2.y + 0.8
+							
+			direction = vec_direction(pos,pos2)
+			distance = vec_distance(pos2,pos)
+			multiplier = distance
+			if multiplier < 1 then
+				multiplier = 1
+			end
+			goal = multiply_vec(direction,multiplier)
+			currentvel = self.object:get_velocity()
+
+			if distance > 1 then
+				multiplier = 20 - distance
+				velocity = multiply_vec(direction,multiplier)
+				goal = velocity
+				acceleration = new_vec(goal.x-currentvel.x,goal.y-currentvel.y,goal.z-currentvel.z)
+				self.object:add_velocity(add_vec(acceleration,player_velocity))
+			elseif distance > 0.9 and temp_pool.buffer > 0 then
+				temp_pool.buffer = temp_pool.buffer - dtime
+				multiplier = 20 - distance
+				velocity = multiply_vec(direction,multiplier)
+				goal = multiply_vec(yaw_to_dir(dir_to_yaw(vec_direction(new_vec(pos.x,0,pos.z),new_vec(pos2.x,0,pos2.z)))+pi/2),10)
+				goal = add_vec(player_velocity,goal)
+				acceleration = new_vec(goal.x-currentvel.x,goal.y-currentvel.y,goal.z-currentvel.z)
+				self.object:add_velocity(acceleration)
+			end
+			if distance < 0.4 and temp_pool.buffer <= 0 then
+				temp_pool.buffer = 0.04
+				add_experience(collector,2)
+				self.object:remove()
+			end
+			return
+		else
+			self.collector = nil
+			self.enable_physics(self)
+		end
+	end
+
+					
+	self.age = self.age + dtime
+	if self.age > 300 then
+		self.object:remove()
+		return
+	end
+
+	pos = self.object:get_pos()
+
+	if pos then
+		node = get_node_or_nil({
+			x = pos.x,
+			y = pos.y -0.25,
+			z = pos.z
+		})
+	else
+		return
+	end
+
+	-- Remove nodes in 'ignore'
+	if node and node.name == "ignore" then
+		self.object:remove()
+		return
+	end
+
+	if not self.physical_state then
+		return -- Don't do anything
+	end
+
+	-- Slide on slippery nodes
+	vel = self.object:get_velocity()
+	def = node and registered_nodes[node.name]
+	is_moving = (def and not def.walkable) or
+		vel.x ~= 0 or vel.y ~= 0 or vel.z ~= 0
+	is_slippery = false
+
+	if def and def.walkable then
+		slippery = get_item_group(node.name, "slippery")
+		is_slippery = slippery ~= 0
+		if is_slippery and (abs(vel.x) > 0.2 or abs(vel.z) > 0.2) then
+			-- Horizontal deceleration
+			slip_factor = 4.0 / (slippery + 4)
+			self.object:set_acceleration({
+				x = -vel.x * slip_factor,
+				y = 0,
+				z = -vel.z * slip_factor
+			})
+		elseif vel.y == 0 then
+			is_moving = false
+		end
+	end
+
+	if self.moving_state == is_moving and self.slippery_state == is_slippery then
+		-- Do not update anything until the moving state changes
+		return
+	end
+
+	self.moving_state = is_moving
+	self.slippery_state = is_slippery
+
+	if is_moving then
+		self.object:set_acceleration({x = 0, y = -9.81, z = 0})
+	else
+		self.object:set_acceleration({x = 0, y = 0, z = 0})
+		self.object:set_velocity({x = 0, y = 0, z = 0})
+	end
+end
+
 minetest.register_entity("experience:orb", {
 	initial_properties = {
 		hp_max = 1,
@@ -298,7 +458,7 @@ minetest.register_entity("experience:orb", {
 	radius = 4,
 
 	get_staticdata = function(self)
-		return minetest.serialize({
+		return serialize({
 			age = self.age,
 			collectable = self.collectable,
 			try_timer = self.try_timer,
@@ -309,8 +469,8 @@ minetest.register_entity("experience:orb", {
 	end,
 
 	on_activate = function(self, staticdata, dtime_s)
-		if string.sub(staticdata, 1, string.len("return")) == "return" then
-			data = minetest.deserialize(staticdata)
+		if s_sub(staticdata, 1, s_len("return")) == "return" then
+			data = deserialize(staticdata)
 			if data and type(data) == "table" then
 				self.age = (data.age or 0) + dtime_s
 				self.collectable = data.collectable
@@ -320,21 +480,21 @@ minetest.register_entity("experience:orb", {
 				self.collector = data.collector
 			end
 		else
-			self.object:set_velocity(vector.new(
-				math.random(-2,2)*math.random(),
-				math.random(2,5),
-				math.random(-2,2)*math.random()
+			self.object:set_velocity(new_vec(
+				random(-2,2)*random(),
+				random(2,5),
+				random(-2,2)*random()
 			))
 		end
 		self.object:set_armor_groups({immortal = 1})
 		self.object:set_velocity({x = 0, y = 2, z = 0})
 		self.object:set_acceleration({x = 0, y = -9.81, z = 0})
-        size = math.random(20,36)/100
+        size = random(20,36)/100
         self.object:set_properties({
 			visual_size = {x = size, y = size},
 			glow = 14,
 		})
-		self.object:set_sprite({x=1,y=math.random(1,14)}, 14, 0.05, false)
+		self.object:set_sprite({x=1,y=random(1,14)}, 14, 0.05, false)
 	end,
 
 	enable_physics = function(self)
@@ -355,128 +515,7 @@ minetest.register_entity("experience:orb", {
 		end
 	end,
 	on_step = function(self, dtime)
-		--if item set to be collected then only execute go to player
-		if self.collected == true then
-			if not self.collector then
-				self.collected = false
-				return
-			end
-			collector = minetest.get_player_by_name(self.collector)
-			if collector and collector:get_hp() > 0 and vector.distance(self.object:get_pos(),collector:get_pos()) < 5 then
-				temp_pool = pool[self.collector]
-
-				self.object:set_acceleration(vector.new(0,0,0))
-				self.disable_physics(self)
-				--get the variables
-				pos = self.object:get_pos()
-				pos2 = collector:get_pos()
-				
-                player_velocity = collector:get_player_velocity()
-                                            
-				pos2.y = pos2.y + 0.8
-								
-				direction = vector.direction(pos,pos2)
-				distance = vector.distance(pos2,pos)
-				multiplier = distance
-                if multiplier < 1 then
-                    multiplier = 1
-                end
-				goal = vector.multiply(direction,multiplier)
-                currentvel = self.object:get_velocity()
-
-				if distance > 1 then
-                    multiplier = 20 - distance
-                    velocity = vector.multiply(direction,multiplier)
-                    goal = velocity
-					acceleration = vector.new(goal.x-currentvel.x,goal.y-currentvel.y,goal.z-currentvel.z)
-					self.object:add_velocity(vector.add(acceleration,player_velocity))
-				elseif distance > 0.9 and temp_pool.buffer > 0 then
-					temp_pool.buffer = temp_pool.buffer - dtime
-					multiplier = 20 - distance
-					velocity = vector.multiply(direction,multiplier)
-					goal = vector.multiply(minetest.yaw_to_dir(minetest.dir_to_yaw(vector.direction(vector.new(pos.x,0,pos.z),vector.new(pos2.x,0,pos2.z)))+math.pi/2),10)
-					goal = vector.add(player_velocity,goal)
-					acceleration = vector.new(goal.x-currentvel.x,goal.y-currentvel.y,goal.z-currentvel.z)
-					self.object:add_velocity(acceleration)
-                end
-				if distance < 0.4 and temp_pool.buffer <= 0 then
-					temp_pool.buffer = 0.04
-                    add_experience(collector,2)
-					self.object:remove()
-				end
-				return
-			else
-				self.collector = nil
-				self.enable_physics(self)
-			end
-		end
-		
-						
-		self.age = self.age + dtime
-		if self.age > 300 then
-			self.object:remove()
-			return
-		end
-
-		pos = self.object:get_pos()
-
-		if pos then
-			node = minetest.get_node_or_nil({
-				x = pos.x,
-				y = pos.y -0.25,
-				z = pos.z
-			})
-		else
-			return
-		end
-
-		-- Remove nodes in 'ignore'
-		if node and node.name == "ignore" then
-			self.object:remove()
-			return
-		end
-
-		if not self.physical_state then
-			return -- Don't do anything
-		end
-
-		-- Slide on slippery nodes
-		vel = self.object:get_velocity()
-		def = node and minetest.registered_nodes[node.name]
-		is_moving = (def and not def.walkable) or
-			vel.x ~= 0 or vel.y ~= 0 or vel.z ~= 0
-		is_slippery = false
-
-		if def and def.walkable then
-			slippery = minetest.get_item_group(node.name, "slippery")
-			is_slippery = slippery ~= 0
-			if is_slippery and (math.abs(vel.x) > 0.2 or math.abs(vel.z) > 0.2) then
-				-- Horizontal deceleration
-				slip_factor = 4.0 / (slippery + 4)
-				self.object:set_acceleration({
-					x = -vel.x * slip_factor,
-					y = 0,
-					z = -vel.z * slip_factor
-				})
-			elseif vel.y == 0 then
-				is_moving = false
-			end
-		end
-
-		if self.moving_state == is_moving and self.slippery_state == is_slippery then
-			-- Do not update anything until the moving state changes
-			return
-		end
-
-		self.moving_state = is_moving
-		self.slippery_state = is_slippery
-		
-		if is_moving then
-			self.object:set_acceleration({x = 0, y = -9.81, z = 0})
-		else
-			self.object:set_acceleration({x = 0, y = 0, z = 0})
-			self.object:set_velocity({x = 0, y = 0, z = 0})
-		end
+		xp_step(self, dtime)
 	end,
 })
 
@@ -486,7 +525,7 @@ minetest.register_chatcommand("xp", {
 	description = "Spawn x amount of a mob, used as /spawn 'mob' 10 or /spawn 'mob' for one",
 	privs = {server=true},
 	func = function(name)
-		local player = minetest.get_player_by_name(name)
+		local player = get_player_by_name(name)
 		local pos = player:get_pos()
 		pos.y = pos.y + 1.2
 		minetest.throw_experience(pos, 1000)

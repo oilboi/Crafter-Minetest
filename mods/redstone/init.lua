@@ -2,8 +2,14 @@ local
 minetest,vector,math,table,pairs
 =
 minetest,vector,math,table,pairs
---define the class
+
+-- minetest class
+
+
+-- define the class
 redstone = {}
+
+
 local r_index = {}
 local r_copy = nil
 

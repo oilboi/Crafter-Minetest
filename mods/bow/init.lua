@@ -22,14 +22,14 @@ local random = math.random
 local floor  = math.floor
 
 -- vector library
-local new_vec = vector.new
-local floor_vec = vector.floor
-local vec_distance = vector.distance
+local new_vec       = vector.new
+local floor_vec     = vector.floor
+local vec_distance  = vector.distance
 local normalize_vec = vector.normalize
-local add_vec = vector.add
-local sub_vec = vector.subtract
-local multiply_vec = vector.multiply
-local divide_vec = vector.divide
+local add_vec       = vector.add
+local sub_vec       = vector.subtract
+local multiply_vec  = vector.multiply
+local divide_vec    = vector.divide
 local vec_direction = vector.direction
 
 
