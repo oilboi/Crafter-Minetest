@@ -47,6 +47,10 @@ minetest.register_node("redstone:repeater_off_"..level, {
 
 	after_destruct = function(pos, oldnode)
 		redstone.collect_info(pos)
+	end,
+
+	after_place_node = function(pos)
+		redstone.collect_info(pos)
 	end
 })
 
@@ -90,6 +94,10 @@ minetest.register_node("redstone:repeater_on_"..level, {
 		redstone.collect_info(pos)
 	end,
 	after_destruct = function(pos, oldnode)
+		redstone.collect_info(pos)
+	end,
+
+	after_place_node = function(pos)
 		redstone.collect_info(pos)
 	end
 })
