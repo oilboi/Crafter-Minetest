@@ -67,6 +67,9 @@ local get_local_power = function(pos)
 			if get_item_group(get_node(add_vec(new_vec(x,y,z),pos)).name, "redstone_power") > 0 then
 				return(1)
 			end
+			if get_meta(add_vec(new_vec(x,y,z),pos)):get_int("redstone_power") > 0 then
+				return(1)
+			end
 		end
 	end
 	end
@@ -74,8 +77,15 @@ local get_local_power = function(pos)
 	return(0)
 end
 
+local power
+local pos
 local get_powered_state_directional = function(pos)
-	return(get_item_group(get_node(sub_vec(pos,facedir_to_dir(get_node(pos).param2))).name, "redstone_power"))
+	pos = sub_vec(pos,facedir_to_dir(get_node(pos).param2))
+	power = get_item_group(get_node(pos).name, "redstone_power")
+	if power == 0 then
+		power = get_meta(pos):get_int("redstone_power")
+	end
+	return(power)
 end
 
 local node
