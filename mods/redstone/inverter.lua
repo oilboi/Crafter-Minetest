@@ -75,7 +75,6 @@ minetest.register_lbm({
 	nodenames = {"redstone:inverter_on"},
 	run_at_every_load = true,
 	action = function(pos)
-		print("collecting info on")
 		local param2 = minetest.get_node(pos).param2
 		local dir = minetest.facedir_to_dir(param2)
 		redstone.collect_info(vector.add(pos,dir))
@@ -88,7 +87,6 @@ minetest.register_lbm({
 	nodenames = {"redstone:inverter_off"},
 	run_at_every_load = true,
 	action = function(pos)
-		print("collecting info off")
 		local param2 = minetest.get_node(pos).param2
 		local dir = minetest.facedir_to_dir(param2)
 		redstone.collect_info(vector.add(pos,dir))

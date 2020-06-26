@@ -31,7 +31,8 @@ minetest.register_node("redstone:repeater_off_"..level, {
 	end,
 
 	on_timer = function(pos, elapsed)
-		minetest.swap_node(pos, {name="redstone:repeater_on_"..level})
+		local param2 = minetest.get_node(pos).param2
+		minetest.swap_node(pos, {name="redstone:repeater_on_"..level,param2=param2})
 		redstone.collect_info(pos)
 	end,
 
@@ -84,10 +85,8 @@ minetest.register_node("redstone:repeater_on_"..level, {
 		end
 	end,
 	on_timer = function(pos, elapsed)
-		minetest.swap_node(pos, {name="redstone:repeater_off_"..level})
-		redstone.collect_info(pos)
-	end,
-	on_dig = function(pos, node, digger)
+		local param2 = minetest.get_node(pos).param2
+		minetest.swap_node(pos, {name="redstone:repeater_off_"..level,param2=param2})
 		redstone.collect_info(pos)
 	end,
 	after_destruct = function(pos, oldnode)
