@@ -110,15 +110,11 @@ end
 
 --collect all nodes that are local to the modified
 --node of redstone dust and store in memory
-local function get_group(i,gotten_group)
-	return(get_item_group(get_node(i).name, gotten_group))
-end
-
-
 local localredstone = {}
-
+local node
 localredstone.injector = function(i)
-	if get_node(i).name == "air" then
+	node = get_node(i).name
+	if node == "air" then
 		return
 	end
 
@@ -129,7 +125,7 @@ localredstone.injector = function(i)
 	end
 
 	--index dust
-	if get_group(i,"redstone_dust") > 0 then
+	if get_item_group(node,"redstone_dust") > 0 then
 		--add data to both maps
 		if not r_index[i.x] then r_index[i.x] = {} end
 		if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
@@ -140,22 +136,22 @@ localredstone.injector = function(i)
 		return
 	end
 	--index power sources
-	if get_group(i,"redstone_torch") > 0 then
+	if get_item_group(node,"redstone_torch") > 0 then
 		if not r_index[i.x] then r_index[i.x] = {} end
 		if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-		r_index[i.x][i.y][i.z] = {torch = true,power=get_group(i,"redstone_power")}
+		r_index[i.x][i.y][i.z] = {torch = true,power=get_item_group(node,"redstone_power")}
 	end	
 	--index directional power sources (Like repeaters/comparators)
 	--only outputs forwards
-	if get_group(i,"torch_directional") > 0 then
+	if get_item_group(node,"torch_directional") > 0 then
 		if not r_index[i.x] then r_index[i.x] = {} end
 		if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-		r_index[i.x][i.y][i.z] = {torch_directional = true, dir = get_node(i).param2 , power = get_group(i,"redstone_power")}
+		r_index[i.x][i.y][i.z] = {torch_directional = true, dir = get_node(i).param2 , power = get_item_group(node,"redstone_power")}
 	end
 	
 	--index directional activators (Like repeaters/comparators)
 	--only accepts input from the back
-	if get_group(i,"redstone_activation_directional") > 0 then
+	if get_item_group(node,"redstone_activation_directional") > 0 then
 		--print("indexing directional")
 		if not a_index[i.x] then a_index[i.x] = {} end
 		if not a_index[i.x][i.y] then a_index[i.x][i.y] = {} end
@@ -166,7 +162,7 @@ localredstone.injector = function(i)
 	end
 	
 	--index objects that activate
-	if get_group(i,"redstone_activation") > 0 then
+	if get_item_group(node,"redstone_activation") > 0 then
 		if not a_index[i.x] then a_index[i.x] = {} end
 		if not a_index[i.x][i.y] then a_index[i.x][i.y] = {} end
 		if not a_index[i.x][i.y][i.z] then a_index[i.x][i.y][i.z] = {} end
