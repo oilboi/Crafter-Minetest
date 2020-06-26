@@ -119,9 +119,9 @@ local yaw_translation = {
 }
 
 local name
+local time
 local do_sleep = function(player,pos,dir)
-
-	local time = minetest.get_timeofday() * 24000
+	time = minetest.get_timeofday() * 24000
 	name = player:get_player_name()
 	if time > time_night.begin or time < time_night.ending then
 		local real_dir = minetest.facedir_to_dir(dir)
