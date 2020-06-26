@@ -8,7 +8,7 @@ local get_itemdef    = minetest.get_itemdef
 
 
 local ceil  = math.ceil
-local ranom = math.random
+local random = math.random
 
 local inv
 local player_skin
