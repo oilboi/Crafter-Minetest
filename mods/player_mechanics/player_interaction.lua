@@ -230,8 +230,10 @@ minetest.register_on_punchplayer(function(player, hitter, time_from_last_punch, 
 
 	punch_diff = (minetest.get_us_time()/1000000)-temp_pool
 
-	hurt = 0
 	hurt = tool_capabilities.damage_groups.damage
+	if not hurt then
+		hurt = 0
+	end
 	hp = player:get_hp()
 
 	if punch_diff >= 0.5 and hp > 0 then
