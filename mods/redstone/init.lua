@@ -195,6 +195,9 @@ end
 
 
 function redstone.collect_info(pos)
+	if r_index[pos.x] and r_index[pos.x][pos.y] and r_index[pos.x][pos.y][pos.z] then
+		return
+	end
 	localredstone.injector(pos)
 	localredstone.collector(pos)
 end
