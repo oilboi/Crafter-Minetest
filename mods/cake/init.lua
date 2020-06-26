@@ -1,8 +1,12 @@
--- GENERATED CODE
--- Node Box Editor, version 0.9.0
--- Namespace: test
--- 
--- the higher it is the more it's "eaten"
+local
+minetest,math
+=
+minetest,math
+
+local play_sound = minetest.sound_play
+local set_node   = minetest.set_node
+
+local random     = math.random
 
 minetest.register_food("cake:cake_item_placeholder",{
 	description = "",
@@ -42,20 +46,20 @@ for i = 0,13 do
 		groups = {wool=1,cake=i,falling_node=1},
 		on_construct = function(pos)
 			--randomly cake eats itself
-			if math.random() > 0.995 then
-				minetest.set_node(pos, {name="cake:cursed_cake_0"})
+			if random() > 0.995 then
+				set_node(pos, {name="cake:cursed_cake_0"})
 			end
 		end,
 		on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 			player_eat_food(clicker,"cake:cake_item_placeholder")
 			--clicker:set_hp(clicker:get_hp()+5)
 			if i == 13 then
-		        minetest.sound_play("eat_finish",{pos=pos,gain=0.2,pitch=math.random(90,100)/100})
+		        play_sound("eat_finish",{pos=pos,gain=0.2,pitch=random(90,100)/100})
 		        minetest.remove_node(pos)
 		        return
 	        else
-		        minetest.sound_play("eat",{pos=pos,gain=0.2,pitch=math.random(90,100)/100})
-		        minetest.set_node(pos, {name="cake:cake_"..i+1})
+		        play_sound("eat",{pos=pos,gain=0.2,pitch=random(90,100)/100})
+		        set_node(pos, {name="cake:cake_"..i+1})
 	        end
 		end,
 	})
@@ -99,12 +103,12 @@ for i = 0,13 do
 		end,
 		on_timer = function(pos, elapsed)
 			if i == 13 then 
-		        minetest.sound_play("eat_finish",{pos=pos,gain=0.2,pitch=math.random(90,100)/100}) 
+		        play_sound("eat_finish",{pos=pos,gain=0.2,pitch=random(90,100)/100}) 
 		        minetest.remove_node(pos)
 		        return
 	        else
-		        minetest.sound_play("eat",{pos=pos,gain=0.2,pitch=math.random(90,100)/100})
-		        minetest.set_node(pos, {name="cake:cursed_cake_"..i+1})
+		        play_sound("eat",{pos=pos,gain=0.2,pitch=random(90,100)/100})
+		        set_node(pos, {name="cake:cursed_cake_"..i+1})
 	        end
 		end,
 	})
