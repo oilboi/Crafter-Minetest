@@ -19,27 +19,15 @@ minetest.register_node("redstone:inverter_on", {
 				{-0.2, -0.5,  0.2, 0.2,  0.1, 0.4}, --output post
 			},
 		},
-	--make the repeater turn on
-	redstone_activation = function(pos)
-		
-	end,
-	on_timer = function(pos, elapsed)
-	end,
-	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-	end,
 	redstone_deactivation = function(pos)
 		local param2 = minetest.get_node(pos).param2
 		minetest.swap_node(pos,{name="redstone:inverter_off",param2=param2})
+
 		local dir = minetest.facedir_to_dir(param2)
-		redstone.collect_info(vector.add(pos,dir))
-	end,
-	redstone_update = function(pos)
-	end,
-	on_construct = function(pos)
-	end,
-	after_destruct  = function(pos)
-	end,
-	after_place_node = function(pos, placer, itemstack, pointed_thing)
+		minetest.after(0,function()
+			redstone.collect_info(vector.add(pos,dir))
+			redstone.collect_info(vector.subtract(pos,dir))
+		end)
 	end,
 })
 
@@ -62,17 +50,14 @@ minetest.register_node("redstone:inverter_off", {
 				{-0.2, -0.5,  0.2, 0.2,  0.1, 0.4}, --output post
 			},
 		},
-	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-	end,
 	redstone_activation = function(pos)
 		local param2 = minetest.get_node(pos).param2
 		minetest.swap_node(pos,{name="redstone:inverter_on",param2=param2})
 		local dir = minetest.facedir_to_dir(param2)
-		redstone.collect_info(vector.add(pos,dir))
-	end,
-	redstone_deactivation = function(pos)
-	end,
-	on_timer = function(pos, elapsed)
+		minetest.after(0,function()
+			redstone.collect_info(vector.add(pos,dir))
+			redstone.collect_info(vector.subtract(pos,dir))
+		end)
 	end,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		redstone.collect_info(pos)
@@ -81,10 +66,31 @@ minetest.register_node("redstone:inverter_off", {
 		minetest.node_dig(pos, node, digger)
 		redstone.collect_info(pos)
 	end,
-	redstone_update = function(pos)
+
+})
+
+minetest.register_lbm({
+	name = "redstone:startupinverter",
+	nodenames = {"redstone:inverter_on"},
+	run_at_every_load = true,
+	action = function(pos)
+		print("collecting info on")
+		local param2 = minetest.get_node(pos).param2
+		local dir = minetest.facedir_to_dir(param2)
+		redstone.collect_info(vector.add(pos,dir))
+		redstone.collect_info(vector.subtract(pos,dir))
 	end,
-	on_construct = function(pos)
-	end,
-	after_destruct = function(pos)
+})
+
+minetest.register_lbm({
+	name = "redstone:also_startup_inverter",
+	nodenames = {"redstone:inverter_off"},
+	run_at_every_load = true,
+	action = function(pos)
+		print("collecting info off")
+		local param2 = minetest.get_node(pos).param2
+		local dir = minetest.facedir_to_dir(param2)
+		redstone.collect_info(vector.add(pos,dir))
+		redstone.collect_info(vector.subtract(pos,dir))
 	end,
 })

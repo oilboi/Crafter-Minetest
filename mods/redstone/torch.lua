@@ -1,26 +1,5 @@
 local minetest,vector = minetest,vector
---get point where particle spawner is added
-local function get_offset(wdir)
-	local z = 0
-	local x = 0
-	if wdir == 4 then
-		z = 0.25
-	elseif wdir == 2 then
-		x = 0.25
-	elseif wdir == 5 then
-		z = -0.25
-	elseif wdir == 3 then
-		x = -0.25
-	end
-	return {x = x, y = 0.27, z = z}	
-end
 
---remove smoke and fire
-local function delete_ps(pos)
-	local meta = minetest.get_meta(pos)
-	minetest.delete_particlespawner(meta:get_int("psf"))
-	minetest.delete_particlespawner(meta:get_int("pss"))
-end
 
 --add in smoke and fire
 local function create_ps(pos)
@@ -76,17 +55,6 @@ local function create_ps(pos)
 	meta:set_int("pss", pss)
 end
 
---reload smoke and flame on load
---[[
-minetest.register_lbm({
-	name = "redstone:torch",
-	nodenames = {"redstone:torch_floor","redstone:torch_wall"},
-	run_at_every_load = true,
-	action = function(pos, node)
-		create_ps(pos)
-	end,
-})
-]]--
 -- Item definitions
 minetest.register_craftitem("redstone:torch", {
 	description = "Redstone Torch",
@@ -110,11 +78,6 @@ minetest.register_craftitem("redstone:torch", {
 			retval = fakestack:set_name("redstone:torch_floor")
 		else
 			retval = fakestack:set_name("redstone:torch_wall")
-			--local name = minetest.get_node(pointed_thing.under).name
-			--local def = minetest.registered_nodes[name]
-			--if def.drawtype == "normal" and string.match(name, "main:") then
-			--	minetest.set_node(pointed_thing.under,{name="redstone:"..string.gsub(name, "main:", "").."_deactivator"})
-			--end
 		end
 		if not retval then
 			return itemstack
@@ -152,7 +115,6 @@ minetest.register_node("redstone:torch_floor", {
 	},
 	
 	on_construct = function(pos)
-		--redstone.torch_activate(pos)
 		redstone.collect_info(pos)
 	end,
 	after_destruct = function(pos, oldnode)
@@ -182,8 +144,7 @@ minetest.register_node("redstone:torch_wall", {
 		wall_bottom = {-0.1, -0.5, -0.1, 0.1, 0.1, 0.1},
 		wall_side = {-0.5, -0.3, -0.1, -0.2, 0.3, 0.1},
 	},
-	on_construct = function(pos)
-		--redstone.torch_activate(pos)
+	on_construct = function(pos)		
 		redstone.collect_info(pos)
 	end,
 	after_destruct = function(pos, oldnode)
