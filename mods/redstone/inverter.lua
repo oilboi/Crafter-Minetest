@@ -29,6 +29,9 @@ minetest.register_node("redstone:inverter_on", {
 			redstone.collect_info(vector.subtract(pos,dir))
 		end)
 	end,
+	after_destruct = function(pos, oldnode)
+		redstone.collect_info(pos)
+	end
 })
 
 minetest.register_node("redstone:inverter_off", {
@@ -62,11 +65,9 @@ minetest.register_node("redstone:inverter_off", {
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		redstone.collect_info(pos)
 	end,
-	on_dig = function(pos, node, digger)
-		minetest.node_dig(pos, node, digger)
+	after_destruct = function(pos, oldnode)
 		redstone.collect_info(pos)
-	end,
-
+	end
 })
 
 minetest.register_lbm({

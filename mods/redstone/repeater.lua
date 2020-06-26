@@ -1,96 +1,8 @@
 local minetest,vector = minetest,vector
 
-repeater_set_buffer = function(pos,level)
-	local meta = minetest.get_meta(pos)
-	meta:set_int("buffer_level",level)
-end
-repeater_get_buffer = function(pos)
-	local meta = minetest.get_meta(pos)
-	return(meta:get_int("buffer_level"))
-end
+local max_timer = 7
 
-repeater_set_input = function(pos,level)
-	local meta = minetest.get_meta(pos)
-	meta:set_int("repeater_input",level)
-end
-repeater_get_input = function(pos)
-	local meta = minetest.get_meta(pos)
-	return(meta:get_int("repeater_input"))
-end
-
-repeater_pass_new_power = function(pos,level)
-	local meta = minetest.get_meta(pos)
-	meta:set_int("new_power",level)
-end
-repeater_get_new_power = function(pos)
-	local meta = minetest.get_meta(pos)
-	return(meta:get_int("new_power"))
-end
-
-function repeater_on_timer(pos)
-	local self_repeater_level = minetest.get_item_group(minetest.get_node(pos).name, "repeater_level")
-	local param2 = minetest.get_node(pos).param2
-	local power = get_powered_state_directional(pos)
-	local buffer = repeater_get_buffer(pos)
-	local input = repeater_get_input(pos)
-	
-	
-	if buffer > 0 then
-		minetest.swap_node(pos,{name="redstone:repeater_on_"..self_repeater_level,param2=param2})
-	else
-		minetest.swap_node(pos,{name="redstone:repeater_off_"..self_repeater_level,param2=param2})
-	end
-	
-	--try to get to equalized power state
-	if buffer ~= power then
-		local timer = minetest.get_node_timer(pos)
-		timer:start(self_repeater_level/2)
-	end
-	
-	
-	--pass on power to next node
-	local output = minetest.facedir_to_dir(param2)
-	output = vector.add(pos,output)
-	local output_node = minetest.get_node(output)
-	if minetest.get_item_group(output_node.name, "repeater") > 0 then
-	
-	
-		repeater_input(output)
-		
-		
-	elseif minetest.get_item_group(output_node.name, "redstone_dust") > 0 then
-		minetest.after(0,function(output)
-			redstone.collect_info(output)
-		end,output)
-	elseif minetest.get_item_group(output_node.name, "redstone_activation") > 0 then
-		minetest.after(0,function(output)
-			redstone.collect_info(output)
-		end,output)
-	end
-	
-	repeater_set_buffer(pos,0)
-end
-
-function repeater_input(pos)
-	local self_repeater_level = minetest.get_item_group(minetest.get_node(pos).name, "repeater_level")
-	local param2 = minetest.get_node(pos).param2
-	local power = get_powered_state_directional(pos)
-	
-	local buffer = repeater_get_buffer(pos)
-	
-	if buffer == 0 then
-		repeater_set_buffer(pos,power)
-	end
-	
-	repeater_set_input(pos,power)
-		
-	local timer = minetest.get_node_timer(pos)
-	timer:start(self_repeater_level/2)
-	
-	set_old_power(pos,power)
-end
-
-for level = 0,2 do
+for level = 0,max_timer do
 minetest.register_node("redstone:repeater_off_"..level, {
     description = "Redstone Repeater",
     tiles = {"repeater_off.png"},
@@ -108,44 +20,33 @@ minetest.register_node("redstone:repeater_off_"..level, {
 				--left  front  bottom right back top
 				{-0.5, -0.5,  -0.5, 0.5,  -0.3, 0.5}, --base
 				{-0.1, -0.5,  0.2, 0.1,  0.1, 0.4}, --output post
-				{-0.1, -0.5,  -0.05-(level*0.15)--[[]], 0.1,  0.1, 0.15-(level*0.15)--[[]]}, --input post
+				{-0.1, -0.5,  -0.05-(level*0.05), 0.1,  0.1, 0.15-(level*0.05)}, --input post
 			},
-		},
-	--make the repeater turn on
+		},	
 	redstone_activation = function(pos)
-		repeater_input(pos)
+		local timer = minetest.get_node_timer(pos)
+		if not timer:is_started() then
+			timer:start(level/max_timer)
+		end
 	end,
-	redstone_deactivation = function(pos)
-	end,
-	
-	
+
 	on_timer = function(pos, elapsed)
-		repeater_on_timer(pos)
+		minetest.swap_node(pos, {name="redstone:repeater_on_"..level})
+		redstone.collect_info(pos)
 	end,
+
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		local newlevel = level + 1
-		if newlevel > 2 then
+		if newlevel > max_timer then
 			newlevel = 0
 		end
 		minetest.swap_node(pos,{name="redstone:repeater_off_"..newlevel,param2=node.param2})
-		minetest.sound_play("lever", {pos=pos,pitch=1-(newlevel*0.1)})
+		minetest.sound_play("lever", {pos=pos})
 	end,
-	redstone_update = function(pos)
-	end,
-	on_construct = function(pos)
-	end,
-	after_destruct  = function(pos)
-	end,
-	after_place_node = function(pos, placer, itemstack, pointed_thing)
-		local timer = minetest.get_node_timer(pos)
-		timer:start(level/2)
-	end,
-	on_dig = function(pos, node, digger)
-		local param2 = minetest.get_node(pos).param2
-		minetest.node_dig(pos, node, digger)
-		local dir = minetest.facedir_to_dir(param2)
-		redstone.collect_info(vector.add(pos,dir))
-	end,
+
+	after_destruct = function(pos, oldnode)
+		redstone.collect_info(pos)
+	end
 })
 
 minetest.register_node("redstone:repeater_on_"..level, {
@@ -165,44 +66,32 @@ minetest.register_node("redstone:repeater_on_"..level, {
 				--left  front  bottom right back top
 				{-0.5, -0.5,  -0.5, 0.5,  -0.3, 0.5}, --base
 				{-0.1, -0.5,  0.2, 0.1,  0.1, 0.4}, --output post
-				{-0.1, -0.5,  -0.05-(level*0.15)--[[]], 0.1,  0.1, 0.15-(level*0.15)--[[]]}, --input post
+				{-0.1, -0.5,  -0.05-(level*0.05), 0.1,  0.1, 0.15-(level*0.05)}, --input post
 			},
 		},
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		local newlevel = level + 1
-		if newlevel > 2 then
+		if newlevel > max_timer then
 			newlevel = 0
 		end
 		minetest.swap_node(pos,{name="redstone:repeater_on_"..newlevel,param2=node.param2})
-		minetest.sound_play("lever", {pos=pos,pitch=1-(newlevel*0.1)})
-	end,
-	redstone_activation = function(pos)
+		minetest.sound_play("lever", {pos=pos})
 	end,
 	redstone_deactivation = function(pos)
-		repeater_input(pos)
+		local timer = minetest.get_node_timer(pos)
+		if not timer:is_started() then
+			timer:start(level/max_timer)
+		end
 	end,
 	on_timer = function(pos, elapsed)
-		repeater_on_timer(pos)
+		minetest.swap_node(pos, {name="redstone:repeater_off_"..level})
+		redstone.collect_info(pos)
 	end,
 	on_dig = function(pos, node, digger)
-		--repeater_on_timer(pos,level)
-		minetest.node_dig(pos, node, digger)
+		redstone.collect_info(pos)
 	end,
-	redstone_update = function(pos)
-	end,
-	after_place_node = function(pos, placer, itemstack, pointed_thing)
-		local timer = minetest.get_node_timer(pos)
-		timer:start(level/2)
-	end,
-	on_construct = function(pos)
-	end,
-	after_destruct = function(pos)
-	end,
-	on_dig = function(pos, node, digger)
-		local param2 = minetest.get_node(pos).param2
-		minetest.node_dig(pos, node, digger)
-		local dir = minetest.facedir_to_dir(param2)
-		redstone.collect_info(vector.add(pos,dir))
-	end,
+	after_destruct = function(pos, oldnode)
+		redstone.collect_info(pos)
+	end
 })
 end
