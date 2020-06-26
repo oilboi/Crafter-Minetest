@@ -13,7 +13,8 @@ minetest.register_node("redstone:light_on", {
     redstone_activation = function(pos)
     end,
     redstone_deactivation = function(pos)
-		minetest.set_node(pos,{name="redstone:light_off"})
+    minetest.set_node(pos,{name="redstone:light_off"})
+    
     end,
 })
 minetest.register_node("redstone:light_off", {

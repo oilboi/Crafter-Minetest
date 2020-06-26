@@ -1,42 +1,5 @@
 
 local minetest,vector,math,pairs = minetest,vector,math,pairs
---create torch versions of the nodes
-for name,def in pairs(minetest.registered_nodes) do
-	if def.drawtype == "normal" and string.match(name, "main:") then
-		local def2 = table.copy(def)
-		def2.groups.redstone_torch = 1
-		def2.groups.redstone_power=9
-		def2.drop = def.drop
-		def2.mod_origin = "redstone"
-		--def2.textures = "dirt.png"
-		def2.after_destruct = function(pos, oldnode)
-			redstone.collect_info(pos)
-		end
-		local newname = "redstone:node_activated_"..string.gsub(name, "main:", "")
-		def2.name = newname
-		def2.description = "Redstone "..def.description
-		minetest.register_node(newname,def2)
-	end
-end
-
-
---this removes power from node that the lever is powering
-local function on_lever_destroy(pos)
-	local param2 = minetest.get_node(pos).param2
-	local self = minetest.get_node(pos)
-	local dir = minetest.wallmounted_to_dir(self.param2)
-	
-	local pos = vector.add(dir,pos)
-	local node = minetest.get_node(pos)
-	local name = node.name
-	
-	local def = minetest.registered_nodes[name]
-	if def.drawtype == "normal" and string.match(name, "redstone:node_activated_")then
-		name = "main:"..string.gsub(name, "redstone:node_activated_", "")
-		minetest.swap_node(pos, {name=name})
-		redstone.collect_info(pos)
-	end
-end
 
 
 minetest.register_node("redstone:lever_off", {
@@ -60,21 +23,28 @@ minetest.register_node("redstone:lever_off", {
 		},
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		minetest.set_node(pos, {name="redstone:lever_on",param2=node.param2})
+		minetest.sound_play("lever", {pos=pos})
+
 		local dir = minetest.wallmounted_to_dir(node.param2)
-		local pos = vector.add(dir,pos)
-		local name = minetest.get_node(pos).name
-		local def = minetest.registered_nodes[name]
+		pos = vector.add(dir,pos)
+	
+		local meta = minetest.get_meta(pos)
+
+		meta:set_int("redstone_power", 9)
 		
-		if def.drawtype == "normal" and string.match(name, "main:") then
-			minetest.sound_play("lever", {pos=pos})
-			name = "redstone:node_activated_"..string.gsub(name, "main:", "")
-			minetest.swap_node(pos,{name=name})
-			redstone.collect_info(pos)
-		else
-			minetest.sound_play("lever", {pos=pos,pitch=0.6})
-		end
+		
+		redstone.collect_info(pos)
 	end,
-	on_destruct = on_lever_destroy,
+	after_destruct = function(pos, oldnode)
+		local dir = minetest.wallmounted_to_dir(oldnode.param2)
+		pos = vector.add(dir,pos)
+	
+		local meta = minetest.get_meta(pos)
+
+		meta:set_int("redstone_power", 0)
+		
+		redstone.collect_info(pos)
+	end,
 })
 minetest.register_node("redstone:lever_on", {
     description = "Lever On",
@@ -96,9 +66,27 @@ minetest.register_node("redstone:lever_on", {
 			},
 		},
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		minetest.sound_play("lever", {pos=pos,pitch=0.8})
 		minetest.set_node(pos, {name="redstone:lever_off",param2=node.param2})
-		on_lever_destroy(pos)
+
+		minetest.sound_play("lever", {pos=pos})
+
+		local dir = minetest.wallmounted_to_dir(node.param2)
+		pos = vector.add(dir,pos)
+	
+		local meta = minetest.get_meta(pos)
+
+		meta:set_int("redstone_power", 0)
+		
+		redstone.collect_info(pos)
 	end,
-	on_destruct = on_lever_destroy,
+	after_destruct = function(pos, oldnode)
+		local dir = minetest.wallmounted_to_dir(oldnode.param2)
+		pos = vector.add(dir,pos)
+	
+		local meta = minetest.get_meta(pos)
+
+		meta:set_int("redstone_power", 0)
+		
+		redstone.collect_info(pos)
+	end,
 })

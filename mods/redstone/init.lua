@@ -161,13 +161,20 @@ localredstone.injector = function(i)
 		if not a_index[i.x][i.y][i.z] then a_index[i.x][i.y][i.z] = {} end
 		a_index[i.x][i.y][i.z].redstone_activation = true
 	end
+
+	--sneaky way to make levers and buttons work
+	if get_meta(i):get_int("redstone_power") > 0 then
+		if not r_index[i.x] then r_index[i.x] = {} end
+		if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
+		r_index[i.x][i.y][i.z] = {torch = true,power=9}
+	end
 end
 
 localredstone.collector = function(pos)
 	for x = -1,1 do
 	for y = -1,1 do
 	for z = -1,1 do
-		if abs(x)+abs(y)+abs(z) == 1 then
+		if abs(x)+abs(z) == 1 then
 			localredstone.injector(add_vec(pos,new_vec(x,y,z)))
 		end
 	end
@@ -299,7 +306,7 @@ local function redstone_pathfinder(source,source_level,direction)
 		for x = -1,1 do
 		for y = -1,1 do
 		for z = -1,1 do
-			if not (abs(x)+abs(z) > 1) or (abs(x)+abs(z) == 0) then
+			if abs(x)+abs(z) == 1 then
 				i = add_vec(source,new_vec(x,y,z))
 				if r_index and r_index[i.x] and r_index[i.x][i.y] and r_index[i.x][i.y][i.z] then
 					index = r_index[i.x][i.y][i.z]					
