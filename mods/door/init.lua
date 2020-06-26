@@ -77,7 +77,17 @@ for _,door in pairs({"top","bottom"}) do
 			local on_rightclick
 			local redstone_deactivation
 			local redstone_activation
-			--make it so only the bottom activates
+
+			--redstone input
+			if state == "open" then
+				redstone_deactivation = function(pos)
+					door_rightclick(pos)
+				end
+			elseif state == "closed" then
+				redstone_activation = function(pos)
+					door_rightclick(pos)
+				end
+			end
 			
 			if material == "wood" then
 				sounds = main.woodSound()
@@ -87,17 +97,8 @@ for _,door in pairs({"top","bottom"}) do
 				--bottom
 				if door == "bottom" then
 					tiles = {"wood.png"}
-					groups = {wood = 2, tree = 1, hard = 1, axe = 1, hand = 3, redstone_activation = 1,bottom = 1,door_open = ((state == "open" and 1) or 0),door_closed = ((state == "closed" and 1) or 0)}
-					--redstone input
-					if state == "open" then
-						redstone_deactivation = function(pos)
-							door_rightclick(pos)
-						end
-					elseif state == "closed" then
-						redstone_activation = function(pos)
-							door_rightclick(pos)
-						end
-					end
+					groups = {wood = 2, tree = 1, hard = 1, axe = 1, hand = 3, bottom = 1,door_open = ((state == "open" and 1) or 0),door_closed = ((state == "closed" and 1) or 0)}
+					
 				--top
 				else
 					if state == "closed" then
@@ -105,35 +106,21 @@ for _,door in pairs({"top","bottom"}) do
 					elseif state == "open" then
 						tiles = {"wood.png","wood.png","wood_door_top.png","wood_door_top.png","wood.png","wood.png"}
 					end
-					groups = {wood = 2, tree = 1, hard = 1, axe = 1, hand = 3,top = 1,door_open = ((state == "open" and 1) or 0),door_closed = ((state == "closed" and 1) or 0)}
+					groups = {wood = 2, tree = 1, hard = 1, axe = 1, hand = 3, redstone_activation = 1, top = 1,door_open = ((state == "open" and 1) or 0),door_closed = ((state == "closed" and 1) or 0)}
 				end
 			elseif material == "iron" then
 				sounds = main.stoneSound()
-				
-				
-				
 				if door == "bottom" then
 					tiles = {"iron_block.png"}
-					groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4, redstone_activation = 1,bottom = 1,door_open = ((state == "open" and 1) or 0),door_closed = ((state == "closed" and 1) or 0)}
-					--redstone input
-					if state == "open" then
-						redstone_deactivation = function(pos)
-							door_rightclick(pos)
-						end
-					elseif state == "closed" then
-						redstone_activation = function(pos)
-							door_rightclick(pos)
-						end
-					end
+					groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4, bottom = 1,door_open = ((state == "open" and 1) or 0),door_closed = ((state == "closed" and 1) or 0)}
+					
 				else
 					if state == "closed" then
 						tiles = {"iron_block.png","iron_block.png","iron_block.png","iron_block.png","iron_door_top.png","iron_door_top.png"}
 					elseif state == "open" then
 						tiles = {"iron_block.png","iron_block.png","iron_door_top.png","iron_door_top.png","iron_block.png","iron_block.png"}
 					end
-					
-					
-					groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,top = 1,door_open = ((state == "open" and 1) or 0),door_closed = ((state == "closed" and 1) or 0)}
+					groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4, redstone_activation = 1, top = 1,door_open = ((state == "open" and 1) or 0),door_closed = ((state == "closed" and 1) or 0)}
 				end
 			end
 			minetest.register_node("door:"..door.."_"..material.."_"..state, {
@@ -156,8 +143,10 @@ for _,door in pairs({"top","bottom"}) do
 						},
 					},
 				--redstone activation is in both because only the bottom is defined as an activator and it's easier to do it like this
+
 				redstone_activation = redstone_activation,
 				redstone_deactivation = redstone_deactivation,
+
 				on_rightclick = on_rightclick,
 				after_place_node = function(pos, placer, itemstack, pointed_thing)
 					local node = get_node(pos)
