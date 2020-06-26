@@ -166,7 +166,7 @@ localredstone.injector = function(i)
 	if get_meta(i):get_int("redstone_power") > 0 then
 		if not r_index[i.x] then r_index[i.x] = {} end
 		if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-		r_index[i.x][i.y][i.z] = {torch = true,power=9}
+		r_index[i.x][i.y][i.z] = {torch = true,power=get_meta(i):get_int("redstone_power")}
 	end
 end
 
