@@ -137,6 +137,7 @@ localredstone.injector = function(i)
 		--the data to the 3d array must be written to memory before this is executed
 		--or a stack overflow occurs!!!
 		localredstone.collector(i)
+		return
 	end
 	--index power sources
 	if get_group(i,"redstone_torch") > 0 then
