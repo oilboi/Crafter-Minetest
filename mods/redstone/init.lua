@@ -44,6 +44,8 @@ local order = {
 	{x=0, y=-1, z=1}, {x= 0, y=-1, z=-1},
 }
 
+--thanks to RhodiumToad for helping me figure out a good method to do this
+
 local pool = {} -- this holds all redstone data (literal 3d virtual memory map)
 
 local table_3d
