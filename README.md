@@ -69,6 +69,9 @@ max_packets_per_iteration = 10096
 
 > #1 idea: weakness items, items that damage the mob more than diamond swords
 
+## redstone bugs
+- spawn when a stack overflow detection occurs and is very hostile
+
 ## zombies
 - zombies drop limbs randomly and a player can use them as a very low durability weapon and place them in the world
 
