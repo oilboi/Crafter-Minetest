@@ -99,13 +99,13 @@ local function data_injection(pos,data)
 		if pool and pool[pos.x] and pool[pos.x][pos.y] then
 			pool[pos.x][pos.y][pos.z] = data
 			
-			--if not pool[pos.x][pos.y] then
-			--	pool[pos.x][pos.y] = nil
-			--	-- only run this if y axis is empty
-			--	if not pool[pos.x] then
-			--		pool[pos.x] = nil
-			--	end
-			--end
+			if pool[pos.x][pos.y] and not next(pool[pos.x][pos.y]) then
+				pool[pos.x][pos.y] = nil
+				-- only run this if y axis is empty
+				if pool[pos.x] and not next(pool[pos.x]) then
+					pool[pos.x] = nil
+				end
+			end
 		end
 	end
 end
@@ -185,7 +185,6 @@ local boundary
 local function calculate(pos)
 
 	boundary = create_boundary_box(pos)
-	--print(dump(boundary))
 
 	--pathfind through memory map	
 	for x,index_x in pairs(boundary) do
