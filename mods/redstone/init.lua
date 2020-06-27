@@ -374,4 +374,13 @@ for i = 0,8 do
 		connects_to = {"group:redstone"},
 	})
 	color= color +31.875
+
+	minetest.register_lbm({
+        name = "redstone:"..i,
+		nodenames = {"redstone:dust_"..i},
+		run_at_every_load = true,
+        action = function(pos)
+            data_injection(pos,{dust=i})
+        end,
+    })
 end
