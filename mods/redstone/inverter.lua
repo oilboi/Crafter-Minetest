@@ -1,4 +1,17 @@
-local minetest,vector = minetest,vector
+local
+minetest,vector
+=
+minetest,vector
+
+--[[
+ ██████╗ ███╗   ██╗
+██╔═══██╗████╗  ██║
+██║   ██║██╔██╗ ██║
+██║   ██║██║╚██╗██║
+╚██████╔╝██║ ╚████║
+ ╚═════╝ ╚═╝  ╚═══╝
+]]--
+
 --inverts redstone signal
 minetest.register_node("redstone:inverter_on", {
     description = "Redstone Inverter",
@@ -72,6 +85,15 @@ minetest.register_lbm({
 })
 
 
+
+--[[
+ ██████╗ ███████╗███████╗
+██╔═══██╗██╔════╝██╔════╝
+██║   ██║█████╗  █████╗  
+██║   ██║██╔══╝  ██╔══╝  
+╚██████╔╝██║     ██║     
+ ╚═════╝ ╚═╝     ╚═╝     
+]]--
 
 minetest.register_node("redstone:inverter_off", {
     description = "Redstone Inverter",
