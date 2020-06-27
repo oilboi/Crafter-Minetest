@@ -263,3 +263,35 @@
 - Snowballs now explode when they hit something in the nether
 - Skins now automatically download and apply when you join a server with your github name if you have a "crafter_skindex" github repo with a skin.png file in it
 - Fixed bed not having valid craft recipe
+
+## Alpha 0.05
+> Multiplayer Polishing Update
+
+- Fixed only one player being able to run on a server
+- Fixed only one person being able to teleport in the same server step
+- Players now use the same damage mechaninism as mobs
+- Fixed wrong variable for durability assigned to all swords
+- Fix bug in experience
+- Fully implemented bows and arrows
+- Tuned the bow and arrows even further
+- Snowmen now drop a carrot, coal, stick, or snowball
+- Added in armor
+- Tuned a lot of things
+- Made armor work
+- Added in Krock's awesome Colored Names mod for csm chat
+- Added sheep
+- Fixed global mob handling
+- Added in better fire
+- Overhauled weather effects
+- Added in clientside modchannel lockout to check if server sending message
+- Added in capes
+- Overhauled client mod version checking
+- Overhauled mob pathfinding AI
+- Overhauled fire
+- Fixed Crafter Client from crashing if joining a non-crafter server
+- Heavily optimized network usage with player mechanics to client mod
+- Updated player_api for next step in optimization
+- ElCeejo remodeled and fixed snowman head tracking. Thanks!
+- Overhauled everything
+- Added in a lot of stuff
+- Fixed a lot of stuff

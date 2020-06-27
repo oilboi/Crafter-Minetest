@@ -283,6 +283,7 @@ local function calculate(pos)
 	for x,datax in pairs(boundary) do
 		for y,datay in pairs(datax) do
 			for z,data in pairs(datay) do
+				print("test")
 				if data.directional_activator then
 					directional_activator(new_vec(x,y,z))
 				elseif data.activator then
@@ -306,7 +307,7 @@ function redstone.update(pos)
 		recursion_check[s_pos] = 0
 	end
 	recursion_check[s_pos] = recursion_check[s_pos] + 1
-
+	--print(recursion_check[s_pos])
 	if recursion_check[s_pos] > 50 then
 		minetest.after(0,function()
 			minetest.dig_node(pos)
