@@ -162,27 +162,37 @@ local n_pos
 local temp_pool
 local temp_pool2
 local input
+local ignore
 local directional_activator = function(pos)
+	
+	ignore = false
+	input = nil
+	temp_pool2 = nil
+
 	temp_pool = pool[pos.x][pos.y][pos.z]
 	
-	if not temp_pool then return end
+	if not temp_pool then ignore = true end
 
-	input = temp_pool.input
-
-	if not input then return end
-
-	input = add_vec(input,pos)
-
-	if pool and pool[input.x] and pool[input.x][input.y] and pool[input.x][input.y][input.z] then
-		temp_pool2 = pool[input.x][input.y][input.z]
-	else
-		return
+	if not ignore then
+		input = temp_pool.input
 	end
 
-	if not temp_pool2 then return end
+	if not input then ignore = true end
 
-	if (temp_pool2.dust and temp_pool2.dust > 0) or (temp_pool2.torch and temp_pool2.directional_activator and temp_pool2.dir == temp_pool.dir) or 
-	(not temp_pool2.directional_activator and temp_pool2.torch)  then
+	if not ignore then
+		input = add_vec(input,pos)
+	end
+
+	if not ignore and pool and pool[input.x] and pool[input.x][input.y] and pool[input.x][input.y][input.z] then
+		temp_pool2 = pool[input.x][input.y][input.z]
+	else
+		ignore = true
+	end
+
+	if not temp_pool2 then ignore = true end
+
+	if not ignore and ((temp_pool2.dust and temp_pool2.dust > 0) or (temp_pool2.torch and temp_pool2.directional_activator and temp_pool2.dir == temp_pool.dir) or 
+	(not temp_pool2.directional_activator and temp_pool2.torch))  then
 		if activator_table[temp_pool.name].activate then
 			activator_table[temp_pool.name].activate(pos)
 			return
@@ -283,7 +293,6 @@ local function calculate(pos)
 	for x,datax in pairs(boundary) do
 		for y,datay in pairs(datax) do
 			for z,data in pairs(datay) do
-				print("test")
 				if data.directional_activator then
 					directional_activator(new_vec(x,y,z))
 				elseif data.activator then
@@ -311,6 +320,8 @@ function redstone.update(pos)
 	if recursion_check[s_pos] > 50 then
 		minetest.after(0,function()
 			minetest.dig_node(pos)
+			data_injection(pos,nil)
+			redstone.update(pos)
 		end)
 		return
 	end
