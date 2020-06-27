@@ -12,7 +12,8 @@ local content_id      = minetest.get_name_from_content_id
 local get_content_id  = minetest.get_content_id
 local get_voxel_manip = minetest.get_voxel_manip
 local after           = minetest.after
-local set_node        = minetest.set_node
+
+local swap_node       = minetest.swap_node
 local registered_nodes
 minetest.register_on_mods_loaded(function()
 	registered_nodes  = minetest.registered_nodes
@@ -72,9 +73,6 @@ dofile(path.."/pressure_plate.lua")
 
 --set the data for powered states
 local get_local_power = function(pos)
-	if not pos then
-		return
-	end
 	for _,order in pairs(order) do
 		--print(get_node(add_vec(new_vec(x,y,z),pos)).name)
 		if get_item_group(get_node(add_vec(new_vec(order.x,order.y,order.z),pos)).name, "redstone_power") > 0 then
@@ -89,6 +87,7 @@ end
 
 local power
 local pos
+local node
 local get_powered_state_directional = function(pos)
 	pos = sub_vec(pos,facedir_to_dir(get_node(pos).param2))
 	power = get_item_group(get_node(pos).name, "redstone_power")
@@ -268,7 +267,7 @@ function redstone.calculate()
 				--print(get_node(new_vec(x,y,z)).name)
 				if index and index.dust and index.level ~= check_table[x][y][z] then
 					--count = count + 1
-					set_node(new_vec(x,y,z),{name="redstone:dust_"..index.level})
+					swap_node(new_vec(x,y,z),{name="redstone:dust_"..index.level})
 				end
 			end
 		end
