@@ -244,7 +244,6 @@ local boundary
 local function calculate(pos)
 
 	boundary = create_boundary_box(pos)
-
 	--pathfind through memory map	
 	for x,index_x in pairs(boundary) do
 		for y,index_y in pairs(index_x) do
@@ -300,13 +299,27 @@ function redstone.inject(pos,data)
 end
 
 
+local recursion_check = {}
 function redstone.update(pos)
+	local s_pos = minetest.serialize(pos)
+	if not recursion_check[s_pos] then
+		recursion_check[s_pos] = 0
+	end
+	recursion_check[s_pos] = recursion_check[s_pos] + 1
+
+	if recursion_check[s_pos] > 50 then
+		minetest.after(0,function()
+			minetest.dig_node(pos)
+		end)
+		return
+	end
+
 	calculate(pos)
 end
 
-
-
-
+minetest.register_globalstep(function()
+	recursion_check = {}
+end)
 
 
 ----------------------------------------------------------------------------
