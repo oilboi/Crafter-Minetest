@@ -35,6 +35,7 @@ max_packets_per_iteration = 10096
 ## Alpha 0.06
 > Redstone Update
 
+- Add in virtualization algorithm
 
 ---
 
