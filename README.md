@@ -42,10 +42,6 @@ max_packets_per_iteration = 10096
 
 # IDEAS:
 
-## jetpack:
-- equipped like armor
-- uses XP
-
 
 ## REDSTONE:
 - breaker (mines whatever is in front of it)
