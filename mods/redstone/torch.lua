@@ -157,3 +157,12 @@ minetest.register_node("redstone:torch_wall", {
 	sounds = main.woodSound(),
 })
 
+
+minetest.register_lbm({
+	name = "redstone:torch_init",
+	nodenames = {"redstone:torch_wall","redstone:torch_floor"},
+	run_at_every_load = true,
+	action = function(pos)
+		redstone.inject(pos,{torch=9})
+	end,
+})
