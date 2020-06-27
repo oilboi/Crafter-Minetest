@@ -29,6 +29,37 @@ local add_vec         = vector.add
 local sub_vec         = vector.subtract
 local vector_distance = vector.distance
 
+local activator_table = {} -- this holds the translation data of activator tables (activator functions)
+
+-- redstone class
+redstone = {}
+
+-- enables mods to create data functions
+function redstone.register_activator(data)
+	activator_table[data.name] = {
+		activate   = data.activate,
+		deactivate = data.deactivate
+	}
+end
+
+local path = minetest.get_modpath("redstone")
+--dofile(path.."/functions.lua")
+--dofile(path.."/wire.lua")
+dofile(path.."/torch.lua")
+--dofile(path.."/lever.lua")
+--dofile(path.."/button.lua")
+--dofile(path.."/repeater.lua")
+--dofile(path.."/light.lua")
+--dofile(path.."/piston.lua")
+--dofile(path.."/comparator.lua")
+--dofile(path.."/craft.lua")
+--dofile(path.."/ore.lua")
+dofile(path.."/inverter.lua")
+--dofile(path.."/player_detector.lua")
+--dofile(path.."/space_maker.lua")
+--dofile(path.."/pressure_plate.lua")
+
+
 --this is written out manually so that
 --math.abs is not needed
 local order = {
@@ -86,8 +117,6 @@ local function create_boundary_box(pos)
 	return(table_3d)
 end
 
-
-
 local function data_injection(pos,data)
 	-- add data into 3d memory
 	if data then
@@ -98,7 +127,6 @@ local function data_injection(pos,data)
 	else
 		if pool and pool[pos.x] and pool[pos.x][pos.y] then
 			pool[pos.x][pos.y][pos.z] = data
-			
 			if pool[pos.x][pos.y] and not next(pool[pos.x][pos.y]) then
 				pool[pos.x][pos.y] = nil
 				-- only run this if y axis is empty
@@ -111,36 +139,72 @@ local function data_injection(pos,data)
 end
 
 
--- redstone class
-redstone = {}
+-- activators
+local n
+local temp_pool
+local non_directional_activator = function(pos)
+	for _,order in pairs(order) do
+		n_pos = add_vec(pos,order)
+		temp_pool = pool[n.x][n.y][n.z]
+		if temp_pool then
+			--if temp_pool.dust and temp_pool.dust > 0 or 
+			--print(get_node(add_vec(new_vec(x,y,z),pos)).name)
+			if get_item_group(get_node(add_vec(new_vec(order.x,order.y,order.z),pos)).name, "redstone_power") > 0 then
+				return(1)
+			end
+		end
+	end	
+	return(0)
+end
 
-local path = minetest.get_modpath("redstone")
---dofile(path.."/functions.lua")
---dofile(path.."/wire.lua")
-dofile(path.."/torch.lua")
---dofile(path.."/lever.lua")
---dofile(path.."/button.lua")
---dofile(path.."/repeater.lua")
---dofile(path.."/light.lua")
---dofile(path.."/piston.lua")
---dofile(path.."/comparator.lua")
---dofile(path.."/craft.lua")
---dofile(path.."/ore.lua")
---dofile(path.."/inverter.lua")
---dofile(path.."/player_detector.lua")
---dofile(path.."/space_maker.lua")
---dofile(path.."/pressure_plate.lua")
+-- directional activators
+local n_pos
+local temp_pool
+local temp_pool2
+local input
+local directional_activator = function(pos)
+	temp_pool = pool[pos.x][pos.y][pos.z]
+	
+	if not temp_pool then return end
 
+	input = temp_pool.input
+
+	if not input then return end
+
+	input = add_vec(input,pos)
+
+	if pool and pool[input.x] and pool[input.x][input.y] and pool[input.x][input.y][input.z] then
+		temp_pool2 = pool[input.x][input.y][input.z]
+	else
+		return
+	end
+
+	if not temp_pool2 then return end
+
+	if (temp_pool2.dust and temp_pool2.dust > 0) or (temp_pool2.torch and temp_pool2.directional_activator and temp_pool2.dir == temp_pool.dir) or 
+	(not temp_pool2.directional_activator and temp_pool2.torch)  then
+		if activator_table[temp_pool.name].activate then
+			activator_table[temp_pool.name].activate(pos)
+			return
+		end
+		return
+	end
+
+	if activator_table[temp_pool.name].deactivate then
+		activator_table[temp_pool.name].deactivate(pos)
+	end
+end
 
 --make redstone wire pass on current one level lower than it is
 local i
 local index
 local passed_on_level
 local function redstone_pathfinder(source,source_level,boundary,direction)
+	if not source_level then return end
 	--directional torches
 	if direction then
-		i = add_vec(source,facedir_to_dir(direction))
-		if boundary and boundary[i.x][i.y][i.z] then
+		i = add_vec(source,direction)
+		if i and boundary and boundary[i.x] and boundary[i.x][i.y] and boundary[i.x][i.y][i.z] then
 			index = boundary[i.x][i.y][i.z]
 			--dust
 			if index.dust then
@@ -157,16 +221,11 @@ local function redstone_pathfinder(source,source_level,boundary,direction)
 			i = add_vec(source,new_vec(order.x,order.y,order.z))
 			if i and boundary and boundary[i.x] and boundary[i.x][i.y] and boundary[i.x][i.y][i.z] then
 				index = boundary[i.x][i.y][i.z]
-
 				if index.dust then
-
 					passed_on_level = source_level - 1
-
 					if passed_on_level > 0 and index.dust < source_level then
 						boundary[i.x][i.y][i.z].dust = passed_on_level
-
 						redstone_pathfinder(i,passed_on_level,boundary,nil)
-
 					end
 				end
 			end
@@ -191,12 +250,11 @@ local function calculate(pos)
 		for y,index_y in pairs(index_x) do
 			for z,data in pairs(index_y) do
 				--allow data values for torches
-				if data.torch then
+				if data.torch and not data.torch_directional then
 					redstone_pathfinder(new_vec(x,y,z),data.torch,boundary)
 					boundary[x][y][z] = nil
 				elseif data.torch_directional then
 					redstone_pathfinder(new_vec(x,y,z),data.torch,boundary,data.dir)
-					boundary[x][y][z] = nil
 				end
 			end
 		end
@@ -207,50 +265,30 @@ local function calculate(pos)
 	for x,datax in pairs(boundary) do
 		for y,datay in pairs(datax) do
 			for z,data in pairs(datay) do
-				--print(dump(data))
 				if data.dust and data.dust ~= data.origin then
-					--print("setting:" ..data.dust)
 					swap_node(new_vec(x,y,z),{name="redstone:dust_"..data.dust})
+				end
+
+				--write data back to memory pool
+				pool[x][y][z] = data
+
+				if data.dust then
+					--delete the data to speed up next loop
+					boundary[x][y][z] = nil
 				end
 			end
 		end
 	end
-	--[[
+
+	--this must be done after the memory is written
 	for x,datax in pairs(boundary) do
 		for y,datay in pairs(datax) do
 			for z,data in pairs(datay) do
-				--directional activators
-				if data.directional == true then
-					power = get_powered_state_directional(new_vec(x,y,z))
-					if power then
-						if power > 0 then
-							redstone_activate(new_vec(x,y,z),power)
-						elseif power == 0 then
-							redstone_deactivate(new_vec(x,y,z),power)
-						end
-					end
-				--non directional activators
-				else
-					power = get_local_power(new_vec(x,y,z))
-					--print(power)
-					if power then
-						if power > 0 then
-							redstone_activate(new_vec(x,y,z),power)
-						elseif power == 0 then
-							redstone_deactivate(new_vec(x,y,z),power)
-						end
-					end
+				if data.directional_activator then
+					directional_activator(new_vec(x,y,z))
+				elseif data.activator then
+					non_directional_activator(new_vec(x,y,z))
 				end
-			end
-		end
-	end
-	]]--
-
-	for x,index_x in pairs(boundary) do
-		for y,index_y in pairs(index_x) do
-			for z,data in pairs(index_y) do
-				--write data back to memory pool
-				pool[x][y][z] = data
 			end
 		end
 	end

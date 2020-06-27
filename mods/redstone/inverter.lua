@@ -19,23 +19,62 @@ minetest.register_node("redstone:inverter_on", {
 				{-0.2, -0.5,  0.2, 0.2,  0.1, 0.4}, --output post
 			},
 		},
-	redstone_deactivation = function(pos)
-		local param2 = minetest.get_node(pos).param2
-		minetest.swap_node(pos,{name="redstone:inverter_off",param2=param2})
-
-		local dir = minetest.facedir_to_dir(param2)
-		minetest.after(0,function()
-			redstone.collect_info(vector.add(pos,dir))
-			redstone.collect_info(vector.subtract(pos,dir))
-		end)
-	end,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
-		redstone.collect_info(pos)
+		local dir = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+		redstone.inject(pos,{
+			name = "redstone:inverter_on",
+			directional_activator = true,
+			input  = vector.multiply(dir,-1),
+			dir = dir
+		})
+		redstone.update(pos)
 	end,
 	after_destruct = function(pos, oldnode)
-		redstone.collect_info(pos)
+		redstone.inject(pos,nil)
+		redstone.update(pos)
 	end
 })
+
+
+redstone.register_activator({
+	name = "redstone:inverter_on",
+	deactivate = function(pos)
+		local param2 = minetest.get_node(pos).param2
+		minetest.set_node(pos,{name="redstone:inverter_off",param2=param2})
+		local dir = minetest.facedir_to_dir(param2)
+		redstone.inject(pos,{
+			name = "redstone:inverter_off",
+			torch  = 9,
+			torch_directional = true,
+			directional_activator = true,
+			input  = vector.multiply(dir,-1),
+			dir = dir
+		})
+
+		minetest.after(0,function()
+			redstone.update(vector.add(pos,dir))
+			redstone.update(vector.subtract(pos,dir))
+		end)
+	end
+})
+
+
+minetest.register_lbm({
+	name = "redstone:startupinverter",
+	nodenames = {"redstone:inverter_on"},
+	run_at_every_load = true,
+	action = function(pos)
+		local dir = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+		redstone.inject(pos,{
+			name = "redstone:inverter_on",
+			directional_activator = true,
+			input  = vector.multiply(dir,-1),
+			dir = dir
+		})
+	end,
+})
+
+
 
 minetest.register_node("redstone:inverter_off", {
     description = "Redstone Inverter",
@@ -56,43 +95,59 @@ minetest.register_node("redstone:inverter_off", {
 				{-0.2, -0.5,  0.2, 0.2,  0.1, 0.4}, --output post
 			},
 		},
-	redstone_activation = function(pos)
-		local param2 = minetest.get_node(pos).param2
-		minetest.swap_node(pos,{name="redstone:inverter_on",param2=param2})
-		local dir = minetest.facedir_to_dir(param2)
-		minetest.after(0,function()
-			redstone.collect_info(vector.add(pos,dir))
-			redstone.collect_info(vector.subtract(pos,dir))
-		end)
-	end,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
-		redstone.collect_info(pos)
+		local dir = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+		redstone.inject(pos,{
+			name = "redstone:inverter_off",
+			torch  = 9,
+			torch_directional = true,
+			directional_activator = true,
+			input  = vector.multiply(dir,-1),
+			dir = dir
+		})
+		redstone.update(pos)
 	end,
 	after_destruct = function(pos, oldnode)
-		redstone.collect_info(pos)
+		redstone.inject(pos,nil)
+		redstone.update(pos)
 	end
 })
 
-minetest.register_lbm({
-	name = "redstone:startupinverter",
-	nodenames = {"redstone:inverter_on"},
-	run_at_every_load = true,
-	action = function(pos)
+redstone.register_activator({
+	name = "redstone:inverter_off",
+	activate = function(pos)
+		
 		local param2 = minetest.get_node(pos).param2
+		minetest.set_node(pos,{name="redstone:inverter_on",param2=param2})
 		local dir = minetest.facedir_to_dir(param2)
-		redstone.collect_info(vector.add(pos,dir))
-		redstone.collect_info(vector.subtract(pos,dir))
-	end,
+		redstone.inject(pos,{
+			name = "redstone:inverter_on",
+			directional_activator = true,
+			input  = vector.multiply(dir,-1),
+			dir = dir
+		})
+		minetest.after(0,function()
+			redstone.update(vector.add(pos,dir))
+			redstone.update(vector.subtract(pos,dir))
+		end)
+	end
 })
+
 
 minetest.register_lbm({
 	name = "redstone:also_startup_inverter",
 	nodenames = {"redstone:inverter_off"},
 	run_at_every_load = true,
 	action = function(pos)
-		local param2 = minetest.get_node(pos).param2
-		local dir = minetest.facedir_to_dir(param2)
-		redstone.collect_info(vector.add(pos,dir))
-		redstone.collect_info(vector.subtract(pos,dir))
+		local dir = minetest.facedir_to_dir(minetest.get_node(pos).param2)
+		redstone.inject(pos,{
+			name = "redstone:inverter_off",
+			torch  = 9,
+			torch_directional = true,
+			directional_activator = true,
+			input  = vector.multiply(dir,-1),
+			dir    = dir
+		})
+		redstone.update(pos)
 	end,
 })
