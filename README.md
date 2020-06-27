@@ -50,7 +50,7 @@ max_packets_per_iteration = 10096
 - breaker (mines whatever is in front of it)
 - dispenser (shoots out first item in inventory, or shoots item into pipe)
 - piston in general (if node is falling and piston is pointing up then FLING IT, if detects falling node entity FLING IT)
-
+- redstone bugs which spawn and try to kill you if a stack overflow detection occurs
 
 ---
 
