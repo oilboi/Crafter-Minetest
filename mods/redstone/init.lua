@@ -1,7 +1,7 @@
 local 
-minetest,vector,math,table,pairs
+minetest,vector,math,table,pairs,next
 =
-minetest,vector,math,table,pairs
+minetest,vector,math,table,pairs,next
 
 -- minetest class
 local get_node        = minetest.get_node
@@ -44,31 +44,51 @@ local order = {
 	{x=0, y=-1, z=1}, {x= 0, y=-1, z=-1},
 }
 
+local pool = {} -- this holds all redstone data (literal 3d virtual memory map)
+
+local function data_injection(pos,data)
+	--add data to both maps
+	if data then
+		if not pool[pos.x] then pool[pos.x] = {} end
+		if not pool[pos.x][pos.y] then pool[pos.x][pos.y] = {} end
+		pool[pos.x][pos.y][pos.z] = data
+	else
+		pool[pos.x][pos.y][pos.z] = data
+		if not next(pool[pos.x][pos.y]) then
+			pool[pos.x][pos.y] = nil
+			if not next(pool[pos.x]) then
+				pool[pos.x] = nil
+			end
+		end
+	end
+	print(dump(pool))
+end
+
+
+
 -- redstone class
 redstone = {}
-
-local speed_test
 
 local r_index = {}
 local a_index = {}
 local check_table = {}
 
-local path = minetest.get_modpath("redstone")
-dofile(path.."/functions.lua")
-dofile(path.."/wire.lua")
-dofile(path.."/torch.lua")
-dofile(path.."/lever.lua")
-dofile(path.."/button.lua")
-dofile(path.."/repeater.lua")
-dofile(path.."/light.lua")
-dofile(path.."/piston.lua")
-dofile(path.."/comparator.lua")
-dofile(path.."/craft.lua")
-dofile(path.."/ore.lua")
-dofile(path.."/inverter.lua")
-dofile(path.."/player_detector.lua")
-dofile(path.."/space_maker.lua")
-dofile(path.."/pressure_plate.lua")
+--local path = minetest.get_modpath("redstone")
+--dofile(path.."/functions.lua")
+--dofile(path.."/wire.lua")
+--dofile(path.."/torch.lua")
+--dofile(path.."/lever.lua")
+--dofile(path.."/button.lua")
+--dofile(path.."/repeater.lua")
+--dofile(path.."/light.lua")
+--dofile(path.."/piston.lua")
+--dofile(path.."/comparator.lua")
+--dofile(path.."/craft.lua")
+--dofile(path.."/ore.lua")
+--dofile(path.."/inverter.lua")
+--dofile(path.."/player_detector.lua")
+--dofile(path.."/space_maker.lua")
+--dofile(path.."/pressure_plate.lua")
 
 
 --set the data for powered states
@@ -446,11 +466,10 @@ for i = 0,8 do
 		groups={dig_immediate=1,attached_node=1,redstone_dust=1,redstone=1,redstone_power=i},
 		drop="redstone:dust",
 		on_construct = function(pos)
-			redstone.collect_info(pos)
+			data_injection(pos,{dust=i})
 		end,
 		after_destruct = function(pos)
-			--redstone.remove(pos,registered_nodes[get_node(pos).name].power)
-			redstone.collect_info(pos)
+			data_injection(pos,nil)
 		end,
 		connects_to = {"group:redstone"},
 	})
