@@ -73,6 +73,9 @@ max_packets_per_iteration = 10096
 
 > #1 idea: weakness items, items that damage the mob more than diamond swords
 
+## spider
+- spider eyes randomly drop as an object and players can wear them and place them
+
 ### snowman
 - you can put a pumpkin on it's head to make it survive when it's not snowing out
 - drops snowballs, coal, or carrot
