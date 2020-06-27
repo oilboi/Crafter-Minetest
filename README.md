@@ -73,6 +73,9 @@ max_packets_per_iteration = 10096
 
 > #1 idea: weakness items, items that damage the mob more than diamond swords
 
+## zombies
+- zombies drop limbs randomly and a player can use them as a very low durability weapon and place them in the world
+
 ## spider
 - spider eyes randomly drop as an object and players can wear them and place them
 
