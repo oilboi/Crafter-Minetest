@@ -46,37 +46,76 @@ local order = {
 
 local pool = {} -- this holds all redstone data (literal 3d virtual memory map)
 
+local table_3d
+local temp_pool
+local function create_boundary_box(pos)
+	table_3d = {}
+	for x = pos.x-9,pos.x+9 do
+		if pool[x] then
+			for y = pos.y-9,pos.y+9 do
+				if pool[x][y] then
+					for z = pos.z-9,pos.z+9 do
+						temp_pool = pool[x][y][z]
+						if temp_pool then
+							if not table_3d[x] then table_3d[x] = {} end
+							if not table_3d[x][y] then table_3d[x][y] = {} end
+
+							if x == pos.x-9 or x == pos.x+9 or 
+							y == pos.y-9 or y == pos.y+9 or 
+							z == pos.z-9 or z == pos.z+9 then
+								if temp_pool.dust then
+									table_3d[x][y][z] = {torch=temp_pool.dust}
+								else
+									table_3d[x][y][z] = temp_pool
+								end
+							else
+								if temp_pool.dust then
+									table_3d[x][y][z] = {dust=0,origin=temp_pool.dust}
+								else
+									table_3d[x][y][z] = temp_pool
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	return(table_3d)
+end
+
+
+
 local function data_injection(pos,data)
-	--add data to both maps
+	-- add data into 3d memory
 	if data then
 		if not pool[pos.x] then pool[pos.x] = {} end
 		if not pool[pos.x][pos.y] then pool[pos.x][pos.y] = {} end
 		pool[pos.x][pos.y][pos.z] = data
+	--delete data from 3d memory
 	else
-		pool[pos.x][pos.y][pos.z] = data
-		if not next(pool[pos.x][pos.y]) then
-			pool[pos.x][pos.y] = nil
-			if not next(pool[pos.x]) then
-				pool[pos.x] = nil
-			end
+		if pool and pool[pos.x] and pool[pos.x][pos.y] then
+			pool[pos.x][pos.y][pos.z] = data
+			
+			--if not pool[pos.x][pos.y] then
+			--	pool[pos.x][pos.y] = nil
+			--	-- only run this if y axis is empty
+			--	if not pool[pos.x] then
+			--		pool[pos.x] = nil
+			--	end
+			--end
 		end
 	end
-	print(dump(pool))
 end
-
 
 
 -- redstone class
 redstone = {}
 
-local r_index = {}
-local a_index = {}
-local check_table = {}
-
---local path = minetest.get_modpath("redstone")
+local path = minetest.get_modpath("redstone")
 --dofile(path.."/functions.lua")
 --dofile(path.."/wire.lua")
---dofile(path.."/torch.lua")
+dofile(path.."/torch.lua")
 --dofile(path.."/lever.lua")
 --dofile(path.."/button.lua")
 --dofile(path.."/repeater.lua")
@@ -91,162 +130,47 @@ local check_table = {}
 --dofile(path.."/pressure_plate.lua")
 
 
---set the data for powered states
-local get_local_power = function(pos)
-	for _,order in pairs(order) do
-		--print(get_node(add_vec(new_vec(x,y,z),pos)).name)
-		if get_item_group(get_node(add_vec(new_vec(order.x,order.y,order.z),pos)).name, "redstone_power") > 0 then
-			return(1)
+--make redstone wire pass on current one level lower than it is
+local i
+local index
+local passed_on_level
+local function redstone_pathfinder(source,source_level,boundary,direction)
+	--directional torches
+	if direction then
+		i = add_vec(source,facedir_to_dir(direction))
+		if boundary and boundary[i.x][i.y][i.z] then
+			index = boundary[i.x][i.y][i.z]
+			--dust
+			if index.dust then
+				passed_on_level = source_level - 1
+				if passed_on_level > 0 then
+					boundary[i.x][i.y][i.z].dust = passed_on_level
+					redstone_pathfinder(i,passed_on_level,boundary,nil)
+				end
+			end
 		end
-		if get_meta(add_vec(new_vec(order.x,order.y,order.z),pos)):get_int("redstone_power") > 0 then
-			return(1)
-		end
-	end	
-	return(0)
-end
+	else
+		--redstone and torch
+		for _,order in pairs(order) do
+			i = add_vec(source,new_vec(order.x,order.y,order.z))
+			if i and boundary and boundary[i.x] and boundary[i.x][i.y] and boundary[i.x][i.y][i.z] then
+				index = boundary[i.x][i.y][i.z]
 
-local power
-local pos
-local node
-local get_powered_state_directional = function(pos)
-	pos = sub_vec(pos,facedir_to_dir(get_node(pos).param2))
-	power = get_item_group(get_node(pos).name, "redstone_power")
-	if power == 0 then
-		power = get_meta(pos):get_int("redstone_power")
-	end
-	return(power)
-end
+				if index.dust then
 
-local node
-local redstone_activate = function(pos,power)
-	after(0,function()
-		node = get_node(pos).name
-		if registered_nodes[node].redstone_activation then
-			registered_nodes[node].redstone_activation(pos)
-		end
-	end)
-end
+					passed_on_level = source_level - 1
 
-local node
-local redstone_deactivate = function(pos,power)
-	after(0,function()
-		node = get_node(pos).name
-		if registered_nodes[node].redstone_deactivation then
-			registered_nodes[node].redstone_deactivation(pos)
-		end
-	end)
-end
+					if passed_on_level > 0 and index.dust < source_level then
+						boundary[i.x][i.y][i.z].dust = passed_on_level
 
---collect all nodes that are local to the modified
---node of redstone dust and store in memory
-local localredstone = {}
-local node
-localredstone.injector = function(i,origin)
-	node = get_node(i).name
-	if node == "air" then
-		return
-	end
+						redstone_pathfinder(i,passed_on_level,boundary,nil)
 
-	if r_index[i.x] and r_index[i.x][i.y] and r_index[i.x][i.y][i.z] then
-		return
-	end
-
-	if vector_distance(i,origin) > 9 then
-		return
-	end
-
-	--index dust
-	if get_item_group(node,"redstone_dust") > 0 then
-		if vector_distance(i,origin) <= 8 then
-			--add data to both maps
-			if not r_index[i.x] then r_index[i.x] = {} end
-			if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-			r_index[i.x][i.y][i.z] = {dust = true,level = 0}
-
-			if not check_table[i.x] then check_table[i.x] = {} end
-			if not check_table[i.x][i.y] then check_table[i.x][i.y] = {} end
-			check_table[i.x][i.y][i.z] = get_item_group(node,"redstone_power")
-			
-			--the data to the 3d array must be written to memory before this is executed
-			--or a stack overflow occurs!!!
-			localredstone.collector(i,origin)
-			return
-		else
-			if not r_index[i.x] then r_index[i.x] = {} end
-			if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-			r_index[i.x][i.y][i.z] = {torch = true,power=get_item_group(node,"redstone_power")}
+					end
+				end
+			end
 		end
 	end
-	--index power sources
-	if get_item_group(node,"redstone_torch") > 0 then
-		if not r_index[i.x] then r_index[i.x] = {} end
-		if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-		r_index[i.x][i.y][i.z] = {torch = true,power=get_item_group(node,"redstone_power")}
-	end	
-	--index directional power sources (Like repeaters/comparators)
-	--only outputs forwards
-	if get_item_group(node,"torch_directional") > 0 then
-		if not r_index[i.x] then r_index[i.x] = {} end
-		if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-		r_index[i.x][i.y][i.z] = {torch_directional = true, dir = get_node(i).param2 , power = get_item_group(node,"redstone_power")}
-	end
-	
-	--index directional activators (Like repeaters/comparators)
-	--only accepts input from the back
-	if get_item_group(node,"redstone_activation_directional") > 0 then
-		--print("indexing directional")
-		if not a_index[i.x] then a_index[i.x] = {} end
-		if not a_index[i.x][i.y] then a_index[i.x][i.y] = {} end
-		if not a_index[i.x][i.y][i.z] then a_index[i.x][i.y][i.z] = {} end
-
-		a_index[i.x][i.y][i.z].redstone_activation = true
-		a_index[i.x][i.y][i.z].directional = true
-	end
-	
-	--index objects that activate
-	if get_item_group(node,"redstone_activation") > 0 then
-		if not a_index[i.x] then a_index[i.x] = {} end
-		if not a_index[i.x][i.y] then a_index[i.x][i.y] = {} end
-		if not a_index[i.x][i.y][i.z] then a_index[i.x][i.y][i.z] = {} end
-		a_index[i.x][i.y][i.z].redstone_activation = true
-	end
-
-	--sneaky way to make levers and buttons work
-	if get_meta(i):get_int("redstone_power") > 0 then
-		if not r_index[i.x] then r_index[i.x] = {} end
-		if not r_index[i.x][i.y] then r_index[i.x][i.y] = {} end
-		r_index[i.x][i.y][i.z] = {torch = true,power=get_meta(i):get_int("redstone_power")}
-	end
-end
-
-localredstone.collector = function(pos,origin)
-	for _,order in pairs(order) do
-		localredstone.injector(add_vec(pos,new_vec(order.x,order.y,order.z)),origin)
-	end
-end
-
-
---check if index table contains items
---then execute an update
-local function redstone_algorithm()
-	--if indexes exist then calculate redstone
-	--create the old version to help with deactivation calculation
-	redstone.calculate()
-	--clear the index to avoid cpu looping wasting processing power
-	r_index = {}
-	a_index = {}
-	check_table = {}
-end
-
-
-function redstone.collect_info(pos)
-	if r_index[pos.x] and r_index[pos.x][pos.y] and r_index[pos.x][pos.y][pos.z] then
-		return
-	end
-	localredstone.injector(pos,pos)
-	localredstone.collector(pos,pos)
-
-	redstone_algorithm()
+	return(boundary)
 end
 
 
@@ -254,51 +178,48 @@ end
 local pos
 local node
 local power
-function redstone.calculate()
-	--speed_test = minetest.get_us_time()/1000000
+
+local boundary
+local function calculate(pos)
+
+	boundary = create_boundary_box(pos)
+	--print(dump(boundary))
 
 	--pathfind through memory map	
-	for x,index_x in pairs(r_index) do
+	for x,index_x in pairs(boundary) do
 		for y,index_y in pairs(index_x) do
 			for z,data in pairs(index_y) do
 				--allow data values for torches
 				if data.torch then
-					redstone.pathfind(new_vec(x,y,z),data.power)
-					r_index[x][y][z] = nil
+					redstone_pathfinder(new_vec(x,y,z),data.torch,boundary)
+					boundary[x][y][z] = nil
 				elseif data.torch_directional then
-					redstone.pathfind(new_vec(x,y,z),data.power,data.dir)
-					r_index[x][y][z] = nil
+					redstone_pathfinder(new_vec(x,y,z),data.torch,boundary,data.dir)
+					boundary[x][y][z] = nil
 				end
 			end
 		end
 	end
-	
-	--print("total torch calc time:"..minetest.get_us_time()/1000000-speed_test)
-
-
 
 	--reassemble the table into a position list minetest can understand
 	--run through and set dust
-	--local count = 0
-
-	for x,datax in pairs(r_index) do
+	for x,datax in pairs(boundary) do
 		for y,datay in pairs(datax) do
-			for z,index in pairs(datay) do
-				--print(get_node(new_vec(x,y,z)).name)
-				if index and index.dust and index.level ~= check_table[x][y][z] then
-					--count = count + 1
-					swap_node(new_vec(x,y,z),{name="redstone:dust_"..index.level})
+			for z,data in pairs(datay) do
+				--print(dump(data))
+				if data.dust and data.dust ~= data.origin then
+					--print("setting:" ..data.dust)
+					swap_node(new_vec(x,y,z),{name="redstone:dust_"..data.dust})
 				end
 			end
 		end
 	end
-	--print("set "..count.." nodes")
-
-	for x,datax in pairs(a_index) do
+	--[[
+	for x,datax in pairs(boundary) do
 		for y,datay in pairs(datax) do
-			for z,index in pairs(datay) do
+			for z,data in pairs(datay) do
 				--directional activators
-				if index.directional == true then
+				if data.directional == true then
 					power = get_powered_state_directional(new_vec(x,y,z))
 					if power then
 						if power > 0 then
@@ -322,52 +243,27 @@ function redstone.calculate()
 			end
 		end
 	end
-end
+	]]--
 
---make redstone wire pass on current one level lower than it is
-local i
-local index
-local passed_on_level
-local function redstone_pathfinder(source,source_level,direction)
-	--directional torches
-
-	if direction then
-		--print("starting direction")
-		i = add_vec(source,facedir_to_dir(direction))
-		if r_index and r_index[i.x] and r_index[i.x][i.y] and r_index[i.x][i.y][i.z] then
-			index = r_index[i.x][i.y][i.z]
-			--dust
-			if index.dust  then
-				passed_on_level = source_level - 1
-				if passed_on_level > 0 then
-					r_index[i.x][i.y][i.z].level = passed_on_level
-					redstone_pathfinder(i,passed_on_level,nil)
-				end
-			end
-		end
-	else
-		--redstone and torch
-		for _,order in pairs(order) do
-			i = add_vec(source,new_vec(order.x,order.y,order.z))
-			if r_index and r_index[i.x] and r_index[i.x][i.y] and r_index[i.x][i.y][i.z] then
-				--print(minetest.get_node(i).name)
-				index = r_index[i.x][i.y][i.z]					
-				if index.dust  then
-					passed_on_level = source_level - 1
-					if passed_on_level > 0 and index.level < source_level then
-						r_index[i.x][i.y][i.z].level = passed_on_level
-						redstone_pathfinder(i,passed_on_level,nil)
-					end
-				end
+	for x,index_x in pairs(boundary) do
+		for y,index_y in pairs(index_x) do
+			for z,data in pairs(index_y) do
+				--write data back to memory pool
+				pool[x][y][z] = data
 			end
 		end
 	end
 end
-function redstone.pathfind(source,source_level,direction)
-	redstone_pathfinder(source,source_level,direction)
+
+
+function redstone.inject(pos,data)
+	data_injection(pos,data)
 end
 
 
+function redstone.update(pos)
+	calculate(pos)
+end
 
 
 
@@ -467,9 +363,11 @@ for i = 0,8 do
 		drop="redstone:dust",
 		on_construct = function(pos)
 			data_injection(pos,{dust=i})
+			calculate(pos)
 		end,
 		after_destruct = function(pos)
 			data_injection(pos,nil)
+			calculate(pos)
 		end,
 		connects_to = {"group:redstone"},
 	})

@@ -115,10 +115,12 @@ minetest.register_node("redstone:torch_floor", {
 	},
 	
 	on_construct = function(pos)
-		redstone.collect_info(pos)
+		redstone.inject(pos,{torch=9})
+		redstone.update(pos)
 	end,
 	after_destruct = function(pos, oldnode)
-		redstone.collect_info(pos)
+		redstone.inject(pos,nil)
+		redstone.update(pos)
 	end,
 	sounds = main.woodSound(),
 })
@@ -144,11 +146,13 @@ minetest.register_node("redstone:torch_wall", {
 		wall_bottom = {-0.1, -0.5, -0.1, 0.1, 0.1, 0.1},
 		wall_side = {-0.5, -0.3, -0.1, -0.2, 0.3, 0.1},
 	},
-	on_construct = function(pos)		
-		redstone.collect_info(pos)
+	on_construct = function(pos)
+		redstone.inject(pos,{torch=9})
+		redstone.update(pos)
 	end,
 	after_destruct = function(pos, oldnode)
-		redstone.collect_info(pos)
+		redstone.inject(pos,nil)
+		redstone.update(pos)
 	end,
 	sounds = main.woodSound(),
 })
