@@ -67,7 +67,7 @@ end
 --index all mods
 local all_nodes = {}
 minetest.register_on_mods_loaded(function()
-	for name in pairs(minetest.registered_nodes) do
+	for name in pairs(minetest.registered_items) do
 		if name ~= "air" and name ~= "ignore" then
 			table.insert(all_nodes,name)
 		end
