@@ -595,7 +595,7 @@ minetest.register_lbm({
 })
 
 redstone.register_activator({
-	name = "redstone:piston_on",
+	name = "redstone:sticky_piston_on",
 	deactivate = function(pos)
 		--this is where the piston deactivates
 		local facedir = minetest.get_node(pos).param2
