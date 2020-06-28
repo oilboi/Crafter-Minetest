@@ -95,6 +95,9 @@ for _,color in pairs(colors) do
       
       after_destruct = function(pos, oldnode)
           redstone.inject(pos,nil)
+      end,
+      after_place_node = function(pos, placer, itemstack, pointed_thing)
+        redstone.update(pos)
       end
   })
 
