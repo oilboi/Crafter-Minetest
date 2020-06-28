@@ -497,7 +497,7 @@ end
 
 minetest.register_node("redstone:sticky_piston_off", {
     description = "Sticky Piston",
-    tiles = {"redstone_piston.png","redstone_piston.png^[transformR180","redstone_piston.png^[transformR270","redstone_piston.png^[transformR90","wood.png","stone.png"},
+    tiles = {"redstone_piston.png","redstone_piston.png^[transformR180","redstone_piston.png^[transformR270","redstone_piston.png^[transformR90","sticky_piston.png","stone.png"},
     paramtype2 = "facedir",
     groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,pathable = 1,redstone_activation=1},
     sounds = main.stoneSound(),
@@ -554,6 +554,27 @@ minetest.register_lbm({
  ╚═════╝ ╚═╝  ╚═══╝
 ]]
 
+local function sticky_piston_pull_nodes(pos,dir)
+	print("test")
+	local move_index = {}
+	local index_pos = vector.add(pos,dir)
+	
+	local node = minetest.get_node(index_pos)
+	local param2 = node.param2
+	local def = minetest.registered_nodes[node.name]
+	local name = node.name
+	print(name)
+	local pull = ((excluded_mods[def.mod_origin] ~= true) and (excluded_nodes[name] ~= true))
+	--if it can be pulled pull it
+	if pull and name ~= "air" then
+		minetest.remove_node(index_pos)
+		minetest.set_node(pos,{name=name,param2=param2})
+	end
+end
+
+
+
+
 minetest.register_node("redstone:sticky_piston_on", {
     description = "Sticky Piston",
     tiles = {"redstone_piston.png","redstone_piston.png^[transformR180","redstone_piston.png^[transformR270","redstone_piston.png^[transformR90","stone.png","stone.png"},
@@ -601,9 +622,12 @@ redstone.register_activator({
 		local facedir = minetest.get_node(pos).param2
 		local dir = minetest.facedir_to_dir(facedir)
 		local piston_location = vector.add(pos,dir)
+		
 		minetest.remove_node(piston_location)
+
+		sticky_piston_pull_nodes(piston_location,dir)
 		minetest.swap_node(pos,{name="redstone:sticky_piston_off",param2=facedir})
-		piston_location.y = piston_location.y + 1
+
 		minetest.sound_play("piston", {pos=pos,pitch=math.random(85,100)/100})
 		redstone.inject(pos,{
 			name = "redstone:sticky_piston_off",
@@ -626,7 +650,7 @@ redstone.register_activator({
 
 minetest.register_node("redstone:sticky_actuator", {
     description = "Piston Actuator",
-    tiles = {"wood.png"},
+    tiles = {"wood.png","wood.png","wood.png","wood.png","sticky_piston.png","wood.png"},
     drawtype = "nodebox",
     paramtype = "light",
     paramtype2 = "facedir",
