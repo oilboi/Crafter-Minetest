@@ -51,7 +51,8 @@ minetest.register_node("redstone:repeater_on_"..level, {
 			torch  = 9,
 			torch_directional = true,
 			directional_activator = true,
-			input  = vector.multiply(dir,-1),
+			input  = vector.subtract(pos,dir),
+			output = vector.add(pos,dir),
 			dir = dir
 		})
 	end,
@@ -63,11 +64,12 @@ minetest.register_node("redstone:repeater_on_"..level, {
 		redstone.inject(pos,{
 			name = "redstone:repeater_off_"..level,
 			directional_activator = true,
-			input  = vector.multiply(dir,-1),
+			input  = vector.subtract(pos,dir),
 			dir = dir
 		})
 		minetest.after(0,function()
-			redstone.update(vector.add(pos,dir))
+			--redstone.update(vector.add(pos,dir))
+			redstone.update(pos)
 		end)
 	end,
 
@@ -83,7 +85,8 @@ minetest.register_node("redstone:repeater_on_"..level, {
 			torch  = 9,
 			torch_directional = true,
 			directional_activator = true,
-			input  = vector.multiply(dir,-1),
+			input  = vector.subtract(pos,dir),
+			output = vector.add(pos,dir),
 			dir = dir
 		})
 		redstone.update(pos)
@@ -112,10 +115,13 @@ minetest.register_lbm({
 			torch  = 9,
 			torch_directional = true,
 			directional_activator = true,
-			input  = vector.multiply(dir,-1),
+			input  = vector.subtract(pos,dir),
+			output = vector.add(pos,dir),
 			dir = dir
 		})
-		redstone.update(pos)
+		minetest.after(0,function()
+			redstone.update(vector.add(pos,dir))
+		end)
 	end,
 })
 
@@ -176,11 +182,13 @@ minetest.register_node("redstone:repeater_off_"..level, {
 			torch  = 9,
 			torch_directional = true,
 			directional_activator = true,
-			input  = vector.multiply(dir,-1),
+			input  = vector.subtract(pos,dir),
+			output = vector.add(pos,dir),
 			dir = dir
 		})
 		minetest.after(0,function()
-			redstone.update(vector.add(pos,dir))
+			--redstone.update(vector.add(pos,dir))
+			redstone.update(pos)
 		end)
 	end,
 
@@ -195,7 +203,7 @@ minetest.register_node("redstone:repeater_off_"..level, {
 		redstone.inject(pos,{
 			name = "redstone:repeater_off_"..newlevel,
 			directional_activator = true,
-			input  = vector.multiply(dir,-1),
+			input  = vector.subtract(pos,dir),
 			dir = dir
 		})
 		minetest.sound_play("lever", {pos=pos})
@@ -211,7 +219,7 @@ minetest.register_node("redstone:repeater_off_"..level, {
 		redstone.inject(pos,{
 			name = "redstone:repeater_off_"..level,
 			directional_activator = true,
-			input  = vector.multiply(dir,-1),
+			input  = vector.subtract(pos,dir),
 			dir = dir
 		})
 		redstone.update(pos)
@@ -239,10 +247,12 @@ minetest.register_lbm({
 		redstone.inject(pos,{
 			name = "redstone:repeater_off_"..level,
 			directional_activator = true,
-			input  = vector.multiply(dir,-1),
+			input  = vector.subtract(pos,dir),
 			dir = dir
 		})
-		redstone.update(pos)
+		minetest.after(0,function()
+			redstone.update(vector.add(pos,dir))
+		end)
 	end,
 })
 

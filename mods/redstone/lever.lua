@@ -1,5 +1,8 @@
 
-local minetest,vector,math,pairs = minetest,vector,math,pairs
+local
+minetest,vector,math,pairs
+=
+minetest,vector,math,pairs
 
 
 minetest.register_node("redstone:lever_off", {

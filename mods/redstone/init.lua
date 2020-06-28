@@ -180,7 +180,7 @@ local directional_activator = function(pos)
 	if not input then ignore = true end
 
 	if not ignore then
-		input = add_vec(input,pos)
+		input = temp_pool.input
 	end
 
 	if not ignore and pool and pool[input.x] and pool[input.x][input.y] and pool[input.x][input.y][input.z] then
@@ -209,11 +209,11 @@ end
 local i
 local index
 local passed_on_level
-local function redstone_pathfinder(source,source_level,boundary,direction)
+local function redstone_pathfinder(source,source_level,boundary,output)
 	if not source_level then return end
 	--directional torches
-	if direction then
-		i = add_vec(source,direction)
+	if output then
+		i = output
 		if i and boundary and boundary[i.x] and boundary[i.x][i.y] and boundary[i.x][i.y][i.z] then
 			index = boundary[i.x][i.y][i.z]
 			--dust
@@ -245,14 +245,14 @@ local function redstone_pathfinder(source,source_level,boundary,direction)
 end
 
 
+
+
 --make all power sources push power out
 local pos
 local node
 local power
-
 local boundary
 local function calculate(pos)
-
 	boundary = create_boundary_box(pos)
 	--pathfind through memory map	
 	for x,index_x in pairs(boundary) do
@@ -263,12 +263,11 @@ local function calculate(pos)
 					redstone_pathfinder(new_vec(x,y,z),data.torch,boundary)
 					boundary[x][y][z] = nil
 				elseif data.torch_directional then
-					redstone_pathfinder(new_vec(x,y,z),data.torch,boundary,data.dir)
+					redstone_pathfinder(new_vec(x,y,z),data.torch,boundary,data.output)
 				end
 			end
 		end
 	end
-
 	--reassemble the table into a position list minetest can understand
 	--run through and set dust
 	for x,datax in pairs(boundary) do
@@ -289,6 +288,7 @@ local function calculate(pos)
 		end
 	end
 
+	
 	--this must be done after the memory is written
 	for x,datax in pairs(boundary) do
 		for y,datay in pairs(datax) do
@@ -317,7 +317,7 @@ function redstone.update(pos)
 	end
 	recursion_check[s_pos] = recursion_check[s_pos] + 1
 	--print(recursion_check[s_pos])
-	if recursion_check[s_pos] > 50 then
+	if recursion_check[s_pos] > 6 then
 		minetest.after(0,function()
 			minetest.dig_node(pos)
 			data_injection(pos,nil)

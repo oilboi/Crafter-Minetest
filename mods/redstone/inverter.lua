@@ -63,8 +63,9 @@ redstone.register_activator({
 			input  = vector.multiply(dir,-1),
 			dir = dir
 		})
-
-		redstone.update(pos)
+		minetest.after(0.1,function()
+			--redstone.update(pos)
+		end)
 	end
 })
 
@@ -145,7 +146,9 @@ redstone.register_activator({
 			input  = vector.multiply(dir,-1),
 			dir = dir
 		})
-		redstone.update(pos)
+		minetest.after(0.1,function()
+			--redstone.update(pos)
+		end)
 	end
 })
 
