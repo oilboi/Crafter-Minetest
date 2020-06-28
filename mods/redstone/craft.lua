@@ -50,11 +50,6 @@ minetest.register_craft({
 		{"main:stone","main:stone","main:stone"},
 	}
 })
-minetest.register_craft({
-	output = "redstone:light_off",
-	type = "shapeless",
-	recipe = {"main:glass","redstone:dust"},
-})
 
 minetest.register_craft({
 	output = "redstone:piston_off",

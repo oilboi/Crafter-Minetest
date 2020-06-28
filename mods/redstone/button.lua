@@ -89,3 +89,21 @@ minetest.register_node("redstone:button_on", {
 		redstone.update(pos2)
 	end,
 })
+
+minetest.register_lbm({
+	name = "redstone:button_on",
+	nodenames = {"redstone:button_on"},
+	run_at_every_load = true,
+	action = function(pos)
+		local dir = minetest.wallmounted_to_dir(node.param2)
+
+		redstone.inject(pos,{torch=9})
+		local pos2 = vector.add(dir,pos)
+		redstone.inject(pos2,{torch=9})
+
+		minetest.after(0,function()
+			redstone.update(pos)
+			redstone.update(pos2)
+		end)
+	end,
+})

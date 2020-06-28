@@ -49,7 +49,7 @@ dofile(path.."/torch.lua")
 dofile(path.."/lever.lua")
 dofile(path.."/button.lua")
 dofile(path.."/repeater.lua")
---dofile(path.."/light.lua")
+dofile(path.."/light.lua")
 --dofile(path.."/piston.lua")
 --dofile(path.."/comparator.lua")
 --dofile(path.."/craft.lua")
@@ -137,21 +137,29 @@ end
 
 
 -- activators
-local n
+local n_pos
 local temp_pool
+local temp_pool2
 local non_directional_activator = function(pos)
+	temp_pool = pool[pos.x][pos.y][pos.z]
 	for _,order in pairs(order) do
 		n_pos = add_vec(pos,order)
-		temp_pool = pool[n.x][n.y][n.z]
-		if temp_pool then
-			--if temp_pool.dust and temp_pool.dust > 0 or 
-			--print(get_node(add_vec(new_vec(x,y,z),pos)).name)
-			if get_item_group(get_node(add_vec(new_vec(order.x,order.y,order.z),pos)).name, "redstone_power") > 0 then
-				return(1)
+		if pool[n_pos.x] and pool[n_pos.x][n_pos.y] and pool[n_pos.x][n_pos.y][n_pos.z] then
+			temp_pool2 = pool[n_pos.x][n_pos.y][n_pos.z]
+			if temp_pool2 then
+				if (not temp_pool2.directional_activator and temp_pool2.torch) or 
+				(temp_pool2.dust and temp_pool2.dust > 0) then
+					if activator_table[temp_pool.name].activate then
+						activator_table[temp_pool.name].activate(pos)
+					end
+					return
+				end
 			end
 		end
 	end	
-	return(0)
+	if activator_table[temp_pool.name].deactivate then
+		activator_table[temp_pool.name].deactivate(pos)
+	end
 end
 
 -- directional activators
