@@ -37,7 +37,7 @@ minetest.register_node("redstone:inverter_on", {
 		redstone.inject(pos,{
 			name = "redstone:inverter_on",
 			directional_activator = true,
-			input  = vector.multiply(dir,-1),
+			input  = vector.subtract(pos,dir),
 			dir = dir
 		})
 		redstone.update(pos)
@@ -60,11 +60,12 @@ redstone.register_activator({
 			torch  = 9,
 			torch_directional = true,
 			directional_activator = true,
-			input  = vector.multiply(dir,-1),
+			input  = vector.subtract(pos,dir),
+			output = vector.add(pos,dir),
 			dir = dir
 		})
-		minetest.after(0.1,function()
-			--redstone.update(pos)
+		minetest.after(0,function()
+			redstone.update(pos)
 		end)
 	end
 })
@@ -79,7 +80,7 @@ minetest.register_lbm({
 		redstone.inject(pos,{
 			name = "redstone:inverter_on",
 			directional_activator = true,
-			input  = vector.multiply(dir,-1),
+			input  = vector.subtract(pos,dir),
 			dir = dir
 		})
 	end,
@@ -122,7 +123,8 @@ minetest.register_node("redstone:inverter_off", {
 			torch  = 9,
 			torch_directional = true,
 			directional_activator = true,
-			input  = vector.multiply(dir,-1),
+			input  = vector.subtract(pos,dir),
+			output = vector.add(pos,dir),
 			dir = dir
 		})
 		redstone.update(pos)
@@ -143,11 +145,11 @@ redstone.register_activator({
 		redstone.inject(pos,{
 			name = "redstone:inverter_on",
 			directional_activator = true,
-			input  = vector.multiply(dir,-1),
+			input  = vector.subtract(pos,dir),
 			dir = dir
 		})
-		minetest.after(0.1,function()
-			--redstone.update(pos)
+		minetest.after(0,function()
+			redstone.update(pos)
 		end)
 	end
 })
@@ -164,7 +166,8 @@ minetest.register_lbm({
 			torch  = 9,
 			torch_directional = true,
 			directional_activator = true,
-			input  = vector.multiply(dir,-1),
+			input  = vector.subtract(pos,dir),
+			output = vector.add(pos,dir),
 			dir    = dir
 		})
 		redstone.update(pos)

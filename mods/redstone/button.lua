@@ -22,27 +22,27 @@ minetest.register_node("redstone:button_off", {
 		minetest.swap_node(pos, {name="redstone:button_on",param2=node.param2})
 
 		minetest.sound_play("lever", {pos=pos})
+
 		local timer = minetest.get_node_timer(pos)
 		timer:start(1.25)
 
 		local dir = minetest.wallmounted_to_dir(node.param2)
-		pos = vector.add(dir,pos)
-	
-		local meta = minetest.get_meta(pos)
 
-		meta:set_int("redstone_power", 9)
+		redstone.inject(pos,{torch=9})
+		local pos2 = vector.add(dir,pos)
+		redstone.inject(pos2,{torch=9})
 
-		redstone.collect_info(pos)
+		redstone.update(pos)
+		redstone.update(pos2)
 	end,
 	after_destruct = function(pos, oldnode)
+		redstone.inject(pos,nil)
 		local dir = minetest.wallmounted_to_dir(oldnode.param2)
-		pos = vector.add(dir,pos)
-	
-		local meta = minetest.get_meta(pos)
+		local pos2 = vector.add(dir,pos)
+		redstone.inject(pos2,nil)
 
-		meta:set_int("redstone_power", 0)
-		
-		redstone.collect_info(pos)
+		redstone.update(pos)
+		redstone.update(pos2)
 	end,
 })
 minetest.register_node("redstone:button_on", {
@@ -69,24 +69,23 @@ minetest.register_node("redstone:button_on", {
 		local node = minetest.get_node(pos)
 		minetest.swap_node(pos, {name="redstone:button_off",param2=node.param2})
 
-		local dir = minetest.wallmounted_to_dir(node.param2)
-		pos = vector.add(dir,pos)
-	
-		local meta = minetest.get_meta(pos)
+		redstone.inject(pos,nil)
+		local param2 = minetest.get_node(pos).param2
+		local dir = minetest.wallmounted_to_dir(param2)
+		local pos2 = vector.add(dir,pos)
+		redstone.inject(pos2,nil)
 
-		meta:set_int("redstone_power", 0)
-		
-		redstone.collect_info(pos)
+		redstone.update(pos)
+		redstone.update(pos2)
 		
 	end,
 	after_destruct = function(pos, oldnode)
+		redstone.inject(pos,nil)
 		local dir = minetest.wallmounted_to_dir(oldnode.param2)
-		pos = vector.add(dir,pos)
-	
-		local meta = minetest.get_meta(pos)
+		local pos2 = vector.add(dir,pos)
+		redstone.inject(pos2,nil)
 
-		meta:set_int("redstone_power", 0)
-		
-		redstone.collect_info(pos)
+		redstone.update(pos)
+		redstone.update(pos2)
 	end,
 })
