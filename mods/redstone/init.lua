@@ -93,14 +93,11 @@ local function create_boundary_box(pos)
 							if not table_3d[x] then table_3d[x] = {} end
 							if not table_3d[x][y] then table_3d[x][y] = {} end
 
-							if x == pos.x-9 or x == pos.x+9 or 
+							if (x == pos.x-9 or x == pos.x+9 or 
 							y == pos.y-9 or y == pos.y+9 or 
-							z == pos.z-9 or z == pos.z+9 then
-								if temp_pool.dust then
-									table_3d[x][y][z] = {torch=temp_pool.dust}
-								else
-									table_3d[x][y][z] = temp_pool
-								end
+							z == pos.z-9 or z == pos.z+9) and 
+							temp_pool.dust and temp_pool.dust > 1 then
+								table_3d[x][y][z] = {torch=temp_pool.dust}
 							else
 								if temp_pool.dust then
 									table_3d[x][y][z] = {dust=0,origin=temp_pool.dust}
