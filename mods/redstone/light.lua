@@ -25,17 +25,17 @@ for _,color in pairs(colors) do
     }),
       drop = "redstone:light_off_"..color,
 
-      after_place_node = function(pos, placer, itemstack, pointed_thing)
+      on_construct = function(pos)
         redstone.inject(pos,{
           name = "redstone:light_on_"..color,
           activator = true,
         })
-
-        redstone.update(pos)
+        minetest.after(0,function()
+          redstone.update(pos)
+        end)
       end,
       after_destruct = function(pos, oldnode)
         redstone.inject(pos,nil)
-        redstone.update(pos)
       end
   })
 
@@ -82,18 +82,19 @@ for _,color in pairs(colors) do
       drop = "redstone:light_off_"..color,
       
 
-      after_place_node = function(pos, placer, itemstack, pointed_thing)
+      on_construct = function(pos)
         redstone.inject(pos,{
           name = "redstone:light_off_"..color,
           activator = true,
         })
 
-        redstone.update(pos)
+        minetest.after(0,function()
+          redstone.update(pos)
+        end)
       end,
       
       after_destruct = function(pos, oldnode)
-        redstone.inject(pos,nil)
-        redstone.update(pos)
+          redstone.inject(pos,nil)
       end
   })
 

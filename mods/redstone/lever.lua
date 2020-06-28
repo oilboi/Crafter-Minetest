@@ -4,6 +4,11 @@ minetest,vector,math,pairs
 =
 minetest,vector,math,pairs
 
+local excluded_mods = {redstone=true,door=true}
+local registered_nodes
+minetest.register_on_mods_loaded(function()
+	registered_nodes  = minetest.registered_nodes
+end)
 
 minetest.register_node("redstone:lever_on", {
     description = "Lever On",
@@ -87,6 +92,17 @@ minetest.register_node("redstone:lever_off", {
 				{-0.1, -0.5,  -0.3, 0.1,  0, -0.1},
 			},
 		},
+
+	on_construct = function(pos)
+		local param2 = minetest.get_node(pos).param2
+		local dir = minetest.wallmounted_to_dir(param2)
+		local node = minetest.get_node(vector.add(pos,dir)).name
+		if excluded_mods[registered_nodes[node].mod_origin] then
+			minetest.swap_node(pos,{name="air"})
+			redstone.inject(pos,nil)
+			minetest.throw_item(pos, "redstone:lever_off")
+		end
+	end,
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		minetest.swap_node(pos, {name="redstone:lever_on",param2=node.param2})
 		minetest.sound_play("lever", {pos=pos})

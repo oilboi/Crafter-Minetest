@@ -1,5 +1,11 @@
 local minetest,table,vector = minetest,table,vector
 
+local excluded_mods = {redstone=true,door=true}
+local registered_nodes
+minetest.register_on_mods_loaded(function()
+	registered_nodes  = minetest.registered_nodes
+end)
+
 minetest.register_node("redstone:button_off", {
     description = "Button",
     tiles = {"stone.png"},
@@ -18,6 +24,16 @@ minetest.register_node("redstone:button_off", {
 				{-0.25, -0.5,  -0.15, 0.25,  -0.3, 0.15},
 			},
 		},
+	on_construct = function(pos)
+		local param2 = minetest.get_node(pos).param2
+		local dir = minetest.wallmounted_to_dir(param2)
+		local node = minetest.get_node(vector.add(pos,dir)).name
+		if excluded_mods[registered_nodes[node].mod_origin] then
+			minetest.swap_node(pos,{name="air"})
+			redstone.inject(pos,nil)
+			minetest.throw_item(pos, "redstone:button_off")
+		end
+	end,
     on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		minetest.swap_node(pos, {name="redstone:button_on",param2=node.param2})
 

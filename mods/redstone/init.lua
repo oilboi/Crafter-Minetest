@@ -43,14 +43,14 @@ function redstone.register_activator(data)
 end
 
 local path = minetest.get_modpath("redstone")
---dofile(path.."/functions.lua")
+dofile(path.."/functions.lua")
 --dofile(path.."/wire.lua")
 dofile(path.."/torch.lua")
 dofile(path.."/lever.lua")
 dofile(path.."/button.lua")
 dofile(path.."/repeater.lua")
 dofile(path.."/light.lua")
---dofile(path.."/piston.lua")
+dofile(path.."/piston.lua")
 --dofile(path.."/comparator.lua")
 --dofile(path.."/craft.lua")
 --dofile(path.."/ore.lua")
@@ -141,24 +141,27 @@ local n_pos
 local temp_pool
 local temp_pool2
 local non_directional_activator = function(pos)
-	temp_pool = pool[pos.x][pos.y][pos.z]
-	for _,order in pairs(order) do
-		n_pos = add_vec(pos,order)
-		if pool[n_pos.x] and pool[n_pos.x][n_pos.y] and pool[n_pos.x][n_pos.y][n_pos.z] then
-			temp_pool2 = pool[n_pos.x][n_pos.y][n_pos.z]
-			if temp_pool2 then
-				if (not temp_pool2.directional_activator and temp_pool2.torch) or 
-				(temp_pool2.dust and temp_pool2.dust > 0) then
-					if activator_table[temp_pool.name].activate then
-						activator_table[temp_pool.name].activate(pos)
+	if pool[pos.x] and pool[pos.x][pos.y] and pool[pos.x][pos.y][pos.z] then
+		temp_pool = pool[pos.x][pos.y][pos.z]
+		for _,order in pairs(order) do
+			n_pos = add_vec(pos,order)
+			if pool[n_pos.x] and pool[n_pos.x][n_pos.y] and pool[n_pos.x][n_pos.y][n_pos.z] then
+				temp_pool2 = pool[n_pos.x][n_pos.y][n_pos.z]
+				if temp_pool2 then
+					if (not temp_pool2.directional_activator and temp_pool2.torch) or 
+					(temp_pool2.dust and temp_pool2.dust > 0) or 
+					(temp_pool2.torch_directional and vector.equals(temp_pool2.output, pos)) then
+						if activator_table[temp_pool.name].activate then
+							activator_table[temp_pool.name].activate(pos)
+						end
+						return
 					end
-					return
 				end
 			end
+		end	
+		if activator_table[temp_pool.name].deactivate then
+			activator_table[temp_pool.name].deactivate(pos)
 		end
-	end	
-	if activator_table[temp_pool.name].deactivate then
-		activator_table[temp_pool.name].deactivate(pos)
 	end
 end
 
