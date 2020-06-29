@@ -148,7 +148,6 @@ end
 
 
 local function capacitor_pathfind(source,mem_map)
-	--redstone and torch
 	for _,order in pairs(order) do
 
 		i = add_vec(source,order)
@@ -188,7 +187,6 @@ local function capacitor_sniff(pos)
 					if temp_pool then
 						temp_pool.capacitor = 1
 						if capacitor_table[temp_pool.name] then
-							--print("doing")
 							swap_node(new_vec(x,y,z),{name=capacitor_table[temp_pool.name].on})
 							redstone.update(new_vec(x,y,z))
 						end
@@ -204,7 +202,6 @@ local function capacitor_sniff(pos)
 					if temp_pool then
 						temp_pool.capacitor = 0
 						if capacitor_table[temp_pool.name] then
-							--print(temp_pool.name)
 							swap_node(new_vec(x,y,z),{name=capacitor_table[temp_pool.name].off})
 							redstone.update(new_vec(x,y,z))
 						end

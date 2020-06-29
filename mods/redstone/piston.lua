@@ -85,7 +85,6 @@ local function push_nodes(pos,dir)
 	if space == true and next(move_index) then
 		if table.getn(move_index) == 1 and minetest.get_item_group(move_index[1].name, "falling_node") > 0 then
 			for i = 1,table.getn(move_index) do
-				print("trying")
 				move_index[i].pos = vector.add(move_index[i].pos,dir)
 				minetest.set_node(move_index[i].pos,{name="air"})
 
@@ -555,7 +554,6 @@ minetest.register_lbm({
 ]]
 
 local function sticky_piston_pull_nodes(pos,dir)
-	print("test")
 	local move_index = {}
 	local index_pos = vector.add(pos,dir)
 	
@@ -563,7 +561,6 @@ local function sticky_piston_pull_nodes(pos,dir)
 	local param2 = node.param2
 	local def = minetest.registered_nodes[node.name]
 	local name = node.name
-	print(name)
 	local pull = ((excluded_mods[def.mod_origin] ~= true) and (excluded_nodes[name] ~= true))
 	--if it can be pulled pull it
 	if pull and name ~= "air" then
