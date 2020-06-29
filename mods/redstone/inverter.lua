@@ -64,7 +64,7 @@ redstone.register_activator({
 			output = vector.add(pos,dir),
 			dir = dir
 		})
-		redstone.update(vector.add(dir,pos))
+		redstone.update(pos)
 	end
 })
 
@@ -146,7 +146,7 @@ redstone.register_activator({
 			input  = vector.subtract(pos,dir),
 			dir = dir
 		})
-		redstone.update(vector.add(dir,pos))
+		redstone.update(pos)
 	end
 })
 
