@@ -406,7 +406,7 @@ function redstone.update(pos,is_capacitor)
 		recursion_check[s_pos] = 0
 	end
 	recursion_check[s_pos] = recursion_check[s_pos] + 1
-	if recursion_check[s_pos] > 10 then
+	if recursion_check[s_pos] > 25 then
 		--print(recursion_check[s_pos])
 		minetest.after(0,function()
 			bad_node = minetest.get_node(pos).name
