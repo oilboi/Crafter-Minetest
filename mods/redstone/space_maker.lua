@@ -48,10 +48,12 @@ minetest.register_node("redstone:space", {
 		pos.y = pos.y + 1
 		for _,item in pairs(items) do
 			local obj = minetest.add_item(pos,item)
-			local x=math.random(-2,2)*math.random()
-			local y=math.random(2,5)
-			local z=math.random(-2,2)*math.random()
-			obj:setvelocity({x=x, y=y, z=z})
+			--local x=math.random(-2,2)*math.random()
+			--local y=math.random(2,5)
+			--local z=math.random(-2,2)*math.random()
+			--if obj and obj:get_luaentity() then
+			--	obj:setvelocity({x=x, y=y, z=z})
+			--end
 		end
     end,
     

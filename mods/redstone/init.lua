@@ -65,7 +65,7 @@ dofile(path.."/craft.lua")
 --dofile(path.."/ore.lua")
 dofile(path.."/inverter.lua")
 --dofile(path.."/player_detector.lua")
---dofile(path.."/space_maker.lua")
+dofile(path.."/space_maker.lua")
 --dofile(path.."/pressure_plate.lua")
 dofile(path.."/capacitors.lua")
 
@@ -296,19 +296,19 @@ end
 local i
 local index
 local passed_on_level
-local function redstone_pathfinder(source,source_level,boundary,output)
+local function redstone_pathfinder(source,source_level,mem_map,output)
 	if not source_level then return end
 	--directional torches
 	if output then
 		i = output
-		if i and boundary and boundary[i.x] and boundary[i.x][i.y] and boundary[i.x][i.y][i.z] then
-			index = boundary[i.x][i.y][i.z]
+		if i and mem_map and mem_map[i.x] and mem_map[i.x][i.y] and mem_map[i.x][i.y][i.z] then
+			index = mem_map[i.x][i.y][i.z]
 			--dust
 			if index.dust then
 				passed_on_level = source_level - 1
 				if passed_on_level > 0 then
-					boundary[i.x][i.y][i.z].dust = passed_on_level
-					redstone_pathfinder(i,passed_on_level,boundary,nil)
+					mem_map[i.x][i.y][i.z].dust = passed_on_level
+					redstone_pathfinder(i,passed_on_level,mem_map,nil)
 				end
 			end
 		end
@@ -316,51 +316,131 @@ local function redstone_pathfinder(source,source_level,boundary,output)
 		--redstone and torch
 		for _,order in pairs(order) do
 			i = add_vec(source,order)
-			if i and boundary and boundary[i.x] and boundary[i.x][i.y] and boundary[i.x][i.y][i.z] then
-				index = boundary[i.x][i.y][i.z]
+			if i and mem_map and mem_map[i.x] and mem_map[i.x][i.y] and mem_map[i.x][i.y][i.z] then
+				index = mem_map[i.x][i.y][i.z]
 				if index.dust then
 					passed_on_level = source_level - 1
 					if passed_on_level > 0 and index.dust < source_level then
-						boundary[i.x][i.y][i.z].dust = passed_on_level
-						redstone_pathfinder(i,passed_on_level,boundary,nil)
+						mem_map[i.x][i.y][i.z].dust = passed_on_level
+						redstone_pathfinder(i,passed_on_level,mem_map,nil)
 					end
 				end
 			end
 		end
 	end
-	return(boundary)
+	return(mem_map)
 end
 
 
+--[[
+                     , 
+                ,.  | \ 
+               |: \ ; :\ 
+               :' ;\| ::\ 
+                \ : | `::\ 
+                _)  |   `:`. 
+              ,' , `.    ;: ; 
+            ,' ;:  ;"'  ,:: |_ 
+           /,   ` .    ;::: |:`-.__ 
+        _,' _o\  ,::.`:' ;  ;   . ' 
+    _,-'           `:.          ;""\, 
+ ,-'                     ,:         `-;, 
+ \,                       ;:           ;--._ 
+  `.______,-,----._     ,' ;:        ,/ ,  ,` 
+         / /,-';'  \     ; `:      ,'/,::.::: 
+       ,',;-'-'_,--;    ;   :.   ,',',;:::::: 
+      ( /___,-'     `.     ;::,,'o/  ,::::::: 
+       `'             )    ;:,'o /  ;"-   -:: 
+                      \__ _,'o ,'         ,:: 
+                         ) `--'       ,..:::: 
+                         ; `.        ,::::::: 
+                          ;  ``::.    ::::::: 
+]]-- sic em boy!
+local i
+local index
+local function dust_sniff(pos,mem_map,boundary)
+	for _,order in pairs(order) do
+		i = add_vec(pos,order)
 
+		if not mem_map[i.x] then mem_map[i.x] = {} end
+		if not mem_map[i.x][i.y] then mem_map[i.x][i.y] = {} end
+
+		if not mem_map[i.x][i.y][i.z] then
+			if i and boundary and boundary[i.x] and boundary[i.x][i.y] and boundary[i.x][i.y][i.z] then
+				index = boundary[i.x][i.y][i.z]
+				if index.dust then
+					mem_map[i.x][i.y][i.z] = index
+					mem_map[i.x][i.y][i.z].sniffed = true
+
+					dust_sniff(i,mem_map,boundary)
+
+				elseif index.torch then
+					mem_map[i.x][i.y][i.z] = index
+					mem_map[i.x][i.y][i.z].sniffed = true
+				end
+			end
+		end
+	end
+	return mem_map
+end
 
 --make all power sources push power out
 local pos
 local node
 local power
 local boundary
+local dust_detected
+local dust_map
+local count
+local pos3
+local temp_pool3
 local function calculate(pos,is_capacitor)
 	if not is_capacitor then
 		boundary = create_boundary_box(pos)
-		--pathfind through memory map	
-		for x,index_x in pairs(boundary) do
-			for y,index_y in pairs(index_x) do
-				for z,data in pairs(index_y) do
-					--allow data values for torches
-					if data.torch and not data.torch_directional then
-						redstone_pathfinder(new_vec(x,y,z),data.torch,boundary)
-						boundary[x][y][z] = nil
-					elseif data.torch_directional then
-						redstone_pathfinder(new_vec(x,y,z),data.torch,boundary,data.output)
+		dust_map = {}
+
+		dust_detected = false
+		count = 0
+		
+		if boundary[pos.x] and boundary[pos.x][pos.y] and boundary[pos.x][pos.y][pos.z] then
+			if not dust_map[pos.x] then dust_map[pos.x] = {} end
+			if not dust_map[pos.x][pos.y] then dust_map[pos.x][pos.y] = {} end
+			dust_map[pos.x][pos.y][pos.z] = boundary[pos.x][pos.y][pos.z]
+		end
+
+		dust_sniff(pos,dust_map,boundary)
+
+		-- sniff all possible dust within boundaries
+		for _,pos2 in pairs(order) do
+			pos3 = add_vec(pos,pos2)
+			if boundary[pos3.x] and boundary[pos3.x][pos3.y] and boundary[pos3.x][pos3.y][pos3.z] and
+				not (dust_map[pos3.x] and dust_map[pos3.x][pos3.y] and dust_map[pos3.x][pos3.y][pos3.z] and dust_map[pos3.x][pos3.y][pos3.z].sniffed) then
+				temp_pool3 = boundary[pos3.x][pos3.y][pos3.z]
+				if temp_pool3.dust then
+					dust_sniff(pos3,dust_map,boundary)
+				end
+			end
+		end
+
+
+		--do torches
+		for x,datax in pairs(dust_map) do
+			for y,datay in pairs(datax) do
+				for z,data in pairs(datay) do
+					count = count + 1
+					if data.torch and data.torch > 1 then
+						redstone_pathfinder(new_vec(x,y,z),data.torch,dust_map)
+						dust_map[x][y][z] = nil
 					end
 				end
 			end
 		end
-		--reassemble the table into a position list minetest can understand
-		--run through and set dust
-		for x,datax in pairs(boundary) do
+
+		--set dust, set pool memory
+		for x,datax in pairs(dust_map) do
 			for y,datay in pairs(datax) do
 				for z,data in pairs(datay) do
+					--print("update")
 					if data.dust and data.dust ~= data.origin then
 						swap_node(new_vec(x,y,z),{name="redstone:dust_"..data.dust})
 					end
@@ -369,13 +449,17 @@ local function calculate(pos,is_capacitor)
 
 					if data.dust then
 						--delete the data to speed up next loop
-						boundary[x][y][z] = nil
+						dust_map[x][y][z] = nil
 					end
 				end
 			end
 		end
 
-		
+
+
+		--swap_node(new_vec(x,y,z),{name="redstone:dust_"..data.dust})
+		--print("sniffy "..count)
+		--[[
 		--this must be done after the memory is written
 		for x,datax in pairs(boundary) do
 			for y,datay in pairs(datax) do
@@ -388,6 +472,7 @@ local function calculate(pos,is_capacitor)
 				end
 			end
 		end
+		]]--
 	else
 		capacitor_sniff(pos)
 	end
