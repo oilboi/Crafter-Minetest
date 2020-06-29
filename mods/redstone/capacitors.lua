@@ -122,7 +122,6 @@ minetest.register_lbm({
         redstone.inject(pos,{
             name = "main:ironblock",
             activator = true,
-            source = true,
             capacitor = 1,
         })
         minetest.after(0,function()
