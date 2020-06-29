@@ -53,7 +53,7 @@ redstone.register_activator({
 	name = "redstone:inverter_on",
 	deactivate = function(pos)
 		local param2 = minetest.get_node(pos).param2
-		minetest.set_node(pos,{name="redstone:inverter_off",param2=param2})
+		minetest.swap_node(pos,{name="redstone:inverter_off",param2=param2})
 		local dir = minetest.facedir_to_dir(param2)
 		redstone.inject(pos,{
 			name = "redstone:inverter_off",
@@ -138,7 +138,7 @@ redstone.register_activator({
 	activate = function(pos)
 		
 		local param2 = minetest.get_node(pos).param2
-		minetest.set_node(pos,{name="redstone:inverter_on",param2=param2})
+		minetest.swap_node(pos,{name="redstone:inverter_on",param2=param2})
 		local dir = minetest.facedir_to_dir(param2)
 		redstone.inject(pos,{
 			name = "redstone:inverter_on",

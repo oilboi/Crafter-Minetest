@@ -255,8 +255,11 @@ local directional_activator = function(pos)
 	
 	ignore = false
 	input = nil
+	temp_pool = nil
 	temp_pool2 = nil
 
+	--if not (pool[pos.x] and pool[pos.x][pos.y] and pool[pos.x][pos.y][pos.z]) then return end
+	
 	temp_pool = pool[pos.x][pos.y][pos.z]
 	
 	if not temp_pool then ignore = true end
@@ -367,8 +370,10 @@ local function dust_sniff(pos,mem_map,boundary)
 		if not mem_map[i.x][i.y] then mem_map[i.x][i.y] = {} end
 
 		if not mem_map[i.x][i.y][i.z] then
+			
 			if i and boundary and boundary[i.x] and boundary[i.x][i.y] and boundary[i.x][i.y][i.z] then
 				index = boundary[i.x][i.y][i.z]
+
 				if index.dust then
 					mem_map[i.x][i.y][i.z] = index
 					mem_map[i.x][i.y][i.z].sniffed = true
@@ -386,11 +391,7 @@ local function dust_sniff(pos,mem_map,boundary)
 				elseif index.activator then
 					mem_map[i.x][i.y][i.z] = index
 					mem_map[i.x][i.y][i.z].sniffed = true
-				end
-				--this needs to be hooked into the end
-				--because nodes can be directional activators
-				--and directional torches
-				if index.directional_activator and vec_equals(pos,index.input) then
+				elseif index.directional_activator and vec_equals(pos,index.input) then
 					mem_map[i.x][i.y][i.z] = index
 					mem_map[i.x][i.y][i.z].sniffed = true
 				end
@@ -439,7 +440,6 @@ local function calculate(pos,is_capacitor)
 			end
 		end
 
-
 		--do torches
 		for x,datax in pairs(dust_map) do
 			for y,datay in pairs(datax) do
@@ -464,11 +464,9 @@ local function calculate(pos,is_capacitor)
 					--print("update")
 					if data.dust and data.dust ~= data.origin then
 						swap_node(new_vec(x,y,z),{name="redstone:dust_"..data.dust})
-					end
 
-					data_injection(new_vec(x,y,z),data)
-					
-					if data.dust then
+						data_injection(new_vec(x,y,z),data)
+
 						--delete the data to speed up next loop
 						dust_map[x][y][z] = nil
 					end
@@ -516,7 +514,7 @@ function redstone.update(pos,is_capacitor)
 			for _,nodey in pairs(bad_node) do
 				minetest.throw_item(pos,nodey)
 			end
-			minetest.dig_node(pos)
+			minetest.remove_node(pos)
 			data_injection(pos,nil)
 			redstone.update(pos)
 		end)
@@ -632,7 +630,7 @@ for i = 0,8 do
 		nodenames = {"redstone:dust_"..i},
 		run_at_every_load = true,
         action = function(pos)
-            data_injection(pos,{dust=i})
+			data_injection(pos,{dust=i})
         end,
     })
 end

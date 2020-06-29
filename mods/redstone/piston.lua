@@ -96,9 +96,9 @@ local function push_nodes(pos,dir)
 			for i = 1,table.getn(move_index) do
 				if move_index[i] then
 					if move_index[i].pos then
-					move_index[i].pos = vector.add(move_index[i].pos,dir)
-					minetest.set_node(move_index[i].pos,move_index[i])
-					minetest.check_for_falling(move_index[i].pos)
+						move_index[i].pos = vector.add(move_index[i].pos,dir)
+						minetest.set_node(move_index[i].pos,move_index[i])
+						minetest.check_for_falling(move_index[i].pos)
 					end
 				end
 			end
@@ -173,9 +173,7 @@ local function actuator_arm_function(pos)
 			name = "redstone:piston_on",
 			activator = true,
 		})
-		minetest.after(0,function()
-			redstone.update(pos)
-		end)
+		redstone.update(pos)
 	end
 end
 
@@ -199,17 +197,19 @@ minetest.register_node("redstone:piston_off", {
     drop = "redstone:piston_off",
     paramtype = "light",
 	sunlight_propagates = true,
-    --reverse the direction to face the player
-    after_place_node = function(pos, placer, itemstack, pointed_thing)
-		local look = placer:get_look_dir()
-		look = vector.multiply(look,-1)
-		local dir = minetest.dir_to_facedir(look, true)
-		minetest.swap_node(pos,{name="redstone:piston_off",param2=dir})
+	--reverse the direction to face the player
+	on_construct = function(pos)
 		redstone.inject(pos,{
 			name = "redstone:piston_off",
 			activator = true,
 		})
 		redstone.update(pos)
+	end,
+    after_place_node = function(pos, placer, itemstack, pointed_thing)
+		local look = placer:get_look_dir()
+		look = vector.multiply(look,-1)
+		local dir = minetest.dir_to_facedir(look, true)
+		minetest.swap_node(pos,{name="redstone:piston_off",param2=dir})
 	end,
 	after_destruct = function(pos, oldnode)
 		redstone.inject(pos,nil)
@@ -220,7 +220,9 @@ minetest.register_node("redstone:piston_off", {
 redstone.register_activator({
 	name = "redstone:piston_off",
 	activate = function(pos)
-		actuator_arm_function(pos)
+		minetest.after(0,function()
+			actuator_arm_function(pos)
+		end)
 	end
 })
 
@@ -233,6 +235,7 @@ minetest.register_lbm({
 			name = "redstone:piston_off",
 			activator = true,
 		})
+		--redstone needs to warm up
 		minetest.after(0,function()
 			redstone.update(pos)
 		end)
@@ -283,6 +286,7 @@ minetest.register_lbm({
 			name = "redstone:piston_on",
 			activator = true,
 		})
+		--redstone needs to warm up
 		minetest.after(0,function()
 			redstone.update(pos)
 		end)
@@ -481,9 +485,8 @@ local function sticky_actuator_arm_function(pos)
 			name = "redstone:sticky_piston_on",
 			activator = true,
 		})
-		minetest.after(0,function()
-			redstone.update(pos)
-		end)
+		
+		redstone.update(pos)
 	end
 end
 
@@ -507,17 +510,19 @@ minetest.register_node("redstone:sticky_piston_off", {
     drop = "redstone:sticky_piston_off",
     paramtype = "light",
 	sunlight_propagates = true,
+	on_construct = function(pos)
+		redstone.inject(pos,{
+			name = "redstone:sticky_piston_off",
+			activator = true,
+		})
+		redstone.update(pos)
+	end,
     --reverse the direction to face the player
     after_place_node = function(pos, placer, itemstack, pointed_thing)
 		local look = placer:get_look_dir()
 		look = vector.multiply(look,-1)
 		local dir = minetest.dir_to_facedir(look, true)
 		minetest.swap_node(pos,{name="redstone:sticky_piston_off",param2=dir})
-		redstone.inject(pos,{
-			name = "redstone:sticky_piston_off",
-			activator = true,
-		})
-		redstone.update(pos)
 	end,
 	after_destruct = function(pos, oldnode)
 		redstone.inject(pos,nil)
@@ -528,7 +533,9 @@ minetest.register_node("redstone:sticky_piston_off", {
 redstone.register_activator({
 	name = "redstone:sticky_piston_off",
 	activate = function(pos)
-		sticky_actuator_arm_function(pos)
+		minetest.after(0,function()
+			sticky_actuator_arm_function(pos)
+		end)
 	end
 })
 
@@ -541,6 +548,7 @@ minetest.register_lbm({
 			name = "redstone:sticky_piston_off",
 			activator = true,
 		})
+		--redstone needs to warm up
 		minetest.after(0,function()
 			redstone.update(pos)
 		end)
@@ -610,6 +618,7 @@ minetest.register_lbm({
 			name = "redstone:sticky_piston_on",
 			activator = true,
 		})
+		--redstone needs to warm up
 		minetest.after(0,function()
 			redstone.update(pos)
 		end)
