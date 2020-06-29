@@ -74,7 +74,7 @@ minetest.register_node(":main:ironblock_on", {
         },
     on_construct = function(pos)
         redstone.inject(pos,{
-            name = "main:ironblock",
+            name = "main:ironblock_on",
             activator = true,
             source = true,
             capacitor = 1,
