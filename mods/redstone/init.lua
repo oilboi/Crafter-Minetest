@@ -406,8 +406,8 @@ function redstone.update(pos,is_capacitor)
 		recursion_check[s_pos] = 0
 	end
 	recursion_check[s_pos] = recursion_check[s_pos] + 1
-	--print(recursion_check[s_pos])
-	if recursion_check[s_pos] > 6 then
+	if recursion_check[s_pos] > 10 then
+		--print(recursion_check[s_pos])
 		minetest.after(0,function()
 			bad_node = minetest.get_node(pos).name
 			bad_node = minetest.get_node_drops(bad_node, "main:rubypick")
