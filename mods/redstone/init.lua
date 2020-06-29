@@ -465,9 +465,9 @@ local function calculate(pos,is_capacitor)
 					if data.dust and data.dust ~= data.origin then
 						swap_node(new_vec(x,y,z),{name="redstone:dust_"..data.dust})
 					end
-					--write data back to memory pool
-					pool[x][y][z] = data
 
+					data_injection(new_vec(x,y,z),data)
+					
 					if data.dust then
 						--delete the data to speed up next loop
 						dust_map[x][y][z] = nil
