@@ -30,6 +30,7 @@ local sub_vec         = vector.subtract
 local vector_distance = vector.distance
 
 local activator_table = {} -- this holds the translation data of activator tables (activator functions)
+local capacitor_table = {}
 
 -- redstone class
 redstone = {}
@@ -39,6 +40,14 @@ function redstone.register_activator(data)
 	activator_table[data.name] = {
 		activate   = data.activate,
 		deactivate = data.deactivate
+	}
+end
+
+-- enables mods to create data functions
+function redstone.register_capacitor(data)
+	capacitor_table[data.name] = {
+		off = data.off,
+		on  = data.on
 	}
 end
 
@@ -58,6 +67,7 @@ dofile(path.."/inverter.lua")
 --dofile(path.."/player_detector.lua")
 --dofile(path.."/space_maker.lua")
 --dofile(path.."/pressure_plate.lua")
+dofile(path.."/capacitors.lua")
 
 
 --this is written out manually so that
@@ -78,6 +88,28 @@ local order = {
 --thanks to RhodiumToad for helping me figure out a good method to do this
 
 local pool = {} -- this holds all redstone data (literal 3d virtual memory map)
+
+
+local function data_injection(pos,data)
+	-- add data into 3d memory
+	if data then
+		if not pool[pos.x] then pool[pos.x] = {} end
+		if not pool[pos.x][pos.y] then pool[pos.x][pos.y] = {} end
+		pool[pos.x][pos.y][pos.z] = data
+	--delete data from 3d memory
+	else
+		if pool and pool[pos.x] and pool[pos.x][pos.y] then
+			pool[pos.x][pos.y][pos.z] = data
+			if pool[pos.x][pos.y] and not next(pool[pos.x][pos.y]) then
+				pool[pos.x][pos.y] = nil
+				-- only run this if y axis is empty
+				if pool[pos.x] and not next(pool[pos.x]) then
+					pool[pos.x] = nil
+				end
+			end
+		end
+	end
+end
 
 local table_3d
 local temp_pool
@@ -114,26 +146,75 @@ local function create_boundary_box(pos)
 	return(table_3d)
 end
 
-local function data_injection(pos,data)
-	-- add data into 3d memory
-	if data then
-		if not pool[pos.x] then pool[pos.x] = {} end
-		if not pool[pos.x][pos.y] then pool[pos.x][pos.y] = {} end
-		pool[pos.x][pos.y][pos.z] = data
-	--delete data from 3d memory
+
+local function capacitor_pathfind(source,mem_map)
+	--redstone and torch
+	for _,order in pairs(order) do
+
+		i = add_vec(source,order)
+		if not mem_map[i.x] then mem_map[i.x] = {} end
+		if not mem_map[i.x][i.y] then mem_map[i.x][i.y] = {} end
+
+		if not mem_map[i.x][i.y][i.z] then
+
+			if i and pool and pool[i.x] and pool[i.x][i.y] and pool[i.x][i.y][i.z] then
+				index = pool[i.x][i.y][i.z]
+				if index.capacitor then
+					mem_map[i.x][i.y][i.z] = {name = index.name, capacitor = 0, source = index.source}
+					if index.source then
+						mem_map.found = true
+					end
+					capacitor_pathfind(i,mem_map)
+				end
+			end
+		end
+	end
+	return mem_map,found
+end
+
+local table_3d
+local found
+local temp_pool
+local function capacitor_sniff(pos)
+	table_3d = {}
+	table_3d = capacitor_pathfind(pos,table_3d)
+	found = table_3d.found
+	table_3d.found = nil
+	if found then
+		for x,datax in pairs(table_3d) do
+			for y,datay in pairs(datax) do
+				for z,data in pairs(datay) do
+					temp_pool = pool[x][y][z]
+					if temp_pool then
+						temp_pool.capacitor = 1
+						if capacitor_table[temp_pool.name] then
+							--print("doing")
+							swap_node(new_vec(x,y,z),{name=capacitor_table[temp_pool.name].on})
+							redstone.update(new_vec(x,y,z))
+						end
+					end
+				end
+			end
+		end
 	else
-		if pool and pool[pos.x] and pool[pos.x][pos.y] then
-			pool[pos.x][pos.y][pos.z] = data
-			if pool[pos.x][pos.y] and not next(pool[pos.x][pos.y]) then
-				pool[pos.x][pos.y] = nil
-				-- only run this if y axis is empty
-				if pool[pos.x] and not next(pool[pos.x]) then
-					pool[pos.x] = nil
+		for x,datax in pairs(table_3d) do
+			for y,datay in pairs(datax) do
+				for z,data in pairs(datay) do
+					temp_pool = pool[x][y][z]
+					if temp_pool then
+						temp_pool.capacitor = 0
+						if capacitor_table[temp_pool.name] then
+							--print(temp_pool.name)
+							swap_node(new_vec(x,y,z),{name=capacitor_table[temp_pool.name].off})
+							redstone.update(new_vec(x,y,z))
+						end
+					end
 				end
 			end
 		end
 	end
 end
+
 
 
 -- activators
@@ -200,7 +281,7 @@ local directional_activator = function(pos)
 	if not temp_pool2 then ignore = true end
 
 	if not ignore and ((temp_pool2.dust and temp_pool2.dust > 0) or (temp_pool2.torch and temp_pool2.directional_activator and temp_pool2.dir == temp_pool.dir) or 
-	(not temp_pool2.directional_activator and temp_pool2.torch))  then
+	(not temp_pool2.directional_activator and temp_pool2.torch) or (temp_pool2.capacitor and temp_pool2.capacitor > 0))  then
 		if activator_table[temp_pool.name].activate then
 			activator_table[temp_pool.name].activate(pos)
 			return
@@ -236,7 +317,7 @@ local function redstone_pathfinder(source,source_level,boundary,output)
 	else
 		--redstone and torch
 		for _,order in pairs(order) do
-			i = add_vec(source,new_vec(order.x,order.y,order.z))
+			i = add_vec(source,order)
 			if i and boundary and boundary[i.x] and boundary[i.x][i.y] and boundary[i.x][i.y][i.z] then
 				index = boundary[i.x][i.y][i.z]
 				if index.dust then
@@ -260,54 +341,57 @@ local pos
 local node
 local power
 local boundary
-local function calculate(pos)
-	boundary = create_boundary_box(pos)
-	--pathfind through memory map	
-	for x,index_x in pairs(boundary) do
-		for y,index_y in pairs(index_x) do
-			for z,data in pairs(index_y) do
-				--allow data values for torches
-				if data.torch and not data.torch_directional then
-					redstone_pathfinder(new_vec(x,y,z),data.torch,boundary)
-					boundary[x][y][z] = nil
-				elseif data.torch_directional then
-					redstone_pathfinder(new_vec(x,y,z),data.torch,boundary,data.output)
+local function calculate(pos,is_capacitor)
+	if not is_capacitor then
+		boundary = create_boundary_box(pos)
+		--pathfind through memory map	
+		for x,index_x in pairs(boundary) do
+			for y,index_y in pairs(index_x) do
+				for z,data in pairs(index_y) do
+					--allow data values for torches
+					if data.torch and not data.torch_directional then
+						redstone_pathfinder(new_vec(x,y,z),data.torch,boundary)
+						boundary[x][y][z] = nil
+					elseif data.torch_directional then
+						redstone_pathfinder(new_vec(x,y,z),data.torch,boundary,data.output)
+					end
 				end
 			end
 		end
-	end
-	--reassemble the table into a position list minetest can understand
-	--run through and set dust
-	for x,datax in pairs(boundary) do
-		for y,datay in pairs(datax) do
-			for z,data in pairs(datay) do
-				if data.dust and data.dust ~= data.origin then
-					swap_node(new_vec(x,y,z),{name="redstone:dust_"..data.dust})
-				end
+		--reassemble the table into a position list minetest can understand
+		--run through and set dust
+		for x,datax in pairs(boundary) do
+			for y,datay in pairs(datax) do
+				for z,data in pairs(datay) do
+					if data.dust and data.dust ~= data.origin then
+						swap_node(new_vec(x,y,z),{name="redstone:dust_"..data.dust})
+					end
+					--write data back to memory pool
+					pool[x][y][z] = data
 
-				--write data back to memory pool
-				pool[x][y][z] = data
-
-				if data.dust then
-					--delete the data to speed up next loop
-					boundary[x][y][z] = nil
-				end
-			end
-		end
-	end
-
-	
-	--this must be done after the memory is written
-	for x,datax in pairs(boundary) do
-		for y,datay in pairs(datax) do
-			for z,data in pairs(datay) do
-				if data.directional_activator then
-					directional_activator(new_vec(x,y,z))
-				elseif data.activator then
-					non_directional_activator(new_vec(x,y,z))
+					if data.dust then
+						--delete the data to speed up next loop
+						boundary[x][y][z] = nil
+					end
 				end
 			end
 		end
+
+		
+		--this must be done after the memory is written
+		for x,datax in pairs(boundary) do
+			for y,datay in pairs(datax) do
+				for z,data in pairs(datay) do
+					if data.directional_activator then
+						directional_activator(new_vec(x,y,z))
+					elseif data.activator then
+						non_directional_activator(new_vec(x,y,z))
+					end
+				end
+			end
+		end
+	else
+		capacitor_sniff(pos)
 	end
 end
 
@@ -318,7 +402,8 @@ end
 
 
 local recursion_check = {}
-function redstone.update(pos)
+local bad_node
+function redstone.update(pos,is_capacitor)
 	local s_pos = minetest.serialize(pos)
 	if not recursion_check[s_pos] then
 		recursion_check[s_pos] = 0
@@ -327,6 +412,11 @@ function redstone.update(pos)
 	--print(recursion_check[s_pos])
 	if recursion_check[s_pos] > 6 then
 		minetest.after(0,function()
+			bad_node = minetest.get_node(pos).name
+			bad_node = minetest.get_node_drops(bad_node, "main:rubypick")
+			for _,nodey in pairs(bad_node) do
+				minetest.throw_item(pos,nodey)
+			end
 			minetest.dig_node(pos)
 			data_injection(pos,nil)
 			redstone.update(pos)
@@ -334,7 +424,7 @@ function redstone.update(pos)
 		return
 	end
 
-	calculate(pos)
+	calculate(pos,is_capacitor)
 end
 
 minetest.register_globalstep(function()
