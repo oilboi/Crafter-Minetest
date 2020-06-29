@@ -28,6 +28,7 @@ local new_vec         = vector.new
 local add_vec         = vector.add
 local sub_vec         = vector.subtract
 local vector_distance = vector.distance
+local vec_equals      = vector.equals
 
 local activator_table = {} -- this holds the translation data of activator tables (activator functions)
 local capacitor_table = {}
@@ -374,7 +375,22 @@ local function dust_sniff(pos,mem_map,boundary)
 
 					dust_sniff(i,mem_map,boundary)
 
-				elseif index.torch then
+				elseif index.torch and index.torch > 1 then
+					if index.torch_directional and vec_equals(pos,index.output) then
+						mem_map[i.x][i.y][i.z] = index
+						mem_map[i.x][i.y][i.z].sniffed = true
+					elseif not index.torch_directional then
+						mem_map[i.x][i.y][i.z] = index
+						mem_map[i.x][i.y][i.z].sniffed = true
+					end
+				elseif index.activator then
+					mem_map[i.x][i.y][i.z] = index
+					mem_map[i.x][i.y][i.z].sniffed = true
+				end
+				--this needs to be hooked into the end
+				--because nodes can be directional activators
+				--and directional torches
+				if index.directional_activator and vec_equals(pos,index.input) then
 					mem_map[i.x][i.y][i.z] = index
 					mem_map[i.x][i.y][i.z].sniffed = true
 				end
@@ -402,6 +418,7 @@ local function calculate(pos,is_capacitor)
 		dust_detected = false
 		count = 0
 		
+		--update needs to sniff it's own position
 		if boundary[pos.x] and boundary[pos.x][pos.y] and boundary[pos.x][pos.y][pos.z] then
 			if not dust_map[pos.x] then dust_map[pos.x] = {} end
 			if not dust_map[pos.x][pos.y] then dust_map[pos.x][pos.y] = {} end
@@ -428,9 +445,13 @@ local function calculate(pos,is_capacitor)
 			for y,datay in pairs(datax) do
 				for z,data in pairs(datay) do
 					count = count + 1
-					if data.torch and data.torch > 1 then
-						redstone_pathfinder(new_vec(x,y,z),data.torch,dust_map)
-						dust_map[x][y][z] = nil
+					if data.torch then
+						if data.torch_directional then
+							redstone_pathfinder(new_vec(x,y,z),data.torch,dust_map,data.output)
+						else
+							redstone_pathfinder(new_vec(x,y,z),data.torch,dust_map)
+							dust_map[x][y][z] = nil
+						end
 					end
 				end
 			end
@@ -455,13 +476,9 @@ local function calculate(pos,is_capacitor)
 			end
 		end
 
-
-
-		--swap_node(new_vec(x,y,z),{name="redstone:dust_"..data.dust})
-		--print("sniffy "..count)
-		--[[
-		--this must be done after the memory is written
-		for x,datax in pairs(boundary) do
+		--activators
+		--this must be run at the end
+		for x,datax in pairs(dust_map) do
 			for y,datay in pairs(datax) do
 				for z,data in pairs(datay) do
 					if data.directional_activator then
@@ -472,7 +489,6 @@ local function calculate(pos,is_capacitor)
 				end
 			end
 		end
-		]]--
 	else
 		capacitor_sniff(pos)
 	end
@@ -571,13 +587,6 @@ minetest.register_craftitem("redstone:dust", {
 			itemstack:take_item()
 			return(itemstack)
 		end
-
-
-			--minetest.add_node(pointed_thing.above, {name="redstone:dust_0"})
-			--itemstack:take_item(1)
-			--minetest.sound_play("stone", {pos=pointed_thing.above})
-			--return(itemstack)
-		--end
 	end,
 })
 

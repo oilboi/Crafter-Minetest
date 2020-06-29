@@ -64,9 +64,7 @@ redstone.register_activator({
 			output = vector.add(pos,dir),
 			dir = dir
 		})
-		minetest.after(0,function()
-			redstone.update(pos)
-		end)
+		redstone.update(pos)
 	end
 })
 
@@ -148,9 +146,7 @@ redstone.register_activator({
 			input  = vector.subtract(pos,dir),
 			dir = dir
 		})
-		minetest.after(0,function()
-			redstone.update(pos)
-		end)
+		redstone.update(pos)
 	end
 })
 
@@ -170,6 +166,9 @@ minetest.register_lbm({
 			output = vector.add(pos,dir),
 			dir    = dir
 		})
-		redstone.update(pos)
+		--redstone needs to warm up
+		minetest.after(0,function()
+			redstone.update(pos)
+		end)
 	end,
 })
