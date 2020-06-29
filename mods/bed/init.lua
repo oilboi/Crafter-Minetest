@@ -4,7 +4,7 @@ local sleep_channel = {}
 local pool = {}
 local sleep_loop = false
 
-
+local name
 minetest.register_on_joinplayer(function(player)
 	name = player:get_player_name()
 	sleep_channel[name] = minetest.mod_channel_join(name..":sleep_channel")

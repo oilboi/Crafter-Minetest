@@ -146,7 +146,8 @@ local function create_boundary_box(pos)
 	return(table_3d)
 end
 
-
+local i
+local index
 local function capacitor_pathfind(source,mem_map)
 	for _,order in pairs(order) do
 
@@ -168,7 +169,7 @@ local function capacitor_pathfind(source,mem_map)
 			end
 		end
 	end
-	return mem_map,found
+	return mem_map
 end
 
 local table_3d
