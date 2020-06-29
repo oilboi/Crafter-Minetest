@@ -94,9 +94,13 @@ local function push_nodes(pos,dir)
 			end
 		else
 			for i = 1,table.getn(move_index) do
-				move_index[i].pos = vector.add(move_index[i].pos,dir)
-				minetest.set_node(move_index[i].pos,move_index[i])
-				minetest.check_for_falling(move_index[i].pos)
+				if move_index[i] then
+					if move_index[i].pos then
+					move_index[i].pos = vector.add(move_index[i].pos,dir)
+					minetest.set_node(move_index[i].pos,move_index[i])
+					minetest.check_for_falling(move_index[i].pos)
+					end
+				end
 			end
 		end
 	end

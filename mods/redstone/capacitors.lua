@@ -12,8 +12,10 @@ minetest.override_item("main:ironblock",{
     end,
     after_destruct = function(pos, oldnode)
         redstone.inject(pos,nil)
-        redstone.update(pos)
-        redstone.update(pos,true)
+        --redstone.update(pos)
+        minetest.after(0,function()
+            redstone.update(pos,true)
+        end)
     end
 })
 
@@ -86,8 +88,10 @@ minetest.register_node(":main:ironblock_on", {
     end,
     after_destruct = function(pos, oldnode)
         redstone.inject(pos,nil)
-        redstone.update(pos)
-        redstone.update(pos,true)
+        --redstone.update(pos)
+        minetest.after(0,function()
+            redstone.update(pos,true)
+        end)
     end,
 })
 
