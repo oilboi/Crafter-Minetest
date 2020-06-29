@@ -478,7 +478,6 @@ local function calculate(pos,is_capacitor)
 				for z,data in pairs(datay) do
 					if data.directional_activator then
 						directional_activator(new_vec(x,y,z))
-						--dust_map[x][y][z] = nil
 					elseif data.activator then
 						non_directional_activator(new_vec(x,y,z))
 					end
