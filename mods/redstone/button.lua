@@ -1,5 +1,11 @@
-local minetest,table,vector = minetest,table,vector
-
+local
+minetest,table,vector
+=
+minetest,table,vector
+local excluded_nodes = {
+	["main:ironblock"]=true,
+	["main:ironblock_on"]=true,
+}
 local excluded_mods = {redstone=true,door=true}
 local registered_nodes
 minetest.register_on_mods_loaded(function()
@@ -16,6 +22,7 @@ minetest.register_node("redstone:button_off", {
 	sunlight_propagates = true,
 	walkable = false,
 	drawtype= "nodebox",
+	node_placement_prediction = "",
 	drop="redstone:button_off",
 	node_box = {
 		type = "fixed",
@@ -27,8 +34,10 @@ minetest.register_node("redstone:button_off", {
 	on_construct = function(pos)
 		local param2 = minetest.get_node(pos).param2
 		local dir = minetest.wallmounted_to_dir(param2)
-		local node = minetest.get_node(vector.add(pos,dir)).name
-		if excluded_mods[registered_nodes[node].mod_origin] then
+		local node = minetest.get_node(vector.add(pos,dir))
+		local def = registered_nodes[node.name]
+		local remove = (excluded_mods[def.mod_origin] == true or excluded_nodes[node.name] == true)
+		if remove then
 			minetest.swap_node(pos,{name="air"})
 			redstone.inject(pos,nil)
 			minetest.throw_item(pos, "redstone:button_off")
