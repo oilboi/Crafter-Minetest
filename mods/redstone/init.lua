@@ -380,6 +380,9 @@ local function dust_sniff(pos,mem_map,boundary)
 
 					dust_sniff(i,mem_map,boundary)
 
+				elseif index.directional_activator and vec_equals(pos,index.input) then
+					mem_map[i.x][i.y][i.z] = index
+					mem_map[i.x][i.y][i.z].sniffed = true
 				elseif index.torch and index.torch > 1 then
 					if index.torch_directional and vec_equals(pos,index.output) then
 						mem_map[i.x][i.y][i.z] = index
@@ -389,9 +392,6 @@ local function dust_sniff(pos,mem_map,boundary)
 						mem_map[i.x][i.y][i.z].sniffed = true
 					end
 				elseif index.activator then
-					mem_map[i.x][i.y][i.z] = index
-					mem_map[i.x][i.y][i.z].sniffed = true
-				elseif index.directional_activator and vec_equals(pos,index.input) then
 					mem_map[i.x][i.y][i.z] = index
 					mem_map[i.x][i.y][i.z].sniffed = true
 				end
@@ -461,12 +461,9 @@ local function calculate(pos,is_capacitor)
 		for x,datax in pairs(dust_map) do
 			for y,datay in pairs(datax) do
 				for z,data in pairs(datay) do
-					--print("update")
 					if data.dust and data.dust ~= data.origin then
 						swap_node(new_vec(x,y,z),{name="redstone:dust_"..data.dust})
-
 						data_injection(new_vec(x,y,z),data)
-
 						--delete the data to speed up next loop
 						dust_map[x][y][z] = nil
 					end
@@ -481,6 +478,7 @@ local function calculate(pos,is_capacitor)
 				for z,data in pairs(datay) do
 					if data.directional_activator then
 						directional_activator(new_vec(x,y,z))
+						--dust_map[x][y][z] = nil
 					elseif data.activator then
 						non_directional_activator(new_vec(x,y,z))
 					end
