@@ -62,6 +62,17 @@ function register_mob_spawner(mobname,texture,mesh)
                 minetest.add_entity(pos, "mob_spawners:"..mobname)
             end
 
+            local player_found = false
+            for _,object in ipairs(minetest.get_objects_inside_radius(pos, 7)) do
+                if object:is_player() then
+                    player_found = true
+                end
+            end
+
+            if not player_found then
+                return
+            end
+
             local mobcount = 0
             for _,object in ipairs(minetest.get_objects_inside_radius(pos, 10)) do
                 if not object:is_player() and object:get_luaentity().mobname then
