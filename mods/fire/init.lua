@@ -144,9 +144,11 @@ fire.timer = 0
 fire.life = 0
 fire.on_step = function(self,dtime)	
 	if self.owner and (self.owner:is_player() or self.owner:get_luaentity()) then
+		if self.owner:is_player() and self.owner:get_hp() <= 0 then
+			put_fire_out(self.owner)
+		end
 		self.timer = self.timer + dtime
 		self.life = self.life + dtime
-
 		if self.life >= 7 then
 			put_fire_out(self.owner)
 			self.object:remove()
