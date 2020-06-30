@@ -50,10 +50,6 @@ minetest.register_lbm({
             activator = true,
             capacitor = 0,
           })
-          minetest.after(0,function()
-              --redstone.update(pos)
-              redstone.update(pos,true)
-          end)
     end,
 })
 
@@ -128,9 +124,5 @@ minetest.register_lbm({
             activator = true,
             capacitor = 1,
         })
-        minetest.after(0,function()
-            --redstone.update(pos)
-            redstone.update(pos,true)
-        end)
     end,
 })
