@@ -32,9 +32,19 @@ local vec_equals      = vector.equals
 
 local activator_table = {} -- this holds the translation data of activator tables (activator functions)
 local capacitor_table = {}
+local player_detection_table = {}
 
 -- redstone class
 redstone = {}
+
+redstone.player_detector_add = function(pos)
+	player_detection_table[minetest.serialize(pos)] = pos
+end
+
+redstone.player_detector_remove = function(pos)
+	player_detection_table[minetest.serialize(pos)] = nil
+end
+
 
 -- enables mods to create data functions
 function redstone.register_activator(data)
@@ -64,7 +74,7 @@ dofile(path.."/piston.lua")
 dofile(path.."/craft.lua")
 --dofile(path.."/ore.lua")
 dofile(path.."/inverter.lua")
---dofile(path.."/player_detector.lua")
+dofile(path.."/player_detector.lua")
 dofile(path.."/space_maker.lua")
 --dofile(path.."/pressure_plate.lua")
 dofile(path.."/capacitors.lua")
@@ -520,7 +530,42 @@ function redstone.update(pos,is_capacitor)
 	calculate(pos,is_capacitor)
 end
 
+
+local level
+local pos2
+local power
+local max
+local function player_detector_calculation()
+	for _,pos in pairs(player_detection_table) do
+		level = pool[pos.x][pos.y][pos.z].torch
+		max = 0
+		for _,player in ipairs(minetest.get_connected_players()) do
+			pos2 = player:get_pos()
+			power = floor(10-vector_distance(pos2,pos))
+			if power > 9 then
+				power = 9
+			elseif power < 0 then
+				power = 0
+			end
+
+			if power > max then
+				max = power
+			end
+		end
+
+		if max ~= level then
+			swap_node(pos,{name="redstone:player_detector_"..max})
+			redstone.inject(pos,{
+				name = "redstone:player_detector_"..max,
+				torch = max,
+			})
+			redstone.update(pos)
+		end
+	end
+end
+
 minetest.register_globalstep(function()
+	player_detector_calculation()
 	recursion_check = {}
 end)
 

@@ -1,32 +1,53 @@
-local minetest,ipairs,math = minetest,ipairs,math
+local
+minetest,ipairs,math
+=
+minetest,ipairs,math
+
 --detects players and outputs accordingly
 for i = 0,9  do
+
 minetest.register_node("redstone:player_detector_"..i, {
 	description = "Redstone Player Detector",
-	--inventory_image = "redstone_torch.png",
-	--wield_image = "redstone_torch.png",
-	--wield_scale = {x = 1, y = 1, z = 1 + 2/16},
 	drawtype = "normal",
 	tiles = {"player_detector.png"},
 	paramtype = "light",
 	paramtype2 = "none",
-	power = 9,
-	--sunlight_propagates = true,
 	drop = "redstone:player_detector_0",
-	--walkable = false,
-	light_source = i,
 	groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4, torch=1,redstone=1,redstone_torch=1,redstone_power=i, redstone_player_detection = 1},
 	legacy_wallmounted = true,
 	
 	on_construct = function(pos)
-		redstone.collect_info(pos)
+		redstone.inject(pos,{
+            name = "redstone:player_detector_"..i,
+            torch = i,
+		})
+		redstone.player_detector_add(pos)
+		redstone.update(pos)
 	end,
-	after_destruct = function(pos, oldnode)
-		redstone.collect_info(pos)
+	on_destruct = function(pos, oldnode)
+		redstone.player_detector_remove(pos)
+		redstone.inject(pos,nil)
+		redstone.update(pos)
 	end,
 	sounds = main.stoneSound(),
 })
+
+minetest.register_lbm({
+    name = "redstone:player_detector_"..i,
+    nodenames = {"redstone:player_detector_"..i},
+    run_at_every_load = true,
+    action = function(pos)
+        redstone.inject(pos,{
+            name = "redstone:player_detector_"..i,
+            torch = i,
+		})
+		redstone.player_detector_add(pos)
+    end,
+})
+
 end
+
+--[[
 
 minetest.register_abm{
     label = "Redstone Player Detection",
@@ -53,8 +74,9 @@ minetest.register_abm{
 			end
 		end
 		if found_player == false then
-			minetest.set_node(pos,{name="redstone:player_detector_0"})
+			minetest.swap_node(pos,{name="redstone:player_detector_0"})
 			redstone.collect_info(pos)
 		end
 	end,
 }
+]]--
