@@ -578,6 +578,7 @@ local function sticky_piston_pull_nodes(pos,dir)
 	if pull and name ~= "air" then
 		minetest.remove_node(index_pos)
 		minetest.set_node(pos,{name=name,param2=param2})
+		minetest.check_for_falling(index_pos)
 	end
 end
 
