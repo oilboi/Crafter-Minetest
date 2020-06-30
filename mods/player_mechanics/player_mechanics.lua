@@ -32,6 +32,9 @@ minetest.register_on_respawnplayer(function(player)
 	pool[name].was_in_water = false
 	pool[name].swim_bumped = minetest.get_us_time()/1000000
 	send_running_cancellation(player,false)
+	player:set_properties({
+		collisionbox = {-0.3, 0.0, -0.3, 0.3, 1.7, 0.3},
+	})
 end)
 
 
