@@ -531,3 +531,15 @@ minetest.register_chatcommand("xp", {
 		minetest.throw_experience(pos, 1000)
 	end,
 })
+
+minetest.register_chatcommand("levelup", {
+	params = "nil",
+	description = "Spawn x amount of a mob, used as /spawn 'mob' 10 or /spawn 'mob' for one",
+	privs = {server=true},
+	func = function(name)
+		local player = get_player_by_name(name)
+		for i = 1,10000 do
+			level_up_experience(player)
+		end
+	end,
+})
