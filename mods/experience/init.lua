@@ -441,6 +441,7 @@ minetest.register_entity("experience:orb", {
 		initial_sprite_basepos = {x = 0, y = 0},
 		is_visible = true,
 		pointable = false,
+		static_save = false,
 	},
 	moving_state = true,
 	slippery_state = false,
@@ -457,35 +458,13 @@ minetest.register_entity("experience:orb", {
 	delete_timer = 0,
 	radius = 4,
 
-	get_staticdata = function(self)
-		return serialize({
-			age = self.age,
-			collectable = self.collectable,
-			try_timer = self.try_timer,
-			collected = self.collected,
-			delete_timer = self.delete_timer,
-			collector = self.collector,
-		})
-	end,
 
 	on_activate = function(self, staticdata, dtime_s)
-		if s_sub(staticdata, 1, s_len("return")) == "return" then
-			data = deserialize(staticdata)
-			if data and type(data) == "table" then
-				self.age = (data.age or 0) + dtime_s
-				self.collectable = data.collectable
-				self.try_timer = data.try_timer
-				self.collected = data.collected
-				self.delete_timer = data.delete_timer
-				self.collector = data.collector
-			end
-		else
-			self.object:set_velocity(new_vec(
-				random(-2,2)*random(),
-				random(2,5),
-				random(-2,2)*random()
-			))
-		end
+		self.object:set_velocity(new_vec(
+			random(-2,2)*random(),
+			random(2,5),
+			random(-2,2)*random()
+		))
 		self.object:set_armor_groups({immortal = 1})
 		self.object:set_velocity({x = 0, y = 2, z = 0})
 		self.object:set_acceleration({x = 0, y = -9.81, z = 0})
@@ -529,17 +508,5 @@ minetest.register_chatcommand("xp", {
 		local pos = player:get_pos()
 		pos.y = pos.y + 1.2
 		minetest.throw_experience(pos, 1000)
-	end,
-})
-
-minetest.register_chatcommand("levelup", {
-	params = "nil",
-	description = "Spawn x amount of a mob, used as /spawn 'mob' 10 or /spawn 'mob' for one",
-	privs = {server=true},
-	func = function(name)
-		local player = get_player_by_name(name)
-		for i = 1,10000 do
-			level_up_experience(player)
-		end
 	end,
 })
