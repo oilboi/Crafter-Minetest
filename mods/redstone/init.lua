@@ -54,7 +54,6 @@ end
 
 local path = minetest.get_modpath("redstone")
 dofile(path.."/functions.lua")
---dofile(path.."/wire.lua")
 dofile(path.."/torch.lua")
 dofile(path.."/lever.lua")
 dofile(path.."/button.lua")
