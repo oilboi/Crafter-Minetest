@@ -242,7 +242,7 @@ local range
 local tnt_boom = function(self,dtime)
 	self.timer = self.timer - dtime
 	if not self.shot or not self.redstone_activated then
-		vel = self.object:getvelocity()
+		vel = self.object:get_velocity()
 		vel = vector.multiply(vel,-0.05)
 		self.object:add_velocity(vector.new(vel.x,0,vel.z))
 	end
