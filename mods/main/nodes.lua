@@ -177,7 +177,7 @@ minetest.register_node("main:glass", {
 minetest.register_node("main:ice", {
     description = "Ice",
     tiles = {"ice.png"},
-    drawtype = "glasslike",
+    drawtype = "normal",
 	paramtype = "light",
 	sunlight_propagates = true,
 	sunlight_propagates = true,
@@ -187,8 +187,8 @@ minetest.register_node("main:ice", {
 		footstep = {name = "glass_footstep", gain = 0.4},
         dug =  {name = "break_glass", gain = 0.4},
 	}),
-	use_texture_alpha = false,
-	alpha = 100,
+	--use_texture_alpha = false,
+	--alpha = 100,
     drop = "",
     after_destruct = function(pos, oldnode)
        minetest.set_node(pos, {name="main:water"})                            
