@@ -251,7 +251,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				minetest.sound_play("pickup", {to_player = name,gain=0.7,pitch = math.random(60,100)/100})
 			--no room for item
 			else
-				minetest.chat_send_player(name "Might want to clear your inventory")
+				minetest.chat_send_player(name, "Might want to clear your inventory")
 				minetest.sound_play("lever", {to_player = name,gain=0.7,pitch=0.7})
 			end
 
