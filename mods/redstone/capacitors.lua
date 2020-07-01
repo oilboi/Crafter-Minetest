@@ -10,12 +10,11 @@ minetest.override_item("main:ironblock",{
             redstone.update(pos,true)
         end)
     end,
-    after_destruct = function(pos, oldnode)
+    on_destruct = function(pos)
         redstone.inject(pos,nil)
+        
+        redstone.update(pos,true)
         --redstone.update(pos)
-        minetest.after(0,function()
-            redstone.update(pos,true)
-        end)
     end
 })
 
@@ -29,8 +28,8 @@ redstone.register_activator({
             source    = true,
             activator = true,
         })
-        redstone.update(pos)
         redstone.update(pos,true)
+        redstone.update(pos)
     end,
   })
 
@@ -82,12 +81,11 @@ minetest.register_node(":main:ironblock_on", {
             redstone.update(pos,true)
         end)
     end,
-    after_destruct = function(pos, oldnode)
+    on_destruct = function(pos)
         redstone.inject(pos,nil)
-        --redstone.update(pos)
-        minetest.after(0,function()
-            redstone.update(pos,true)
-        end)
+
+        redstone.update(pos,true)
+        redstone.update(pos)
     end,
 })
 
@@ -102,7 +100,6 @@ redstone.register_activator({
             capacitor = 0,
             activator = true,
         })
-        redstone.update(pos)
         redstone.update(pos,true)
     end,
 })

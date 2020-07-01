@@ -68,8 +68,10 @@ minetest.register_node("redstone:repeater_on_"..level, {
 			output = vector.add(pos,dir),
 			dir = dir
 		})
-		redstone.update(pos)
-		redstone.update(vector.add(pos,dir))
+		minetest.after(0,function()
+			redstone.update(pos)
+			redstone.update(vector.add(pos,dir))
+		end)
 	end,
 
 	after_destruct = function(pos, oldnode)
@@ -176,8 +178,10 @@ minetest.register_node("redstone:repeater_off_"..level, {
 			output = vector.add(pos,dir),
 			dir = dir
 		})
-		redstone.update(pos)
-		redstone.update(vector.add(pos,dir))
+		minetest.after(0,function()
+			redstone.update(pos)
+			redstone.update(vector.add(pos,dir))
+		end)
 	end,
 
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
