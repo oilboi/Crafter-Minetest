@@ -67,7 +67,7 @@ minetest.register_node("redstone:repeater_on_"..level, {
 			input  = vector.subtract(pos,dir),
 			dir = dir
 		})
-
+		redstone.update(pos)
 		redstone.update(vector.add(pos,dir))
 	end,
 
@@ -164,12 +164,6 @@ minetest.register_node("redstone:repeater_off_"..level, {
 				{-0.1, -0.5,  -0.05-(level*0.05), 0.1,  0.1, 0.15-(level*0.05)}, --input post
 			},
 		},	
-	redstone_activation = function(pos)
-		local timer = minetest.get_node_timer(pos)
-		if not timer:is_started() then
-			timer:start(level/max_timer)
-		end
-	end,
 
 	on_timer = function(pos, elapsed)
 		local param2 = minetest.get_node(pos).param2
@@ -185,6 +179,7 @@ minetest.register_node("redstone:repeater_off_"..level, {
 			output = vector.add(pos,dir),
 			dir = dir
 		})
+		redstone.update(pos)
 		redstone.update(vector.add(pos,dir))
 	end,
 
