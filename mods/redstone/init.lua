@@ -79,6 +79,7 @@ dofile(path.."/player_detector.lua")
 dofile(path.."/space_maker.lua")
 --dofile(path.."/pressure_plate.lua")
 dofile(path.."/capacitors.lua")
+dofile(path.."/breaker.lua")
 
 
 --this is written out manually so that
