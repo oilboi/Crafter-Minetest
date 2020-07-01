@@ -108,11 +108,12 @@ end
 
 local base_x = 0.75
 local base_y = -0.5
-local output = 
+local output_constant = 
 "listcolors[#8b8a89;#c9c3c6;#3e3d3e;#000000;#FFFFFF]"..
 "list[current_player;main;0,4.5;9,1;]"..   --hot bar
 "list[current_player;main;0,6;9,3;9]"..    --main inventory
 "button[5,3.5;1,1;toomanyitems.back;back]" --back button
+local output
 local recipe
 local usable_recipe
 local function create_craft_formspec(item)
@@ -124,6 +125,8 @@ local function create_craft_formspec(item)
 	recipe = minetest.get_craft_recipe(item)
 	
 	usable_table = recipe_converter(recipe.items, recipe.width)
+
+	output = output_constant
 	
 	if recipe.method == "normal" then
 		if usable_table then
