@@ -229,7 +229,6 @@ minetest.register_node("redstone:piston_off", {
     end,
 })
 
-
 redstone.register_activator({
 	name = "redstone:piston_off",
 	activate = function(pos)
