@@ -82,6 +82,7 @@ dofile(path.."/space_maker.lua")
 --dofile(path.."/pressure_plate.lua")
 dofile(path.."/capacitors.lua")
 dofile(path.."/breaker.lua")
+dofile(path.."/detector.lua")
 
 
 --this is written out manually so that
