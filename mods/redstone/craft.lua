@@ -64,7 +64,7 @@ minetest.register_craft({
 	output = "redstone:breaker_off",
 	recipe = {
 		{"main:stone","main:stone","main:stone"},
-		{"main:stone","main:rubypick","main:stone"},
+		{"main:stone","main:diamondpick","main:stone"},
 		{"main:stone","main:stone","main:stone"},
 	}
 })
