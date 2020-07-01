@@ -61,6 +61,15 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output = "redstone:breaker_off",
+	recipe = {
+		{"main:stone","main:stone","main:stone"},
+		{"main:stone","main:rubypick","main:stone"},
+		{"main:stone","main:stone","main:stone"},
+	}
+})
+
+minetest.register_craft({
 	output = "redstone:sticky_piston_off",
 	type = "shapeless",
 	recipe = {"mob:slimeball","redstone:piston_off"},
