@@ -205,6 +205,12 @@ minetest.register_node("redstone:piston_off", {
 		})
 		redstone.update(pos)
 	end,
+	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+		local look = clicker:get_look_dir()
+		look = vector.multiply(look,-1)
+		local dir = minetest.dir_to_facedir(look, true)
+		minetest.swap_node(pos,{name="redstone:piston_off",param2=dir})
+	end,
     after_place_node = function(pos, placer, itemstack, pointed_thing)
 		local look = placer:get_look_dir()
 		look = vector.multiply(look,-1)
@@ -516,6 +522,12 @@ minetest.register_node("redstone:sticky_piston_off", {
 			activator = true,
 		})
 		redstone.update(pos)
+	end,
+	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+		local look = clicker:get_look_dir()
+		look = vector.multiply(look,-1)
+		local dir = minetest.dir_to_facedir(look, true)
+		minetest.swap_node(pos,{name="redstone:sticky_piston_off",param2=dir})
 	end,
     --reverse the direction to face the player
     after_place_node = function(pos, placer, itemstack, pointed_thing)
