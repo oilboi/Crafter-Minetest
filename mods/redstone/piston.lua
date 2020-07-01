@@ -474,7 +474,6 @@ local function sticky_push_nodes(pos,dir)
 
 	--check if room to move and objects in log
 	if space == true and next(move_index) then
-		print("running")
 		for i = 1,table.getn(move_index) do
 			move_index[i].pos = vector.add(move_index[i].pos,dir)
 			minetest.set_node(move_index[i].pos,move_index[i])
