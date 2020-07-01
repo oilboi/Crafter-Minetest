@@ -7,7 +7,6 @@ minetest.register_craftitem("redstone:torch", {
 	wield_image = "redstone_torch.png",
 	wield_scale = {x = 1, y = 1, z = 1 + 1/16},
 	liquids_pointable = false,
-	power = 9,
 	on_place = function(itemstack, placer, pointed_thing)
 		if pointed_thing.type ~= "node" then
 			return itemstack
@@ -47,12 +46,11 @@ minetest.register_node("redstone:torch_floor", {
 	tiles = {"redstone_torch.png"},
 	paramtype = "light",
 	paramtype2 = "none",
-	power = 9,
 	sunlight_propagates = true,
 	drop = "redstone:torch",
 	walkable = false,
 	light_source = 13,
-	groups = {choppy=2, dig_immediate=3, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,redstone_torch=1,redstone_power=9},
+	groups = {choppy=2, dig_immediate=3, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,},
 	legacy_wallmounted = true,
 	selection_box = {
 		type = "fixed",
@@ -60,7 +58,7 @@ minetest.register_node("redstone:torch_floor", {
 	},
 	
 	on_construct = function(pos)
-		redstone.inject(pos,{torch=9})
+		redstone.inject(pos,{torch=16})
 		redstone.update(pos)
 	end,
 	after_destruct = function(pos, oldnode)
@@ -82,8 +80,7 @@ minetest.register_node("redstone:torch_wall", {
 	sunlight_propagates = true,
 	walkable = false,
 	light_source = 13,
-	power = 9,
-	groups = {choppy=2, dig_immediate=3, flammable=1, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,redstone_torch=1,redstone_power=9},
+	groups = {choppy=2, dig_immediate=3, flammable=1, not_in_creative_inventory=1, attached_node=1, torch=1,redstone=1,},
 	drop = "redstone:torch",
 	selection_box = {
 		type = "wallmounted",
@@ -92,7 +89,7 @@ minetest.register_node("redstone:torch_wall", {
 		wall_side = {-0.5, -0.3, -0.1, -0.2, 0.3, 0.1},
 	},
 	on_construct = function(pos)
-		redstone.inject(pos,{torch=9})
+		redstone.inject(pos,{torch=16})
 		redstone.update(pos)
 	end,
 	after_destruct = function(pos, oldnode)
@@ -108,6 +105,6 @@ minetest.register_lbm({
 	nodenames = {"redstone:torch_wall","redstone:torch_floor"},
 	run_at_every_load = true,
 	action = function(pos)
-		redstone.inject(pos,{torch=9})
+		redstone.inject(pos,{torch=16})
 	end,
 })

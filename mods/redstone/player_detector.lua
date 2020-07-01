@@ -4,7 +4,7 @@ minetest,ipairs,math
 minetest,ipairs,math
 
 --detects players and outputs accordingly
-for i = 0,9  do
+for i = 0,16  do
 
 minetest.register_node("redstone:player_detector_"..i, {
 	description = "Redstone Player Detector",

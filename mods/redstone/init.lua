@@ -22,6 +22,7 @@ end)
 -- math class
 local abs   = math.abs
 local floor = math.floor
+local ceil   = math.ceil
 
 -- vector library
 local new_vec         = vector.new
@@ -83,6 +84,8 @@ dofile(path.."/capacitors.lua")
 --this is written out manually so that
 --math.abs is not needed
 local order = {
+	{x=0,y=0,z=0},
+
 	{x=1, y=0, z=0}, {x=-1, y=0, z= 0},
 	{x=0, y=0, z=1}, {x= 0, y=0, z=-1},
 
@@ -125,19 +128,19 @@ local table_3d
 local temp_pool
 local function create_boundary_box(pos)
 	table_3d = {}
-	for x = pos.x-9,pos.x+9 do
+	for x = pos.x-16,pos.x+16 do
 		if pool[x] then
-			for y = pos.y-9,pos.y+9 do
+			for y = pos.y-16,pos.y+16 do
 				if pool[x][y] then
-					for z = pos.z-9,pos.z+9 do
+					for z = pos.z-16,pos.z+16 do
 						temp_pool = pool[x][y][z]
 						if temp_pool then
 							if not table_3d[x] then table_3d[x] = {} end
 							if not table_3d[x][y] then table_3d[x][y] = {} end
 
-							if (x == pos.x-9 or x == pos.x+9 or 
-							y == pos.y-9 or y == pos.y+9 or 
-							z == pos.z-9 or z == pos.z+9) and 
+							if (x == pos.x-16 or x == pos.x+16 or 
+							y == pos.y-16 or y == pos.y+16 or 
+							z == pos.z-16 or z == pos.z+16) and 
 							temp_pool.dust and temp_pool.dust > 1 then
 								table_3d[x][y][z] = {torch=temp_pool.dust}
 							else
@@ -267,7 +270,7 @@ local directional_activator = function(pos)
 	temp_pool = nil
 	temp_pool2 = nil
 
-	--if not (pool[pos.x] and pool[pos.x][pos.y] and pool[pos.x][pos.y][pos.z]) then return end
+	if not (pool[pos.x] and pool[pos.x][pos.y] and pool[pos.x][pos.y][pos.z]) then return end
 	
 	temp_pool = pool[pos.x][pos.y][pos.z]
 	
@@ -309,34 +312,33 @@ end
 local i
 local index
 local passed_on_level
-local function redstone_pathfinder(source,source_level,mem_map,output)
-	if not source_level then return end
+local x,y,z
+local function redstone_distribute(pos,power,mem_map,output)
+
+	power = power - 1
+
 	--directional torches
 	if output then
-		i = output
-		if i and mem_map and mem_map[i.x] and mem_map[i.x][i.y] and mem_map[i.x][i.y][i.z] then
-			index = mem_map[i.x][i.y][i.z]
-			--dust
-			if index.dust then
-				passed_on_level = source_level - 1
-				if passed_on_level > 0 then
-					mem_map[i.x][i.y][i.z].dust = passed_on_level
-					redstone_pathfinder(i,passed_on_level,mem_map,nil)
-				end
+		x=output.x
+		y=output.y
+		z=output.z
+		if mem_map.dust[x] and mem_map.dust[x][y] and mem_map.dust[x][y][z] then
+			if mem_map.dust[x][y][z].dust < power then
+				mem_map.dust[x][y][z].dust = power
+				redstone_distribute(new_vec(x,y,z),power,mem_map,nil)
 			end
 		end
 	else
 		--redstone and torch
 		for _,order in pairs(order) do
-			i = add_vec(source,order)
-			if i and mem_map and mem_map[i.x] and mem_map[i.x][i.y] and mem_map[i.x][i.y][i.z] then
-				index = mem_map[i.x][i.y][i.z]
-				if index.dust then
-					passed_on_level = source_level - 1
-					if passed_on_level > 0 and index.dust < source_level then
-						mem_map[i.x][i.y][i.z].dust = passed_on_level
-						redstone_pathfinder(i,passed_on_level,mem_map,nil)
-					end
+			i = add_vec(pos,order)
+			x=i.x
+			y=i.y
+			z=i.z
+			if mem_map.dust[x] and mem_map.dust[x][y] and mem_map.dust[x][y][z] then
+				if mem_map.dust[x][y][z].dust < power then
+					mem_map.dust[x][y][z].dust = power
+					redstone_distribute(new_vec(x,y,z),power,mem_map,nil)
 				end
 			end
 		end
@@ -371,38 +373,131 @@ end
 ]]-- sic em boy!
 local i
 local index
-local function dust_sniff(pos,mem_map,boundary)
-	for _,order in pairs(order) do
-		i = add_vec(pos,order)
+local function dust_sniff(pos,mem_map,boundary,single,origin,ignore)
+	if not single then
+		--print("all position index--")
+		for _,order in pairs(order) do
+			i = add_vec(pos,order)
+
+			if not mem_map[i.x] then mem_map[i.x] = {} end
+			if not mem_map[i.x][i.y] then mem_map[i.x][i.y] = {} end
+
+			if not mem_map[i.x][i.y][i.z] then
+				if i and boundary and boundary[i.x] and boundary[i.x][i.y] and boundary[i.x][i.y][i.z] then
+					index = boundary[i.x][i.y][i.z]
+
+					if index.dust then
+
+						mem_map[i.x][i.y][i.z] = true
+
+						if not mem_map.dust[i.x] then mem_map.dust[i.x] = {} end
+						if not mem_map.dust[i.x][i.y] then mem_map.dust[i.x][i.y] = {} end
+
+						mem_map.dust[i.x][i.y][i.z] = index
+
+						dust_sniff(i,mem_map,boundary)
+					
+					elseif index.torch and index.torch > 1 then
+						if index.torch_directional and vec_equals(pos,index.output) then
+							
+							mem_map[i.x][i.y][i.z] = true
+
+							if not mem_map.torch[i.x] then mem_map.torch[i.x] = {} end
+							if not mem_map.torch[i.x][i.y] then mem_map.torch[i.x][i.y] = {} end
+
+							mem_map.torch[i.x][i.y][i.z] = index
+
+							
+						elseif not index.torch_directional then
+
+							mem_map[i.x][i.y][i.z] = true
+
+							if not mem_map.torch[i.x] then mem_map.torch[i.x] = {} end
+							if not mem_map.torch[i.x][i.y] then mem_map.torch[i.x][i.y] = {} end
+
+							mem_map.torch[i.x][i.y][i.z] = index
+						end
+					end
+
+					if index.activator then
+						mem_map[i.x][i.y][i.z] = true
+
+						if not mem_map.activator[i.x] then mem_map.activator[i.x] = {} end
+						if not mem_map.activator[i.x][i.y] then mem_map.activator[i.x][i.y] = {} end
+
+						mem_map.activator[i.x][i.y][i.z] = index
+					elseif index.directional_activator and vec_equals(pos,index.input) then
+
+						mem_map[i.x][i.y][i.z] = true
+
+						if not mem_map.activator[i.x] then mem_map.activator[i.x] = {} end
+						if not mem_map.activator[i.x][i.y] then mem_map.activator[i.x][i.y] = {} end
+
+						mem_map.activator[i.x][i.y][i.z] = index
+					end
+				end
+			end
+		end
+	else
+		--print("single position index")
+		
+		i = pos
+
 
 		if not mem_map[i.x] then mem_map[i.x] = {} end
 		if not mem_map[i.x][i.y] then mem_map[i.x][i.y] = {} end
 
 		if not mem_map[i.x][i.y][i.z] then
-			
 			if i and boundary and boundary[i.x] and boundary[i.x][i.y] and boundary[i.x][i.y][i.z] then
 				index = boundary[i.x][i.y][i.z]
-
 				if index.dust then
-					mem_map[i.x][i.y][i.z] = index
-					mem_map[i.x][i.y][i.z].sniffed = true
+
+					mem_map[i.x][i.y][i.z] = true
+
+					if not mem_map.dust[i.x] then mem_map.dust[i.x] = {} end
+					if not mem_map.dust[i.x][i.y] then mem_map.dust[i.x][i.y] = {} end
+
+					mem_map.dust[i.x][i.y][i.z] = index
 
 					dust_sniff(i,mem_map,boundary)
-
-				elseif index.directional_activator and vec_equals(pos,index.input) then
-					mem_map[i.x][i.y][i.z] = index
-					mem_map[i.x][i.y][i.z].sniffed = true
+				
 				elseif index.torch and index.torch > 1 then
-					if index.torch_directional and vec_equals(pos,index.output) then
-						mem_map[i.x][i.y][i.z] = index
-						mem_map[i.x][i.y][i.z].sniffed = true
+					if index.torch_directional and (vec_equals(origin,index.output) or ignore) then
+						
+						mem_map[i.x][i.y][i.z] = true
+
+						if not mem_map.torch[i.x] then mem_map.torch[i.x] = {} end
+						if not mem_map.torch[i.x][i.y] then mem_map.torch[i.x][i.y] = {} end
+
+						mem_map.torch[i.x][i.y][i.z] = index
+
+						
 					elseif not index.torch_directional then
-						mem_map[i.x][i.y][i.z] = index
-						mem_map[i.x][i.y][i.z].sniffed = true
+
+						mem_map[i.x][i.y][i.z] = true
+
+						if not mem_map.torch[i.x] then mem_map.torch[i.x] = {} end
+						if not mem_map.torch[i.x][i.y] then mem_map.torch[i.x][i.y] = {} end
+
+						mem_map.torch[i.x][i.y][i.z] = index
 					end
-				elseif index.activator then
-					mem_map[i.x][i.y][i.z] = index
-					mem_map[i.x][i.y][i.z].sniffed = true
+				end
+
+				if index.activator then
+					mem_map[i.x][i.y][i.z] = true
+
+					if not mem_map.activator[i.x] then mem_map.activator[i.x] = {} end
+					if not mem_map.activator[i.x][i.y] then mem_map.activator[i.x][i.y] = {} end
+
+					mem_map.activator[i.x][i.y][i.z] = index
+				elseif index.directional_activator and (vec_equals(origin,index.input) or ignore) then
+
+					mem_map[i.x][i.y][i.z] = true
+
+					if not mem_map.activator[i.x] then mem_map.activator[i.x] = {} end
+					if not mem_map.activator[i.x][i.y] then mem_map.activator[i.x][i.y] = {} end
+
+					mem_map.activator[i.x][i.y][i.z] = index
 				end
 			end
 		end
@@ -417,49 +512,63 @@ local power
 local boundary
 local dust_detected
 local dust_map
-local count
 local pos3
 local temp_pool3
+local directional
 local function calculate(pos,is_capacitor)
 	if not is_capacitor then
 		boundary = create_boundary_box(pos)
 		dust_map = {}
 
+		dust_map.dust = {}
+		dust_map.torch = {}
+		dust_map.activator = {}
+
 		dust_detected = false
-		count = 0
-		
-		--update needs to sniff it's own position
+
+		directional = false
+
 		if boundary[pos.x] and boundary[pos.x][pos.y] and boundary[pos.x][pos.y][pos.z] then
-			if not dust_map[pos.x] then dust_map[pos.x] = {} end
-			if not dust_map[pos.x][pos.y] then dust_map[pos.x][pos.y] = {} end
-			dust_map[pos.x][pos.y][pos.z] = boundary[pos.x][pos.y][pos.z]
-		end
-
-		dust_sniff(pos,dust_map,boundary)
-
-		-- sniff all possible dust within boundaries
-		for _,pos2 in pairs(order) do
-			pos3 = add_vec(pos,pos2)
-			if boundary[pos3.x] and boundary[pos3.x][pos3.y] and boundary[pos3.x][pos3.y][pos3.z] and
-				not (dust_map[pos3.x] and dust_map[pos3.x][pos3.y] and dust_map[pos3.x][pos3.y][pos3.z] and dust_map[pos3.x][pos3.y][pos3.z].sniffed) then
-				temp_pool3 = boundary[pos3.x][pos3.y][pos3.z]
-				if temp_pool3.dust then
-					dust_sniff(pos3,dust_map,boundary)
-				end
+			if boundary[pos.x][pos.y][pos.z].torch_directional or boundary[pos.x][pos.y][pos.z].directional_activator then
+				directional = true
 			end
 		end
 
+		-- sniff all possible dust within boundaries
+		if not directional then
+			dust_sniff(pos,dust_map,boundary)
+			for _,pos2 in pairs(order) do
+				pos3 = add_vec(pos,pos2)
+				if boundary[pos3.x] and boundary[pos3.x][pos3.y] and boundary[pos3.x][pos3.y][pos3.z] and
+					not (dust_map[pos3.x] and dust_map[pos3.x][pos3.y] and dust_map[pos3.x][pos3.y][pos3.z]) then
+					temp_pool3 = boundary[pos3.x][pos3.y][pos3.z]
+					if temp_pool3.dust then
+						dust_sniff(pos3,dust_map,boundary)
+					end
+				end
+			end
+		else
+			dust_sniff(pos,dust_map,boundary,true,pos,true)
+
+			local input = boundary[pos.x][pos.y][pos.z].input
+			local output = boundary[pos.x][pos.y][pos.z].output
+
+			if input and boundary[input.x] and boundary[input.x][input.y] and boundary[input.x][input.y][input.z] then
+				dust_sniff(input,dust_map,boundary,true,pos)
+			end
+			if output and boundary[output.x] and boundary[output.x][output.y] and boundary[output.x][output.y][output.z] then
+				dust_sniff(output,dust_map,boundary,true,pos)
+			end
+		end
 		--do torches
-		for x,datax in pairs(dust_map) do
+		for x,datax in pairs(dust_map.torch) do
 			for y,datay in pairs(datax) do
 				for z,data in pairs(datay) do
-					count = count + 1
 					if data.torch then
 						if data.torch_directional then
-							redstone_pathfinder(new_vec(x,y,z),data.torch,dust_map,data.output)
+							redstone_distribute(new_vec(x,y,z),data.torch,dust_map,data.output)
 						else
-							redstone_pathfinder(new_vec(x,y,z),data.torch,dust_map)
-							dust_map[x][y][z] = nil
+							redstone_distribute(new_vec(x,y,z),data.torch,dust_map)
 						end
 					end
 				end
@@ -467,22 +576,20 @@ local function calculate(pos,is_capacitor)
 		end
 
 		--set dust, set pool memory
-		for x,datax in pairs(dust_map) do
+		for x,datax in pairs(dust_map.dust) do
 			for y,datay in pairs(datax) do
 				for z,data in pairs(datay) do
 					if data.dust and data.dust ~= data.origin then
 						swap_node(new_vec(x,y,z),{name="redstone:dust_"..data.dust})
 						data_injection(new_vec(x,y,z),data)
-						--delete the data to speed up next loop
-						dust_map[x][y][z] = nil
 					end
 				end
 			end
 		end
-
+		
 		--activators
 		--this must be run at the end
-		for x,datax in pairs(dust_map) do
+		for x,datax in pairs(dust_map.activator) do
 			for y,datay in pairs(datax) do
 				for z,data in pairs(datay) do
 					if data.directional_activator then
@@ -541,9 +648,9 @@ local function player_detector_calculation()
 		max = 0
 		for _,player in ipairs(minetest.get_connected_players()) do
 			pos2 = player:get_pos()
-			power = floor(10-vector_distance(pos2,pos))
-			if power > 9 then
-				power = 9
+			power = floor(17-vector_distance(pos2,pos))
+			if power > 16 then
+				power = 16
 			elseif power < 0 then
 				power = 0
 			end
@@ -629,16 +736,17 @@ minetest.register_craftitem("redstone:dust", {
 	end,
 })
 
---8 power levels 8 being the highest
-local color = 0
-for i = 0,8 do
-	local coloring = floor(color)
+--15 power levels 15 being the highest
+for i = 0,15 do
+
+	local color = floor(255 * (i/15))
+	
 	minetest.register_node("redstone:dust_"..i,{
 		description = "Redstone Dust",
 		wield_image = "redstone_dust_item.png",
 		tiles = {
-			"redstone_dust_main.png^[colorize:red:"..coloring, "redstone_turn.png^[colorize:red:"..coloring,
-			"redstone_t.png^[colorize:red:"..coloring, "redstone_cross.png^[colorize:red:"..coloring
+			"redstone_dust_main.png^[colorize:red:"..color, "redstone_turn.png^[colorize:red:"..color,
+			"redstone_t.png^[colorize:red:"..color, "redstone_cross.png^[colorize:red:"..color
 		},
 		power=i,
 		drawtype = "raillike",
@@ -664,7 +772,6 @@ for i = 0,8 do
 		end,
 		connects_to = {"group:redstone"},
 	})
-	color= color +31.875
 
 	minetest.register_lbm({
         name = "redstone:"..i,
