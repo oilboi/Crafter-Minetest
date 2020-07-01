@@ -10,7 +10,7 @@ local function sapling_grow(pos)
 		return
 	end
 	--print("growing at "..dump(pos))
-	if minetest.get_node_group(minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name, "soil") > 0 then
+	if minetest.get_item_group(minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name, "soil") > 0 then
 		local good_to_grow = true
 		--check if room to grow (leaves or air)
 		for i = 1,4 do
@@ -72,16 +72,16 @@ minetest.register_node("main:sapling", {
 		
 		local buildable = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name].buildable_to
 		--replace buildable
-		if buildable and minetest.get_node_group(minetest.get_node(vector.new(pointed_thing.under.x,pointed_thing.under.y-1,pointed_thing.under.z)).name, "soil") > 0 then
+		if buildable and minetest.get_item_group(minetest.get_node(vector.new(pointed_thing.under.x,pointed_thing.under.y-1,pointed_thing.under.z)).name, "soil") > 0 then
 			return(minetest.item_place(itemstack, placer, pointed_thing))
 		end
 		local buildable = minetest.registered_nodes[minetest.get_node(pointed_thing.above).name].buildable_to
-		if buildable and minetest.get_node_group(minetest.get_node(vector.new(pointed_thing.above.x,pointed_thing.above.y-1,pointed_thing.above.z)).name, "soil") > 0 then
+		if buildable and minetest.get_item_group(minetest.get_node(vector.new(pointed_thing.above.x,pointed_thing.above.y-1,pointed_thing.above.z)).name, "soil") > 0 then
 			return(minetest.item_place(itemstack, placer, pointed_thing))
 		end
 		--place sapling
 		local pos = pointed_thing.above
-		if minetest.get_node_group(minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name, "soil") > 0 and minetest.get_node(pointed_thing.above).name == "air" then
+		if minetest.get_item_group(minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name, "soil") > 0 and minetest.get_node(pointed_thing.above).name == "air" then
 			minetest.set_node(pointed_thing.above, {name="main:sapling"})
 			minetest.sound_play("dirt",{pos=pointed_thing.above})
 			itemstack:take_item(1)
