@@ -1,3 +1,5 @@
+--if you attempt to read this, god bless you
+
 local 
 minetest,vector,math,table,pairs,next
 =
@@ -124,6 +126,30 @@ local function data_injection(pos,data)
 		end
 	end
 end
+
+--[[
+                                         _ __
+        ___                             | '  \
+   ___  \ /  ___         ,'\_           | .-. \        /|
+   \ /  | |,'__ \  ,'\_  |   \          | | | |      ,' |_   /|
+ _ | |  | |\/  \ \ |   \ | |\_|    _    | |_| |   _ '-. .-',' |_   _
+// | |  | |____| | | |\_|| |__    //    |     | ,'_`. | | '-. .-',' `. ,'\_
+\\_| |_,' .-, _  | | |   | |\ \  //    .| |\_/ | / \ || |   | | / |\  \|   \
+ `-. .-'| |/ / | | | |   | | \ \//     |  |    | | | || |   | | | |_\ || |\_|
+   | |  | || \_| | | |   /_\  \ /      | |`    | | | || |   | | | .---'| |
+   | |  | |\___,_\ /_\ _      //       | |     | \_/ || |   | | | |  /\| |
+   /_\  | |           //_____//       .||`  _   `._,' | |   | | \ `-' /| |
+        /_\           `------'        \ |  /-\ND _     `.\  | |  `._,' /_\
+                                       \|        |HE         `.\
+                                      __        _           _   __  _
+                                     /   |__|  /_\  |\  /| |_) |_  |_)
+                                     \__ |  | /   \ | \/ | |_) |__ | \
+                                             _  _  
+											(_)|-   ___     __     __ __ 
+													 |  /\ |__)|  |_ (_  
+													 | /--\|__)|__|____) 
+]]--
+
 
 local table_3d
 local temp_pool
@@ -299,14 +325,14 @@ local directional_activator = function(pos)
 
 	if not ignore and ((temp_pool2.dust and temp_pool2.dust > 0) or (temp_pool2.torch and temp_pool2.directional_activator and temp_pool2.dir == temp_pool.dir) or 
 	(not temp_pool2.directional_activator and temp_pool2.torch) or (temp_pool2.capacitor and temp_pool2.capacitor > 0))  then
-		if activator_table[temp_pool.name].activate then
+		if  activator_table[temp_pool.name] and activator_table[temp_pool.name].activate then
 			activator_table[temp_pool.name].activate(pos)
 			return
 		end
 		return
 	end
 
-	if activator_table[temp_pool.name].deactivate then
+	if activator_table[temp_pool.name] and activator_table[temp_pool.name].deactivate then
 		activator_table[temp_pool.name].deactivate(pos)
 	end
 end
