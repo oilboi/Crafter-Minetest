@@ -47,6 +47,51 @@ end
 ╚═╝      ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝   ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 ]]
 
+local function push_objects(pos,dir)
+	--push player
+	for _,object in ipairs(minetest.get_objects_inside_radius(pos,2)) do
+
+		if object:is_player() and object:get_hp() > 0 then
+			local pos2 = object:get_pos()
+			local compare = vector.subtract(pos2,pos)
+			local real_y = compare.y
+			compare = vector.abs(compare)
+			--piston pointing up
+			if dir.y == 1 then
+				if compare.y <= 0.5 and compare.x < 0.8 and compare.z < 0.8 then
+					object:move_to(vector.add(dir,pos2))
+					object:add_player_velocity(vector.multiply(dir,20))
+				end
+			--piston sideways
+			elseif dir.x ~=0 or dir.z ~= 0 then
+				if real_y <= 0.5 and real_y >= -1.6 and compare.x < 0.8 and compare.z < 0.8 then
+					object:move_to(vector.add(dir,pos2))
+					object:add_player_velocity(vector.multiply(dir,19))
+				end
+			end
+		elseif not object:is_player() and object:get_luaentity().name == "__builtin:falling_node" then
+			local pos2 = object:get_pos()
+			local compare = vector.subtract(pos2,pos)
+			local real_y = compare.y
+			compare = vector.abs(compare)
+			if compare.y <= 1.5 and compare.x <= 1.5 and compare.z <= 1.5 then
+				object:move_to(vector.add(dir,pos2))
+				object:add_velocity(vector.multiply(dir,20))
+			end
+		elseif not object:is_player() and object:get_luaentity().name == "__builtin:item" then
+			local pos2 = object:get_pos()
+			local compare = vector.subtract(pos2,pos)
+			local real_y = compare.y
+			compare = vector.abs(compare)
+			if compare.y <= 1 and compare.x <= 1 and compare.z <= 1 then
+				object:move_to(vector.add(dir,pos2))
+				object:add_velocity(vector.multiply(dir,20))
+				object:get_luaentity().poll_timer = 0
+			end
+		end
+	end
+end
+
 --this is how the piston pushes nodes
 local move_index
 local space
@@ -66,6 +111,10 @@ local function push_nodes(pos,dir)
 		def = minetest.registered_nodes[node.name]
 		name = node.name
 		push = ((excluded_mods[def.mod_origin] ~= true) and (excluded_nodes[name] ~= true))
+
+		if i == 1 then
+			push_objects(index_pos,dir)
+		end
 		if push and name ~= "air" then
 			index = {}
 			index.pos = index_pos
@@ -99,6 +148,7 @@ local function push_nodes(pos,dir)
 						move_index[i].pos = vector.add(move_index[i].pos,dir)
 						minetest.set_node(move_index[i].pos,move_index[i])
 						minetest.check_for_falling(move_index[i].pos)
+						push_objects(move_index[i].pos,dir)
 					end
 				end
 			end
@@ -121,50 +171,6 @@ local function actuator_arm_function(pos)
 	local node = minetest.get_node(vector.add(pos,dir)).name
 	
 	if worked == true then
-		--push player
-		if node == "air" then
-			for _,object in ipairs(minetest.get_objects_inside_radius(piston_location, 2)) do
-
-				if object:is_player() and object:get_hp() > 0 then
-					local pos2 = object:get_pos()
-					local compare = vector.subtract(pos2,piston_location)
-					local real_y = compare.y
-					compare = vector.abs(compare)
-					--piston pointing up
-					if dir.y == 1 then
-						if compare.y <= 0.5 and compare.x < 0.8 and compare.z < 0.8 then
-							object:move_to(vector.add(dir,pos2))
-							object:add_player_velocity(vector.multiply(dir,20))
-						end
-					--piston sideways
-					elseif dir.x ~=0 or dir.z ~= 0 then
-						if real_y <= 0.5 and real_y >= -1.6 and compare.x < 0.8 and compare.z < 0.8 then
-							object:move_to(vector.add(dir,pos2))
-							object:add_player_velocity(vector.multiply(dir,19))
-						end
-					end
-				elseif not object:is_player() and object:get_luaentity().name == "__builtin:falling_node" then
-					local pos2 = object:get_pos()
-					local compare = vector.subtract(pos2,piston_location)
-					local real_y = compare.y
-					compare = vector.abs(compare)
-					if compare.y <= 1.5 and compare.x <= 1.5 and compare.z <= 1.5 then
-						object:move_to(vector.add(dir,pos2))
-						object:add_velocity(vector.multiply(dir,20))
-					end
-				elseif not object:is_player() and object:get_luaentity().name == "__builtin:item" then
-					local pos2 = object:get_pos()
-					local compare = vector.subtract(pos2,piston_location)
-					local real_y = compare.y
-					compare = vector.abs(compare)
-					if compare.y <= 1 and compare.x <= 1 and compare.z <= 1 then
-						object:move_to(vector.add(dir,pos2))
-						object:add_velocity(vector.multiply(dir,20))
-						object:get_luaentity().poll_timer = 0
-					end
-				end
-			end
-		end
 		minetest.sound_play("piston", {pos=pos,pitch=math.random(85,100)/100})
 		minetest.set_node(piston_location,{name="redstone:actuator",param2=facedir})
 		minetest.swap_node(pos,{name="redstone:piston_on",param2=facedir})
@@ -210,6 +216,7 @@ minetest.register_node("redstone:piston_off", {
 		look = vector.multiply(look,-1)
 		local dir = minetest.dir_to_facedir(look, true)
 		minetest.swap_node(pos,{name="redstone:piston_off",param2=dir})
+		redstone.update(pos)
 	end,
     after_place_node = function(pos, placer, itemstack, pointed_thing)
 		local look = placer:get_look_dir()
@@ -307,6 +314,9 @@ redstone.register_activator({
 		local dir = minetest.facedir_to_dir(facedir)
 		local piston_location = vector.add(pos,dir)
 		minetest.remove_node(piston_location)
+
+		minetest.check_for_falling(piston_location)
+
 		minetest.swap_node(pos,{name="redstone:piston_off",param2=facedir})
 		piston_location.y = piston_location.y + 1
 		minetest.sound_play("piston", {pos=pos,pitch=math.random(85,100)/100})
@@ -384,6 +394,48 @@ minetest.register_node("redstone:actuator", {
 ]]
 
 
+
+local function sticky_push_objects(pos,dir)
+	--push player
+	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 2)) do
+		if object:is_player() and object:get_hp() > 0 then
+			local pos2 = object:get_pos()
+			local compare = vector.subtract(pos2,pos)
+			local real_y = compare.y
+			compare = vector.abs(compare)
+			--piston pointing up
+			if dir.y == 1 then
+				if compare.y <= 0.5 and compare.x < 0.8 and compare.z < 0.8 then
+					object:move_to(vector.add(dir,pos2))
+				end
+			--piston sideways
+			elseif dir.x ~=0 or dir.z ~= 0 then
+				if real_y <= 0.5 and real_y >= -1.6 and compare.x < 0.8 and compare.z < 0.8 then
+					object:move_to(vector.add(dir,pos2))
+				end
+			end
+		elseif not object:is_player() and object:get_luaentity().name == "__builtin:falling_node" then
+			local pos2 = object:get_pos()
+			local compare = vector.subtract(pos2,pos)
+			local real_y = compare.y
+			compare = vector.abs(compare)
+			if compare.y <= 1.5 and compare.x <= 1.5 and compare.z <= 1.5 then
+				object:move_to(vector.add(dir,pos2))
+			end
+		elseif not object:is_player() and object:get_luaentity().name == "__builtin:item" then
+			local pos2 = object:get_pos()
+			local compare = vector.subtract(pos2,pos)
+			local real_y = compare.y
+			compare = vector.abs(compare)
+			if compare.y <= 1 and compare.x <= 1 and compare.z <= 1 then
+				object:move_to(vector.add(dir,pos2))
+				object:get_luaentity().poll_timer = 0
+			end
+		end
+	end
+end
+
+
 --this is how the piston pushes nodes
 local move_index
 local space
@@ -403,6 +455,9 @@ local function sticky_push_nodes(pos,dir)
 		def = minetest.registered_nodes[node.name]
 		name = node.name
 		push = ((excluded_mods[def.mod_origin] ~= true) and (excluded_nodes[name] ~= true))
+		if i == 1 then
+			sticky_push_objects(index_pos,dir)
+		end
 		if push and name ~= "air" then
 			index = {}
 			index.pos = index_pos
@@ -420,10 +475,12 @@ local function sticky_push_nodes(pos,dir)
 
 	--check if room to move and objects in log
 	if space == true and next(move_index) then
+		print("running")
 		for i = 1,table.getn(move_index) do
 			move_index[i].pos = vector.add(move_index[i].pos,dir)
 			minetest.set_node(move_index[i].pos,move_index[i])
 			minetest.check_for_falling(move_index[i].pos)
+			sticky_push_objects(move_index[i].pos,dir)
 		end
 	end
 	return(space)
@@ -443,46 +500,7 @@ local function sticky_actuator_arm_function(pos)
 	local node = minetest.get_node(vector.add(pos,dir)).name
 	
 	if worked == true then
-		--push player
-		if node == "air" then
-			for _,object in ipairs(minetest.get_objects_inside_radius(piston_location, 2)) do
-
-				if object:is_player() and object:get_hp() > 0 then
-					local pos2 = object:get_pos()
-					local compare = vector.subtract(pos2,piston_location)
-					local real_y = compare.y
-					compare = vector.abs(compare)
-					--piston pointing up
-					if dir.y == 1 then
-						if compare.y <= 0.5 and compare.x < 0.8 and compare.z < 0.8 then
-							object:move_to(vector.add(dir,pos2))
-						end
-					--piston sideways
-					elseif dir.x ~=0 or dir.z ~= 0 then
-						if real_y <= 0.5 and real_y >= -1.6 and compare.x < 0.8 and compare.z < 0.8 then
-							object:move_to(vector.add(dir,pos2))
-						end
-					end
-				elseif not object:is_player() and object:get_luaentity().name == "__builtin:falling_node" then
-					local pos2 = object:get_pos()
-					local compare = vector.subtract(pos2,piston_location)
-					local real_y = compare.y
-					compare = vector.abs(compare)
-					if compare.y <= 1.5 and compare.x <= 1.5 and compare.z <= 1.5 then
-						object:move_to(vector.add(dir,pos2))
-					end
-				elseif not object:is_player() and object:get_luaentity().name == "__builtin:item" then
-					local pos2 = object:get_pos()
-					local compare = vector.subtract(pos2,piston_location)
-					local real_y = compare.y
-					compare = vector.abs(compare)
-					if compare.y <= 1 and compare.x <= 1 and compare.z <= 1 then
-						object:move_to(vector.add(dir,pos2))
-						object:get_luaentity().poll_timer = 0
-					end
-				end
-			end
-		end
+		
 		minetest.sound_play("piston", {pos=pos,pitch=math.random(85,100)/100})
 		minetest.set_node(piston_location,{name="redstone:sticky_actuator",param2=facedir})
 		minetest.swap_node(pos,{name="redstone:sticky_piston_on",param2=facedir})
@@ -528,6 +546,7 @@ minetest.register_node("redstone:sticky_piston_off", {
 		look = vector.multiply(look,-1)
 		local dir = minetest.dir_to_facedir(look, true)
 		minetest.swap_node(pos,{name="redstone:sticky_piston_off",param2=dir})
+		redstone.update(pos)
 	end,
     --reverse the direction to face the player
     after_place_node = function(pos, placer, itemstack, pointed_thing)
@@ -649,6 +668,9 @@ redstone.register_activator({
 		minetest.remove_node(piston_location)
 
 		sticky_piston_pull_nodes(piston_location,dir)
+
+		minetest.check_for_falling(piston_location)
+
 		minetest.swap_node(pos,{name="redstone:sticky_piston_off",param2=facedir})
 
 		minetest.sound_play("piston", {pos=pos,pitch=math.random(85,100)/100})
