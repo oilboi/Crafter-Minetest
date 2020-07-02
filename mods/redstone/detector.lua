@@ -23,7 +23,7 @@ minetest.register_node("redstone:detector_off", {
             
             redstone.inject(pos,{
                 name = "redstone:detector_on",
-                torch = 16,
+                torch = 9,
             })
             minetest.after(0,function()
             	redstone.update(pos)
@@ -118,7 +118,7 @@ minetest.register_node("redstone:detector_on", {
 	on_construct = function(pos)
 		redstone.inject(pos,{
             name = "redstone:detector_on",
-            torch = 16,
+            torch = 9,
         })
         local timer = minetest.get_node_timer(pos)
 		if not timer:is_started() then
@@ -140,7 +140,7 @@ minetest.register_lbm({
 	action = function(pos)
 		redstone.inject(pos,{
 			name = "redstone:detector_on",
-			torch = 16,
+			torch = 9,
         })
         
         local timer = minetest.get_node_timer(pos)

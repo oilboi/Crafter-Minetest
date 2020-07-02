@@ -156,19 +156,19 @@ local table_3d
 local temp_pool
 local function create_boundary_box(pos)
 	table_3d = {}
-	for x = pos.x-16,pos.x+16 do
+	for x = pos.x-9,pos.x+9 do
 		if pool[x] then
-			for y = pos.y-16,pos.y+16 do
+			for y = pos.y-9,pos.y+9 do
 				if pool[x][y] then
-					for z = pos.z-16,pos.z+16 do
+					for z = pos.z-9,pos.z+9 do
 						temp_pool = pool[x][y][z]
 						if temp_pool then
 							if not table_3d[x] then table_3d[x] = {} end
 							if not table_3d[x][y] then table_3d[x][y] = {} end
 
-							if (x == pos.x-16 or x == pos.x+16 or 
-							y == pos.y-16 or y == pos.y+16 or 
-							z == pos.z-16 or z == pos.z+16) and 
+							if (x == pos.x-9 or x == pos.x+9 or 
+							y == pos.y-9 or y == pos.y+9 or 
+							z == pos.z-9 or z == pos.z+9) and 
 							temp_pool.dust and temp_pool.dust > 1 then
 								table_3d[x][y][z] = {torch=temp_pool.dust}
 							else
@@ -652,9 +652,9 @@ local function player_detector_calculation()
 		max = 0
 		for _,player in ipairs(minetest.get_connected_players()) do
 			pos2 = player:get_pos()
-			power = floor(17-vector_distance(pos2,pos))
-			if power > 16 then
-				power = 16
+			power = floor(11-vector_distance(pos2,pos))
+			if power > 9 then
+				power = 9
 			elseif power < 0 then
 				power = 0
 			end
@@ -681,8 +681,6 @@ local bad_node
 local queue = {}
 function redstone.update(pos,is_capacitor)
 	local count = table.getn(queue)
-	queue[count+1] = {pos=pos,is_capacitor=is_capacitor}
-	--[[
 	local s_pos = minetest.serialize(pos)
 	if not recursion_check[s_pos] then
 		recursion_check[s_pos] = 0
@@ -702,34 +700,33 @@ function redstone.update(pos,is_capacitor)
 		end)
 		return
 	end
-	]]--
-
-	--calculate(pos,is_capacitor)
+	calculate(pos,is_capacitor)
 end
 local dtime_goal = 0.02
 local sleep = 0
 minetest.register_globalstep(function(dtime)
-
-
+	player_detector_calculation()
+	recursion_check = {}
+	--[[
 	if dtime > dtime_goal then
 		sleep = dtime - dtime_goal
 	end
 
 	if sleep == 0 then
-		player_detector_calculation()
 
 		for index,element in pairs(queue) do
 			calculate(element.pos,element.is_capacitor)
 		end
 
 		queue = {}
-		--recursion_check = {}
+		
 	else
 		sleep = sleep - dtime
 		if sleep <= 0 then
 			sleep = 0
 		end
 	end
+	]]--
 end)
 
 
@@ -793,9 +790,9 @@ minetest.register_craftitem("redstone:dust", {
 })
 
 --15 power levels 15 being the highest
-for i = 0,15 do
+for i = 0,8 do
 
-	local color = floor(255 * (i/15))
+	local color = floor(255 * (i/8))
 	
 	minetest.register_node("redstone:dust_"..i,{
 		description = "Redstone Dust",

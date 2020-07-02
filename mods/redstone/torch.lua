@@ -58,7 +58,7 @@ minetest.register_node("redstone:torch_floor", {
 	},
 	
 	on_construct = function(pos)
-		redstone.inject(pos,{torch=16})
+		redstone.inject(pos,{torch=9})
 		redstone.update(pos)
 	end,
 	after_destruct = function(pos, oldnode)
@@ -89,7 +89,7 @@ minetest.register_node("redstone:torch_wall", {
 		wall_side = {-0.5, -0.3, -0.1, -0.2, 0.3, 0.1},
 	},
 	on_construct = function(pos)
-		redstone.inject(pos,{torch=16})
+		redstone.inject(pos,{torch=9})
 		redstone.update(pos)
 	end,
 	after_destruct = function(pos, oldnode)
@@ -105,6 +105,6 @@ minetest.register_lbm({
 	nodenames = {"redstone:torch_wall","redstone:torch_floor"},
 	run_at_every_load = true,
 	action = function(pos)
-		redstone.inject(pos,{torch=16})
+		redstone.inject(pos,{torch=9})
 	end,
 })

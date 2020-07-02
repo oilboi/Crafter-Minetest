@@ -18,7 +18,7 @@ for level = 0,max_timer do
 minetest.register_node("redstone:repeater_on_"..level, {
 	description = "Redstone Repeater",
 	tiles = {"repeater_on.png"},
-	groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1,redstone_activation_directional=1,repeater_on=1,repeater=1,torch_directional=1,redstone_power=16,repeater_level=level},
+	groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1,redstone_activation_directional=1,repeater_on=1,repeater=1,torch_directional=1,redstone_power=9,repeater_level=level},
 	sounds = main.stoneSound(),
 	paramtype = "light",
 	paramtype2 = "facedir",
@@ -48,7 +48,7 @@ minetest.register_node("redstone:repeater_on_"..level, {
 		minetest.sound_play("lever", {pos=pos})
 		redstone.inject(pos,{
 			name = "redstone:repeater_on_"..newlevel,
-			torch  = 16,
+			torch  = 9,
 			torch_directional = true,
 			directional_activator = true,
 			input  = vector.subtract(pos,dir),
@@ -84,7 +84,7 @@ minetest.register_node("redstone:repeater_on_"..level, {
 		local dir = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 		redstone.inject(pos,{
 			name = "redstone:repeater_on_"..level,
-			torch  = 16,
+			torch  = 9,
 			torch_directional = true,
 			directional_activator = true,
 			input  = vector.subtract(pos,dir),
@@ -115,7 +115,7 @@ minetest.register_lbm({
 		local dir = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 		redstone.inject(pos,{
 			name = "redstone:repeater_on_"..level,
-			torch  = 16,
+			torch  = 9,
 			torch_directional = true,
 			directional_activator = true,
 			input  = vector.subtract(pos,dir),
@@ -175,7 +175,7 @@ minetest.register_node("redstone:repeater_off_"..level, {
 		local dir = minetest.facedir_to_dir(param2)
 		redstone.inject(pos,{
 			name = "redstone:repeater_on_"..level,
-			torch  = 16,
+			torch  = 9,
 			torch_directional = true,
 			directional_activator = true,
 			input  = vector.subtract(pos,dir),
