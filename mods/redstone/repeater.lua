@@ -241,6 +241,7 @@ minetest.register_lbm({
 			input  = vector.subtract(pos,dir),
 			dir = dir
 		})
+		redstone.update(pos)
 	end,
 })
 
