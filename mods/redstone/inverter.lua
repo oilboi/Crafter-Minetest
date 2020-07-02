@@ -44,8 +44,11 @@ minetest.register_node("redstone:inverter_on", {
 		redstone.update(pos)
 	end,
 	after_destruct = function(pos, oldnode)
+		local param2 = oldnode.param2
+		local dir = minetest.facedir_to_dir(param2)
 		redstone.inject(pos,nil)
 		redstone.update(pos)
+		redstone.update(vector.add(pos,dir))
 	end
 })
 
@@ -65,7 +68,7 @@ redstone.register_activator({
 			output = vector.add(pos,dir),
 			dir = dir
 		})
-
+		redstone.update(pos)
 		redstone.update(vector.add(pos,dir))
 	end
 })
@@ -131,8 +134,11 @@ minetest.register_node("redstone:inverter_off", {
 		redstone.update(pos)
 	end,
 	after_destruct = function(pos, oldnode)
+		local param2 = oldnode.param2
+		local dir = minetest.facedir_to_dir(param2)
 		redstone.inject(pos,nil)
 		redstone.update(pos)
+		redstone.update(vector.add(pos,dir))
 	end
 })
 
@@ -150,6 +156,7 @@ redstone.register_activator({
 			output = vector.add(pos,dir),
 			dir = dir
 		})
+		redstone.update(pos)
 		redstone.update(vector.add(pos,dir))
 	end
 })
