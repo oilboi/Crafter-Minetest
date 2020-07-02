@@ -28,8 +28,10 @@ redstone.register_activator({
             source    = true,
             activator = true,
         })
-        redstone.update(pos,true)
-        redstone.update(pos)
+        minetest.after(0,function()
+            redstone.update(pos,true)
+            redstone.update(pos)
+        end)
     end,
   })
 
@@ -100,7 +102,10 @@ redstone.register_activator({
             capacitor = 0,
             activator = true,
         })
-        redstone.update(pos,true)
+        minetest.after(0,function()
+            redstone.update(pos,true)
+            redstone.update(pos)
+        end)
     end,
 })
 
