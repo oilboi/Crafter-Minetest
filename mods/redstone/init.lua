@@ -711,7 +711,7 @@ minetest.register_globalstep(function()
 	player_detector_calculation()
 
 	if table.getn(queue) > 0 then
-		print(dump(queue))
+		--print(dump(queue))
 		local element = queue[1]
 		calculate(element.pos,element.is_capacitor)
 		queue[1] = nil
