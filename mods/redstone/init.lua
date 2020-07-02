@@ -706,22 +706,30 @@ function redstone.update(pos,is_capacitor)
 
 	--calculate(pos,is_capacitor)
 end
+local dtime_goal = 0.02
+local sleep = 0
+minetest.register_globalstep(function(dtime)
 
-minetest.register_globalstep(function()
-	player_detector_calculation()
 
-	if table.getn(queue) > 0 then
-		--print(dump(queue))
-		local element = queue[1]
-		calculate(element.pos,element.is_capacitor)
-		queue[1] = nil
-		for index,data in pairs(queue) do
-			queue[index-1] = data
-		end
-		queue[table.getn(queue)] = nil
+	if dtime > dtime_goal then
+		sleep = dtime - dtime_goal
 	end
 
-	--recursion_check = {}
+	if sleep == 0 then
+		player_detector_calculation()
+
+		for index,element in pairs(queue) do
+			calculate(element.pos,element.is_capacitor)
+		end
+
+		queue = {}
+		--recursion_check = {}
+	else
+		sleep = sleep - dtime
+		if sleep <= 0 then
+			sleep = 0
+		end
+	end
 end)
 
 

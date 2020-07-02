@@ -68,13 +68,16 @@ minetest.register_node("redstone:repeater_on_"..level, {
 			output = vector.add(pos,dir),
 			dir = dir
 		})
-		redstone.update(pos)
+		--redstone.update(pos)
 		redstone.update(vector.add(pos,dir))
 	end,
 
 	after_destruct = function(pos, oldnode)
+		local param2 = oldnode.param2
+		local dir = minetest.facedir_to_dir(param2)
 		redstone.inject(pos,nil)
-		redstone.update(pos)
+		--redstone.update(pos)
+		redstone.update(vector.add(pos,dir))
 	end,
 
 	after_place_node = function(pos)
@@ -89,6 +92,7 @@ minetest.register_node("redstone:repeater_on_"..level, {
 			dir = dir
 		})
 		redstone.update(pos)
+		redstone.update(vector.add(pos,dir))
 	end
 })
 
@@ -118,7 +122,8 @@ minetest.register_lbm({
 			output = vector.add(pos,dir),
 			dir = dir
 		})
-		redstone.update(pos)
+		--redstone.update(pos)
+		redstone.update(vector.add(pos,dir))
 	end,
 })
 
@@ -177,7 +182,7 @@ minetest.register_node("redstone:repeater_off_"..level, {
 			output = vector.add(pos,dir),
 			dir = dir
 		})
-		redstone.update(pos)
+		--redstone.update(pos)
 		redstone.update(vector.add(pos,dir))
 	end,
 
@@ -200,8 +205,11 @@ minetest.register_node("redstone:repeater_off_"..level, {
 	end,
 
 	after_destruct = function(pos, oldnode)
+		local param2 = oldnode.param2
+		local dir = minetest.facedir_to_dir(param2)
 		redstone.inject(pos,nil)
-		redstone.update(pos)
+		--redstone.update(pos)
+		redstone.update(vector.add(pos,dir))
 	end,
 
 	after_place_node = function(pos)
@@ -214,6 +222,7 @@ minetest.register_node("redstone:repeater_off_"..level, {
 			dir = dir
 		})
 		redstone.update(pos)
+		redstone.update(vector.add(pos,dir))
 	end
 })
 
@@ -241,7 +250,8 @@ minetest.register_lbm({
 			input  = vector.subtract(pos,dir),
 			dir = dir
 		})
-		redstone.update(pos)
+		--redstone.update(pos)
+		redstone.update(vector.add(pos,dir))
 	end,
 })
 
