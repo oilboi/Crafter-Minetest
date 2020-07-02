@@ -641,32 +641,6 @@ function redstone.inject(pos,data)
 end
 
 
-local recursion_check = {}
-local bad_node
-function redstone.update(pos,is_capacitor)
-	local s_pos = minetest.serialize(pos)
-	if not recursion_check[s_pos] then
-		recursion_check[s_pos] = 0
-	end
-	recursion_check[s_pos] = recursion_check[s_pos] + 1
-	if recursion_check[s_pos] > 25 then
-		--print(recursion_check[s_pos])
-		minetest.after(0,function()
-			bad_node = minetest.get_node(pos).name
-			bad_node = minetest.get_node_drops(bad_node, "main:rubypick")
-			for _,nodey in pairs(bad_node) do
-				minetest.throw_item(pos,nodey)
-			end
-			minetest.remove_node(pos)
-			data_injection(pos,nil)
-			redstone.update(pos)
-		end)
-		return
-	end
-
-	calculate(pos,is_capacitor)
-end
-
 
 local level
 local pos2
@@ -701,9 +675,53 @@ local function player_detector_calculation()
 	end
 end
 
+
+local recursion_check = {}
+local bad_node
+local queue = {}
+function redstone.update(pos,is_capacitor)
+	local count = table.getn(queue)
+	queue[count+1] = {pos=pos,is_capacitor=is_capacitor}
+	--[[
+	local s_pos = minetest.serialize(pos)
+	if not recursion_check[s_pos] then
+		recursion_check[s_pos] = 0
+	end
+	recursion_check[s_pos] = recursion_check[s_pos] + 1
+	if recursion_check[s_pos] > 25 then
+		--print(recursion_check[s_pos])
+		minetest.after(0,function()
+			bad_node = minetest.get_node(pos).name
+			bad_node = minetest.get_node_drops(bad_node, "main:rubypick")
+			for _,nodey in pairs(bad_node) do
+				minetest.throw_item(pos,nodey)
+			end
+			minetest.remove_node(pos)
+			data_injection(pos,nil)
+			redstone.update(pos)
+		end)
+		return
+	end
+	]]--
+
+	--calculate(pos,is_capacitor)
+end
+
 minetest.register_globalstep(function()
 	player_detector_calculation()
-	recursion_check = {}
+
+	if table.getn(queue) > 0 then
+		print(dump(queue))
+		local element = queue[1]
+		calculate(element.pos,element.is_capacitor)
+		queue[1] = nil
+		for index,data in pairs(queue) do
+			queue[index-1] = data
+		end
+		queue[table.getn(queue)] = nil
+	end
+
+	--recursion_check = {}
 end)
 
 
