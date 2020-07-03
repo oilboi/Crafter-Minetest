@@ -3,6 +3,9 @@ local
 minetest,vector,math,pairs
 =
 minetest,vector,math,pairs
+
+local r_max = redstone.max_state
+
 local excluded_nodes = {
 	["main:ironblock"]=true,
 	["main:ironblock_on"]=true,
@@ -64,9 +67,9 @@ minetest.register_lbm({
 	action = function(pos)
 		local param2 = minetest.get_node(pos).param2
 		local dir = minetest.wallmounted_to_dir(param2)
-		redstone.inject(pos,{torch=9})
+		redstone.inject(pos,{torch=r_max})
 		local pos2 = vector.add(dir,pos)
-		redstone.inject(pos2,{torch=9})
+		redstone.inject(pos2,{torch=r_max})
 		minetest.after(0,function()
 			redstone.update(pos)
 			redstone.update(pos2)
@@ -115,9 +118,9 @@ minetest.register_node("redstone:lever_off", {
 
 		local dir = minetest.wallmounted_to_dir(node.param2)
 
-		redstone.inject(pos,{torch=9})
+		redstone.inject(pos,{torch=r_max})
 		local pos2 = vector.add(dir,pos)
-		redstone.inject(pos2,{torch=9})
+		redstone.inject(pos2,{torch=r_max})
 
 		redstone.update(pos)
 		redstone.update(pos2)

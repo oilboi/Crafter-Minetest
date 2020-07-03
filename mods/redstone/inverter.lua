@@ -3,6 +3,8 @@ minetest,vector
 =
 minetest,vector
 
+local r_max = redstone.max_state
+
 --[[
  ██████╗ ███╗   ██╗
 ██╔═══██╗████╗  ██║
@@ -62,7 +64,7 @@ redstone.register_activator({
 		local dir = minetest.facedir_to_dir(param2)
 		redstone.inject(pos,{
 			name = "redstone:inverter_off",
-			torch  = 9,
+			torch  = r_max,
 			torch_directional = true,
 			directional_activator = true,
 			input  = vector.subtract(pos,dir),
@@ -107,7 +109,7 @@ minetest.register_lbm({
 minetest.register_node("redstone:inverter_off", {
     description = "Redstone Inverter",
     tiles = {"repeater_off.png"},
-    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1,redstone_activation_directional=1,torch_directional=1,redstone_power=9},
+    groups = {stone = 1, hard = 1, pickaxe = 1, hand = 4,attached_node = 1,redstone_activation_directional=1,torch_directional=1,redstone_power=r_max},
     sounds = main.stoneSound(),
     paramtype = "light",
 	paramtype2 = "facedir",
@@ -127,7 +129,7 @@ minetest.register_node("redstone:inverter_off", {
 		local dir = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 		redstone.inject(pos,{
 			name = "redstone:inverter_off",
-			torch  = 9,
+			torch  = r_max,
 			torch_directional = true,
 			directional_activator = true,
 			input  = vector.subtract(pos,dir),
@@ -174,7 +176,7 @@ minetest.register_lbm({
 		local dir = minetest.facedir_to_dir(minetest.get_node(pos).param2)
 		redstone.inject(pos,{
 			name = "redstone:inverter_off",
-			torch  = 9,
+			torch  = r_max,
 			torch_directional = true,
 			directional_activator = true,
 			input  = vector.subtract(pos,dir),

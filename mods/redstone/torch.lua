@@ -1,5 +1,7 @@
 local minetest,vector = minetest,vector
 
+local r_max = redstone.max_state
+
 -- Item definitions
 minetest.register_craftitem("redstone:torch", {
 	description = "Redstone Torch",
@@ -58,7 +60,7 @@ minetest.register_node("redstone:torch_floor", {
 	},
 	
 	on_construct = function(pos)
-		redstone.inject(pos,{torch=9})
+		redstone.inject(pos,{torch=r_max})
 		redstone.update(pos)
 	end,
 	after_destruct = function(pos, oldnode)
@@ -89,7 +91,7 @@ minetest.register_node("redstone:torch_wall", {
 		wall_side = {-0.5, -0.3, -0.1, -0.2, 0.3, 0.1},
 	},
 	on_construct = function(pos)
-		redstone.inject(pos,{torch=9})
+		redstone.inject(pos,{torch=r_max})
 		redstone.update(pos)
 	end,
 	after_destruct = function(pos, oldnode)
@@ -105,6 +107,6 @@ minetest.register_lbm({
 	nodenames = {"redstone:torch_wall","redstone:torch_floor"},
 	run_at_every_load = true,
 	action = function(pos)
-		redstone.inject(pos,{torch=9})
+		redstone.inject(pos,{torch=r_max})
 	end,
 })

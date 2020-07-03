@@ -40,6 +40,8 @@ local player_detection_table = {}
 -- redstone class
 redstone = {}
 
+redstone.max_state = 9 -- the limit to power transmission
+
 redstone.player_detector_add = function(pos)
 	player_detection_table[minetest.serialize(pos)] = pos
 end
@@ -154,21 +156,22 @@ end
 
 local table_3d
 local temp_pool
+local r_max = redstone.max_state
 local function create_boundary_box(pos)
 	table_3d = {}
-	for x = pos.x-9,pos.x+9 do
+	for x = pos.x-r_max,pos.x+r_max do
 		if pool[x] then
-			for y = pos.y-9,pos.y+9 do
+			for y = pos.y-r_max,pos.y+r_max do
 				if pool[x][y] then
-					for z = pos.z-9,pos.z+9 do
+					for z = pos.z-r_max,pos.z+r_max do
 						temp_pool = pool[x][y][z]
 						if temp_pool then
 							if not table_3d[x] then table_3d[x] = {} end
 							if not table_3d[x][y] then table_3d[x][y] = {} end
 
-							if (x == pos.x-9 or x == pos.x+9 or 
-							y == pos.y-9 or y == pos.y+9 or 
-							z == pos.z-9 or z == pos.z+9) and 
+							if (x == pos.x-r_max or x == pos.x+r_max or 
+							y == pos.y-r_max or y == pos.y+r_max or 
+							z == pos.z-r_max or z == pos.z+r_max) and 
 							temp_pool.dust and temp_pool.dust > 1 then
 								table_3d[x][y][z] = {torch=temp_pool.dust}
 							else
@@ -653,8 +656,8 @@ local function player_detector_calculation()
 		for _,player in ipairs(minetest.get_connected_players()) do
 			pos2 = player:get_pos()
 			power = floor(11-vector_distance(pos2,pos))
-			if power > 9 then
-				power = 9
+			if power > r_max then
+				power = r_max
 			elseif power < 0 then
 				power = 0
 			end
@@ -789,10 +792,11 @@ minetest.register_craftitem("redstone:dust", {
 	end,
 })
 
---15 power levels 15 being the highest
-for i = 0,8 do
+--power levels r_max-1 being the highest
+local d_max = r_max-1
+for i = 0,d_max do
 
-	local color = floor(255 * (i/8))
+	local color = floor(255 * (i/d_max))
 	
 	minetest.register_node("redstone:dust_"..i,{
 		description = "Redstone Dust",
@@ -820,6 +824,7 @@ for i = 0,8 do
 			calculate(pos)
 		end,
 		after_destruct = function(pos)
+			print("test")
 			data_injection(pos,nil)
 			calculate(pos)
 		end,

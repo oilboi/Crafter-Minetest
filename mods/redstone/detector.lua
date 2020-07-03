@@ -1,3 +1,5 @@
+local r_max = redstone.max_state
+
 minetest.register_node("redstone:detector_off", {
     description = "Detector",
     tiles = {"redstone_piston.png^[invert:rgb^[colorize:yellow:100",
@@ -23,7 +25,7 @@ minetest.register_node("redstone:detector_off", {
             
             redstone.inject(pos,{
                 name = "redstone:detector_on",
-                torch = 9,
+                torch = r_max,
             })
             minetest.after(0,function()
             	redstone.update(pos)
@@ -118,7 +120,7 @@ minetest.register_node("redstone:detector_on", {
 	on_construct = function(pos)
 		redstone.inject(pos,{
             name = "redstone:detector_on",
-            torch = 9,
+            torch = r_max,
         })
         local timer = minetest.get_node_timer(pos)
 		if not timer:is_started() then
@@ -140,7 +142,7 @@ minetest.register_lbm({
 	action = function(pos)
 		redstone.inject(pos,{
 			name = "redstone:detector_on",
-			torch = 9,
+			torch = r_max,
         })
         
         local timer = minetest.get_node_timer(pos)

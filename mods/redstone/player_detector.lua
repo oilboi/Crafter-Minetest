@@ -3,8 +3,10 @@ minetest,ipairs,math
 =
 minetest,ipairs,math
 
+local r_max = redstone.max_state
+
 --detects players and outputs accordingly
-for i = 0,9  do
+for i = 0,r_max  do
 
 minetest.register_node("redstone:player_detector_"..i, {
 	description = "Redstone Player Detector",
