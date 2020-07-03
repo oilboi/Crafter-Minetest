@@ -60,7 +60,7 @@ local fetch_function = function(name)
     fetch_url("https://raw.githubusercontent.com/"..name.."/crafter_skindex/master/skin.png", function(data)
         if data then
 
-            if not player:is_player() then
+            if not minetest.get_player_by_name(name) then
                 return
             end
             new_temp_path = temppath .. DIR_DELIM .. "/skin_"..name..".png"
