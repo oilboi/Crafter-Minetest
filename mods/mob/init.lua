@@ -307,6 +307,7 @@ mobs.register_mob(
 					node = minetest.get_node(vector.new(pos.x,pos.y-1,pos.z)).name
 					def = minetest.registered_nodes[node]
 
+					if not def then return end
 					drawtype = acceptable_drawtypes[def.drawtype]
 					walkable = def.walkable
 					liquid = (def.liquidtype ~= "none")
