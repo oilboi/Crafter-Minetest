@@ -36,12 +36,12 @@ local vec_equals      = vector.equals
 local activator_table = {} -- this holds the translation data of activator tables (activator functions)
 local capacitor_table = {}
 local player_detection_table = {}
-local instructions = 0
+--local instructions = 0
 
 -- redstone class
 redstone = {}
 
-redstone.max_state = 64 -- the limit to power transmission
+redstone.max_state = 9 -- the limit to power transmission
 
 redstone.player_detector_add = function(pos)
 	player_detection_table[minetest.serialize(pos)] = pos
@@ -78,7 +78,7 @@ dofile(path.."/light.lua")
 dofile(path.."/piston.lua")
 --dofile(path.."/comparator.lua")
 dofile(path.."/craft.lua")
---dofile(path.."/ore.lua")
+dofile(path.."/ore.lua")
 dofile(path.."/inverter.lua")
 dofile(path.."/player_detector.lua")
 dofile(path.."/space_maker.lua")
@@ -114,27 +114,27 @@ local pool = {} -- this holds all redstone data (literal 3d virtual memory map)
 
 
 local function data_injection(pos,data)
-	instructions = instructions + 1
+	--instructions = instructions + 1
 	-- add data into 3d memory
 	if data then
 		if not pool[pos.x] then pool[pos.x] = {} end
 		if not pool[pos.x][pos.y] then pool[pos.x][pos.y] = {} end
 		pool[pos.x][pos.y][pos.z] = data
-		instructions = instructions + 1
+		--instructions = instructions + 1
 		--print("building 3d memory")
 	--delete data from 3d memory
 	else
 		if pool and pool[pos.x] and pool[pos.x][pos.y] then
 			pool[pos.x][pos.y][pos.z] = data
-			instructions = instructions + 1
+			--instructions = instructions + 1
 			--print("deleting 3d memory")
 			if pool[pos.x][pos.y] and not next(pool[pos.x][pos.y]) then
 				pool[pos.x][pos.y] = nil
-				instructions = instructions + 1
+				--instructions = instructions + 1
 				-- only run this if y axis is empty
 				if pool[pos.x] and not next(pool[pos.x]) then
 					pool[pos.x] = nil
-					instructions = instructions + 1
+					--instructions = instructions + 1
 				end
 			end
 		end
@@ -169,18 +169,18 @@ local table_3d
 local temp_pool
 local r_max = redstone.max_state
 local function create_boundary_box(pos)
-	instructions = instructions + 1
+	--instructions = instructions + 1
 	table_3d = {}
 	for x = pos.x-r_max,pos.x+r_max do
-		instructions = instructions + 1
+		--instructions = instructions + 1
 		if pool[x] then
 			for y = pos.y-r_max,pos.y+r_max do
-				instructions = instructions + 1
+				--instructions = instructions + 1
 				if pool[x][y] then
 					for z = pos.z-r_max,pos.z+r_max do
-						instructions = instructions + 1
+						--instructions = instructions + 1
 						temp_pool = pool[x][y][z]
-						instructions = instructions + 1
+						--instructions = instructions + 1
 						if temp_pool then
 							if not table_3d[x] then table_3d[x] = {} end
 							if not table_3d[x][y] then table_3d[x][y] = {} end
@@ -380,7 +380,7 @@ local function redstone_distribute(pos,power,mem_map,output)
 	else
 		--redstone and torch
 		for _,order in pairs(order) do
-			instructions = instructions + 1
+			--instructions = instructions + 1
 			i = add_vec(pos,order)
 			x=i.x
 			y=i.y
@@ -427,7 +427,7 @@ local function dust_sniff(pos,mem_map,boundary,single,origin,ignore)
 	if not single then
 		--print("all position index--")
 		for _,order in pairs(order) do
-			instructions = instructions + 1
+			--instructions = instructions + 1
 			i = add_vec(pos,order)
 
 			if not mem_map[i.x] then mem_map[i.x] = {} end
@@ -748,10 +748,10 @@ minetest.register_globalstep(function(dtime)
 		end
 	end
 	]]--
-	if instructions and instructions > 0 then
-		print(instructions)
-	end
-	instructions = 0
+	--if instructions and instructions > 0 then
+	--	print(instructions)
+	--end
+	--instructions = 0
 end)
 
 
@@ -759,15 +759,56 @@ end)
 
 
 
+local instruction_order = {
+	{x= 1,y= 0,z= 0},
+	{x=-1,y= 0,z= 0},
+	{x= 0,y= 0,z= 1},
+	{x= 0,y= 0,z=-1},
+	{x= 0,y= 1,z= 0},
+	{x= 0,y=-1,z= 0},
+	{x= 1,y= 1,z= 0}, 
+	{x=-1,y= 1,z= 0},
+	{x= 0,y= 1,z= 1},
+	{x= 0,y= 1,z=-1},
+	{x= 1,y=-1,z= 0},
+	{x=-1,y=-1,z= 0},
+	{x= 0,y=-1,z= 1},
+	{x= 0,y=-1,z=-1},
+	}
+
+
+-- this is used for dynamic instruction set rebuilds
+local function instruction_rebuild(pos,delete)
+	if not delete then
+		local instruction_set = {}
+		for _,pos2 in pairs(instruction_order) do
+			local pos3 = vector.add(pos,pos2)
+			if pool[pos3.x] and pool[pos3.x][pos3.y] and pool[pos3.x][pos3.y][pos3.z] then
+				table.insert(instruction_set,pos2)
+			end
+		end
+	else
+		for _,pos2 in pairs(instruction_order) do
+		
+		end
+	end
+	
+	print(dump(instruction_set))
+end
 
 
 
-
-
-
-
-
-
+-- this is used for creating fast data for the game to utilize
+local function initial_instruction_build(pos)
+	local instruction_set = {}
+	for _,pos2 in pairs(instruction_order) do
+		local pos3 = vector.add(pos,pos2)
+		if pool[pos3.x] and pool[pos3.x][pos3.y] and pool[pos3.x][pos3.y][pos3.z] then
+			table.insert(instruction_set,pos2)
+		end
+	end
+	pool[pos.x][pos.y][pos.z].instruction_set = instruction_set
+end
 
 
 
@@ -843,10 +884,12 @@ for i = 0,d_max do
 		drop="redstone:dust",
 		on_construct = function(pos)
 			data_injection(pos,{dust=i})
+			--instruction_rebuild(pos)
 			calculate(pos)
 		end,
 		after_destruct = function(pos)			
 			data_injection(pos,nil)
+			--instruction_rebuild(pos,true)
 			calculate(pos)
 		end,
 		connects_to = {"group:redstone"},
@@ -858,6 +901,9 @@ for i = 0,d_max do
 		run_at_every_load = true,
         action = function(pos)
 			data_injection(pos,{dust=i})
+			--minetest.after(0,function()
+				--initial_instruction_build(pos)
+			--end)
         end,
     })
 end
