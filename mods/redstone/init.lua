@@ -812,9 +812,12 @@ local function initial_instruction_build(pos)
 end
 
 
-
-
-
+--[[
+       / .'
+ .---. \/
+(._.' \()
+ ^"""^"
+]]--
 
 
 
