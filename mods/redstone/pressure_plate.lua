@@ -1,6 +1,6 @@
 local minetest,ipairs,vector = minetest,ipairs,vector
 
-r_max
+
 
 for level = 0,9 do
 local subtracter = 0
