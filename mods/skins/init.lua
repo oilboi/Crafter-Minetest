@@ -272,6 +272,10 @@ local patrons   = {
 local name
 local temp_cape
 local get_texture = function(player)
+    if not player then
+        return
+    end
+
     name = string.lower(player:get_player_name())
 
     temp_cape = nil
