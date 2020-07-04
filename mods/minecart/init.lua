@@ -168,14 +168,6 @@ minecart.on_step = function(self,dtime)
 		self.object:move_to(vector.add(float_pos,test))
 	end
 
-	
-	--stop minecarts from derailing when going super fast
-	if self.old_pos and vector.distance(float_pos,self.old_pos) > 0.5 then
-		self.object:move_to(self.old_pos)
-		float_pos = self.object:get_pos()
-		pos = vector.round(self.old_pos)
-	end
-
 	if not self.axis_lock then
 		local possible_dirs = create_axis(pos)
 		for _,dir in pairs(possible_dirs) do
