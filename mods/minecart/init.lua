@@ -68,23 +68,45 @@ local function collision_detect(self)
 end
 
 
+
 local function rail_brain(self,pos)
 	if not self.dir then return end
 
-	if self.dir then print(dump(self.dir)) end
+	--if self.dir then print(dump(self.dir)) end
 
 	local pos2 = self.object:get_pos()
 
 	local dir = self.dir
 
+	local triggered = false
+
 	if dir.x < 0 and pos2.x < pos.x then
-		print("check dat rail boi")
+		triggered = true
 	elseif dir.x > 0 and pos2.x > pos.x then
-		print("check dat rail boi 2")
+		triggered = true
 	elseif dir.z < 0 and pos2.z < pos.z then
-		print("check dat rail boi 3")
+		triggered = true
 	elseif dir.z > 0 and pos2.z > pos.z then
-		print("wow this actually wurkz")
+		triggered = true
+	end
+
+	if triggered and not pool[minetest.hash_node_position(vector.add(pos,dir))] then
+		local possible_dirs = create_axis(pos)
+		if table.getn(possible_dirs) == 0 then
+			--stop slow down become physical, something
+		else
+			for _,dir2 in pairs(possible_dirs) do
+				if dir.x ~= 0 and dir2.z ~= 0 then
+					local transmitted = self.object:get_velocity().x
+					self.object:set_velocity(vector.new(0,0,transmitted))
+					self.dir = vector.direction(vector.new(0,0,transmitted),vector.new(0,0,0))
+				elseif dir.z ~= 0 and dir2.x ~= 0 then
+					local transmitted = self.object:get_velocity().z
+					self.object:set_velocity(vector.new(transmitted,0,0))
+					self.dir = vector.direction(vector.new(transmitted,0,0),vector.new(0,0,0))
+				end
+			end
+		end
 	end
 end
 
