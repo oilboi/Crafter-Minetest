@@ -52,17 +52,44 @@ local function collision_detect(self)
 			local pos2 = object:get_pos()
 			if self.axis_lock == "x" then
 				local velocity = 1-vector.distance(vector.new(pos.x,0,0),vector.new(pos2.x,0,0))
+				print(velocity)
 				local dir = vector.direction(vector.new(pos2.x,0,0),vector.new(pos.x,0,0))
-				self.object:add_velocity(dir)
+				self.object:add_velocity(vector.multiply(dir,velocity))
+				self.dir = dir
 			elseif self.axis_lock == "z" then
 				local velocity = 1-vector.distance(vector.new(0,0,pos.z),vector.new(0,0,pos2.z))
 				local dir = vector.direction(vector.new(0,0,pos2.z),vector.new(0,0,pos.z))
-				self.object:add_velocity(dir)
+				self.object:add_velocity(vector.multiply(dir,velocity))
+				self.dir = dir
 			end
 			return
 		end
 	end
 end
+
+
+local function rail_brain(self,pos)
+	if not self.dir then return end
+
+	if self.dir then print(dump(self.dir)) end
+
+	local pos2 = self.object:get_pos()
+
+	local dir = self.dir
+
+	if dir.x < 0 and pos2.x < pos.x then
+		print("check dat rail boi")
+	elseif dir.x > 0 and pos2.x > pos.x then
+		print("check dat rail boi 2")
+	elseif dir.z < 0 and pos2.z < pos.z then
+		print("check dat rail boi 3")
+	elseif dir.z > 0 and pos2.z > pos.z then
+		print("wow this actually wurkz")
+	end
+end
+
+
+
 
 local minecart = {}
 
@@ -81,6 +108,7 @@ minecart.on_step = function(self,dtime)
 		end
 	else
 		collision_detect(self)
+		rail_brain(self,pos)
 	end
 end
 
