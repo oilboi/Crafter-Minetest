@@ -151,24 +151,24 @@ minecart.on_step = function(self,dtime)
 	local pos = vector.round(float_pos)
 
 	if self.velocity then
-		local new_vel = dtime/0.01
-		--print(new_vel)
+		local new_vel = dtime/0.01		
 		local test = vector.multiply(self.velocity,new_vel)
+
 		--print(dump(test))
-		if test.x >= 0.5 then
-			test.x = 0.4999999999
-		elseif test.x <= -0.5 then
-			test.x = -0.4999999999
+		if test.x > 0.5 then
+			test.x = 0.5
+		elseif test.x < -0.5 then
+			test.x = -0.5
 		end
-		if test.z >= 0.5 then
-			test.z = 0.4999999999
-		elseif test.z <= -0.5 then
-			test.z = -0.4999999999
+		if test.z > 0.5 then
+			test.z = 0.5
+		elseif test.z < -0.5 then
+			test.z = -0.5
 		end
 		self.object:move_to(vector.add(float_pos,test))
-		self.velocity = test
 	end
 
+	
 	--stop minecarts from derailing when going super fast
 	if self.old_pos and vector.distance(float_pos,self.old_pos) > 0.5 then
 		self.object:move_to(self.old_pos)
