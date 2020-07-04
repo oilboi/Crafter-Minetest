@@ -46,7 +46,6 @@ end
 local function collision_detect(self)
 	if not self.axis_lock then return end
 	local pos = self.object:get_pos()
-
 	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
 		if object:is_player() then
 			local pos2 = object:get_pos()
@@ -93,6 +92,46 @@ local function turn_snap(pos,self,dir,dir2)
 	end
 end
 
+local function climb_snap(pos,self,dir,dir2)
+	if dir.x == dir2.x and dir2.y ~= 0 then
+		print(dump(dir2))
+		print("x snapping")
+		local inertia = math.abs(self.velocity.x)
+		self.velocity = vector.multiply(dir2,inertia)
+		self.dir = dir2
+		self.axis_lock = "x"
+		self.object:set_pos(pos)
+		direction_snap(self)
+		return(true)
+	elseif dir.z == dir2.z and dir2.y ~= 0 then
+		local inertia = math.abs(self.velocity.z)
+		self.velocity = vector.multiply(dir2,inertia)
+		self.dir = dir2
+		self.axis_lock = "z"
+		self.object:set_pos(pos)
+		direction_snap(self)
+		return(true)
+	end
+end
+
+local function straight_snap(pos,self,dir)
+	if dir.x ~= 0 and pool[minetest.hash_node_position(vector.add(pos,vector.new(dir.x,0,0)))] then
+		self.velocity = vector.new(self.velocity.x,0,0)
+		self.dir = vector.new(dir.x,0,0)
+		self.axis_lock = "x"
+		self.object:set_pos(pos)
+		direction_snap(self)
+		return(true)
+	elseif dir.z ~= 0 and pool[minetest.hash_node_position(vector.add(pos,vector.new(0,0,dir.z)))] then
+		self.velocity = vector.new(0,0,self.velocity.z)
+		self.dir = vector.new(0,0,dir.z)
+		self.axis_lock = "z"
+		self.object:set_pos(pos)
+		direction_snap(self)
+		return(true)
+	end
+end
+
 local function rail_brain(self,pos)
 	if not self.dir then return end
 
@@ -116,13 +155,22 @@ local function rail_brain(self,pos)
 
 	--print(dump(dir))
 	if triggered and not pool[minetest.hash_node_position(vector.add(pos,dir))] then
+
+		if straight_snap(pos,self,dir) then
+			return
+		end
+
 		local possible_dirs = create_axis(pos)
+		
 		if table.getn(possible_dirs) == 0 then
 			--print("train fails")
 			--stop slow down become physical, something
 		else
 			for _,dir2 in pairs(possible_dirs) do
 				if turn_snap(pos,self,dir,dir2) then
+					return
+				end
+				if climb_snap(pos,self,dir,dir2) then
 					return
 				end
 			end
