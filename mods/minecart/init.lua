@@ -40,18 +40,29 @@ local function create_axis(pos)
 			table.insert(possible_dirs,dir)
 		end
 	end
-	print(dump(possible_dirs))
+	return(possible_dirs)
 end
 
 
 
 local minecart = {}
 
-
-
 minecart.on_step = function(self,dtime)
 	local pos = vector.round(self.object:get_pos())
-	create_axis(pos)
+	if not self.axis_lock then
+		local possible_dirs = create_axis(pos)
+		for _,dir in pairs(possible_dirs) do
+			if dir.x ~=0 then
+				self.axis_lock = "x"
+				break
+			elseif dir.z ~= 0 then
+				self.axis_lock = "z"
+				break
+			end
+		end
+	else
+		print(self.axis_lock)
+	end
 end
 
 minecart.on_rightclick = function(self,clicker)
