@@ -51,17 +51,14 @@ local function collision_detect(self)
 		if object:is_player() then
 			local pos2 = object:get_pos()
 			if self.axis_lock == "x" then
-				local velocity = (5-vector.distance(vector.new(pos.x,0,0),vector.new(pos2.x,0,0)))/10
-				print(velocity)
+				local velocity = (1-vector.distance(vector.new(pos.x,0,0),vector.new(pos2.x,0,0)))/50
 				local dir = vector.direction(vector.new(pos2.x,0,0),vector.new(pos.x,0,0))
-				--self.object:add_velocity(vector.multiply(dir,velocity))
-				self.velocity = vector.multiply(dir,velocity)
+				local new_vel = vector.multiply(dir,velocity)
+				self.velocity = new_vel
 				self.dir = dir
 			elseif self.axis_lock == "z" then
-				local velocity = (5-vector.distance(vector.new(0,0,pos.z),vector.new(0,0,pos2.z)))/10
-				print(velocity)
+				local velocity = (1-vector.distance(vector.new(0,0,pos.z),vector.new(0,0,pos2.z)))/50
 				local dir = vector.direction(vector.new(0,0,pos2.z),vector.new(0,0,pos.z))
-				--self.object:add_velocity(vector.multiply(dir,velocity))
 				self.velocity = vector.multiply(dir,velocity)
 				self.dir = dir
 			end
@@ -78,10 +75,7 @@ end
 
 local function turn_snap(pos,self,dir,dir2)
 	if dir.x ~= 0 and dir2.z ~= 0 then
-		--local inertia = math.abs(self.object:get_velocity().x)
 		local inertia = math.abs(self.velocity.x)
-		--self.object:set_velocity(vector.multiply(dir2,inertia))
-
 		self.velocity = vector.multiply(dir2,inertia)
 		self.dir = dir2
 		self.axis_lock = "z"
@@ -89,13 +83,8 @@ local function turn_snap(pos,self,dir,dir2)
 		direction_snap(self)
 		return(true)
 	elseif dir.z ~= 0 and dir2.x ~= 0 then
-		--local inertia = math.abs(self.object:get_velocity().z)
-		--print(dump(self.velocity))
 		local inertia = math.abs(self.velocity.z)
-		--self.object:set_velocity(vector.multiply(dir2,inertia))
-		
 		self.velocity = vector.multiply(dir2,inertia)
-
 		self.dir = dir2
 		self.axis_lock = "x"
 		self.object:set_pos(pos)
@@ -151,10 +140,9 @@ minecart.on_step = function(self,dtime)
 	local pos = vector.round(float_pos)
 
 	if self.velocity then
-		local new_vel = dtime*100
+		local new_vel = dtime*1000
 		local test = vector.multiply(self.velocity,new_vel)
 
-		--print(dump(test))
 		if test.x > 0.5 then
 			test.x = 0.5
 		elseif test.x < -0.5 then
@@ -173,9 +161,13 @@ minecart.on_step = function(self,dtime)
 		for _,dir in pairs(possible_dirs) do
 			if dir.x ~=0 then
 				self.axis_lock = "x"
+				self.dir = vector.new(1,0,0)
+				direction_snap(self)
 				break
 			elseif dir.z ~= 0 then
 				self.axis_lock = "z"
+				self.dir = vector.new(0,0,1)
+				direction_snap(self)
 				break
 			end
 		end
