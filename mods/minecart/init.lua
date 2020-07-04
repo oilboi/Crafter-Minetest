@@ -43,7 +43,26 @@ local function create_axis(pos)
 	return(possible_dirs)
 end
 
+local function collision_detect(self)
+	if not self.axis_lock then return end
+	local pos = self.object:get_pos()
 
+	for _,object in ipairs(minetest.get_objects_inside_radius(pos, 1)) do
+		if object:is_player() then
+			local pos2 = object:get_pos()
+			if self.axis_lock == "x" then
+				local velocity = 1-vector.distance(vector.new(pos.x,0,0),vector.new(pos2.x,0,0))
+				local dir = vector.direction(vector.new(pos2.x,0,0),vector.new(pos.x,0,0))
+				self.object:add_velocity(dir)
+			elseif self.axis_lock == "z" then
+				local velocity = 1-vector.distance(vector.new(0,0,pos.z),vector.new(0,0,pos2.z))
+				local dir = vector.direction(vector.new(0,0,pos2.z),vector.new(0,0,pos.z))
+				self.object:add_velocity(dir)
+			end
+			return
+		end
+	end
+end
 
 local minecart = {}
 
@@ -61,7 +80,7 @@ minecart.on_step = function(self,dtime)
 			end
 		end
 	else
-		print(self.axis_lock)
+		collision_detect(self)
 	end
 end
 
