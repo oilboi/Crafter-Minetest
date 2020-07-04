@@ -90,7 +90,7 @@ local function rail_brain(self,pos)
 		triggered = true
 	end
 
-	print(dump(dir))
+	--print(dump(dir))
 	if triggered and not pool[minetest.hash_node_position(vector.add(pos,dir))] then
 		local possible_dirs = create_axis(pos)
 		if table.getn(possible_dirs) == 0 then
@@ -102,12 +102,14 @@ local function rail_brain(self,pos)
 					self.object:set_velocity(vector.multiply(dir2,intertia))
 					self.dir = dir2
 					self.axis_lock = "z"
+					self.object:set_pos(pos)
 					break
 				elseif dir.z ~= 0 and dir2.x ~= 0 then
 					local intertia = math.abs(self.object:get_velocity().z)
 					self.object:set_velocity(vector.multiply(dir2,intertia))
 					self.dir = dir2
 					self.axis_lock = "x"
+					self.object:set_pos(pos)
 					break
 				end
 			end
