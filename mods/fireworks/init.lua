@@ -25,7 +25,7 @@ local function fireworks_pop(pos)
             texture = "smoke.png^[colorize:"..color..":255",
         })
     end
-    minetest.sound_play("fireworks_pop",{pos=pos,pitch=math.random(80,100)/100})
+    minetest.sound_play("fireworks_pop",{pos=pos,pitch=math.random(80,100)/100,gain=6.0})
 end
 
 
