@@ -67,7 +67,11 @@ local function collision_detect(self)
 	end
 end
 
-
+local function direction_snap(self)
+	local dir = self.dir
+	local yaw = minetest.dir_to_yaw(dir)
+	self.object:set_rotation(vector.new(0,yaw,0))
+end
 
 local function rail_brain(self,pos)
 	if not self.dir then return end
@@ -103,6 +107,7 @@ local function rail_brain(self,pos)
 					self.dir = dir2
 					self.axis_lock = "z"
 					self.object:set_pos(pos)
+					direction_snap(self)
 					break
 				elseif dir.z ~= 0 and dir2.x ~= 0 then
 					local intertia = math.abs(self.object:get_velocity().z)
@@ -110,6 +115,7 @@ local function rail_brain(self,pos)
 					self.dir = dir2
 					self.axis_lock = "x"
 					self.object:set_pos(pos)
+					direction_snap(self)
 					break
 				end
 			end
