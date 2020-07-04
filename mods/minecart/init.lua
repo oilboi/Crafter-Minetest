@@ -154,7 +154,7 @@ minecart.on_step = function(self,dtime)
 		local new_vel = dtime/0.01
 		--print(new_vel)
 		local test = vector.multiply(self.velocity,new_vel)
-		print(dump(test))
+		--print(dump(test))
 		if test.x >= 0.5 then
 			test.x = 0.4999999999
 		elseif test.x <= -0.5 then
