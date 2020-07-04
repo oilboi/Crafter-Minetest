@@ -23,6 +23,7 @@ local function fireworks_pop(pos)
             collision_removal = false,
             vertical = false,
             texture = "smoke.png^[colorize:"..color..":255",
+            glow = 14,
         })
     end
     minetest.sound_play("fireworks_pop",{pos=pos,pitch=math.random(80,100)/100,gain=6.0,max_hear_distance = 128})
