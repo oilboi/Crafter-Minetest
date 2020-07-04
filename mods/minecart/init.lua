@@ -151,7 +151,7 @@ minecart.on_step = function(self,dtime)
 	local pos = vector.round(float_pos)
 
 	if self.velocity then
-		local new_vel = dtime/0.01		
+		local new_vel = dtime*100
 		local test = vector.multiply(self.velocity,new_vel)
 
 		--print(dump(test))
