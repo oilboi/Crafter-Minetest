@@ -3,6 +3,11 @@ local colors ={
     "white",
     "blue"
 }
+local colors_halloween ={
+    "orange",
+    "black"
+}
+
 
 local function fireworks_pop(pos)
     for _,color in pairs(colors) do
