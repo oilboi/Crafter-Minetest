@@ -51,13 +51,15 @@ local function collision_detect(self)
 		if object:is_player() then
 			local pos2 = object:get_pos()
 			if self.axis_lock == "x" then
-				local velocity = (1-vector.distance(vector.new(pos.x,0,0),vector.new(pos2.x,0,0)))/10
+				local velocity = (5-vector.distance(vector.new(pos.x,0,0),vector.new(pos2.x,0,0)))/10
+				print(velocity)
 				local dir = vector.direction(vector.new(pos2.x,0,0),vector.new(pos.x,0,0))
 				--self.object:add_velocity(vector.multiply(dir,velocity))
 				self.velocity = vector.multiply(dir,velocity)
 				self.dir = dir
 			elseif self.axis_lock == "z" then
-				local velocity = (1-vector.distance(vector.new(0,0,pos.z),vector.new(0,0,pos2.z)))/10
+				local velocity = (5-vector.distance(vector.new(0,0,pos.z),vector.new(0,0,pos2.z)))/10
+				print(velocity)
 				local dir = vector.direction(vector.new(0,0,pos2.z),vector.new(0,0,pos.z))
 				--self.object:add_velocity(vector.multiply(dir,velocity))
 				self.velocity = vector.multiply(dir,velocity)
@@ -150,8 +152,21 @@ minecart.on_step = function(self,dtime)
 
 	if self.velocity then
 		local new_vel = dtime/0.01
-		print(new_vel)
-		self.object:move_to(vector.add(float_pos,vector.multiply(self.velocity,new_vel)))
+		--print(new_vel)
+		local test = vector.multiply(self.velocity,new_vel)
+		print(dump(test))
+		if test.x >= 0.5 then
+			test.x = 0.4999999999
+		elseif test.x <= -0.5 then
+			test.x = -0.4999999999
+		end
+		if test.z >= 0.5 then
+			test.z = 0.4999999999
+		elseif test.z <= -0.5 then
+			test.z = -0.4999999999
+		end
+		self.object:move_to(vector.add(float_pos,test))
+		self.velocity = test
 	end
 
 	--stop minecarts from derailing when going super fast
