@@ -51,15 +51,16 @@ local function collision_detect(self)
 		if object:is_player() then
 			local pos2 = object:get_pos()
 			if self.axis_lock == "x" then
-				local velocity = 1-vector.distance(vector.new(pos.x,0,0),vector.new(pos2.x,0,0))
-				print(velocity)
+				local velocity = (1-vector.distance(vector.new(pos.x,0,0),vector.new(pos2.x,0,0)))/10
 				local dir = vector.direction(vector.new(pos2.x,0,0),vector.new(pos.x,0,0))
-				self.object:add_velocity(vector.multiply(dir,velocity))
+				--self.object:add_velocity(vector.multiply(dir,velocity))
+				self.velocity = vector.multiply(dir,velocity)
 				self.dir = dir
 			elseif self.axis_lock == "z" then
-				local velocity = 1-vector.distance(vector.new(0,0,pos.z),vector.new(0,0,pos2.z))
+				local velocity = (1-vector.distance(vector.new(0,0,pos.z),vector.new(0,0,pos2.z)))/10
 				local dir = vector.direction(vector.new(0,0,pos2.z),vector.new(0,0,pos.z))
-				self.object:add_velocity(vector.multiply(dir,velocity))
+				--self.object:add_velocity(vector.multiply(dir,velocity))
+				self.velocity = vector.multiply(dir,velocity)
 				self.dir = dir
 			end
 			return
@@ -71,6 +72,34 @@ local function direction_snap(self)
 	local dir = self.dir
 	local yaw = minetest.dir_to_yaw(dir)
 	self.object:set_rotation(vector.new(0,yaw,0))
+end
+
+local function turn_snap(pos,self,dir,dir2)
+	if dir.x ~= 0 and dir2.z ~= 0 then
+		--local inertia = math.abs(self.object:get_velocity().x)
+		local inertia = math.abs(self.velocity.x)
+		--self.object:set_velocity(vector.multiply(dir2,inertia))
+
+		self.velocity = vector.multiply(dir2,inertia)
+		self.dir = dir2
+		self.axis_lock = "z"
+		self.object:set_pos(pos)
+		direction_snap(self)
+		return(true)
+	elseif dir.z ~= 0 and dir2.x ~= 0 then
+		--local inertia = math.abs(self.object:get_velocity().z)
+		--print(dump(self.velocity))
+		local inertia = math.abs(self.velocity.z)
+		--self.object:set_velocity(vector.multiply(dir2,inertia))
+		
+		self.velocity = vector.multiply(dir2,inertia)
+
+		self.dir = dir2
+		self.axis_lock = "x"
+		self.object:set_pos(pos)
+		direction_snap(self)
+		return(true)
+	end
 end
 
 local function rail_brain(self,pos)
@@ -98,25 +127,12 @@ local function rail_brain(self,pos)
 	if triggered and not pool[minetest.hash_node_position(vector.add(pos,dir))] then
 		local possible_dirs = create_axis(pos)
 		if table.getn(possible_dirs) == 0 then
+			--print("train fails")
 			--stop slow down become physical, something
 		else
 			for _,dir2 in pairs(possible_dirs) do
-				if dir.x ~= 0 and dir2.z ~= 0 then
-					local intertia = math.abs(self.object:get_velocity().x)
-					self.object:set_velocity(vector.multiply(dir2,intertia))
-					self.dir = dir2
-					self.axis_lock = "z"
-					self.object:set_pos(pos)
-					direction_snap(self)
-					break
-				elseif dir.z ~= 0 and dir2.x ~= 0 then
-					local intertia = math.abs(self.object:get_velocity().z)
-					self.object:set_velocity(vector.multiply(dir2,intertia))
-					self.dir = dir2
-					self.axis_lock = "x"
-					self.object:set_pos(pos)
-					direction_snap(self)
-					break
+				if turn_snap(pos,self,dir,dir2) then
+					return
 				end
 			end
 		end
@@ -129,7 +145,22 @@ end
 local minecart = {}
 
 minecart.on_step = function(self,dtime)
-	local pos = vector.round(self.object:get_pos())
+	local float_pos = self.object:get_pos()
+	local pos = vector.round(float_pos)
+
+	if self.velocity then
+		local new_vel = dtime/0.01
+		print(new_vel)
+		self.object:move_to(vector.add(float_pos,vector.multiply(self.velocity,new_vel)))
+	end
+
+	--stop minecarts from derailing when going super fast
+	if self.old_pos and vector.distance(float_pos,self.old_pos) > 0.5 then
+		self.object:move_to(self.old_pos)
+		float_pos = self.object:get_pos()
+		pos = vector.round(self.old_pos)
+	end
+
 	if not self.axis_lock then
 		local possible_dirs = create_axis(pos)
 		for _,dir in pairs(possible_dirs) do
@@ -145,6 +176,7 @@ minecart.on_step = function(self,dtime)
 		collision_detect(self)
 		rail_brain(self,pos)
 	end
+	self.old_pos = float_pos
 end
 
 minecart.on_rightclick = function(self,clicker)
@@ -160,7 +192,8 @@ minecart.on_activate = function(self,staticdata, dtime_s)
 	if type(data) ~= "table" then
 		return
 	end
-
+	self.old_pos = self.object:get_pos()
+	self.velocity = vector.new(0,0,0)
 end
 
 minecart.get_staticdata = function(self)
