@@ -224,7 +224,7 @@ local function coupling_logic(self)
 			self.dir = dir
 			new_vel = vector.multiply(dir,velocity)
 		else
-			new_vel = vector.multiply(velocity_real,-1)
+			new_vel = vector.multiply(velocity_real,-0.1)
 		end
 		self.object:add_velocity(new_vel)
 	elseif self.axis_lock == "z" then
@@ -237,7 +237,7 @@ local function coupling_logic(self)
 			self.dir = dir
 			new_vel = vector.multiply(dir,velocity)
 		else
-			new_vel = vector.multiply(velocity_real,-1)
+			new_vel = vector.multiply(velocity_real,-0.1)
 		end
 		self.object:add_velocity(new_vel)
 	end
