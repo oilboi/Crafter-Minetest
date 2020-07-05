@@ -119,7 +119,7 @@ local function direction_snap(self)
 	local yaw = minetest.dir_to_yaw(dir)
 
 	if self.driver then
-		self.driver:set_look_vertical(pitch)
+		self.driver:set_look_vertical(-pitch)
 		self.driver:set_look_horizontal(yaw)
 	end
 	self.object:set_rotation(vector.new(pitch,yaw,0))
@@ -360,7 +360,15 @@ train.on_punch = function(self, puncher)
 
 	if self.is_engine and puncher:get_player_control().sneak then
 		if vector.equals(self.object:get_velocity(),vector.new(0,0,0)) then
-			print("reverse direction")
+			if self.dir.y == 0 then
+				self.dir = vector.multiply(self.dir,-1)
+				direction_snap(self)
+				minetest.sound_play("wrench",{
+					object = self.object,
+					gain = 1.0,
+					max_hear_distance = 64,
+				})
+			end
 		end
 		return
 	end
