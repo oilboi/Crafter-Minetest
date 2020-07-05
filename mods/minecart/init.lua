@@ -382,7 +382,7 @@ minecart.on_rightclick = function(self,clicker)
 			coupling_particles(pos,false)
 		end
 	else
-		if not (pool[name]:get_luaentity().coupler1 and pool[name]:get_luaentity().coupler1 == self.object or self.coupler2) then
+		if pool[name] ~= self.object and not (pool[name]:get_luaentity().coupler1 and pool[name]:get_luaentity().coupler1 == self.object or self.coupler2) then
 			self.coupler1 = pool[name]
 			pool[name]:get_luaentity().coupler2 = self.object
 			minetest.sound_play("wrench",{
