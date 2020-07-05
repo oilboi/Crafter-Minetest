@@ -295,3 +295,16 @@
 - Overhauled everything
 - Added in a lot of stuff
 - Fixed a lot of stuff
+
+
+## Alpha 0.06
+> Redstone Update
+
+- Add in virtualization algorithm
+- Added in breaker
+- Added in detector
+- Added in faster algorithm
+- Made iron blocks capacitors
+- Fixed timings
+- Fixed pistons
+- Added colored redstone lights

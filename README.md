@@ -32,10 +32,14 @@ max_packets_per_iteration = 10096
 
 > <a href="https://github.com/oilboi/Crafter/blob/master/old_changelog.md">Old Version Changelogs</a>
 
-## Alpha 0.06
-> Redstone Update
+## Alpha 0.07
+> RailRoad Tech
 
-- Add in virtualization algorithm
+- Added in better minecart algorithm
+- Added in ability to link minecarts
+- Added in train wrench
+- Added in prototype of Engine by using a furnace on a minecart
+- Added in SolarShrine's vignette
 
 ---
 
