@@ -224,7 +224,7 @@ local function coupling_logic(self)
 			self.dir = dir
 			new_vel = vector.multiply(dir,velocity)
 		else
-			new_vel = vector.multiply(velocity_real,-0.1)
+			new_vel = vector.multiply(velocity_real,-1)
 		end
 		self.object:add_velocity(new_vel)
 	elseif self.axis_lock == "z" then
@@ -237,7 +237,7 @@ local function coupling_logic(self)
 			self.dir = dir
 			new_vel = vector.multiply(dir,velocity)
 		else
-			new_vel = vector.multiply(velocity_real,-0.1)
+			new_vel = vector.multiply(velocity_real,-1)
 		end
 		self.object:add_velocity(new_vel)
 	end
@@ -247,7 +247,6 @@ end
 
 
 local function rail_brain(self,pos)
-
 
 	if not self.dir then self.dir = vector.new(0,0,0) end
 
@@ -283,160 +282,165 @@ local function rail_brain(self,pos)
 
 end
 
-local minecart = {}
+function register_train(name,data)
 
-minecart.on_step = function(self,dtime)
-	if dtime > 0.1 then
-		self.object:set_pos(self.old_pos)
-	end
-	local pos = vector.round(self.object:get_pos())
-	if not self.axis_lock then
-		local possible_dirs = create_axis(pos)
-		for _,dir in pairs(possible_dirs) do
-			if dir.x ~=0 then
-				self.axis_lock = "x"
-				self.dir = dir
-				direction_snap(self)
-				break
-			elseif dir.z ~= 0 then
-				self.axis_lock = "z"
-				self.dir = dir
-				direction_snap(self)
-				break
+	local train = {}
+
+	train.on_step = function(self,dtime)
+		if dtime > 0.1 then
+			self.object:set_pos(self.old_pos)
+		end
+		local pos = vector.round(self.object:get_pos())
+		if not self.axis_lock then
+			local possible_dirs = create_axis(pos)
+			for _,dir in pairs(possible_dirs) do
+				if dir.x ~=0 then
+					self.axis_lock = "x"
+					self.dir = dir
+					direction_snap(self)
+					break
+				elseif dir.z ~= 0 then
+					self.axis_lock = "z"
+					self.dir = dir
+					direction_snap(self)
+					break
+				end
 			end
+		else
+			rail_brain(self,pos)
+			--collision_detect(self)
 		end
-	else
-		rail_brain(self,pos)
-		--collision_detect(self)
-	end
-	self.old_pos = self.object:get_pos()
-end
-
-
-minecart.on_punch = function(self, puncher)
-	if not puncher:get_wielded_item():get_name() == "minecart:wrench" then
-		return
-	end
-	if self.furnace then
-		self.object:set_velocity(vector.multiply(self.dir,6))
-		minetest.add_particlespawner({
-			amount = 30,
-			time = 0,
-			minpos = vector.new(0,0.5,0),
-			maxpos = vector.new(0,0.5,0),
-			minvel = vector.new(0,0,0),
-			maxvel = vector.new(0,0,0),
-			minacc = {x=0, y=3, z=0},
-			maxacc = {x=0, y=5, z=0},
-			minexptime = 1.1,
-			maxexptime = 1.5,
-			minsize = 1,
-			maxsize = 2,
-			collisiondetection = false,
-			collision_removal = false,
-			vertical = false,
-			texture = "smoke.png",
-			attached = self.object
-		})
+		self.old_pos = self.object:get_pos()
 	end
 
-end
 
+	train.on_punch = function(self, puncher)
+		if not puncher:get_wielded_item():get_name() == "train:wrench" then
+			return
+		end
+		if self.furnace then
+			self.object:set_velocity(vector.multiply(self.dir,6))
+			minetest.add_particlespawner({
+				amount = 30,
+				time = 0,
+				minpos = vector.new(0,0.5,0),
+				maxpos = vector.new(0,0.5,0),
+				minvel = vector.new(0,0,0),
+				maxvel = vector.new(0,0,0),
+				minacc = {x=0, y=3, z=0},
+				maxacc = {x=0, y=5, z=0},
+				minexptime = 1.1,
+				maxexptime = 1.5,
+				minsize = 1,
+				maxsize = 2,
+				collisiondetection = false,
+				collision_removal = false,
+				vertical = false,
+				texture = "smoke.png",
+				attached = self.object
+			})
+		end
 
-minecart.on_rightclick = function(self,clicker)
-	local pos = self.object:get_pos()
-	if clicker:get_wielded_item():get_name() == "utility:furnace" then
-		local obj = minetest.add_entity(pos, "minecart:furnace")
-		obj:set_attach(self.object,"",vector.new(0,0,0),vector.new(0,0,0))
-		minetest.sound_play("wrench",{
-			object = self.object,
-			gain = 1.0,
-			max_hear_distance = 64,
-		})
-		coupling_particles(pos,true)
-		self.furnace = true
-		return
 	end
 
-	if not clicker:get_wielded_item():get_name() == "minecart:wrench" then
-		return
-	end
 
-	local name = clicker:get_player_name()
-	if not pool[name] then
-		if not self.coupler2 then
-			pool[name] = self.object
+	train.on_rightclick = function(self,clicker)
+		local pos = self.object:get_pos()
+		if clicker:get_wielded_item():get_name() == "utility:furnace" then
+			local obj = minetest.add_entity(pos, "train:furnace")
+			obj:set_attach(self.object,"",vector.new(0,0,0),vector.new(0,0,0))
 			minetest.sound_play("wrench",{
 				object = self.object,
 				gain = 1.0,
 				max_hear_distance = 64,
 			})
 			coupling_particles(pos,true)
-		else
-			minetest.sound_play("wrench",{
-				object = self.object,
-				gain = 1.0,
-				max_hear_distance = 64,
-				pitch = 0.7,
-			})
-			coupling_particles(pos,false)
+			self.furnace = true
+			return
 		end
-	else
-		if pool[name] ~= self.object and not (pool[name]:get_luaentity().coupler1 and pool[name]:get_luaentity().coupler1 == self.object or self.coupler2) then
-			self.coupler1 = pool[name]
-			pool[name]:get_luaentity().coupler2 = self.object
-			minetest.sound_play("wrench",{
-				object = self.object,
-				gain = 1.0,
-				max_hear_distance = 64,
-			})
-			coupling_particles(pos,true)
-		else
-			minetest.sound_play("wrench",{
-				object = self.object,
-				gain = 1.0,
-				max_hear_distance = 64,
-				pitch = 0.7,
-			})
-			coupling_particles(pos,false)
+
+		if not clicker:get_wielded_item():get_name() == "train:wrench" then
+			return
 		end
-		pool[name] = nil
+
+		local name = clicker:get_player_name()
+		if not pool[name] then
+			if not self.coupler2 then
+				pool[name] = self.object
+				minetest.sound_play("wrench",{
+					object = self.object,
+					gain = 1.0,
+					max_hear_distance = 64,
+				})
+				coupling_particles(pos,true)
+			else
+				minetest.sound_play("wrench",{
+					object = self.object,
+					gain = 1.0,
+					max_hear_distance = 64,
+					pitch = 0.7,
+				})
+				coupling_particles(pos,false)
+			end
+		else
+			if pool[name] ~= self.object and not (pool[name]:get_luaentity().coupler1 and pool[name]:get_luaentity().coupler1 == self.object or self.coupler2) then
+				self.coupler1 = pool[name]
+				pool[name]:get_luaentity().coupler2 = self.object
+				minetest.sound_play("wrench",{
+					object = self.object,
+					gain = 1.0,
+					max_hear_distance = 64,
+				})
+				coupling_particles(pos,true)
+			else
+				minetest.sound_play("wrench",{
+					object = self.object,
+					gain = 1.0,
+					max_hear_distance = 64,
+					pitch = 0.7,
+				})
+				coupling_particles(pos,false)
+			end
+			pool[name] = nil
+		end
 	end
+
+	--get old data
+	train.on_activate = function(self,staticdata, dtime_s)
+		self.object:set_armor_groups({immortal=1})
+		if string.sub(staticdata, 1, string.len("return")) ~= "return" then
+			return
+		end
+		local data = minetest.deserialize(staticdata)
+		if type(data) ~= "table" then
+			return
+		end
+		self.old_pos = self.object:get_pos()
+		self.velocity = vector.new(0,0,0)
+	end
+
+	train.get_staticdata = function(self)
+		return minetest.serialize({
+		})
+	end
+
+
+
+	train.initial_properties = {
+		physical = false, -- otherwise going uphill breaks
+		collisionbox = {-0.4, -0.5, -0.4, 0.4, 0.45, 0.4},--{-0.5, -0.4, -0.5, 0.5, 0.25, 0.5},
+		visual = "mesh",
+		mesh = "steam_train.b3d",
+		visual_size = {x=1, y=1},
+		textures = {"steam_train.png"},
+	}
+
+		
+
+	minetest.register_entity(name, train)
+
 end
 
---get old data
-minecart.on_activate = function(self,staticdata, dtime_s)
-	self.object:set_armor_groups({immortal=1})
-	if string.sub(staticdata, 1, string.len("return")) ~= "return" then
-		return
-	end
-	local data = minetest.deserialize(staticdata)
-	if type(data) ~= "table" then
-		return
-	end
-	self.old_pos = self.object:get_pos()
-	self.velocity = vector.new(0,0,0)
-end
-
-minecart.get_staticdata = function(self)
-	return minetest.serialize({
-	})
-end
-
-
-
-minecart.initial_properties = {
-	physical = false, -- otherwise going uphill breaks
-	collisionbox = {-0.4, -0.5, -0.4, 0.4, 0.45, 0.4},--{-0.5, -0.4, -0.5, 0.5, 0.25, 0.5},
-	visual = "mesh",
-	mesh = "minecart.x",
-	visual_size = {x=1, y=1},
-	textures = {"minecart.png"},
-}
-
-	
-
-minetest.register_entity("minecart:minecart", minecart)
 
 
 
@@ -446,11 +450,8 @@ minetest.register_entity("minecart:minecart", minecart)
 
 
 
-
-
-
-minetest.register_craftitem("minecart:minecart", {
-	description = "Minecart",
+minetest.register_craftitem("train:minecart", {
+	description = "train",
 	inventory_image = "minecartitem.png",
 	wield_image = "minecartitem.png",
 	on_place = function(itemstack, placer, pointed_thing)
@@ -466,7 +467,7 @@ minetest.register_craftitem("minecart:minecart", {
 		end
 		
 		if minetest.get_item_group(minetest.get_node(pointed_thing.under).name, "rail")>0 then
-			minetest.add_entity(pointed_thing.under, "minecart:minecart")
+			minetest.add_entity(pointed_thing.under, "train:train")
 		else
 			return
 		end
@@ -478,7 +479,7 @@ minetest.register_craftitem("minecart:minecart", {
 })
 
 minetest.register_craft({
-	output = "minecart:minecart",
+	output = "train:train",
 	recipe = {
 		{"main:iron", "", "main:iron"},
 		{"main:iron", "main:iron", "main:iron"},
@@ -489,7 +490,7 @@ minetest.register_craft({
 
 
 
-minetest.register_node("minecart:rail",{
+minetest.register_node("train:rail",{
 	description = "Rail",
 	wield_image = "rail.png",
 	tiles = {
@@ -518,8 +519,8 @@ minetest.register_node("minecart:rail",{
 
 
 minetest.register_lbm({
-	name = "minecart:rail",
-	nodenames = {"minecart:rail"},
+	name = "train:rail",
+	nodenames = {"train:rail"},
 	run_at_every_load = true,
 	action = function(pos)
 		data_injection(pos,true)
@@ -527,7 +528,7 @@ minetest.register_lbm({
 })
 
 minetest.register_craft({
-	output = "minecart:rail 32",
+	output = "train:rail 32",
 	recipe = {
 		{"main:iron","","main:iron"},
 		{"main:iron","main:stick","main:iron"},
@@ -536,13 +537,13 @@ minetest.register_craft({
 })
 
 
-minetest.register_food("minecart:wrench",{
+minetest.register_food("train:wrench",{
 	description = "Train Wrench",
 	texture = "wrench.png",
 })
 
 minetest.register_craft({
-	output = "minecart:wrench",
+	output = "train:wrench",
 	recipe = {
 		{"main:iron", "", "main:iron"},
 		{"main:iron", "main:lapis", "main:iron"},
@@ -552,7 +553,7 @@ minetest.register_craft({
 
 
 
-minetest.register_entity("minecart:furnace", {
+minetest.register_entity("train:furnace", {
 	initial_properties = {
 		visual = "wielditem",
 		visual_size = {x = 0.6, y = 0.6},
