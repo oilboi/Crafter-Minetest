@@ -304,15 +304,60 @@ minecart.on_step = function(self,dtime)
 		end
 	else
 		rail_brain(self,pos)
-		collision_detect(self)
+		--collision_detect(self)
 	end
 end
 
+
+minecart.on_punch = function(self, puncher)
+	if not puncher:get_wielded_item():get_name() == "minecart:wrench" then
+		return
+	end
+	if self.furnace then
+		self.object:set_velocity(vector.multiply(self.dir,6))
+		minetest.add_particlespawner({
+			amount = 30,
+			time = 0,
+			minpos = vector.new(0,0.5,0),
+			maxpos = vector.new(0,0.5,0),
+			minvel = vector.new(0,0,0),
+			maxvel = vector.new(0,0,0),
+			minacc = {x=0, y=3, z=0},
+			maxacc = {x=0, y=5, z=0},
+			minexptime = 1.1,
+			maxexptime = 1.5,
+			minsize = 1,
+			maxsize = 2,
+			collisiondetection = false,
+			collision_removal = false,
+			vertical = false,
+			texture = "smoke.png",
+			attached = self.object
+		})
+	end
+
+end
+
+
 minecart.on_rightclick = function(self,clicker)
+	local pos = self.object:get_pos()
+	if clicker:get_wielded_item():get_name() == "utility:furnace" then
+		local obj = minetest.add_entity(pos, "minecart:furnace")
+		obj:set_attach(self.object,"",vector.new(0,0,0),vector.new(0,0,0))
+		minetest.sound_play("wrench",{
+			object = self.object,
+			gain = 1.0,
+			max_hear_distance = 64,
+		})
+		coupling_particles(pos,true)
+		self.furnace = true
+		return
+	end
+
 	if not clicker:get_wielded_item():get_name() == "minecart:wrench" then
 		return
 	end
-	local pos = self.object:get_pos()
+
 	local name = clicker:get_player_name()
 	if not pool[name] then
 		if not self.coupler2 then
@@ -384,12 +429,6 @@ minecart.initial_properties = {
 	visual_size = {x=1, y=1},
 	textures = {"minecart.png"},
 }
-
-
-minecart.on_punch = function(self,puncher, time_from_last_punch, tool_capabilities, dir, damage)
-	--local obj = minetest.add_item(self.object:getpos(), "minecart:minecart")
-	--self.object:remove()
-end
 
 	
 
@@ -505,4 +544,32 @@ minetest.register_craft({
 		{"main:iron", "main:lapis", "main:iron"},
 		{"", "main:lapis", ""}
 	}
+})
+
+
+
+minetest.register_entity("minecart:furnace", {
+	initial_properties = {
+		visual = "wielditem",
+		visual_size = {x = 0.6, y = 0.6},
+		textures = {},
+		physical = true,
+		is_visible = false,
+		collide_with_objects = false,
+		pointable=false,
+		collisionbox = {-0.5, -0.5, -0.5, 0.5, 0.5, 0.5},
+	},
+	set_node = function(self)
+		self.object:set_properties({
+			is_visible = true,
+			textures = {"utility:furnace"},
+		})
+	end,
+
+
+	on_activate = function(self, staticdata)
+		self.object:set_armor_groups({immortal = 1})
+
+		self:set_node()
+	end,
 })
