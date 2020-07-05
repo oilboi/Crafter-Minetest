@@ -115,8 +115,16 @@ local function direction_snap(self)
 	local pitch = 0
 	if dir.y == 1 then pitch = math.pi/4 end
 	if dir.y == -1 then pitch = -math.pi/4 end
+
 	local yaw = minetest.dir_to_yaw(dir)
+
+	if self.driver then
+		self.driver:set_look_vertical(pitch)
+		self.driver:set_look_horizontal(yaw)
+	end
 	self.object:set_rotation(vector.new(pitch,yaw,0))
+
+	
 end
 
 local function turn_snap(pos,self,dir,dir2)
@@ -214,12 +222,14 @@ local function coupling_logic(self)
 	
 	local pos2 = self.coupler1:get_pos()
 
+	local coupler_goal = self.coupler1:get_luaentity().coupler_distance
+
 	if self.axis_lock == "x" then
 		local velocity_real = self.object:get_velocity()
 		local distance = vector.distance(pos,pos2)
 		local new_vel = vector.new(0,0,0)
-		if distance > 1.5 then
-			local velocity = (distance-1)
+		if distance > coupler_goal then
+			local velocity = (distance-coupler_goal)
 			local dir = vector.direction(vector.new(pos.x,0,0),vector.new(pos2.x,0,0))
 			self.dir = dir
 			new_vel = vector.multiply(dir,velocity)
@@ -231,8 +241,8 @@ local function coupling_logic(self)
 		local velocity_real = self.object:get_velocity()
 		local distance = vector.distance(pos,pos2)
 		local new_vel = vector.new(0,0,0)
-		if distance > 1.5 then
-			local velocity = (distance-1)
+		if distance > coupler_goal then
+			local velocity = (distance-coupler_goal)
 			local dir = vector.direction(vector.new(0,0,pos.z),vector.new(0,0,pos2.z))
 			self.dir = dir
 			new_vel = vector.multiply(dir,velocity)
@@ -300,7 +310,18 @@ train.power            = data.power
 train.coupler_distance = data.coupler_distance
 train.is_car           = data.is_car
 train.is_engine        = data.is_engine
-train.speed_max        = data.speed_max
+train.max_speed        = data.max_speed
+train.driver           = nil
+
+train.initial_properties = {
+	physical = false, -- otherwise going uphill breaks
+	collisionbox = {-0.4, -0.5, -0.4, 0.4, 0.45, 0.4},
+	visual = "mesh",
+	mesh = data.mesh,
+	visual_size = {x=1, y=1},
+	textures = {data.texture},
+}
+
 
 train.on_step = function(self,dtime)
 	if dtime > 0.1 then
@@ -358,7 +379,7 @@ end
 
 
 train.on_rightclick = function(self,clicker)
-	local pos = self.object:get_pos()
+	--[[
 	if clicker:get_wielded_item():get_name() == "utility:furnace" then
 		local obj = minetest.add_entity(pos, "train:furnace")
 		obj:set_attach(self.object,"",vector.new(0,0,0),vector.new(0,0,0))
@@ -371,10 +392,26 @@ train.on_rightclick = function(self,clicker)
 		self.furnace = true
 		return
 	end
+	]]--
 
-	if not clicker:get_wielded_item():get_name() == "train:wrench" then
+	if clicker:get_wielded_item():get_name() ~= "train:wrench" then
+		if self.is_engine then
+			print("jump on in")
+			clicker:set_attach(self.object, "", data.body_pos, data.body_rotation)
+			clicker:set_eye_offset(data.eye_offset,{x=0,y=0,z=0})
+			player_is_attached(clicker,true)
+			set_player_animation(clicker,"stand",0)
+			local rotation = self.object:get_rotation()
+			clicker:set_look_vertical(0)
+			clicker:set_look_horizontal(rotation.y)
+			self.object:set_velocity(vector.multiply(self.dir,self.max_speed))
+			self.driver = clicker
+			return
+		end
 		return
 	end
+
+	local pos = self.object:get_pos()
 
 	local name = clicker:get_player_name()
 	if not pool[name] then
@@ -437,33 +474,37 @@ train.get_staticdata = function(self)
 	})
 end
 
-
-
-train.initial_properties = {
-	physical = false, -- otherwise going uphill breaks
-	collisionbox = {-0.4, -0.5, -0.4, 0.4, 0.45, 0.4},--{-0.5, -0.4, -0.5, 0.5, 0.25, 0.5},
-	visual = "mesh",
-	mesh = "steam_train.b3d",
-	visual_size = {x=1, y=1},
-	textures = {"steam_train.png"},
-}
-
-	
-
 minetest.register_entity(name, train)
 
 end
 
+--[[
+███████╗███╗   ██╗██████╗ 
+██╔════╝████╗  ██║██╔══██╗
+█████╗  ██╔██╗ ██║██║  ██║
+██╔══╝  ██║╚██╗██║██║  ██║
+███████╗██║ ╚████║██████╔╝
+╚══════╝╚═╝  ╚═══╝╚═════╝ 
+]]--
 
 
 
 
+register_train("train:steam_train",{
+	mesh = "steam_train.b3d",
+	texture = "steam_train.png",
+	is_engine = true,
+	power = 6,
+	max_speed = 6,
+	coupler_distance = 2,
+	body_pos = vector.new(0,0,-15),
+	body_rotation = vector.new(0,0,0),
+	eye_offset = vector.new(6,-1,-10)
+})
 
 
 
-
-
-minetest.register_craftitem("train:minecart", {
+minetest.register_craftitem("train:train", {
 	description = "train",
 	inventory_image = "minecartitem.png",
 	wield_image = "minecartitem.png",
@@ -480,7 +521,7 @@ minetest.register_craftitem("train:minecart", {
 		end
 		
 		if minetest.get_item_group(minetest.get_node(pointed_thing.under).name, "rail")>0 then
-			minetest.add_entity(pointed_thing.under, "train:train")
+			minetest.add_entity(pointed_thing.under, "train:steam_train")
 		else
 			return
 		end

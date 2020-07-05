@@ -153,6 +153,13 @@ player_is_attached = function(player,truth)
 end
 
 local name
+get_if_player_attached = function(player)
+	name = player:get_player_name()
+	return(pool[name].attached)
+end
+
+
+local name
 player_is_sleeping = function(player,truth)
 	name = player:get_player_name()
 	pool[name].sleeping = truth
