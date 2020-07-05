@@ -286,6 +286,9 @@ end
 local minecart = {}
 
 minecart.on_step = function(self,dtime)
+	if dtime > 0.1 then
+		self.object:set_pos(self.old_pos)
+	end
 	local pos = vector.round(self.object:get_pos())
 	if not self.axis_lock then
 		local possible_dirs = create_axis(pos)
@@ -306,6 +309,7 @@ minecart.on_step = function(self,dtime)
 		rail_brain(self,pos)
 		--collision_detect(self)
 	end
+	self.old_pos = self.object:get_pos()
 end
 
 
