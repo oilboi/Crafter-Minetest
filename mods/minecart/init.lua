@@ -1,5 +1,8 @@
 local pool = {}
 
+local player_pool = {}
+
+
 local dirs = {
 	{x= 1,y= 0,z= 0},
 	{x=-1,y= 0,z= 0},
@@ -50,15 +53,17 @@ local function collision_detect(self)
 		if object:is_player() then
 			local pos2 = object:get_pos()
 			if self.axis_lock == "x" then
-				local velocity = (1-vector.distance(vector.new(pos.x,0,0),vector.new(pos2.x,0,0)))/50
+
+				local velocity = (1-vector.distance(vector.new(pos.x,0,0),vector.new(pos2.x,0,0)))
 				local dir = vector.direction(vector.new(pos2.x,0,0),vector.new(pos.x,0,0))
 				local new_vel = vector.multiply(dir,velocity)
-				self.velocity = new_vel
+				self.object:add_velocity(new_vel)
 				self.dir = dir
 			elseif self.axis_lock == "z" then
-				local velocity = (1-vector.distance(vector.new(0,0,pos.z),vector.new(0,0,pos2.z)))/50
+				local velocity = (1-vector.distance(vector.new(0,0,pos.z),vector.new(0,0,pos2.z)))
 				local dir = vector.direction(vector.new(0,0,pos2.z),vector.new(0,0,pos.z))
-				self.velocity = vector.multiply(dir,velocity)
+				local new_vel = vector.multiply(dir,velocity)
+				self.object:add_velocity(new_vel)
 				self.dir = dir
 			end
 			return
@@ -78,8 +83,9 @@ end
 local function turn_snap(pos,self,dir,dir2)
 	if self.axis_lock == "x" then
 		if dir.x ~= 0 and dir2.z ~= 0 then
-			local inertia = math.abs(self.velocity.x)
-			self.velocity = vector.multiply(dir2,inertia)
+			local velocity = self.object:get_velocity()
+			local inertia = math.abs(velocity.x)
+			self.object:set_velocity(vector.multiply(dir2,inertia))
 			self.dir = dir2
 			self.axis_lock = "z"
 			self.object:set_pos(pos)
@@ -89,8 +95,9 @@ local function turn_snap(pos,self,dir,dir2)
 	end
 	if self.axis_lock == "z" then
 		if dir.z ~= 0 and dir2.x ~= 0 then
-			local inertia = math.abs(self.velocity.z)
-			self.velocity = vector.multiply(dir2,inertia)
+			local velocity = self.object:get_velocity()
+			local inertia = math.abs(velocity.z)
+			self.object:set_velocity(vector.multiply(dir2,inertia))
 			self.dir = dir2
 			self.axis_lock = "x"
 			self.object:set_pos(pos)
@@ -104,8 +111,9 @@ end
 local function climb_snap(pos,self,dir,dir2)
 	if self.axis_lock == "x" then
 		if dir.x == dir2.x and dir2.y ~= 0 then
-			local inertia = math.abs(self.velocity.x)
-			self.velocity = vector.multiply(dir2,inertia)
+			local velocity = self.object:get_velocity()
+			local inertia = math.abs(velocity.x)
+			self.object:set_velocity(vector.multiply(dir2,inertia))
 			self.dir = dir2
 			self.axis_lock = "x"
 			self.object:set_pos(pos)
@@ -115,8 +123,9 @@ local function climb_snap(pos,self,dir,dir2)
 	end
 	if self.axis_lock == "z" then
 		if dir.z == dir2.z and dir2.y ~= 0 then
-			local inertia = math.abs(self.velocity.z)
-			self.velocity = vector.multiply(dir2,inertia)
+			local velocity = self.object:get_velocity()
+			local inertia = math.abs(velocity.z)
+			self.object:set_velocity(vector.multiply(dir2,inertia))
 			self.dir = dir2
 			self.axis_lock = "z"
 			self.object:set_pos(pos)
@@ -130,7 +139,8 @@ end
 local function straight_snap(pos,self,dir)
 	if self.axis_lock == "x" then
 		if dir.x ~= 0 and pool[minetest.hash_node_position(vector.add(pos,vector.new(dir.x,0,0)))] then
-			self.velocity = vector.new(self.velocity.x,0,0)
+			local velocity = self.object:get_velocity()
+			self.object:set_velocity(vector.new(velocity.x,0,0))
 			self.dir = vector.new(dir.x,0,0)
 			self.axis_lock = "x"
 			self.object:set_pos(pos)
@@ -140,7 +150,8 @@ local function straight_snap(pos,self,dir)
 	end
 	if self.axis_lock == "z" then
 		if dir.z ~= 0 and pool[minetest.hash_node_position(vector.add(pos,vector.new(0,0,dir.z)))] then
-			self.velocity = vector.new(0,0,self.velocity.z)
+			local velocity = self.object:get_velocity()
+			self.object:set_velocity(vector.new(0,0,velocity.z))
 			self.dir = vector.new(0,0,dir.z)
 			self.axis_lock = "z"
 			self.object:set_pos(pos)
@@ -172,11 +183,9 @@ local function rail_brain(self,pos)
 		triggered = true
 	end
 
-	--print(dump(dir))
 	if triggered and not pool[minetest.hash_node_position(vector.add(pos,dir))] then
 
 		if straight_snap(pos,self,dir) then
-			print('beraking')
 			return
 		end
 
@@ -202,6 +211,40 @@ local function rail_brain(self,pos)
 end
 
 
+local function coupling_logic(self)
+	
+	if not self.axis_lock then return end
+
+	if not self.coupler1 then return end
+
+	if not self.dir.y == 0 then print("failing") return end
+
+	local pos = self.object:get_pos()
+	
+	local pos2 = self.coupler1:get_pos()
+
+	if self.axis_lock == "x" then
+		--local velocity = self.object:get_velocity()
+
+		local distance = 1-vector.distance(pos,pos2)		
+
+		local dir = vector.direction(vector.new(pos2.x,0,0),vector.new(pos.x,0,0))
+
+		local new_vel = vector.multiply(dir,distance)
+		self.object:add_velocity(new_vel)
+		--self.dir = dir
+	--[[
+	elseif self.axis_lock == "z" then
+		local velocity = self.object:get_velocity()
+		local velocity = (1-vector.distance(pos,pos2))
+		local dir = vector.direction(vector.new(0,0,pos2.z),vector.new(0,0,pos.z))
+		local new_vel = vector.multiply(dir,velocity)
+		self.object:add_velocity(new_vel)
+		--self.dir = dir
+		]]--
+	end
+	return
+end
 
 
 local minecart = {}
@@ -210,22 +253,28 @@ minecart.on_step = function(self,dtime)
 	local float_pos = self.object:get_pos()
 	local pos = vector.round(float_pos)
 
-	if self.velocity then
-		local new_vel = dtime*1000
-		local test = vector.multiply(self.velocity,new_vel)
+	--if self.velocity then
+		--local new_vel = dtime*1000
+		local test = self.object:get_velocity()--vector.multiply(self.velocity,new_vel)
 
-		if test.x > 0.5 then
-			test.x = 0.5
-		elseif test.x < -0.5 then
-			test.x = -0.5
+		if test.x > 10 then
+			test.x = 10
+			print("slowing down 1")
+		elseif test.x < -10 then
+			test.x = -10
+			print("slowing down 2")
 		end
-		if test.z > 0.5 then
-			test.z = 0.5
-		elseif test.z < -0.5 then
-			test.z = -0.5
+		if test.z > 10 then
+			test.z = 10
+			print("slowing down 3")
+		elseif test.z < -10 then
+			test.z = -10
+			print("slowing down 4")
+			
 		end
-		self.object:move_to(vector.add(float_pos,test))
-	end
+		self.object:set_velocity(test)
+		--self.object:move_to(vector.add(float_pos,test))
+	--end
 
 	if not self.axis_lock then
 		local possible_dirs = create_axis(pos)
@@ -233,23 +282,38 @@ minecart.on_step = function(self,dtime)
 			if dir.x ~=0 then
 				self.axis_lock = "x"
 				self.dir = vector.new(1,0,0)
+				--self.velocity = vector.new(0,0,0)
 				direction_snap(self)
 				break
 			elseif dir.z ~= 0 then
 				self.axis_lock = "z"
 				self.dir = vector.new(0,0,1)
+				--self.velocity = vector.new(0,0,0)
 				direction_snap(self)
 				break
 			end
 		end
 	else
+
 		collision_detect(self)
+
+		coupling_logic(self)
+
 		rail_brain(self,pos)
 	end
 	self.old_pos = float_pos
 end
 
 minecart.on_rightclick = function(self,clicker)
+	local name = clicker:get_player_name()
+	if not pool[name] then
+		pool[name] = self.object
+	else
+		self.coupler1 = pool[name]
+		--pool[name]:get_luaentity().coupler1 = self.object
+		pool[name] = nil
+		print("coupled")
+	end
 end
 
 --get old data
@@ -377,7 +441,7 @@ minetest.register_lbm({
 	run_at_every_load = true,
 	action = function(pos)
 		data_injection(pos,true)
-		print("buildin dat cash")
+		--print("buildin dat cashay")
 	end,
 })
 
