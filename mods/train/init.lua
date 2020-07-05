@@ -396,16 +396,26 @@ train.on_rightclick = function(self,clicker)
 
 	if clicker:get_wielded_item():get_name() ~= "train:wrench" then
 		if self.is_engine then
-			print("jump on in")
-			clicker:set_attach(self.object, "", data.body_pos, data.body_rotation)
-			clicker:set_eye_offset(data.eye_offset,{x=0,y=0,z=0})
-			player_is_attached(clicker,true)
-			set_player_animation(clicker,"stand",0)
-			local rotation = self.object:get_rotation()
-			clicker:set_look_vertical(0)
-			clicker:set_look_horizontal(rotation.y)
-			self.object:set_velocity(vector.multiply(self.dir,self.max_speed))
-			self.driver = clicker
+			if not self.driver then
+				print("jump on in")
+				clicker:set_attach(self.object, "", data.body_pos, data.body_rotation)
+				clicker:set_eye_offset(data.eye_offset,{x=0,y=0,z=0})
+				player_is_attached(clicker,true)
+				set_player_animation(clicker,"stand",0)
+				local rotation = self.object:get_rotation()
+				clicker:set_look_vertical(0)
+				clicker:set_look_horizontal(rotation.y)
+				self.object:set_velocity(vector.multiply(self.dir,self.max_speed))
+				self.driver = clicker
+			elseif clicker == self.driver then
+				print("jumpin off!")
+				clicker:set_detach()
+				clicker:set_eye_offset({x=0,y=0,z=0},{x=0,y=0,z=0})
+				player_is_attached(clicker,false)
+				set_player_animation(clicker,"stand",0)
+				self.object:set_velocity(vector.new(0,0,0))
+				self.driver = nil
+			end
 			return
 		end
 		return
