@@ -23,9 +23,33 @@ local dirs = {
 	{x= 0,y=-1,z=-1},
 }
 
-local axis_order = {
+local function coupling_particles(pos,truth)
+	local color = "red"
+	if truth then
+		color = "green"
+	end
 
-}
+	minetest.add_particlespawner({
+		amount = 15,
+		time = 0.001,
+		minpos = pos,
+		maxpos = pos,
+		minvel = vector.new(-10,-10,-10),
+		maxvel = vector.new(10,10,10),
+		minacc = {x=0, y=0, z=0},
+		maxacc = {x=0, y=0, z=0},
+		minexptime = 1.1,
+		maxexptime = 1.5,
+		minsize = 1,
+		maxsize = 2,
+		collisiondetection = false,
+		collision_removal = false,
+		vertical = false,
+		texture = "couple_particle.png^[colorize:"..color..":200",
+		glow = 14,
+	})
+end
+
 local function data_injection(pos,data)
 	if data then
 		pool[minetest.hash_node_position(pos)] = true
@@ -285,12 +309,48 @@ minecart.on_step = function(self,dtime)
 end
 
 minecart.on_rightclick = function(self,clicker)
+	if not clicker:get_wielded_item():get_name() == "minecart:wrench" then
+		return
+	end
+	local pos = self.object:get_pos()
 	local name = clicker:get_player_name()
 	if not pool[name] then
-		pool[name] = self.object
+		if not self.coupler2 then
+			pool[name] = self.object
+			minetest.sound_play("wrench",{
+				object = self.object,
+				gain = 1.0,
+				max_hear_distance = 64,
+			})
+			coupling_particles(pos,true)
+		else
+			minetest.sound_play("wrench",{
+				object = self.object,
+				gain = 1.0,
+				max_hear_distance = 64,
+				pitch = 0.7,
+			})
+			coupling_particles(pos,false)
+		end
 	else
-		self.coupler1 = pool[name]
-		--pool[name]:get_luaentity().coupler1 = self.object
+		if not (pool[name]:get_luaentity().coupler1 and pool[name]:get_luaentity().coupler1 == self.object or self.coupler2) then
+			self.coupler1 = pool[name]
+			pool[name]:get_luaentity().coupler2 = self.object
+			minetest.sound_play("wrench",{
+				object = self.object,
+				gain = 1.0,
+				max_hear_distance = 64,
+			})
+			coupling_particles(pos,true)
+		else
+			minetest.sound_play("wrench",{
+				object = self.object,
+				gain = 1.0,
+				max_hear_distance = 64,
+				pitch = 0.7,
+			})
+			coupling_particles(pos,false)
+		end
 		pool[name] = nil
 	end
 end
@@ -429,5 +489,20 @@ minetest.register_craft({
 		{"main:iron","","main:iron"},
 		{"main:iron","main:stick","main:iron"},
 		{"main:iron","","main:iron"}
+	}
+})
+
+
+minetest.register_food("minecart:wrench",{
+	description = "Train Wrench",
+	texture = "wrench.png",
+})
+
+minetest.register_craft({
+	output = "minecart:wrench",
+	recipe = {
+		{"main:iron", "", "main:iron"},
+		{"main:iron", "main:lapis", "main:iron"},
+		{"", "main:lapis", ""}
 	}
 })
