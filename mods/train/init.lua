@@ -282,162 +282,175 @@ local function rail_brain(self,pos)
 
 end
 
+
+--[[
+ █████╗ ██████╗ ██╗    ██████╗ ███████╗ ██████╗ ██╗███╗   ██╗
+██╔══██╗██╔══██╗██║    ██╔══██╗██╔════╝██╔════╝ ██║████╗  ██║
+███████║██████╔╝██║    ██████╔╝█████╗  ██║  ███╗██║██╔██╗ ██║
+██╔══██║██╔═══╝ ██║    ██╔══██╗██╔══╝  ██║   ██║██║██║╚██╗██║
+██║  ██║██║     ██║    ██████╔╝███████╗╚██████╔╝██║██║ ╚████║
+╚═╝  ╚═╝╚═╝     ╚═╝    ╚═════╝ ╚══════╝ ╚═════╝ ╚═╝╚═╝  ╚═══╝
+]]--
+
+
 function register_train(name,data)
+local train = {}
 
-	local train = {}
+train.power            = data.power
+train.coupler_distance = data.coupler_distance
+train.is_car           = data.is_car
+train.is_engine        = data.is_engine
+train.speed_max        = data.speed_max
 
-	train.on_step = function(self,dtime)
-		if dtime > 0.1 then
-			self.object:set_pos(self.old_pos)
-		end
-		local pos = vector.round(self.object:get_pos())
-		if not self.axis_lock then
-			local possible_dirs = create_axis(pos)
-			for _,dir in pairs(possible_dirs) do
-				if dir.x ~=0 then
-					self.axis_lock = "x"
-					self.dir = dir
-					direction_snap(self)
-					break
-				elseif dir.z ~= 0 then
-					self.axis_lock = "z"
-					self.dir = dir
-					direction_snap(self)
-					break
-				end
+train.on_step = function(self,dtime)
+	if dtime > 0.1 then
+		self.object:set_pos(self.old_pos)
+	end
+	local pos = vector.round(self.object:get_pos())
+	if not self.axis_lock then
+		local possible_dirs = create_axis(pos)
+		for _,dir in pairs(possible_dirs) do
+			if dir.x ~=0 then
+				self.axis_lock = "x"
+				self.dir = dir
+				direction_snap(self)
+				break
+			elseif dir.z ~= 0 then
+				self.axis_lock = "z"
+				self.dir = dir
+				direction_snap(self)
+				break
 			end
-		else
-			rail_brain(self,pos)
-			--collision_detect(self)
 		end
-		self.old_pos = self.object:get_pos()
+	else
+		rail_brain(self,pos)
+		--collision_detect(self)
+	end
+	self.old_pos = self.object:get_pos()
+end
+
+
+
+
+train.on_punch = function(self, puncher)
+	if not puncher:get_wielded_item():get_name() == "train:wrench" then
+		return
 	end
 
-
-	train.on_punch = function(self, puncher)
-		if not puncher:get_wielded_item():get_name() == "train:wrench" then
-			return
+	if self.is_engine and puncher:get_player_control().sneak then
+		if vector.equals(self.object:get_velocity(),vector.new(0,0,0)) then
+			print("reverse direction")
 		end
-		if self.furnace then
-			self.object:set_velocity(vector.multiply(self.dir,6))
-			minetest.add_particlespawner({
-				amount = 30,
-				time = 0,
-				minpos = vector.new(0,0.5,0),
-				maxpos = vector.new(0,0.5,0),
-				minvel = vector.new(0,0,0),
-				maxvel = vector.new(0,0,0),
-				minacc = {x=0, y=3, z=0},
-				maxacc = {x=0, y=5, z=0},
-				minexptime = 1.1,
-				maxexptime = 1.5,
-				minsize = 1,
-				maxsize = 2,
-				collisiondetection = false,
-				collision_removal = false,
-				vertical = false,
-				texture = "smoke.png",
-				attached = self.object
-			})
-		end
-
+		return
 	end
 
+	if self.coupler1 then
+		self.coupler1:get_luaentity().coupler2 = nil
+		self.coupler1 = nil
+	end
 
-	train.on_rightclick = function(self,clicker)
-		local pos = self.object:get_pos()
-		if clicker:get_wielded_item():get_name() == "utility:furnace" then
-			local obj = minetest.add_entity(pos, "train:furnace")
-			obj:set_attach(self.object,"",vector.new(0,0,0),vector.new(0,0,0))
+	if self.coupler2 then
+		self.coupler2:get_luaentity().coupler1 = nil
+		self.coupler2 = nil
+	end
+
+end
+
+
+train.on_rightclick = function(self,clicker)
+	local pos = self.object:get_pos()
+	if clicker:get_wielded_item():get_name() == "utility:furnace" then
+		local obj = minetest.add_entity(pos, "train:furnace")
+		obj:set_attach(self.object,"",vector.new(0,0,0),vector.new(0,0,0))
+		minetest.sound_play("wrench",{
+			object = self.object,
+			gain = 1.0,
+			max_hear_distance = 64,
+		})
+		coupling_particles(pos,true)
+		self.furnace = true
+		return
+	end
+
+	if not clicker:get_wielded_item():get_name() == "train:wrench" then
+		return
+	end
+
+	local name = clicker:get_player_name()
+	if not pool[name] then
+		if not self.coupler2 then
+			pool[name] = self.object
 			minetest.sound_play("wrench",{
 				object = self.object,
 				gain = 1.0,
 				max_hear_distance = 64,
 			})
 			coupling_particles(pos,true)
-			self.furnace = true
-			return
-		end
-
-		if not clicker:get_wielded_item():get_name() == "train:wrench" then
-			return
-		end
-
-		local name = clicker:get_player_name()
-		if not pool[name] then
-			if not self.coupler2 then
-				pool[name] = self.object
-				minetest.sound_play("wrench",{
-					object = self.object,
-					gain = 1.0,
-					max_hear_distance = 64,
-				})
-				coupling_particles(pos,true)
-			else
-				minetest.sound_play("wrench",{
-					object = self.object,
-					gain = 1.0,
-					max_hear_distance = 64,
-					pitch = 0.7,
-				})
-				coupling_particles(pos,false)
-			end
 		else
-			if pool[name] ~= self.object and not (pool[name]:get_luaentity().coupler1 and pool[name]:get_luaentity().coupler1 == self.object or self.coupler2) then
-				self.coupler1 = pool[name]
-				pool[name]:get_luaentity().coupler2 = self.object
-				minetest.sound_play("wrench",{
-					object = self.object,
-					gain = 1.0,
-					max_hear_distance = 64,
-				})
-				coupling_particles(pos,true)
-			else
-				minetest.sound_play("wrench",{
-					object = self.object,
-					gain = 1.0,
-					max_hear_distance = 64,
-					pitch = 0.7,
-				})
-				coupling_particles(pos,false)
-			end
-			pool[name] = nil
+			minetest.sound_play("wrench",{
+				object = self.object,
+				gain = 1.0,
+				max_hear_distance = 64,
+				pitch = 0.7,
+			})
+			coupling_particles(pos,false)
 		end
-	end
-
-	--get old data
-	train.on_activate = function(self,staticdata, dtime_s)
-		self.object:set_armor_groups({immortal=1})
-		if string.sub(staticdata, 1, string.len("return")) ~= "return" then
-			return
+	else
+		if not self.is_engine and pool[name] ~= self.object and not (pool[name]:get_luaentity().coupler1 and pool[name]:get_luaentity().coupler1 == self.object or self.coupler2) then
+			self.coupler1 = pool[name]
+			pool[name]:get_luaentity().coupler2 = self.object
+			minetest.sound_play("wrench",{
+				object = self.object,
+				gain = 1.0,
+				max_hear_distance = 64,
+			})
+			coupling_particles(pos,true)
+		else
+			minetest.sound_play("wrench",{
+				object = self.object,
+				gain = 1.0,
+				max_hear_distance = 64,
+				pitch = 0.7,
+			})
+			coupling_particles(pos,false)
 		end
-		local data = minetest.deserialize(staticdata)
-		if type(data) ~= "table" then
-			return
-		end
-		self.old_pos = self.object:get_pos()
-		self.velocity = vector.new(0,0,0)
+		pool[name] = nil
 	end
+end
 
-	train.get_staticdata = function(self)
-		return minetest.serialize({
-		})
+--get old data
+train.on_activate = function(self,staticdata, dtime_s)
+	self.object:set_armor_groups({immortal=1})
+	if string.sub(staticdata, 1, string.len("return")) ~= "return" then
+		return
 	end
+	local data = minetest.deserialize(staticdata)
+	if type(data) ~= "table" then
+		return
+	end
+	self.old_pos = self.object:get_pos()
+	self.velocity = vector.new(0,0,0)
+end
+
+train.get_staticdata = function(self)
+	return minetest.serialize({
+	})
+end
 
 
 
-	train.initial_properties = {
-		physical = false, -- otherwise going uphill breaks
-		collisionbox = {-0.4, -0.5, -0.4, 0.4, 0.45, 0.4},--{-0.5, -0.4, -0.5, 0.5, 0.25, 0.5},
-		visual = "mesh",
-		mesh = "steam_train.b3d",
-		visual_size = {x=1, y=1},
-		textures = {"steam_train.png"},
-	}
+train.initial_properties = {
+	physical = false, -- otherwise going uphill breaks
+	collisionbox = {-0.4, -0.5, -0.4, 0.4, 0.45, 0.4},--{-0.5, -0.4, -0.5, 0.5, 0.25, 0.5},
+	visual = "mesh",
+	mesh = "steam_train.b3d",
+	visual_size = {x=1, y=1},
+	textures = {"steam_train.png"},
+}
 
-		
+	
 
-	minetest.register_entity(name, train)
+minetest.register_entity(name, train)
 
 end
 
