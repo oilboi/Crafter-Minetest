@@ -239,7 +239,13 @@ local function coupling_logic(self)
 			if vector.equals(coupler_velocity,vector.new(0,0,0)) then
 				new_vel = vector.multiply(velocity_real,-1)
 			else
-				new_vel = vector.multiply(velocity_real,-0.05)
+				local c_vel = vector.distance(vector.new(0,0,0),coupler_velocity)
+				local a_vel = vector.distance(vector.new(0,0,0),velocity_real)
+				local d_vel = a_vel-c_vel
+				if d_vel < 0 then
+					d_vel = 0
+				end
+				new_vel = vector.multiply(self.dir,d_vel)
 			end
 		end
 		self.object:add_velocity(new_vel)
@@ -256,7 +262,13 @@ local function coupling_logic(self)
 			if vector.equals(coupler_velocity,vector.new(0,0,0)) then
 				new_vel = vector.multiply(velocity_real,-1)
 			else
-				new_vel = vector.multiply(velocity_real,-0.05)
+				local c_vel = vector.distance(vector.new(0,0,0),coupler_velocity)
+				local a_vel = vector.distance(vector.new(0,0,0),velocity_real)
+				local d_vel = a_vel-c_vel
+				if d_vel < 0 then
+					d_vel = 0
+				end
+				new_vel = vector.multiply(self.dir,d_vel)
 			end
 		end
 		self.object:add_velocity(new_vel)
