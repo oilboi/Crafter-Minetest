@@ -224,17 +224,23 @@ local function coupling_logic(self)
 
 	local coupler_goal = self.coupler1:get_luaentity().coupler_distance
 
+	local coupler_velocity = self.coupler1:get_velocity()
+
 	if self.axis_lock == "x" then
 		local velocity_real = self.object:get_velocity()
 		local distance = vector.distance(pos,pos2)
 		local new_vel = vector.new(0,0,0)
 		if distance > coupler_goal then
-			local velocity = (distance-coupler_goal)*2
+			local velocity = (distance-coupler_goal)*5
 			local dir = vector.direction(vector.new(pos.x,0,0),vector.new(pos2.x,0,0))
 			self.dir = dir
 			new_vel = vector.multiply(dir,velocity)
 		else
-			new_vel = vector.multiply(velocity_real,-1)
+			if vector.equals(coupler_velocity,vector.new(0,0,0)) then
+				new_vel = vector.multiply(velocity_real,-1)
+			else
+				new_vel = vector.multiply(velocity_real,-0.05)
+			end
 		end
 		self.object:add_velocity(new_vel)
 	elseif self.axis_lock == "z" then
@@ -242,12 +248,16 @@ local function coupling_logic(self)
 		local distance = vector.distance(pos,pos2)
 		local new_vel = vector.new(0,0,0)
 		if distance > coupler_goal then
-			local velocity = (distance-coupler_goal)*2
+			local velocity = (distance-coupler_goal)*5
 			local dir = vector.direction(vector.new(0,0,pos.z),vector.new(0,0,pos2.z))
 			self.dir = dir
 			new_vel = vector.multiply(dir,velocity)
 		else
-			new_vel = vector.multiply(velocity_real,-1)
+			if vector.equals(coupler_velocity,vector.new(0,0,0)) then
+				new_vel = vector.multiply(velocity_real,-1)
+			else
+				new_vel = vector.multiply(velocity_real,-0.05)
+			end
 		end
 		self.object:add_velocity(new_vel)
 	end
