@@ -553,6 +553,19 @@ register_train("train:steam_train",{
 	eye_offset = vector.new(6,-1,-10)
 })
 
+register_train("train:steam_train_small",{
+	mesh = "steam_train_small.b3d",
+	texture = "steam_train_small.png",
+	is_engine = true,
+	power = 6,
+	max_speed = 6,
+	coupler_distance = 3,
+	body_pos = vector.new(0,0,-15),
+	body_rotation = vector.new(0,0,0),
+	eye_offset = vector.new(6,-1,-10)
+})
+
+
 register_train("train:minecart",{
 	mesh = "minecart.x",
 	texture = "minecart.png",
@@ -569,7 +582,7 @@ register_train("train:minecart",{
 
 
 minetest.register_craftitem("train:train", {
-	description = "train",
+	description = "Steam Train",
 	inventory_image = "minecartitem.png",
 	wield_image = "minecartitem.png",
 	on_place = function(itemstack, placer, pointed_thing)
@@ -606,7 +619,7 @@ minetest.register_craft({
 
 
 minetest.register_craftitem("train:minecart", {
-	description = "train",
+	description = "Minecart",
 	inventory_image = "minecartitem.png",
 	wield_image = "minecartitem.png",
 	on_place = function(itemstack, placer, pointed_thing)
@@ -731,3 +744,116 @@ minetest.register_entity("train:furnace", {
 		self:set_node()
 	end,
 })
+
+local steam_check_dirs = {
+	{x= 1,y= 0,z= 0},
+	{x=-1,y= 0,z= 0},
+	{x= 0,y= 0,z= 1},
+	{x= 0,y= 0,z=-1},
+}
+local buffer_pool = {}
+local function do_craft_effects(pos)
+	local hash_pos = minetest.hash_node_position(pos)
+
+	if buffer_pool[hash_pos] then return end
+
+	buffer_pool[hash_pos] = true
+
+	minetest.sound_play("steam_whistle_1",{pos=pos,gain=3,max_hear_distance=128})
+	minetest.add_particlespawner({
+		amount = 275,
+		time = 1.3,
+		minpos = vector.new(pos.x-0.1,pos.y+0.5,pos.z-0.1),
+		maxpos = vector.new(pos.x+0.1,pos.y+0.5,pos.z+0.1),
+		minvel = vector.new(-0.5,3,-0.5),
+		maxvel = vector.new(0.5,5,0.5),
+		minacc = {x=0, y=3, z=0},
+		maxacc = {x=0, y=5, z=0},
+		minexptime = 1.1,
+		maxexptime = 1.5,
+		minsize = 1,
+		maxsize = 2,
+		collisiondetection = false,
+		collision_removal = false,
+		vertical = false,
+		texture = "smoke.png",
+	})
+
+	minetest.after(1.3, function()
+		for _,dir in pairs(steam_check_dirs) do
+			local n_pos = vector.add(pos,dir)
+			local node2 = minetest.get_node(n_pos).name
+			if not minetest.get_nodedef(node2, "walkable") then
+				local dir_mod = vector.multiply(dir,0.5)
+				local x_min
+				local x_max
+				local z_min
+				local z_max
+				if dir.z == 0 then
+					x_min = dir_mod.x
+					x_max = dir_mod.x
+					z_min = -0.2
+					z_max = 0.2
+				elseif dir.x == 0 then
+					x_min = -0.2
+					x_max = 0.2
+					z_min = dir_mod.z
+					z_max = dir_mod.z
+				end
+
+				local p_min = vector.new(pos.x+x_min,pos.y-0.2,pos.z+z_min)
+				local p_max = vector.new(pos.x+x_max,pos.y+0.2,pos.z+z_max)
+
+				local v_min = vector.new(dir_mod.x,0.2,dir_mod.z)
+				local v_max = vector.new(dir_mod.x*2,0.3,dir_mod.z*2)
+
+				minetest.add_particlespawner({
+					amount = 200,
+					time = 1.95,
+					minpos = p_min,
+					maxpos = p_max,
+					minvel = v_min,
+					maxvel = v_max,
+					minacc = vector.new(0,1,0),
+					maxacc = vector.new(0,3,0),
+					minexptime = 1.1,
+					maxexptime = 1.5,
+					minsize = 1,
+					maxsize = 2,
+					collisiondetection = false,
+					collision_removal = false,
+					vertical = false,
+					texture = "smoke.png^[colorize:white:255",
+				})
+				
+			end
+		end
+		minetest.sound_play("steam_release",{pos=pos,gain=1,max_hear_distance=128})
+		minetest.after(1.95, function()
+			buffer_pool[hash_pos] = nil
+		end)
+	end)
+	--after
+	--do steam sound
+	--do release effect of steam (check 4 corners before doing it)
+end
+
+minetest.register_on_craft(function(itemstack, player, old_craft_grid, craft_inv)
+	if minetest.registered_items[itemstack:get_name()].mod_origin == "train" then
+		local pos = player:get_pos()
+		pos.y = pos.y + 1.625
+		local look_dir = player:get_look_dir()
+		look_dir = vector.multiply(look_dir,4)
+		local pos2 = vector.add(pos,look_dir)
+		local ray = minetest.raycast(pos, pos2, false, true)		
+		if ray then
+			for pointed_thing in ray do
+				if pointed_thing then
+					if minetest.get_node(pointed_thing.under).name == "craftingtable:craftingtable" then
+						do_craft_effects(pointed_thing.under)
+					end
+				end
+			end
+		end
+	end
+end)
