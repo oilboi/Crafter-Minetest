@@ -829,7 +829,7 @@ local function do_craft_effects(pos)
 			end
 		end
 		minetest.sound_play("steam_release",{pos=pos,gain=1,max_hear_distance=128})
-		minetest.after(1.95, function()
+		minetest.after(1, function()
 			buffer_pool[hash_pos] = nil
 		end)
 	end)
