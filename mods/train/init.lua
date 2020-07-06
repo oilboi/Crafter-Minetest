@@ -229,7 +229,7 @@ local function coupling_logic(self)
 		local distance = vector.distance(pos,pos2)
 		local new_vel = vector.new(0,0,0)
 		if distance > coupler_goal then
-			local velocity = (distance-coupler_goal)
+			local velocity = (distance-coupler_goal)*2
 			local dir = vector.direction(vector.new(pos.x,0,0),vector.new(pos2.x,0,0))
 			self.dir = dir
 			new_vel = vector.multiply(dir,velocity)
@@ -242,7 +242,7 @@ local function coupling_logic(self)
 		local distance = vector.distance(pos,pos2)
 		local new_vel = vector.new(0,0,0)
 		if distance > coupler_goal then
-			local velocity = (distance-coupler_goal)
+			local velocity = (distance-coupler_goal)*2
 			local dir = vector.direction(vector.new(0,0,pos.z),vector.new(0,0,pos2.z))
 			self.dir = dir
 			new_vel = vector.multiply(dir,velocity)
@@ -287,7 +287,9 @@ local function rail_brain(self,pos)
 			end
 		end
 	else
-		coupling_logic(self)
+		if self.is_car then
+			coupling_logic(self)
+		end
 	end
 
 end
@@ -370,6 +372,11 @@ train.on_punch = function(self, puncher)
 				})
 			end
 		end
+		return
+	end
+
+	if self.is_engine then
+		self.object:set_velocity(vector.multiply(self.dir,self.max_speed))
 		return
 	end
 
@@ -514,10 +521,23 @@ register_train("train:steam_train",{
 	is_engine = true,
 	power = 6,
 	max_speed = 6,
-	coupler_distance = 2,
+	coupler_distance = 3,
 	body_pos = vector.new(0,0,-15),
 	body_rotation = vector.new(0,0,0),
 	eye_offset = vector.new(6,-1,-10)
+})
+
+register_train("train:minecart",{
+	mesh = "minecart.x",
+	texture = "minecart.png",
+	--is_engine = true,
+	is_car = true,
+	--power = 6,
+	max_speed = 6,
+	coupler_distance = 1.3,
+	--body_pos = vector.new(0,0,-15),
+	--body_rotation = vector.new(0,0,0),
+	--eye_offset = vector.new(6,-1,-10)
 })
 
 
@@ -551,14 +571,49 @@ minetest.register_craftitem("train:train", {
 })
 
 minetest.register_craft({
+	output = "train:minecart",
+	recipe = {
+		{"main:iron", "main:iron", "main:iron"},
+		{"main:iron", "main:iron", "main:iron"},
+	},
+})
+
+
+minetest.register_craftitem("train:minecart", {
+	description = "train",
+	inventory_image = "minecartitem.png",
+	wield_image = "minecartitem.png",
+	on_place = function(itemstack, placer, pointed_thing)
+		if not pointed_thing.type == "node" then
+			return
+		end
+		
+		local sneak = placer:get_player_control().sneak
+		local noddef = minetest.registered_nodes[minetest.get_node(pointed_thing.under).name]
+		if not sneak and noddef.on_rightclick then
+			minetest.item_place(itemstack, placer, pointed_thing)
+			return
+		end
+		
+		if minetest.get_item_group(minetest.get_node(pointed_thing.under).name, "rail")>0 then
+			minetest.add_entity(pointed_thing.under, "train:minecart")
+		else
+			return
+		end
+
+		itemstack:take_item()
+
+		return itemstack
+	end,
+})
+
+minetest.register_craft({
 	output = "train:train",
 	recipe = {
 		{"main:iron", "", "main:iron"},
 		{"main:iron", "main:iron", "main:iron"},
 	},
 })
-
-
 
 
 
