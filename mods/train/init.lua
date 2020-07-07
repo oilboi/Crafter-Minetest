@@ -833,9 +833,6 @@ local function do_craft_effects(pos)
 			buffer_pool[hash_pos] = nil
 		end)
 	end)
-	--after
-	--do steam sound
-	--do release effect of steam (check 4 corners before doing it)
 end
 
 minetest.register_on_craft(function(itemstack, player, old_craft_grid, craft_inv)
